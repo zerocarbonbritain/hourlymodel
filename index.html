@@ -73,6 +73,9 @@ start = datastarttime;
 end = datastarttime + 10*24*365*3600*1000;
 interval = (end - start)/1000;
 
+page = (window.location.hash).substring(1);
+if (page=="") page = "fullzcb2";
+
 var datasets = 0;
 var pageload = 0;
 
@@ -80,6 +83,8 @@ load_capacityfactor_dataset(function(){
     console.log("capacityfactor dataset loaded");
     datasets ++;
     loading_prc(datasets*10,"capacityfactor dataset");
+    
+    if (datasets==3) load_page(page);
 });
 
 
@@ -87,17 +92,20 @@ load_temperature_dataset(function(){
     console.log("temperature dataset loaded");
     datasets ++;
     loading_prc(datasets*10,"temperature dataset");
+
+    if (datasets==3) load_page(page);
 });
 
 load_test_dataset(function(){
     console.log("test dataset loaded");
     datasets ++;
     loading_prc(datasets*10,"test dataset");
+    
+    if (datasets==3) load_page(page);
 });
 
-page = (window.location.hash).substring(1);
-if (page=="") page = "fullzcb2";
-load_page(page);
+
+// load_page(page);
 
 $(window).on('hashchange', function() {
     timerStart = Date.now();
