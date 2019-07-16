@@ -154,7 +154,6 @@ function fullzcb2_init()
     transport_biofuels_demand = 33.45
     transport_kerosene_demand = 40.32
     
-    biomass_for_biofuel = (transport_biofuels_demand + transport_kerosene_demand + industrial_biofuel)*1.3 // 143.0
     biomass_for_biogas = 74.0 //94.0
     
     FT_process_biomass_req = 1.3   // GWh/GWh fuel
@@ -210,110 +209,73 @@ function fullzcb2_init()
     // -----------------------------------------------------------------------------
     // Transport detailed calculation
     // -----------------------------------------------------------------------------
-    /*
-    travel_reduction = 0.2
     km_per_mile = 1.609344
-    km_per_person_2007 = 14104
     
-    modes = {}
-    modes["2007"] = {walking:0.02168,cycling:0.00508,ebikes:0.00000,rail:0.0701,bus:0.05963,aviation:0.0141,motorbike:0.0069,carsvans:0.8252}
-    modes["2017"] = {walking:0.02565,cycling:0.00634,ebikes:0.00000,rail:0.09677,bus:0.0458,aviation:0.0111,motorbike:0.00583,carsvans:0.80856}
-    modes["2030"] = {walking:0.02543,cycling:0.02476,ebikes:0.02161,rail:0.1152,bus:0.1637,aviation:0.0038,motorbike:0.0262,carsvans:0.6193}
-
-    year = "2030"
-    modes_walking = modes[year].walking
-    modes_cycling = modes[year].cycling
-    modes_ebikes = modes[year].ebikes
-    modes_rail = modes[year].rail
-    modes_bus = modes[year].bus
-    modes_aviation = modes[year].aviation
-    modes_motorbike = modes[year].motorbike
-    modes_carsvans = modes[year].carsvans
+    walking_miles_pp = 186
+    cycling_miles_pp = 168
+    ebikes_miles_pp = 155
+    rail_miles_pp = 808
+    bus_miles_pp = 1150
+    motorbike_miles_pp = 186
+    carsvans_miles_pp = 4350
+    aviation_miles_pp = 1118
     
-    // Walking, cycling and ebikes
-    ebikes_kwh_vehicle_km = 0.01
+    // Mechanical assumed 80% of electric vehicle economy including charging losses, trains 90%
+    ebikes_mechanical_kwhppkm_full = 0.0081
+    rail_mechanical_kwhppkm_full = 0.027
+    bus_mechanical_kwhppkm_full = 0.016
+    motorbike_mechanical_kwhppkm_full = 0.054
+    carsvans_mechanical_kwhppkm_full = 0.031
+    aviation_mechanical_kwhppkm_full = 0.070
+    
+    // Includes 10% charging loss apart from rail + 10% conv loss
+    ebikes_electric_kwhppkm_full = ebikes_mechanical_kwhppkm_full / 0.8
+    rail_electric_kwhppkm_full = rail_mechanical_kwhppkm_full / 0.9
+    bus_electric_kwhppkm_full = bus_mechanical_kwhppkm_full / 0.8
+    motorbike_electric_kwhppkm_full = motorbike_mechanical_kwhppkm_full / 0.8
+    carsvans_electric_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.8
+    aviation_electric_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.8    
 
-    // Rail
-    occupancy_rail = 0.5 // %
-    rail_kwh_vehicle_km_EV = 0.027 // kWh/km.p
-    rail_kwh_vehicle_km_H2 = 0.068 // kWh/km.p
-    rail_kwh_vehicle_km_PD = 0.09  // kWh/km.p
-    rail_kwh_vehicle_km_CH4 = 0.09 // kWh/km.p
-    rail_prc_EV = 0.7
-    rail_prc_H2 = 0.1
-    rail_prc_PD = 0.1
-    rail_prc_CH4 = 0.1
-    // Bus ~ 31 up to 87 person, average ~ 59 person??
-    occupancy_bus = 0.25 // %
-    bus_kwh_vehicle_km_EV = 1.3/60.0  // BYD K9 1.3 kWh/km 250km range 324 kWh battery 31 seats, protera 35 + 18 standing
-    bus_kwh_vehicle_km_H2 = 3.25/60.0 
-    bus_kwh_vehicle_km_PD = 4.0/60.0  // 6.74 mpg 87 max both decks london bus
-    bus_kwh_vehicle_km_CH4 = 4.0/60.0 // 6.74 mpg
-    bus_prc_EV = 0.7
-    bus_prc_H2 = 0.0
-    bus_prc_PD = 0.1
-    bus_prc_CH4 = 0.2
-    // Aviation
-    occupancy_aviation = 0.85 // %
-    aviation_kwh_vehicle_km_EV = 0.078     // eviation, alice 650 miles on 900 kWh (9 pax+2), 0.861 kWh/km, 0.078 kWh/pkm
-    aviation_kwh_vehicle_km_H2 = 0.196     // eviation H2,                                    2.153 kWh/km, 0.196 kWh/pkm
-    aviation_kwh_vehicle_km_PD = 0.370     // 37 kWh per 100p-km                                            0.370 kWh/pkm
-    aviation_kwh_vehicle_km_CH4 = 0.370
-    aviation_prc_EV = 0.1
-    aviation_prc_H2 = 0.0
-    aviation_prc_PD = 0.9
-    aviation_prc_CH4 = 0.0
-    // Motorbikes
-    occupancy_motorbike = 1.1
-    motorbike_kwh_vehicle_km_EV = 0.085     // 
-    motorbike_kwh_vehicle_km_H2 = 0.213     // 0.186
-    motorbike_kwh_vehicle_km_PD = 0.343     // 80mpg seems typical = 0.343 kWh/km
-    motorbike_kwh_vehicle_km_CH4 = 0.343
+    // Fuel cell vehicle efficiency 90% + fuel cell efficiency 55% + transport 80% + compression 90% (liquefaction assumed for aircraft)
+    rail_hydrogen_kwhppkm_full = rail_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    bus_hydrogen_kwhppkm_full = bus_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    motorbike_hydrogen_kwhppkm_full = motorbike_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    carsvans_hydrogen_kwhppkm_full = carsvans_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    aviation_hydrogen_kwhppkm_full = aviation_mechanical_kwhppkm_full / (0.9*0.55*0.9*0.65)
+
+    // Aircraft efficiency here is 20% to match similar today
+    // note that fleet average cars & vans here is 30% lower than fleet average in 2016
+    rail_ice_kwhppkm_full = rail_mechanical_kwhppkm_full / 0.3
+    bus_ice_kwhppkm_full = bus_mechanical_kwhppkm_full / 0.3
+    motorbike_ice_kwhppkm_full = motorbike_mechanical_kwhppkm_full / 0.3
+    carsvans_ice_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.3
+    aviation_ice_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.2
+
+    rail_load_factor = 0.42
+    bus_load_factor = 0.42
+    motorbike_load_factor = 1.1
+    carsvans_load_factor = 0.4
+    aviation_load_factor = 0.85
+    
+    rail_prc_EV = 0.9
+    rail_prc_H2 = 0.04
+    rail_prc_ICE = 0.06
+
+    bus_prc_EV = 0.9
+    bus_prc_H2 = 0.04
+    bus_prc_ICE = 0.06
+
     motorbike_prc_EV = 0.9
     motorbike_prc_H2 = 0.0
-    motorbike_prc_PD = 0.1
-    motorbike_prc_CH4 = 0.0
-    // cars vans
-    occupancy_carsvans = 2.0 // out of 5
-    carsvans_kwh_vehicle_km_EV = 0.170     // 
-    carsvans_kwh_vehicle_km_H2 = 0.425     // 0.186
-    carsvans_kwh_vehicle_km_PD = 0.550     // 0.390 55mpg 0.497 kWh/km, 50mpg:0.550 kWh/km
-    carsvans_kwh_vehicle_km_CH4 = 0.550
+    motorbike_prc_ICE = 0.1
+
     carsvans_prc_EV = 0.9
     carsvans_prc_H2 = 0.04
-    carsvans_prc_PD = 0.06
-    carsvans_prc_CH4 = 0.0
-    // rail freight
-    rail_freight_bn_ton_km = 21.0*2.17  // average 2007 0.115 kWh/ton.km
-    rail_freight_kwh_ton_km_EV = 0.035  // 0.115 * 30% efficient
-    rail_freight_kwh_ton_km_H2 = 0.070  // 50%
-    rail_freight_kwh_ton_km_PD = 0.115  // 30%
-    rail_freight_kwh_ton_km_CH4 = 0.115 // 30%
-    rail_freight_prc_EV = 0.3
-    rail_freight_prc_H2 = 0.1
-    rail_freight_prc_PD = 0.4
-    rail_freight_prc_CH4 = 0.2
-    // Road freight
-    road_freight_bn_ton_km = 157.0*0.81       // average 2007 0.558 kWh/ton.km
-    road_freight_kwh_ton_km_EV = 0.060/0.75   // mid range between small (0.09) and semi (0.03) + part load
-    road_freight_kwh_ton_km_H2 = 0.120/0.75   // 50%
-    road_freight_kwh_ton_km_PD = 0.200/0.75   // 30%
-    road_freight_kwh_ton_km_CH4 = 0.200/0.75  // 30%
-    road_freight_prc_EV = 0.3
-    road_freight_prc_H2 = 0.1
-    road_freight_prc_PD = 0.4
-    road_freight_prc_CH4 = 0.2
-    // National navigation
-    nat_navigation_prc_EV = 0.5
-    nat_navigation_prc_PD = 0.5
-    nat_navigation_TWh = 6.18 // 18.817 * 0.49 * 0.67
-    // International shipping
-    int_shipping_prc_EV = 0.25
-    int_shipping_prc_PD = 0.75
-    int_shipping_TWh = 9.55 // 29.08 * 0.49 * 0.67
-    // International aviation
-    int_aviation_TWh = 39.27 // 153 * 1/3 * 0.77     
-    */
+    carsvans_prc_ICE = 0.06
+
+    aviation_prc_EV = 0.2
+    aviation_prc_H2 = 0.0
+    aviation_prc_ICE = 0.8
 }
 
 function fullzcb2_run()
@@ -395,98 +357,105 @@ function fullzcb2_run()
     prc_reduction_domestic_water_heating = 1.0 - (domestic_water_heating / 71.0)
     prc_reduction_services_water_heating = 1.0 - (services_water_heating / 16.0)
 
-    // ---------------------------------------------------------------------------------------------
-    // Detailed transport model
     // ---------------------------------------------------------------------------------------------    
-    // Using Total for UK from DECC 2050 Pathways
-    /*
-    domestic_passenger_total = km_per_person_2007 * population_2030
-    domestic_passenger_total *= (1-travel_reduction)
-        
-    // Walking, cycling and ebike
-    walking_km = domestic_passenger_total * modes_walking
-    walking_km_pp = walking_km / population_2030
-    cycling_km = domestic_passenger_total * modes_cycling
-    cycling_km_pp = cycling_km / population_2030
-    ebikes_km = domestic_passenger_total * modes_ebikes
-    ebikes_km_pp = ebikes_km / population_2030
-    ebikes_TWh = ebikes_km * ebikes_kwh_vehicle_km / 1000000000
-    // Train
-    rail_km = domestic_passenger_total * modes_rail / occupancy_rail
-    rail_km_pp = domestic_passenger_total * modes_rail / population_2030
-    rail_EV_TWh = rail_prc_EV * rail_km * rail_kwh_vehicle_km_EV / 1000000000
-    rail_H2_TWh = rail_prc_H2 * rail_km * rail_kwh_vehicle_km_H2 / 1000000000
-    rail_PD_TWh = rail_prc_PD * rail_km * rail_kwh_vehicle_km_PD / 1000000000
-    rail_CH4_TWh = rail_prc_CH4 * rail_km * rail_kwh_vehicle_km_CH4 / 1000000000
-    // Bus
-    bus_km = domestic_passenger_total * modes_bus / occupancy_bus
-    bus_km_pp = domestic_passenger_total * modes_bus / population_2030
-    bus_EV_TWh = bus_prc_EV * bus_km * bus_kwh_vehicle_km_EV / 1000000000
-    bus_H2_TWh = bus_prc_H2 * bus_km * bus_kwh_vehicle_km_H2 / 1000000000
-    bus_PD_TWh = bus_prc_PD * bus_km * bus_kwh_vehicle_km_PD / 1000000000
-    bus_CH4_TWh = bus_prc_CH4 * bus_km * bus_kwh_vehicle_km_CH4 / 1000000000
-    // Aviation
-    aviation_km = domestic_passenger_total * modes_aviation / occupancy_aviation
-    aviation_km_pp = domestic_passenger_total * modes_aviation / population_2030
-    aviation_EV_TWh = aviation_prc_EV * aviation_km * aviation_kwh_vehicle_km_EV / 1000000000
-    aviation_H2_TWh = aviation_prc_H2 * aviation_km * aviation_kwh_vehicle_km_H2 / 1000000000
-    aviation_PD_TWh = aviation_prc_PD * aviation_km * aviation_kwh_vehicle_km_PD / 1000000000
-    aviation_CH4_TWh = aviation_prc_CH4 * aviation_km * aviation_kwh_vehicle_km_CH4 / 1000000000
-    // Motorbikes
-    motorbike_km = domestic_passenger_total * modes_motorbike / occupancy_motorbike
-    motorbike_km_pp = domestic_passenger_total * modes_motorbike / population_2030
-    motorbike_EV_TWh = motorbike_prc_EV * motorbike_km * motorbike_kwh_vehicle_km_EV / 1000000000
-    motorbike_H2_TWh = motorbike_prc_H2 * motorbike_km * motorbike_kwh_vehicle_km_H2 / 1000000000
-    motorbike_PD_TWh = motorbike_prc_PD * motorbike_km * motorbike_kwh_vehicle_km_PD / 1000000000
-    motorbike_CH4_TWh = motorbike_prc_CH4 * motorbike_km * motorbike_kwh_vehicle_km_CH4 / 1000000000
-    // Cars & Vans
-    carsvans_km = domestic_passenger_total * modes_carsvans / occupancy_carsvans
-    carsvans_km_pp = domestic_passenger_total * modes_carsvans / population_2030
-    carsvans_EV_TWh = carsvans_prc_EV * carsvans_km * carsvans_kwh_vehicle_km_EV / 1000000000
-    carsvans_H2_TWh = carsvans_prc_H2 * carsvans_km * carsvans_kwh_vehicle_km_H2 / 1000000000
-    carsvans_PD_TWh = carsvans_prc_PD * carsvans_km * carsvans_kwh_vehicle_km_PD / 1000000000
-    carsvans_CH4_TWh = carsvans_prc_CH4 * carsvans_km * carsvans_kwh_vehicle_km_CH4 / 1000000000
-    // Totals
-    transport_electric_TWh = ebikes_TWh + rail_EV_TWh + bus_EV_TWh + aviation_EV_TWh + motorbike_EV_TWh + carsvans_EV_TWh
-    transport_hydrogen_TWh = rail_H2_TWh + bus_H2_TWh + aviation_H2_TWh + motorbike_H2_TWh + carsvans_H2_TWh
-    transport_liquid_TWh = rail_PD_TWh + bus_PD_TWh + aviation_PD_TWh + motorbike_PD_TWh + carsvans_PD_TWh
-    transport_methane_TWh = rail_CH4_TWh + bus_CH4_TWh + aviation_CH4_TWh + motorbike_CH4_TWh + carsvans_CH4_TWh    
-    // Rail Freight
-    rail_freight_EV_TWh = rail_freight_prc_EV * rail_freight_bn_ton_km * rail_freight_kwh_ton_km_EV
-    rail_freight_H2_TWh = rail_freight_prc_H2 * rail_freight_bn_ton_km * rail_freight_kwh_ton_km_H2
-    rail_freight_PD_TWh = rail_freight_prc_PD * rail_freight_bn_ton_km * rail_freight_kwh_ton_km_PD
-    rail_freight_CH4_TWh = rail_freight_prc_CH4 * rail_freight_bn_ton_km * rail_freight_kwh_ton_km_CH4
-    // Road Freight
-    road_freight_EV_TWh = road_freight_prc_EV * road_freight_bn_ton_km * road_freight_kwh_ton_km_EV
-    road_freight_H2_TWh = road_freight_prc_H2 * road_freight_bn_ton_km * road_freight_kwh_ton_km_H2
-    road_freight_PD_TWh = road_freight_prc_PD * road_freight_bn_ton_km * road_freight_kwh_ton_km_PD
-    road_freight_CH4_TWh = road_freight_prc_CH4 * road_freight_bn_ton_km * road_freight_kwh_ton_km_CH4
-    // National navigation
-    nat_navigation_TWh_EV = nat_navigation_TWh * nat_navigation_prc_EV
-    nat_navigation_TWh_PD = nat_navigation_TWh * nat_navigation_prc_PD
-    // International shipping
-    int_shipping_TWh_EV = int_shipping_TWh * int_shipping_prc_EV
-    int_shipping_TWh_PD = int_shipping_TWh * int_shipping_prc_PD
-    // International aviation
-    int_aviation_TWh_PD = int_aviation_TWh
-    // Totals
-    transport_electric_TWh += rail_freight_EV_TWh + road_freight_EV_TWh + nat_navigation_TWh_EV + int_shipping_TWh_EV
-    transport_hydrogen_TWh += rail_freight_H2_TWh + road_freight_H2_TWh 
-    transport_liquid_TWh += rail_freight_PD_TWh + road_freight_PD_TWh + nat_navigation_TWh_PD + int_shipping_TWh_PD + int_aviation_TWh_PD
-    transport_methane_TWh += rail_freight_CH4_TWh + road_freight_CH4_TWh
-
-    // Map to hourly model
-    electrains_demand = rail_EV_TWh + rail_freight_EV_TWh
-    BEV_demand = transport_electric_TWh - electrains_demand
-    transport_H2_demand = transport_hydrogen_TWh
-    transport_CH4_demand = transport_methane_TWh
+    // Transport model
+    // --------------------------------------------------------------------------------------------- 
+    walking_km_pp = walking_miles_pp * km_per_mile
+    cycling_km_pp = cycling_miles_pp * km_per_mile
+    ebikes_km_pp = ebikes_miles_pp * km_per_mile
+    rail_km_pp = rail_miles_pp * km_per_mile
+    bus_km_pp = bus_miles_pp * km_per_mile
+    motorbike_km_pp = motorbike_miles_pp * km_per_mile
+    carsvans_km_pp = carsvans_miles_pp * km_per_mile
+    aviation_km_pp = aviation_miles_pp * km_per_mile
     
-    transport_kerosene_demand = aviation_PD_TWh + int_aviation_TWh_PD
-    transport_biofuels_demand = transport_liquid_TWh - transport_kerosene_demand
-    biomass_for_biofuel = (transport_liquid_TWh + industrial_biofuel)*1.3 // 143.0
-    transport_bioliquid_demand = transport_liquid_TWh
+    // 1. kWh per person km taking into account load factor
+    rail_electric_kwhppkm = rail_electric_kwhppkm_full / rail_load_factor
+    bus_electric_kwhppkm = bus_electric_kwhppkm_full / bus_load_factor
+    motorbike_electric_kwhppkm = motorbike_electric_kwhppkm_full / motorbike_load_factor
+    carsvans_electric_kwhppkm = carsvans_electric_kwhppkm_full / carsvans_load_factor
+    aviation_electric_kwhppkm = aviation_electric_kwhppkm_full / aviation_load_factor    
+
+    rail_hydrogen_kwhppkm = rail_hydrogen_kwhppkm_full / rail_load_factor
+    bus_hydrogen_kwhppkm = bus_hydrogen_kwhppkm_full / bus_load_factor
+    motorbike_hydrogen_kwhppkm = motorbike_hydrogen_kwhppkm_full / motorbike_load_factor
+    carsvans_hydrogen_kwhppkm = carsvans_hydrogen_kwhppkm_full / carsvans_load_factor
+    aviation_hydrogen_kwhppkm = aviation_hydrogen_kwhppkm_full / aviation_load_factor
+
+    rail_ice_kwhppkm = rail_ice_kwhppkm_full / rail_load_factor
+    bus_ice_kwhppkm = bus_ice_kwhppkm_full / bus_load_factor
+    motorbike_ice_kwhppkm = motorbike_ice_kwhppkm_full / motorbike_load_factor
+    carsvans_ice_kwhppkm = carsvans_ice_kwhppkm_full / carsvans_load_factor
+    aviation_ice_kwhppkm = aviation_ice_kwhppkm_full / aviation_load_factor
+    
+    // 2. kWh per person per mode and power train
+    ebikes_kwhpp = ebikes_electric_kwhppkm_full * ebikes_km_pp
+    rail_kwhpp_EV = rail_electric_kwhppkm*rail_prc_EV*rail_km_pp
+    bus_kwhpp_EV = bus_electric_kwhppkm*bus_prc_EV*bus_km_pp
+    motorbike_kwhpp_EV = motorbike_electric_kwhppkm*motorbike_prc_EV*motorbike_km_pp
+    carsvans_kwhpp_EV = carsvans_electric_kwhppkm*carsvans_prc_EV*carsvans_km_pp
+    aviation_kwhpp_EV = aviation_electric_kwhppkm*aviation_prc_EV*aviation_km_pp
+
+    rail_kwhpp_H2 = rail_hydrogen_kwhppkm*rail_prc_H2*rail_km_pp
+    bus_kwhpp_H2 = bus_hydrogen_kwhppkm*bus_prc_H2*bus_km_pp
+    motorbike_kwhpp_H2 = motorbike_hydrogen_kwhppkm*motorbike_prc_H2*motorbike_km_pp
+    carsvans_kwhpp_H2 = carsvans_hydrogen_kwhppkm*carsvans_prc_H2*carsvans_km_pp
+    aviation_kwhpp_H2 = aviation_hydrogen_kwhppkm*aviation_prc_H2*aviation_km_pp
+    
+    rail_kwhpp_ICE = rail_ice_kwhppkm*rail_prc_ICE*rail_km_pp
+    bus_kwhpp_ICE = bus_ice_kwhppkm*bus_prc_ICE*bus_km_pp
+    motorbike_kwhpp_ICE = motorbike_ice_kwhppkm*motorbike_prc_ICE*motorbike_km_pp
+    carsvans_kwhpp_ICE = carsvans_ice_kwhppkm*carsvans_prc_ICE*carsvans_km_pp
+    aviation_kwhpp_ICE = aviation_ice_kwhppkm*aviation_prc_ICE*aviation_km_pp
+    
+    kwpp_to_TWh = population_2030 * 0.000000001
+    
+    // National TWh of demand per mode and powertrain
+    rail_EV_TWh = rail_kwhpp_EV * kwpp_to_TWh
+    bus_EV_TWh = bus_kwhpp_EV * kwpp_to_TWh
+    motorbike_EV_TWh = motorbike_kwhpp_EV * kwpp_to_TWh
+    carsvans_EV_TWh = carsvans_kwhpp_EV * kwpp_to_TWh
+    aviation_EV_TWh = aviation_kwhpp_EV * kwpp_to_TWh
+
+    rail_H2_TWh = rail_kwhpp_H2 * kwpp_to_TWh
+    bus_H2_TWh = bus_kwhpp_H2 * kwpp_to_TWh
+    motorbike_H2_TWh = motorbike_kwhpp_H2 * kwpp_to_TWh
+    carsvans_H2_TWh = carsvans_kwhpp_H2 * kwpp_to_TWh
+    aviation_H2_TWh = aviation_kwhpp_H2 * kwpp_to_TWh
+
+    rail_ICE_TWh = rail_kwhpp_ICE * kwpp_to_TWh
+    bus_ICE_TWh = bus_kwhpp_ICE * kwpp_to_TWh
+    motorbike_ICE_TWh = motorbike_kwhpp_ICE * kwpp_to_TWh
+    carsvans_ICE_TWh = carsvans_kwhpp_ICE * kwpp_to_TWh
+    aviation_ICE_TWh = aviation_kwhpp_ICE * kwpp_to_TWh
+
+    /*
+    rail_kwhpp = rail_kwhpp_EV + rail_kwhpp_H2 + rail_kwhpp_ICE
+    bus_kwhpp = bus_kwhpp_EV + bus_kwhpp_H2 + bus_kwhpp_ICE
+    motorbike_kwhpp = motorbike_kwhpp_EV + motorbike_kwhpp_H2 + motorbike_kwhpp_ICE
+    carsvans_kwhpp = carsvans_kwhpp_EV + carsvans_kwhpp_H2 + carsvans_kwhpp_ICE
+    aviation_kwhpp = aviation_kwhpp_EV + aviation_kwhpp_H2 + aviation_kwhpp_ICE
+    
+    ebikes_TWh = ebikes_kwhpp * kwpp_to_TWh
+    rail_TWh = rail_kwhpp * kwpp_to_TWh
+    bus_TWh = bus_kwhpp * kwpp_to_TWh
+    motorbike_TWh = motorbike_kwhpp * kwpp_to_TWh
+    carsvans_TWh = carsvans_kwhpp * kwpp_to_TWh
+    aviation_TWh = aviation_kwhpp * kwpp_to_TWh
+    
+    kwhpp_EV = ebikes_kwhpp + rail_kwhpp_EV + bus_kwhpp_EV + motorbike_kwhpp_EV + carsvans_kwhpp_EV + aviation_kwhpp_EV
+    kwhpp_H2 = rail_kwhpp_H2 + bus_kwhpp_H2 + motorbike_kwhpp_H2 + carsvans_kwhpp_H2 + aviation_kwhpp_H2    
+    kwhpp_ICE = rail_kwhpp_ICE + bus_kwhpp_ICE + motorbike_kwhpp_ICE + carsvans_kwhpp_ICE + aviation_kwhpp_ICE
     */
     
+    BEV_demand = bus_EV_TWh + motorbike_EV_TWh + carsvans_EV_TWh + aviation_EV_TWh
+    electrains_demand = rail_EV_TWh
+    transport_H2_demand = rail_H2_TWh + bus_H2_TWh + motorbike_H2_TWh + carsvans_H2_TWh + aviation_H2_TWh
+    transport_kerosene_demand = aviation_ICE_TWh
+    transport_biofuels_demand = 23.35 + rail_ICE_TWh + bus_ICE_TWh + motorbike_ICE_TWh + carsvans_H2_TWh
+    
+    biomass_for_biofuel = (transport_biofuels_demand + transport_kerosene_demand + industrial_biofuel)*1.3 // 143.0
+        
     // ---------------------------------------------------------------------------------------------    
     // Hourly model totals
     // ---------------------------------------------------------------------------------------------  

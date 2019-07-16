@@ -454,7 +454,9 @@ table td {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>TRANSPORT</b></div>
     <div class="inner">
-        <!--
+        
+        <p>Travel distance per person, 2016 figures (miles):</p>
+        
         <table class="table" style="width:100%">
         <tr>
             <th width="12.5%">Walking</th>
@@ -462,19 +464,19 @@ table td {
             <th width="12.5%">Ebikes</th>
             <th width="12.5%">Rail</th>
             <th width="12.5%">Bus</th>
-            <th width="12.5%">Aviation</th>
             <th width="12.5%">Motorbikes</th>
             <th width="12.5%">Cars & Vans</th>
+            <th width="12.5%">Aviation</th>
         </tr>
         <tr>
-            <td><input class="modelinput" key="modes_walking" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_cycling" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_ebikes" type="text" style="width:70px" value="" autocomplete="off"/></td>          
-            <td><input class="modelinput" key="modes_rail" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_bus" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_aviation" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_motorbike" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_carsvans" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="walking_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="cycling_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="ebikes_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>          
+            <td><input class="modelinput" key="rail_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="bus_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="motorbike_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="carsvans_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="aviation_miles_pp" type="text" style="width:70px" value="" autocomplete="off"/></td>            
         </tr>
         <tr>
             <td><span class="modeloutput" key="walking_km_pp" dp=0 scale=1></span>km</td>
@@ -482,36 +484,179 @@ table td {
             <td><span class="modeloutput" key="ebikes_km_pp" dp=0 scale=1></span>km</td>
             <td><span class="modeloutput" key="rail_km_pp" dp=0 scale=1></span>km</td>          
             <td><span class="modeloutput" key="bus_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="aviation_km_pp" dp=0 scale=1></span>km</td>
             <td><span class="modeloutput" key="motorbike_km_pp" dp=0 scale=1></span>km</td>
             <td><span class="modeloutput" key="carsvans_km_pp" dp=0 scale=1></span>km</td> 
+            <td><span class="modeloutput" key="aviation_km_pp" dp=0 scale=1></span>km</td>
+        </tr>
+
+        <tr>
+            <td>Mechanical</td>
+            <td><span style="font-size:12px">kWh/p.km full</span></td>
+            <td><span class="modeloutput" key="ebikes_mechanical_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="rail_mechanical_kwhppkm_full" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_mechanical_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_mechanical_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_mechanical_kwhppkm_full" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_mechanical_kwhppkm_full" dp=3 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>Electric</td>
+            <td><span style="font-size:12px">kWh/p.km full</span></td>
+            <td><span class="modeloutput" key="ebikes_electric_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="rail_electric_kwhppkm_full" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_electric_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_electric_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_electric_kwhppkm_full" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_electric_kwhppkm_full" dp=3 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>Hydrogen</td>
+            <td><span style="font-size:12px">kWh/p.km full</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_hydrogen_kwhppkm_full" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_hydrogen_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_hydrogen_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_hydrogen_kwhppkm_full" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_hydrogen_kwhppkm_full" dp=3 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>ICE</td>
+            <td><span style="font-size:12px">kWh/p.km full</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_ice_kwhppkm_full" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_ice_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_ice_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_ice_kwhppkm_full" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_ice_kwhppkm_full" dp=3 scale=1></span></td>
+        </tr>
+
+        <tr>
+            <td>Load Factors</td>
+            <td></td>
+            <td></td>
+            <td><input class="modelinput" key="rail_load_factor" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="bus_load_factor" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="motorbike_load_factor" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="carsvans_load_factor" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="aviation_load_factor" type="text" style="width:70px" value="" autocomplete="off"/></td>            
+        </tr>
+        
+        <tr>
+            <td>Electric</td>
+            <td><span style="font-size:12px">kWh/p.km</span></td>
+            <td><span class="modeloutput" key="ebikes_electric_kwhppkm_full" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="rail_electric_kwhppkm" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_electric_kwhppkm" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_electric_kwhppkm" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_electric_kwhppkm" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_electric_kwhppkm" dp=3 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>Hydrogen</td>
+            <td><span style="font-size:12px">kWh/p.km</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_hydrogen_kwhppkm" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_hydrogen_kwhppkm" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_hydrogen_kwhppkm" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_hydrogen_kwhppkm" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_hydrogen_kwhppkm" dp=3 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>ICE</td>
+            <td><span style="font-size:12px">kWh/p.km</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_ice_kwhppkm" dp=3 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_ice_kwhppkm" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_ice_kwhppkm" dp=3 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_ice_kwhppkm" dp=3 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_ice_kwhppkm" dp=3 scale=1></span></td>
+        </tr>
+
+        <tr>
+            <td>Prc electric</td>
+            <td></td>
+            <td></td>
+            <td><input class="modelinput" key="rail_prc_EV" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="bus_prc_EV" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="motorbike_prc_EV" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="carsvans_prc_EV" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="aviation_prc_EV" type="text" style="width:70px" value="" autocomplete="off"/></td>            
+        </tr>
+
+        <tr>
+            <td>Prc hydrogen</td>
+            <td></td>
+            <td></td>
+            <td><input class="modelinput" key="rail_prc_H2" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="bus_prc_H2" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="motorbike_prc_H2" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="carsvans_prc_H2" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="aviation_prc_H2" type="text" style="width:70px" value="" autocomplete="off"/></td>            
+        </tr>
+        
+        <tr>
+            <td>Prc synth fuel</td>
+            <td></td>
+            <td></td>
+            <td><input class="modelinput" key="rail_prc_ICE" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="bus_prc_ICE" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="motorbike_prc_ICE" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="carsvans_prc_ICE" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="aviation_prc_ICE" type="text" style="width:70px" value="" autocomplete="off"/></td>            
+        </tr>
+        <tr>
+            <td>Electric</td>
+            <td><span style="font-size:12px">TWh national</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_EV_TWh" dp=1 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_EV_TWh" dp=1 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_EV_TWh" dp=1 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_EV_TWh" dp=1 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_EV_TWh" dp=1 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>Hydrogen</td>
+            <td><span style="font-size:12px">TWh national</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_H2_TWh" dp=1 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_H2_TWh" dp=1 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_H2_TWh" dp=1 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_H2_TWh" dp=1 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_H2_TWh" dp=1 scale=1></span></td>
+        </tr>
+        <tr>
+            <td>Synth Fuel</td>
+            <td><span style="font-size:12px">TWh national</span></td>
+            <td></td>
+            <td><span class="modeloutput" key="rail_ICE_TWh" dp=1 scale=1></span></td>          
+            <td><span class="modeloutput" key="bus_ICE_TWh" dp=1 scale=1></span></td>
+            <td><span class="modeloutput" key="motorbike_ICE_TWh" dp=1 scale=1></span></td>
+            <td><span class="modeloutput" key="carsvans_ICE_TWh" dp=1 scale=1></span></td> 
+            <td><span class="modeloutput" key="aviation_ICE_TWh" dp=1 scale=1></span></td>
+        </tr>
         </table>
-        -->
+        
     
         <table class="table" style="width:100%">
         <tr>
             <td>Battery EV (BEV) electr. demand</td>
-            <td><input class="modelinput" key="BEV_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+            <td><span class="modeloutput" key="BEV_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
             <td>Trains electricity demand</td>
-            <td><input class="modelinput" key="electrains_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+            <td><span class="modeloutput" key="electrains_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
             <td>Transport hydrogen demand</td>
-            <td><input class="modelinput" key="transport_H2_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Transport methane demand</td>
-            <td><input class="modelinput" key="transport_CH4_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+            <td><span class="modeloutput" key="transport_H2_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
             <td>Transport biofuels demand</td>
-            <td><input class="modelinput" key="transport_biofuels_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+            <td><span class="modeloutput" key="transport_biofuels_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
             <td>Transport kerosene demand</td>
-            <td><input class="modelinput" key="transport_kerosene_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+            <td><span class="modeloutput" key="transport_kerosene_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
             <td>Total bioliquid demand</td>
