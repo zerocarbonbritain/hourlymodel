@@ -211,6 +211,7 @@ function fullzcb2_init()
     // -----------------------------------------------------------------------------
     km_per_mile = 1.609344
     
+    // zcb figures
     walking_miles_pp = 186
     cycling_miles_pp = 168
     ebikes_miles_pp = 155
@@ -219,6 +220,16 @@ function fullzcb2_init()
     motorbike_miles_pp = 186
     carsvans_miles_pp = 4350
     aviation_miles_pp = 1118
+
+    // 2016 figures
+    /*walking_miles_pp = 198
+    cycling_miles_pp = 48
+    ebikes_miles_pp = 0
+    rail_miles_pp = 754
+    bus_miles_pp = 325
+    motorbike_miles_pp = 46
+    carsvans_miles_pp = 6299
+    aviation_miles_pp = 3438*/
     
     // Mechanical assumed 80% of electric vehicle economy including charging losses, trains 90%
     ebikes_mechanical_kwhppkm_full = 0.0081
@@ -251,12 +262,19 @@ function fullzcb2_init()
     carsvans_ice_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.3
     aviation_ice_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.2
 
-    // Load factors
+    // Load factors (zcb)
     rail_load_factor = 0.42
     bus_load_factor = 0.42
     motorbike_load_factor = 1.1
     carsvans_load_factor = 0.4
     aviation_load_factor = 0.85
+
+    // Load factors (2016)
+    /*rail_load_factor = 0.324
+    bus_load_factor = 0.1432
+    motorbike_load_factor = 1.071
+    carsvans_load_factor = 0.3288
+    aviation_load_factor = 0.85*/
     
     // PRC of different powertrains
     rail_prc_EV = 0.9
