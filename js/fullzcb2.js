@@ -207,7 +207,7 @@ function fullzcb2_init()
     BEV_plugged_in_profile = [0.873684211, 0.889473684, 0.894736842, 0.9, 0.878947368, 0.826315789, 0.689473684, 0.378947368, 0.436842105, 0.489473684, 0.405263158, 0.336842105, 0.278947368, 0.342105263, 0.278947368, 0.2, 0.242105263, 0.226315789, 0.331578947, 0.468421053, 0.578947368, 0.668421053, 0.773684211, 0.831578947];
 
     // -----------------------------------------------------------------------------
-    // Transport detailed calculation
+    // Transport model
     // -----------------------------------------------------------------------------
     km_per_mile = 1.609344
     
@@ -251,12 +251,14 @@ function fullzcb2_init()
     carsvans_ice_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.3
     aviation_ice_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.2
 
+    // Load factors
     rail_load_factor = 0.42
     bus_load_factor = 0.42
     motorbike_load_factor = 1.1
     carsvans_load_factor = 0.4
     aviation_load_factor = 0.85
     
+    // PRC of different powertrains
     rail_prc_EV = 0.9
     rail_prc_H2 = 0.04
     rail_prc_ICE = 0.06
@@ -276,6 +278,7 @@ function fullzcb2_init()
     aviation_prc_EV = 0.2
     aviation_prc_H2 = 0.0
     aviation_prc_ICE = 0.8
+    // -------------------
 }
 
 function fullzcb2_run()
@@ -360,6 +363,7 @@ function fullzcb2_run()
     // ---------------------------------------------------------------------------------------------    
     // Transport model
     // --------------------------------------------------------------------------------------------- 
+    // 1. Convert miles to km
     walking_km_pp = walking_miles_pp * km_per_mile
     cycling_km_pp = cycling_miles_pp * km_per_mile
     ebikes_km_pp = ebikes_miles_pp * km_per_mile
@@ -369,7 +373,7 @@ function fullzcb2_run()
     carsvans_km_pp = carsvans_miles_pp * km_per_mile
     aviation_km_pp = aviation_miles_pp * km_per_mile
     
-    // 1. kWh per person km taking into account load factor
+    // 2. kWh per person _km_ taking into account load factor per mode and power train
     rail_electric_kwhppkm = rail_electric_kwhppkm_full / rail_load_factor
     bus_electric_kwhppkm = bus_electric_kwhppkm_full / bus_load_factor
     motorbike_electric_kwhppkm = motorbike_electric_kwhppkm_full / motorbike_load_factor
@@ -407,10 +411,10 @@ function fullzcb2_run()
     motorbike_kwhpp_ICE = motorbike_ice_kwhppkm*motorbike_prc_ICE*motorbike_km_pp
     carsvans_kwhpp_ICE = carsvans_ice_kwhppkm*carsvans_prc_ICE*carsvans_km_pp
     aviation_kwhpp_ICE = aviation_ice_kwhppkm*aviation_prc_ICE*aviation_km_pp
-    
+
+    // 3. National TWh of demand per mode and powertrain
     kwpp_to_TWh = population_2030 * 0.000000001
     
-    // National TWh of demand per mode and powertrain
     rail_EV_TWh = rail_kwhpp_EV * kwpp_to_TWh
     bus_EV_TWh = bus_kwhpp_EV * kwpp_to_TWh
     motorbike_EV_TWh = motorbike_kwhpp_EV * kwpp_to_TWh
