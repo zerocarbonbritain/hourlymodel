@@ -649,28 +649,40 @@ table td {
     
         <table class="table" style="width:100%">
         <tr>
-            <td>Battery EV (BEV) electr. demand</td>
+            <td>Rail freight electricity demand</td>
+            <td><input class="modelinput" key="rail_freight_elec_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Freight battery EV electricity demand (see matrix: rail, road, shipping)</td>
+            <td><input class="modelinput" key="freight_BEV_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Freight hydrogen demand (see matrix: rail, road, shipping)</td>
+            <td><input class="modelinput" key="freight_H2_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Freight synth fuel demand (see matrix: rail, road, shipping)</td>
+            <td><input class="modelinput" key="freight_ICE_demand" type="text" style="width:70px" value="" autocomplete="off"/> TWh/yr</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Total transport BEV electricity demand</td>
             <td><span class="modeloutput" key="BEV_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
-            <td>Trains electricity demand</td>
+            <td>Total transport direct electricity demand (trains)</td>
             <td><span class="modeloutput" key="electrains_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
-            <td>Transport hydrogen demand</td>
+            <td>Total transport hydrogen demand</td>
             <td><span class="modeloutput" key="transport_H2_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
-            <td>Transport biofuels demand</td>
-            <td><span class="modeloutput" key="transport_biofuels_demand" dp=1 scale=1></span> TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Transport kerosene demand</td>
-            <td><span class="modeloutput" key="transport_kerosene_demand" dp=1 scale=1></span> TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Total bioliquid demand</td>
-            <td><span class="modeloutput" key="transport_bioliquid_demand" dp=1></span> TWh/yr</td>
+            <td>Total transport synth fuel demand</td>
+            <td><span class="modeloutput" key="transport_bioliquid_demand" dp=1 scale=1></span> TWh/yr</td>
         </tr>
         <tr>
             <td></td>

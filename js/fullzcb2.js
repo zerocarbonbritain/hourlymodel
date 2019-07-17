@@ -154,7 +154,7 @@ function fullzcb2_init()
     transport_biofuels_demand = 33.45
     transport_kerosene_demand = 40.32
     
-    biomass_for_biogas = 74.0 //94.0
+    biomass_for_biogas = 85.0 //94.0
     
     FT_process_biomass_req = 1.3   // GWh/GWh fuel
     FT_process_hydrogen_req = 0.61 // GWh/GWh fuel
@@ -166,7 +166,7 @@ function fullzcb2_init()
     elec_store_charge_cap = 10.0
     
     // Hydrogen
-    electrolysis_cap = 25.0
+    electrolysis_cap = 28.0
     electrolysis_eff = 0.8
     hydrogen_storage_cap = 25000.0
     minimum_hydrogen_store_level = 0.0
@@ -296,6 +296,11 @@ function fullzcb2_init()
     aviation_prc_EV = 0.2
     aviation_prc_H2 = 0.0
     aviation_prc_ICE = 0.8
+    
+    rail_freight_elec_demand = 2.0
+    freight_BEV_demand = 10.5
+    freight_H2_demand = 4.06
+    freight_ICE_demand = 20.58
     // -------------------
 }
 
@@ -471,12 +476,13 @@ function fullzcb2_run()
     kwhpp_ICE = rail_kwhpp_ICE + bus_kwhpp_ICE + motorbike_kwhpp_ICE + carsvans_kwhpp_ICE + aviation_kwhpp_ICE
     */
     
-    BEV_demand = ebikes_TWh + bus_EV_TWh + motorbike_EV_TWh + carsvans_EV_TWh + aviation_EV_TWh
-    electrains_demand = rail_EV_TWh
-    transport_H2_demand = rail_H2_TWh + bus_H2_TWh + motorbike_H2_TWh + carsvans_H2_TWh + aviation_H2_TWh
+    BEV_demand = ebikes_TWh + bus_EV_TWh + motorbike_EV_TWh + carsvans_EV_TWh + aviation_EV_TWh + freight_BEV_demand
+    electrains_demand = rail_EV_TWh + rail_freight_elec_demand
+    transport_H2_demand = rail_H2_TWh + bus_H2_TWh + motorbike_H2_TWh + carsvans_H2_TWh + aviation_H2_TWh + freight_H2_demand
+    transport_biofuels_demand = rail_ICE_TWh + bus_ICE_TWh + motorbike_ICE_TWh + carsvans_ICE_TWh + freight_ICE_demand
     transport_kerosene_demand = aviation_ICE_TWh
-    transport_biofuels_demand = 23.35 + rail_ICE_TWh + bus_ICE_TWh + motorbike_ICE_TWh + carsvans_H2_TWh
-    
+    transport_bioliquid_demand = transport_biofuels_demand + transport_kerosene_demand
+        
     biomass_for_biofuel = (transport_biofuels_demand + transport_kerosene_demand + industrial_biofuel)*1.3 // 143.0
         
     // ---------------------------------------------------------------------------------------------    
@@ -519,8 +525,6 @@ function fullzcb2_run()
     
     total_hydrogen_for_hydrogen_vehicles = 0
     unmet_hydrogen_demand = 0
-
-    transport_bioliquid_demand = transport_biofuels_demand + transport_kerosene_demand
     
     // --------------------------------------------- 
     // Final balance
