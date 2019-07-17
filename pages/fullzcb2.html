@@ -455,8 +455,18 @@ table td {
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>TRANSPORT</b></div>
     <div class="inner">
         
-        <p>Travel distance per person, 2016 figures (miles):</p>
+        <div style="font-size:14px">
+        There is an extended discussion of the following transport model here: <a href="https://trystanlea.org.uk/transport_notes">Blog: transport notes</a>.<br><br>
         
+        The mechanical kWh per person km at full occupancy is based on a calculated fleet average, given real world data on a range of available vehicles today. Electric vehicles include battery charging, motor inverter and motor losses. Hydrogen include: fuel cell, transportation, compression, motor & inverter losses. Internal combustion engines include engine losses.<br><br>
+        
+        Miles travelled per transport mode include a reduction in total miles travelled per person and modal shifts towards more public transport, cycling and less aviation. For comparison you might like to try entering the miles per person in 2016 to see the result without these changes: Walking:198, Cycling:48, Rail:754, Bus:325, Motorbike:46, Cars&Vans:6299, Aviation:3438<br><br>
+        
+        Load factors for each transport mode are also increased. The 2016 load factors for comparison are:<br>Rail:0.324, Bus:0.1432, Motorbike:1.071, Cars&Vans:0.3288, Aviation:0.85
+        
+        </div><br>
+        
+        Miles travelled per transport mode:<br><br>
         <table class="table" style="width:100%">
         <tr>
             <th width="12.5%">Walking</th>
@@ -607,7 +617,7 @@ table td {
         <tr>
             <td>Electric</td>
             <td><span style="font-size:12px">TWh national</span></td>
-            <td></td>
+            <td><span class="modeloutput" key="ebikes_TWh" dp=1 scale=1></span></td>          
             <td><span class="modeloutput" key="rail_EV_TWh" dp=1 scale=1></span></td>          
             <td><span class="modeloutput" key="bus_EV_TWh" dp=1 scale=1></span></td>
             <td><span class="modeloutput" key="motorbike_EV_TWh" dp=1 scale=1></span></td>

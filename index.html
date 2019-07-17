@@ -65,6 +65,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
+var v = 1;
 
 view_mode = "";
 
@@ -119,12 +120,12 @@ function load_page(page)
         $("#model").html(view_html[page]);
         $("#description").html(view_desc[page]);
     } else {
-        $.ajax({url: "pages/"+page+".html", async: false, success: function(data){
+        $.ajax({url: "pages/"+page+".html?v="+v, async: false, success: function(data){
             view_html[page] = data;
         }});
         
         view_desc[page] = "";
-        $.ajax({url: "descriptions/"+page+".html", async: false, success: function(data){
+        $.ajax({url: "descriptions/"+page+".html?v="+v, async: false, success: function(data){
             view_desc[page] = data;
         }});
         

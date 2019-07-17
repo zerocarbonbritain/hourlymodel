@@ -432,7 +432,8 @@ function fullzcb2_run()
 
     // 3. National TWh of demand per mode and powertrain
     kwpp_to_TWh = population_2030 * 0.000000001
-    
+
+    ebikes_TWh = ebikes_kwhpp * kwpp_to_TWh
     rail_EV_TWh = rail_kwhpp_EV * kwpp_to_TWh
     bus_EV_TWh = bus_kwhpp_EV * kwpp_to_TWh
     motorbike_EV_TWh = motorbike_kwhpp_EV * kwpp_to_TWh
@@ -470,7 +471,7 @@ function fullzcb2_run()
     kwhpp_ICE = rail_kwhpp_ICE + bus_kwhpp_ICE + motorbike_kwhpp_ICE + carsvans_kwhpp_ICE + aviation_kwhpp_ICE
     */
     
-    BEV_demand = bus_EV_TWh + motorbike_EV_TWh + carsvans_EV_TWh + aviation_EV_TWh
+    BEV_demand = ebikes_TWh + bus_EV_TWh + motorbike_EV_TWh + carsvans_EV_TWh + aviation_EV_TWh
     electrains_demand = rail_EV_TWh
     transport_H2_demand = rail_H2_TWh + bus_H2_TWh + motorbike_H2_TWh + carsvans_H2_TWh + aviation_H2_TWh
     transport_kerosene_demand = aviation_ICE_TWh
