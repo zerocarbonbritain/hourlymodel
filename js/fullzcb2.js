@@ -154,7 +154,7 @@ function fullzcb2_init()
     transport_biofuels_demand = 33.45
     transport_kerosene_demand = 40.32
     
-    biomass_for_biogas = 85.0 //94.0
+    biomass_for_biogas = 55.0 //94.0
     
     FT_process_biomass_req = 1.3   // GWh/GWh fuel
     FT_process_hydrogen_req = 0.61 // GWh/GWh fuel
@@ -166,7 +166,7 @@ function fullzcb2_init()
     elec_store_charge_cap = 10.0
     
     // Hydrogen
-    electrolysis_cap = 28.0
+    electrolysis_cap = 21.0
     electrolysis_eff = 0.8
     hydrogen_storage_cap = 25000.0
     minimum_hydrogen_store_level = 0.0
@@ -1115,16 +1115,23 @@ function fullzcb2_run()
         } 
         hydrogen_SOC -= hydrogen_to_synth_fuel
         
-        // 4. Hydrogen to methanation
-        // limited to available hydrogen and methanation capacity
-        // hydrogen_to_methanation = methane_from_biogas/methanation_raw_biogas_to_H2_ratio // max limit on hydrogen to methanation is biogas supply level
-        // available_hydrogen = hydrogen_SOC-(hydrogen_storage_cap*minimum_hydrogen_store_level)
-        // if (hydrogen_to_methanation>available_hydrogen) hydrogen_to_methanation = available_hydrogen
-        // if (hydrogen_to_methanation>methanation_capacity) hydrogen_to_methanation = methanation_capacity
-        // if (hydrogen_to_methanation<0.0) hydrogen_to_methanation = 0.0
-        // hydrogen_SOC -= hydrogen_to_methanation
+        // ----------------------------------------------------------------------------
+        // Integrated High-Temperature Electrolysis and Methanation (IHTEM)
+        // Pilot projects include Helmeth ~76% efficiency and Store & Go ~59% efficiency
+        // assumes integrated DAC of CO2
+        // DAC relatively low energy requirement compared to electrolysis and heat recovery possible
+        // ----------------------------------------------------------------------------
+        IHTEM_cap = 10.0         // GW
+        IHTEM_efficiency = 0.70  // mid range between store & go and helmeth
         
-
+        electricity_for_IHTEM = 0
+        if (balance>=0.0) {
+            electricity_for_IHTEM = balance
+            if (electricity_for_IHTEM>IHTEM_cap) electricity_for_IHTEM = IHTEM_cap
+        }
+        
+        methane_from_IHTEM = electricity_for_IHTEM * IHTEM_efficiency
+        balance -= electricity_for_IHTEM
         
         // ----------------------------------------------------------------------------
         // Dispatchable (backup power via CCGT gas turbines)
@@ -1191,7 +1198,7 @@ function fullzcb2_run()
         total_sabatier_losses += hydrogen_for_sabatier - methane_from_sabatier
 
         // Total methane production
-        methane_production = methane_from_sabatier + methane_from_biogas
+        methane_production = methane_from_sabatier + methane_from_biogas + methane_from_IHTEM
         total_methane_made += methane_production
         methane_to_dispatchable = electricity_from_dispatchable / dispatchable_gen_eff
 
