@@ -592,7 +592,7 @@ function fullzcb2_run()
     daily_biomass_for_biogas = biomass_for_biogas * 1000.0 / 365.25
     hourly_biomass_for_biogas = daily_biomass_for_biogas / 24.0
 
-    methane_from_biogas = hourly_biomass_for_biogas * anaerobic_digestion_efficiency
+    biogas_supply = hourly_biomass_for_biogas * anaerobic_digestion_efficiency
 
     var check = [];
     
@@ -1091,7 +1091,10 @@ function fullzcb2_run()
         total_electrolysis_losses += electricity_for_electrolysis - hydrogen_from_electrolysis
         data.electricity_for_electrolysis.push([time,electricity_for_electrolysis])
         hydrogen_SOC += hydrogen_from_electrolysis
-        
+
+        // subtract electrolysis from electricity balance
+        balance -= electricity_for_electrolysis
+                
         // 2. Hydrogen vehicle demand
         hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
         if (hydrogen_for_hydrogen_vehicles>hydrogen_SOC) {
@@ -1114,21 +1117,14 @@ function fullzcb2_run()
         
         // 4. Hydrogen to methanation
         // limited to available hydrogen and methanation capacity
-        hydrogen_to_methanation = methane_from_biogas/methanation_raw_biogas_to_H2_ratio // max limit on hydrogen to methanation is biogas supply level
-        available_hydrogen = hydrogen_SOC-(hydrogen_storage_cap*minimum_hydrogen_store_level)
-        if (hydrogen_to_methanation>available_hydrogen) hydrogen_to_methanation = available_hydrogen
-        if (hydrogen_to_methanation>methanation_capacity) hydrogen_to_methanation = methanation_capacity
-        if (hydrogen_to_methanation<0.0) hydrogen_to_methanation = 0.0
-        hydrogen_SOC -= hydrogen_to_methanation
-                       
-        s5_hydrogen_SOC.push(hydrogen_SOC)
-        data.hydrogen_SOC.push([time,hydrogen_SOC])
+        // hydrogen_to_methanation = methane_from_biogas/methanation_raw_biogas_to_H2_ratio // max limit on hydrogen to methanation is biogas supply level
+        // available_hydrogen = hydrogen_SOC-(hydrogen_storage_cap*minimum_hydrogen_store_level)
+        // if (hydrogen_to_methanation>available_hydrogen) hydrogen_to_methanation = available_hydrogen
+        // if (hydrogen_to_methanation>methanation_capacity) hydrogen_to_methanation = methanation_capacity
+        // if (hydrogen_to_methanation<0.0) hydrogen_to_methanation = 0.0
+        // hydrogen_SOC -= hydrogen_to_methanation
         
-        if ((hydrogen_SOC/hydrogen_storage_cap)<0.01) hydrogen_store_empty_count ++
-        if ((hydrogen_SOC/hydrogen_storage_cap)>0.99) hydrogen_store_full_count ++
-        
-        // subtract electrolysis from electricity balance
-        balance -= electricity_for_electrolysis
+
         
         // ----------------------------------------------------------------------------
         // Dispatchable (backup power via CCGT gas turbines)
@@ -1166,12 +1162,37 @@ function fullzcb2_run()
         // ----------------------------------------------------------------------------
         // Methane
         // ----------------------------------------------------------------------------
-        methane_from_hydrogen = hydrogen_to_methanation * methanation_efficiency
-        total_sabatier_losses += hydrogen_to_methanation - methane_from_hydrogen
-        total_anaerobic_digestion_losses += hourly_biomass_for_biogas - methane_from_biogas
+        // The first stage here covers methane produced directly from biogas
+        // A biogas methane content by volume of 65% is assumed in the ZCB model
+        // The remainder is CO2 which is used here as a feed for further methanation using hydrogen
+        methane_from_biogas = biogas_supply                                                          // energy content of methane in biogas is same as biogas itself
+        total_anaerobic_digestion_losses += hourly_biomass_for_biogas - biogas_supply                // biogas AD losses
         
-        // methane_from_biogas: calculated at start
-        total_methane_made += methane_from_hydrogen + methane_from_biogas
+        // CH4: 16.0425 g/mol  HHV: 889 kj/mol* 
+        // 15.4 kWh/kg 15.4 MWh/ton, ~64.94 tons CH4 per GWh HHV
+        // 13.8 kWh/kg 13.8 MWh/ton, ~72.46 tons CH4 per GWH LHV
+        // Ratio of CO2 to CH4 in bigas
+        // (0.35*44.009)÷(0.65*16.0425) = 1.48
+        // (0.40*44.009)÷(0.60*16.0425) = 1.83
+        // tons of CO2 per GWh biogas = 72.46 x 1.83 = 132.60
+        co2_from_biogas = 132.60 * biogas_supply
+                
+        // The second stage here produces methane using hydrogen and the CO2 feed from biogas AD
+        co2_for_sabatier = co2_from_biogas
+        // Methanation: calculation of hydrogen component and application of limits
+        hydrogen_for_sabatier = co2_for_sabatier * (8.064/44.009) * 33.3 * 0.001                     // 1000 tCO2, requires 183 t H2 = 6.1 GWh
+        available_hydrogen = hydrogen_SOC-(hydrogen_storage_cap*minimum_hydrogen_store_level)        // calculate available hydrogen
+        if (hydrogen_for_sabatier>available_hydrogen) hydrogen_for_sabatier = available_hydrogen     // limit by available hydrogen
+        if (hydrogen_for_sabatier>methanation_capacity) hydrogen_for_sabatier = methanation_capacity // limit by methanation capacity
+        if (hydrogen_for_sabatier<0.0) hydrogen_for_sabatier = 0.0
+        hydrogen_SOC -= hydrogen_for_sabatier                                                        // subtract from hydrogen store
+        // Methanation process itself
+        methane_from_sabatier = hydrogen_for_sabatier * methanation_efficiency
+        total_sabatier_losses += hydrogen_for_sabatier - methane_from_sabatier
+
+        // Total methane production
+        methane_production = methane_from_sabatier + methane_from_biogas
+        total_methane_made += methane_production
         methane_to_dispatchable = electricity_from_dispatchable / dispatchable_gen_eff
 
         methane_for_transport = daily_transport_CH4_demand / 24.0
@@ -1179,23 +1200,23 @@ function fullzcb2_run()
         // s1_methane_for_industry: calculated in stage 1
         // s1_methane_for_industryCHP
         methane_for_industryCHP = 0 // MFIX: add this in!!
-        methane_balance = methane_from_hydrogen + methane_from_biogas
+        methane_balance = methane_production
         methane_balance -= methane_to_dispatchable
         methane_balance -= s3_methane_for_spacewaterheat[hour]
         methane_balance -= s1_methane_for_industry[hour]
         methane_balance -= methane_for_industryCHP
         methane_balance -= methane_for_transport
-        
-        s5_methane_SOC.push(methane_SOC)
-        data.methane_SOC.push([time,methane_SOC])
-        if ((methane_SOC/methane_store_capacity)<0.01) methane_store_empty_count ++
-        if ((methane_SOC/methane_store_capacity)>0.99) methane_store_full_count ++
-        
+                
         methane_SOC += methane_balance
         if (methane_SOC>methane_store_capacity) {
             methane_store_vented += methane_SOC - methane_store_capacity
             methane_SOC = methane_store_capacity
         }
+
+        s5_methane_SOC.push(methane_SOC)
+        data.methane_SOC.push([time,methane_SOC])
+        if ((methane_SOC/methane_store_capacity)<0.01) methane_store_empty_count ++
+        if ((methane_SOC/methane_store_capacity)>0.99) methane_store_full_count ++
         
         // ------------------------------------------------------------------------------------
         // Synth fuel
@@ -1210,8 +1231,14 @@ function fullzcb2_run()
         
         // ------------------------------------------------------------------------------------
         // Biomass
-        total_biomass_used += methane_from_biogas / anaerobic_digestion_efficiency 
+        total_biomass_used += biogas_supply / anaerobic_digestion_efficiency 
         total_biomass_used += hourly_biomass_for_biofuel
+        
+        // Hydrogen SOC data
+        s5_hydrogen_SOC.push(hydrogen_SOC)
+        data.hydrogen_SOC.push([time,hydrogen_SOC])
+        if ((hydrogen_SOC/hydrogen_storage_cap)<0.01) hydrogen_store_empty_count ++
+        if ((hydrogen_SOC/hydrogen_storage_cap)>0.99) hydrogen_store_full_count ++
     }
     loading_prc(80,"model stage 5");
 
