@@ -171,40 +171,43 @@ table td {
             <td></td>
             <td></td>
         </tr>
+        <tr>
             <td>Biomass for biogas</td>
+            <td><input class="modelinput" key="biomass_for_biogas" type="text" style="width:70px" value="" autocomplete="off" dp=1 /> TWh</td>
             <td></td>
-            <td><input class="modelinput" key="biomass_for_biogas" type="text" style="width:70px" value="" autocomplete="off" dp=1 /></td>
             <td></td>
             <td></td>
         </tr>
-        </tr>
+        <!--
+        <tr>
             <td>Biomass for space/water heat</td>
             <td></td>
             <td><span class="modeloutput" key="biomass_for_spacewater_heat" type="10y"></span></td>
             <td></td>
             <td></td>
         </tr>
-        </tr>
+        <tr>
             <td>Biomass for industrial CHP</td>
             <td></td>
             <td><span class="modeloutput" key="biomass_for_industry_CHP" type="10y"></span></td>
             <td></td>
             <td></td>
-        </tr>
-        </tr>
+        </tr>-->
+        <tr>
             <td>Anaerobic digestion efficiency</td>
             <td><input class="modelinput" key="anaerobic_digestion_efficiency" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td></td>
             <td></td>
             <td></td>
         </tr>
-        </tr>
+        <!--
+        <tr>
             <td>Gas balance</td>
             <td><span class="modeloutput" key="gas_balance" type="10y"></span></td>
             <td></td>
             <td></td>
             <td></td>
-        </tr>
+        </tr>-->
         </table>
     </div>
 </div>
@@ -788,56 +791,66 @@ table td {
     <div class="inner">
         <table class="table" style="width:100%">
         <tr>
-            <td>Dispatchable generating capacity</td>
+            <th></th>
+            <th>Capacity</th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <td style="width:55%">Dispatchable generation<br><span style="font-size:12px"><i>E.g High efficiency and high flexibility CCGT gas turbines</i></span></td>
             <td><input class="modelinput" key="dispatch_gen_cap" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td style="text-align:right">Efficiency</td>
+            <td><input class="modelinput" key="dispatchable_gen_eff" type="text" style="width:70px" value="" autocomplete="off"/> (HHV)</td>              
         </tr>
         <tr>
-            <td>Dispatchable generation efficiency</td>
-            <td><input class="modelinput" key="dispatchable_gen_eff" type="text" style="width:70px" value="" autocomplete="off"/></td>
-        </tr>
-        <tr>
-            <td>Electrolysis capacity</td>
+            <td>Electrolysis</td>
             <td><input class="modelinput" key="electrolysis_cap" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td style="text-align:right">Efficiency</td>
+            <td><input class="modelinput" key="electrolysis_eff" type="text" style="width:70px" value="" autocomplete="off"/> (HHV)</td>
         </tr>
         <tr>
-            <td>Electrolysis efficiency</td>
-            <td><input class="modelinput" key="electrolysis_eff" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td>Hydrogen storage<br><span style="font-size:12px"><i>GWh chemical energy HHV</i></span></td>
+            <td><input class="modelinput" key="hydrogen_storage_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td style="text-align:right">Lower limit</td>
+            <td><input class="modelinput" key="minimum_hydrogen_store_level" type="text" style="width:70px" value="" autocomplete="off"/> (Fraction)</td>            
         </tr>
         <tr>
-            <td>Methanation capacity (max. Rate)</td>
+            <td>Methanation (without heat integration)<br><span style="font-size:12px"><i>Capacity given is for H2 feed to process</i></span></td>
             <td><input class="modelinput" key="methanation_capacity" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
-            <td>Methanation efficiency (H2->CH4)</td>
-            <td><input class="modelinput" key="methanation_efficiency" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td>Integrated High-Temperature Electrolysis and Methanation<br>
+            <span style="font-size:12px"><i>E.g Helmeth SOEC technology. Includes DAC of CO2 using waste heat.</i></span>
+            </td>
+            <td><input class="modelinput" key="IHTEM_cap" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td style="text-align:right">Efficiency</td>
+            <td><input class="modelinput" key="IHTEM_efficiency" type="text" style="width:70px" value="" autocomplete="off"/> (HHV)</td>            
         </tr>
         <tr>
-            <td>Methanation raw biogas to H2 ratio</td>
-            <td><input class="modelinput" key="methanation_raw_biogas_to_H2_ratio" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td>Methane storage<br><span style="font-size:12px"><i>GWh chemical energy HHV</i></span></td>
+            <td><input class="modelinput" key="methane_store_capacity" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td style="text-align:right">Store start</td>
+            <td><input class="modelinput" key="methane_SOC_start" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
         </tr>
         <tr>
-            <td>Methane storage capacity</td>
-            <td><input class="modelinput" key="methane_store_capacity" type="text" style="width:70px" value="" autocomplete="off"/> GWh chem</td>
+            <td>Synth Fuel<br><span style="font-size:12px"><i>Capacity given is for H2 feed to process</i></span></td>
+            <td><input class="modelinput" key="synth_fuel_capacity" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td style="text-align:right">Store start</td>
+            <td><input class="modelinput" key="synth_fuel_store_SOC_start" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
         </tr>
         <tr>
-            <td>Hydrogen storage capacity</td>
-            <td><input class="modelinput" key="hydrogen_storage_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh chem</td>
-        </tr>
-        <tr>
-            <td>Lower H2 store limit for H2->CH4</td>
-            <td><input class="modelinput" key="minimum_hydrogen_store_level" type="text" style="width:70px" value="" autocomplete="off"/></td>
-        </tr>
-        <tr>
-            <td>Generic energy store capacity</td>
+            <td>Generic energy store<br><span style="font-size:12px"><i>E.g High efficiency lithium ion, flow batteries etc</i></span></td>
             <td><input class="modelinput" key="elec_store_storage_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
-        </tr>
-        <tr>
-            <td>Generic energy store rate of charge</td>
-            <td><input class="modelinput" key="elec_store_charge_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td style="text-align:right">Charge rate</td>
+            <td><input class="modelinput" key="elec_store_charge_cap" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>            
         </tr>
         <tr>
             <td>Enable electricity storage?</td>
-            <td><input class="modelinput" key="electricity_storage_enabled" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td><input class="modelinput" key="electricity_storage_enabled" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td></td>
+            <td></td>
         </tr>
         </table>
     </div>
@@ -955,7 +968,7 @@ table td {
             <td></td>
         </tr>
         <tr>
-            <td>Biogas energy</td>
+            <td>Total methane produced</td>
             <td><span class="modeloutput" key="total_methane_made" dp=1></span></td>
             <td></td>
             <td></td>
