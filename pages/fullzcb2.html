@@ -974,16 +974,29 @@ table td {
             <td></td>
         </tr>
         <tr>
-            <td>Biomass energy syn fuel</td>
+            <td>Biomass for biogas (e.g rotational grasses)</td>
+            <td><span class="modeloutput" key="biomass_for_biogas" dp=1></span></td>
+            <td><span class="modeloutput" key="landarea_for_biogas" dp=1></span> Mha</td>
+            <td><span class="modeloutput" key="prc_landarea_for_biogas" dp=1></span>% of UK</td>
+        </tr>
+        <tr>
+            <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
             <td><span class="modeloutput" key="total_synth_fuel_biomass_used" dp=1></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="landarea_for_synth_fuel" dp=1></span> Mha</td>
+            <td><span class="modeloutput" key="prc_landarea_for_synth_fuel" dp=1></span>% of UK</td>
+        </tr>
+        <tr>
+            <td>Biomass other (assumed SRC, miscanthus)</td>
+            <td><span class="modeloutput" key="total_other_biomass_used" dp=1></span></td>
+            <td><span class="modeloutput" key="landarea_for_other_biomass" dp=1></span> Mha</td>
+            <td><span class="modeloutput" key="prc_landarea_for_other_biomass" dp=1></span>% of UK</td>
             <td></td>
         </tr>
         <tr>
             <td>All input biomass energy</td>
             <td><span class="modeloutput" key="total_biomass_used" dp=1></span></td>
-            <td></td>
-            <td></td>
+            <td><span class="modeloutput" key="landarea_for_biomass" dp=1></span> Mha</td>
+            <td><span class="modeloutput" key="prc_landarea_for_biomass" dp=1></span>% of UK</td>
         </tr>
         <tr>
             <td></td>
@@ -1004,5 +1017,60 @@ table td {
             <td></td>
         </tr>
         </table>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-title">
+        <img class="icon-expand" src="img/expand.png"><b>SCALED TO VILLAGE, TOWN, CITY or COUNTRY
+        </b>
+    </div>
+    <div class="inner">
+        
+        <table><tr>
+        <td>Number of households:</td>
+        <td><input class="modelinput" key="number_of_households" type="text" style="width:100px" value="" autocomplete="off"/></td>
+        </tr></table>
+        <br>
+        <table>
+            <tr><th>Supply</th><th width="100px"></th><th>Storage, Gas & Liquids</th><th width="100px"></th></tr>
+            <tr>
+                <td>Onshore Wind</td><td><span class="modeloutput" key="scaled_onshorewind_capacity" type="auto" baseunit="kW"></td>
+                <td>Electrolysis capacity</td><td><span class="modeloutput" key="scaled_electrolysis_capacity" type="auto" baseunit="kW"></td>
+                <td>Hydrogen storage</td><td><span class="modeloutput" key="scaled_hydrogen_storage_cap" type="auto" baseunit="kWh"></td>
+            </tr>
+            <tr>
+                <td>Offshore Wind</td><td><span class="modeloutput" key="scaled_offshorewind_capacity" type="auto" baseunit="kW"></td>
+                <td>Methanation capacity</td><td><span class="modeloutput" key="scaled_methanation_capacity" type="auto" baseunit="kW"></td>
+                <td>IHTEM capacity</td><td><span class="modeloutput" key="scaled_IHTEM_cap" type="auto" baseunit="kW"></td>
+            </tr>
+            <tr>
+                <td>Solar PV</td><td><span class="modeloutput" key="scaled_solarpv_capacity" type="auto" baseunit="kW"></td>
+                <td>Methanation storage</td><td><span class="modeloutput" key="scaled_methane_store_capacity" type="auto" baseunit="kWh"></td>
+            </tr>
+            <tr>
+                <td>Hydro</td><td><span class="modeloutput" key="scaled_hydro_capacity" type="auto" baseunit="kW"></td>
+                <td>Synth fuel prod capacity</td><td><span class="modeloutput" key="scaled_synth_fuel_capacity" type="auto" baseunit="kW"></td>
+            </tr>
+            
+            <tr>
+                <td>Wave</td><td><span class="modeloutput" key="scaled_wave_capacity" type="auto" baseunit="kW"></td>
+                <td>Elec storage cap</td><td><span class="modeloutput" key="scaled_elec_store_storage_cap" type="auto" baseunit="kWh"></td>
+            </tr>
+            <tr>
+                <td>Tidal</td><td><span class="modeloutput" key="scaled_tidal_capacity" type="auto" baseunit="kW"></td>
+                <td>BEV storage cap</td><td><span class="modeloutput" key="scaled_electric_car_battery_capacity" type="auto" baseunit="kWh"></td>
+            </tr>
+            <tr>
+                <td>Nuclear</td><td><span class="modeloutput" key="scaled_nuclear_capacity" type="auto" baseunit="kW"></td>
+
+            </tr>
+            <tr>
+                <td>CCGT Backup</td><td><span class="modeloutput" key="scaled_CCGT_capacity" type="auto" baseunit="kW"></td>
+
+            </tr>
+        </table>
+        
+        <div style="clear:both"></div>
     </div>
 </div>

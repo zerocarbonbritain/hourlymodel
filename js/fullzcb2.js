@@ -45,6 +45,8 @@ function fullzcb2_init()
     households_2030 = 29941701
     units_mode = "TWhyr"
     unitsmode = "GW"   
+    
+    number_of_households = 29941701
     // ---------------------------------------------------------------------------
     // dataset index:
     // 0:onshore wind, 1:offshore wind, 2:wave, 3:tidal, 4:solar, 5:traditional electricity
@@ -1289,7 +1291,7 @@ function fullzcb2_run()
     loading_prc(80,"model stage 5");
 
     // -------------------------------------------------------------------------------
-        
+    
     total_unmet_demand = total_final_elec_balance_negative
     
     total_supply += total_ambient_heat_supply
@@ -1373,6 +1375,7 @@ function fullzcb2_run()
     total_methane_made = total_methane_made / 10000.0
     total_electricity_from_dispatchable /= 10000.0
     total_biomass_used /= 10000.0
+    total_other_biomass_used = total_biomass_used - biomass_for_biogas - total_synth_fuel_biomass_used
     
     liquid_fuel_produced_prc_diff = 100 * (total_synth_fuel_produced - (transport_bioliquid_demand+industrial_biofuel)) / (transport_bioliquid_demand+industrial_biofuel)
 
@@ -1409,7 +1412,59 @@ function fullzcb2_run()
     } 
     
     console.log("balance error: "+error.toFixed(12));
+
+    // ----------------------------------------------------------------------------
+    // Land area factors
+    // ----------------------------------------------------------------------------
+    uk_landarea = 242495000000                                     // m2
+    landarea_per_household = uk_landarea/households_2030           // m2 x 26 million households is 24 Mha
+
+    // Biogas
+    biomass_landarea_factor = ((0.1/365)/0.024) / 0.51
+    landarea_for_biogas = biomass_for_biogas * biomass_landarea_factor
+    prc_landarea_for_biogas = 100 * landarea_for_biogas / 24.2495
     
+    // Synth fuel
+    biomass_landarea_factor = ((0.1/365)/0.024) / 0.975
+    landarea_for_synth_fuel = total_synth_fuel_biomass_used * biomass_landarea_factor
+    prc_landarea_for_synth_fuel = 100 * landarea_for_synth_fuel / 24.2495
+    
+    // Other
+    biomass_landarea_factor = ((0.1/365)/0.024) / 0.975
+    landarea_for_other_biomass = total_other_biomass_used * biomass_landarea_factor
+    prc_landarea_for_other_biomass = 100 * landarea_for_other_biomass / 24.2495
+    
+    landarea_for_biomass = landarea_for_biogas + landarea_for_synth_fuel + landarea_for_other_biomass    
+    prc_landarea_for_biomass = 100 * landarea_for_biomass / 24.2495
+    
+    // prc_landarea_for_FT = 100 * landarea_for_FT / landarea_per_household
+
+
+    // prc_landarea_for_sabatier = 100 * landarea_for_sabatier / landarea_per_household
+
+    // ----------------------------------------------------------------------------
+    // Scaled up to village, town, country scale
+    // ----------------------------------------------------------------------------
+    scaled_onshorewind_capacity = 1000000 * onshore_wind_capacity * number_of_households / households_2030
+    scaled_offshorewind_capacity = 1000000 * offshore_wind_capacity * number_of_households / households_2030
+    scaled_solarpv_capacity = 1000000 * solarpv_capacity * number_of_households / households_2030
+    scaled_hydro_capacity = 1000000 * hydro_capacity * number_of_households / households_2030
+    scaled_tidal_capacity = 1000000 * tidal_capacity * number_of_households / households_2030
+    scaled_wave_capacity = 1000000 * wave_capacity * number_of_households / households_2030
+    scaled_nuclear_capacity = 1000000 * nuclear_capacity * number_of_households / households_2030   
+    scaled_CCGT_capacity = 1000000 * dispatch_gen_cap * number_of_households / households_2030
+    
+    scaled_electrolysis_capacity = 1000000 * electrolysis_cap * number_of_households / households_2030
+    scaled_hydrogen_storage_cap = 1000000 * hydrogen_storage_cap * number_of_households / households_2030
+    scaled_methanation_capacity = 1000000 * methanation_capacity * number_of_households / households_2030
+    scaled_IHTEM_cap = 1000000 * IHTEM_cap * number_of_households / households_2030
+    scaled_methane_store_capacity = 1000000 * methane_store_capacity * number_of_households / households_2030
+    scaled_synth_fuel_capacity = 1000000 * synth_fuel_capacity * number_of_households / households_2030
+    scaled_elec_store_storage_cap = 1000000 * elec_store_storage_cap * number_of_households / households_2030
+    
+    scaled_electric_car_battery_capacity = 1000000 * electric_car_battery_capacity * number_of_households / households_2030
+    
+    // ----------------------------------------------------------------------------
         
     $(".modeloutput").each(function(){
         var type = $(this).attr("type");
