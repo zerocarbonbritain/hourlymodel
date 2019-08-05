@@ -1463,6 +1463,7 @@ function fullzcb2_run()
     scaled_elec_store_storage_cap = 1000000 * elec_store_storage_cap * number_of_households / households_2030
     
     scaled_electric_car_battery_capacity = 1000000 * electric_car_battery_capacity * number_of_households / households_2030
+    scaled_landarea_for_biomass = 1000000 * 10000 * landarea_for_biomass * number_of_households / households_2030
     
     // ----------------------------------------------------------------------------
         
