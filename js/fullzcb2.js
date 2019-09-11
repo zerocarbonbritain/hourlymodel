@@ -49,7 +49,7 @@ function fullzcb2_init()
     // dataset index:
     // 0:onshore wind, 1:offshore wind, 2:wave, 3:tidal, 4:solar, 5:traditional electricity
     offshore_wind_capacity = 150.0
-    onshore_wind_capacity = 20.0
+    onshore_wind_capacity = 30.0
     wave_capacity = 10.0
     tidal_capacity = 20.0
     hydro_capacity = 3.0
@@ -89,15 +89,15 @@ function fullzcb2_init()
     loft_ins_thickness = 0.3
     window_type = 3
     glazing_extent = 0.2
-    air_change_per_hour = 1.0
+    air_change_per_hour = 1.00
     
     domestic_space_heat_demand_WK = 114.6 // W/K (DECC 2050 Pathway level 4) x number of households 2030 = 3.548 GW/K
     services_space_heat_demand_GWK = 1.486 // GW/K
     industry_space_heat_demand_GWK = 0.502 // GW/K
     space_heat_base_temperature = 13.07               // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050
     
-    domestic_water_heating = 40.80 // TWh
-    services_water_heating = 15.99 // TWh
+    domestic_water_heating = 70.36 // TWh
+    services_water_heating = 12.01 // TWh
         
     // Heating system efficiencies
     heatpump_COP = 3.0
@@ -140,22 +140,22 @@ function fullzcb2_init()
     // ---------------------------------------------
     // Transport
     // ---------------------------------------------
-    electrains_demand = 12.22 // and ships?
+    electrains_demand = 12.70 // and ships?
     
     // Electric cars
-    BEV_demand = 49.53
-    electric_car_battery_capacity = 513.0    // GWh
+    BEV_demand = 56.81
+    electric_car_battery_capacity = 513.0    // GWh (Approx based on 15 million vehicles with average 30kWh batteries + approx 70k e-HGVs with 900kWh batteries)
     electric_car_max_charge_rate = 73.3      // GW
     smart_charging_enabled = 1
     
     // H2 and synthetic fuels
-    transport_H2_demand = 9.61
+    transport_H2_demand = 10.22
     transport_CH4_demand = 0.0
-    transport_biofuels_demand = 33.45
+    transport_biofuels_demand = 33.61
     transport_kerosene_demand = 40.32
     
     biomass_for_biofuel = (transport_biofuels_demand + transport_kerosene_demand + industrial_biofuel)*1.3 // 143.0
-    biomass_for_biogas = 74.0 //94.0
+    biomass_for_biogas = 76.0 //94.0
     
     FT_process_biomass_req = 1.3   // GWh/GWh fuel
     FT_process_hydrogen_req = 0.61 // GWh/GWh fuel
@@ -827,8 +827,8 @@ function fullzcb2_run()
         elres_elec_demand = heat_from_elres / elres_efficiency
         
         // heatpumps
-        heatpump_COP = 1.8+(temperature+15.0)*0.05
-        if (temperature<-15.0) heatpump_COP = 1.8
+        // heatpump_COP = 1.8+(temperature+15.0)*0.05
+        // if (temperature<-15.0) heatpump_COP = 1.8
                 
         heat_from_heatpumps = spacewater_demand_after_heatstore * spacewater_share_heatpumps
         heatpump_elec_demand = heat_from_heatpumps / heatpump_COP
