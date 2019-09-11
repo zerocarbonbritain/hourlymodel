@@ -1,6 +1,6 @@
 /*
 ---------------------------------------------------
-ZeroCarbonBritain hourly energy model v2
+ZeroCarbonBritain hourly energy model v3
 ---------------------------------------------------
 
 CHANGE LOG
@@ -20,6 +20,12 @@ CHANGE LOG
 
 - Modifications to stores removes the imbalance in the model that caused dips and peaks above and below the supply line
 
+- Detailed transport model
+
+- ITHEM
+
+- Hydrogen storage
+
 Store performance, matching addition
 ---------------------------------------------------
 - heatstore:OFF  EVstore:OFF  elecstore:OFF: 81.6 %
@@ -30,16 +36,13 @@ Store performance, matching addition
 
 Issues to fix
 ---------------------------------------------------
-- no grid loss factor
 - no storage losses
 - methane losses from store capping, if biogas feed is set too high
-- review CHP 
-- potential for unmet hydrogen vehicle demand
 - search MFIX to find notes
 
 */
 
-function fullzcb2_init()
+function fullzcb3_init()
 {
     population_2030 = 70499802
     households_2030 = 29941701
@@ -315,7 +318,7 @@ function fullzcb2_init()
     // -------------------
 }
 
-function fullzcb2_run()
+function fullzcb3_run()
 {
     // ---------------------------------------------
     // Supply totals
@@ -1631,7 +1634,7 @@ function fullzcb2_run()
 }
 // ---------------------------------------------------------------------------    
 	
-function fullzcb2_view(start,end,interval)
+function fullzcb3_view(start,end,interval)
 {
     var dataout = data_view(start,end,interval);
     if (view_mode=="")
