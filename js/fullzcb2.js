@@ -351,6 +351,7 @@ function fullzcb2_run()
     total_electricity_from_dispatchable = 0
     max_dispatchable_capacity = 0
     total_methane_for_transport = 0
+    total_methane_demand = 0
     
     // demand totals
     total_traditional_elec = 0
@@ -985,12 +986,11 @@ function fullzcb2_run()
         // s1_methane_for_industry: calculated in stage 1
         // s1_methane_for_industryCHP
         methane_for_industryCHP = 0 // MFIX: add this in!!
-        methane_balance = methane_from_hydrogen + methane_from_biogas
-        methane_balance -= methane_to_dispatchable
-        methane_balance -= s3_methane_for_spacewaterheat[hour]
-        methane_balance -= s1_methane_for_industry[hour]
-        methane_balance -= methane_for_industryCHP
-        methane_balance -= methane_for_transport
+        
+        methane_demand = methane_to_dispatchable + s3_methane_for_spacewaterheat[hour] + s1_methane_for_industry[hour] + methane_for_industryCHP + methane_for_transport
+        total_methane_demand += methane_demand
+        
+        methane_balance = methane_from_hydrogen + methane_from_biogas - methane_demand
         
         s5_methane_SOC.push(methane_SOC)
         data.methane_SOC.push([time,methane_SOC])
