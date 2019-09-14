@@ -30,10 +30,8 @@ Store performance, matching addition
 
 Issues to fix
 ---------------------------------------------------
-- no grid loss factor
 - no storage losses
 - methane losses from store capping, if biogas feed is set too high
-- review CHP 
 - potential for unmet hydrogen vehicle demand
 - search MFIX to find notes
 
@@ -360,8 +358,8 @@ function fullzcb2_run()
     total_industrial_elec_demand = 0
     total_industrial_methane_demand = 0
     total_industrial_biomass_demand = 0
-    total_industrial_liquid_demand = 0  
-      
+    total_industrial_liquid_demand = 0
+    
     total_grid_losses = 0
     total_electrolysis_losses = 0
     total_CCGT_losses = 0
@@ -703,9 +701,9 @@ function fullzcb2_run()
         
         // Industrial DSR
         heat_process_DSR_elec = heat_process_DSR                                    // 1. provide all heat demand with direct elec resistance heaters
-        if (heat_process_DSR_elec>balance) heat_process_DSR_elec = balance              // 2. limited to available electricity balance
+        if (heat_process_DSR_elec>balance) heat_process_DSR_elec = balance          // 2. limited to available electricity balance
         if (heat_process_DSR_elec<0) heat_process_DSR_elec = 0                      // 3. -- should never happen --
-        heat_process_DSR_gas = heat_process_DSR - heat_process_DSR_elec                     // 4. if there is not enough elec to meet demand, use gas
+        heat_process_DSR_gas = heat_process_DSR - heat_process_DSR_elec             // 4. if there is not enough elec to meet demand, use gas
         
         industrial_elec_demand = cooking_elec + non_heat_process_elec + heat_process_fixed_elec + heat_process_DSR_elec
         
@@ -1029,7 +1027,7 @@ function fullzcb2_run()
     loading_prc(80,"model stage 5");
 
     // -------------------------------------------------------------------------------
-        
+    
     total_unmet_demand = total_final_elec_balance_negative
     
     total_supply += total_ambient_heat_supply
@@ -1126,6 +1124,14 @@ function fullzcb2_run()
     methane_store_full_prc = 100*methane_store_full_count / hours
     hydrogen_store_empty_prc = 100*hydrogen_store_empty_count / hours
     hydrogen_store_full_prc = 100*hydrogen_store_full_count / hours
+    
+    
+    offshore_wind_capacity_factor = 100 * total_offshore_wind_supply / (offshore_wind_capacity*24*365*10)
+    onshore_wind_capacity_factor = 100 * total_onshore_wind_supply / (onshore_wind_capacity*24*365*10)
+    tidal_capacity_factor = 100 * total_tidal_supply / (tidal_capacity*24*365*10)
+    wave_capacity_factor = 100 * total_wave_supply / (wave_capacity*24*365*10)
+    solarpv_capacity_factor = 100 * total_solar_supply / (solarpv_capacity*24*365*10)
+    solarthermal_capacity_factor = 100 * total_solarthermal / (solarthermal_capacity*24*365*10)
     
     var out = "";
     var error = 0

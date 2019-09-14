@@ -58,6 +58,8 @@ table td {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>ZERO CARBON BRITAIN HOURLY MODEL v2</b></div>
     <div class="inner" style="display:block">
+<div style="font-size:14px"><b>Note:</b> This hourly energy model is designed to be used in conjunction with the ZeroCarbonBritain matrix spreadsheet, which both provides background calculation for many of the inputs and makes use of the model outputs.</div><br>
+    
         View:
         <button id="pan-left"><</button>
         <button id="pan-right">></button>
@@ -78,6 +80,9 @@ table td {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SUPPLY<!--<span style="float:right" class="modeloutput" key="total_supply" type="10y"></span>--></b></div>
     <div class="inner">
+        <div style="font-size:14px">The following renewable supply mix is detailed in full on page 57-61 of the ZCB report. Capacities reflect proportions of available resource e.g: the Offshore Valuation Group report (2010) estimates that we could produce more than 1,500 TWh/year from floating offshore wind turbines, 400 TWh/year from fixed offshore wind turbines, 40 TWh/year from wave power and 116 TWh/year from tidal stream. The ZCB scenario suggests that only a proportion of this potential would need to be developed. 
+        
+        </div><br>
 
         <table class="table" style="width:100%">
         <tr>
@@ -91,28 +96,28 @@ table td {
             <td>Offshore wind</td>
             <td><input class="modelinput" key="offshore_wind_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td><span class="modeloutput" key="total_offshore_wind_supply" type="10y"></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="offshore_wind_capacity_factor"></span>%</td>
             <td><input class="modelinput" key="offshore_wind_availability" type="text" style="width:70px" value="" autocomplete="off"/></td>
         </tr>
         <tr>
             <td>Onshore wind</td>
             <td><input class="modelinput" key="onshore_wind_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td><span class="modeloutput" key="total_onshore_wind_supply" type="10y"></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="onshore_wind_capacity_factor"></span>%</td>
             <td><input class="modelinput" key="onshore_wind_availability" type="text" style="width:70px" value="" autocomplete="off"/></td>
         </tr>
         <tr>
             <td>Wave</td>
             <td><input class="modelinput" key="wave_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td><span class="modeloutput" key="total_wave_supply" type="10y"></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="wave_capacity_factor"></span>%</td>
             <td></td>
         </tr>
         <tr>
             <td>Tidal (range + stream)</td>
             <td><input class="modelinput" key="tidal_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td><span class="modeloutput" key="total_tidal_supply" type="10y"></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="tidal_capacity_factor"></span>%</td>
             <td></td>
         </tr>
         <tr>
@@ -126,14 +131,14 @@ table td {
             <td>Solar PV</td>
             <td><input class="modelinput" key="solarpv_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td><span class="modeloutput" key="total_solar_supply" type="10y"></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="solarpv_capacity_factor"></span>%</td>
             <td></td>
         </tr>
         <tr>
             <td>Solar Thermal (heat)</td>
-            <td><input class="modelinput" key="solarthermal_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><input class="modelinput" key="solarthermal_capacity" type="text" style="width:70px" value="" autocomplete="off"/> *</td>
             <td><span class="modeloutput" key="total_solarthermal" type="10y"></span></td>
-            <td></td>
+            <td><span class="modeloutput" key="solarthermal_capacity_factor"></span>% *</td>
             <td></td>
         </tr>
         <tr>
@@ -154,8 +159,15 @@ table td {
             <td>Nuclear</td>
             <td><input class="modelinput" key="nuclear_capacity" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td><span class="modeloutput" key="total_nuclear_supply" type="10y"></span></td>
-            <td></td>
+            <td>100%</td>
             <td><input class="modelinput" key="nuclear_availability" type="text" style="width:70px" value="" autocomplete="off"/></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Grid loss</td>
@@ -171,41 +183,23 @@ table td {
             <td></td>
             <td></td>
         </tr>
+        <tr>
             <td>Biomass for biogas</td>
+            <td><input class="modelinput" key="biomass_for_biogas" type="text" style="width:70px" value="" autocomplete="off" dp=1 /> TWh</td>
             <td></td>
-            <td><input class="modelinput" key="biomass_for_biogas" type="text" style="width:70px" value="" autocomplete="off" dp=1 /></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </tr>
-            <td>Biomass for space/water heat</td>
-            <td></td>
-            <td><span class="modeloutput" key="biomass_for_spacewater_heat" type="10y"></span></td>
             <td></td>
             <td></td>
         </tr>
-        </tr>
-            <td>Biomass for industrial CHP</td>
-            <td></td>
-            <td><span class="modeloutput" key="biomass_for_industry_CHP" type="10y"></span></td>
-            <td></td>
-            <td></td>
-        </tr>
-        </tr>
+        <tr>
             <td>Anaerobic digestion efficiency</td>
             <td><input class="modelinput" key="anaerobic_digestion_efficiency" type="text" style="width:70px" value="" autocomplete="off"/></td>
             <td></td>
             <td></td>
             <td></td>
         </tr>
-        </tr>
-            <td>Gas balance</td>
-            <td><span class="modeloutput" key="gas_balance" type="10y"></span></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
         </table>
+        
+        <div style="font-size:14px"><i>* Solar thermal is given in GW solar PV equivalent, actual capacity is much smaller and capacity factor higher.</i></div>       
     </div>
 </div>
 
@@ -250,7 +244,8 @@ table td {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SPACE / WATER HEAT DEMAND</b></div>
     <div class="inner">
-    
+        <div style="font-size:14px">The following simple domestic fabric efficiency model is indicative of an 'average household' in the scenario. The actual domestic heat loss factor is based on more detailed analysis from the DECC 2050 level 4 pathway. Further detail including service and industry heat loss factors are available in the ZCB matrix spreadsheet.</div><br>
+        
         <p><b>1. Simple domestic fabric efficiency model</b></p>
         
         <table class="table" style="width:50%; float:left">
@@ -455,39 +450,7 @@ table td {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>TRANSPORT</b></div>
     <div class="inner">
-        <!--
-        <table class="table" style="width:100%">
-        <tr>
-            <th width="12.5%">Walking</th>
-            <th width="12.5%">Cycling</th>
-            <th width="12.5%">Ebikes</th>
-            <th width="12.5%">Rail</th>
-            <th width="12.5%">Bus</th>
-            <th width="12.5%">Aviation</th>
-            <th width="12.5%">Motorbikes</th>
-            <th width="12.5%">Cars & Vans</th>
-        </tr>
-        <tr>
-            <td><input class="modelinput" key="modes_walking" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_cycling" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_ebikes" type="text" style="width:70px" value="" autocomplete="off"/></td>          
-            <td><input class="modelinput" key="modes_rail" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_bus" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_aviation" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_motorbike" type="text" style="width:70px" value="" autocomplete="off"/></td>
-            <td><input class="modelinput" key="modes_carsvans" type="text" style="width:70px" value="" autocomplete="off"/></td>
-        </tr>
-        <tr>
-            <td><span class="modeloutput" key="walking_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="cycling_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="ebikes_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="rail_km_pp" dp=0 scale=1></span>km</td>          
-            <td><span class="modeloutput" key="bus_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="aviation_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="motorbike_km_pp" dp=0 scale=1></span>km</td>
-            <td><span class="modeloutput" key="carsvans_km_pp" dp=0 scale=1></span>km</td> 
-        </table>
-        -->
+        <div style="font-size:14px">The following transport energy demands are calculated in full in the ZCB matrix spreadsheet.<br><a href="#fullzcb3">Version 3</a> of this hourly energy model includes the detailed transport model in the web interface.</div><br>
     
         <table class="table" style="width:100%">
         <tr>
@@ -547,12 +510,22 @@ table td {
             <td><input class="modelinput" key="FT_process_hydrogen_req" type="text" style="width:70px" value="" autocomplete="off"/> GWh/GWh fuel</td>
         </tr>
         </table>
+        
+         <div style="font-size:14px"><i>See notes on sythetic fuel production using fischer-tropsch process here <a href="https://trystanlea.org.uk/aviation_notes">https://trystanlea.org.uk/aviation_notes</a></i></div>
+        
     </div>
 </div>
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>INDUSTRIAL (& cooking) FUEL INPUTS</b></div>
     <div class="inner">
+        <div style="font-size:14px">Projected scenario domestic cooking electricity consumption: 10.47 TWh, Catering electricity consumption: 16.85 TWh. In 2007 and 2017 these were: 15 TWh, 22 TWh and 14 TWh, 21 TWh respectively.<br><br>
+        Industrial energy demand is based on 2007 levels adjusted for 2030 population (1.15x) and a 25% reduction in energy intensity. E.g High temp heat was 57 TWh in 2007 x 1.15 x 0.75 = 49.16 TWh. Actual industrial energy demand in 2017 was 256 TWh consisting of: High temp: 41 TWh, Low temp: 82 TWh, Non heat + other: 133 TWh. 11% less than projected scenario demand for 2030.
+        <br><br>
+        Industrial energy use is dealt with in the scenario at a high level and a cautious approach is taken. Industry energy demand is an area highlighted for further research within the ZeroCarbonBritain scenario.
+        
+        </div><br>
+        
         <table class="table" style="width:100%">
         <!--
         <tr>
@@ -622,65 +595,95 @@ table td {
             <td></td>
         </tr>
         </table>
-        <p><i>High and low temp DSR implements a substitutable heat source, direct electricity is used when excess renewable energy is available, synthetic gas is used when direct electricity supply is not sufficient.</i></p>
+        <div style="font-size:14px"><i>High and low temp DSR implements a substitutable heat source, direct electricity is used when excess renewable energy is available, synthetic gas is used when direct electricity supply is not sufficient. Breakdown of demand by fuel type is detailed in the ZCB matrix spreadsheet.</i></div>
     </div>
 </div>
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>STORAGE & BACKUP</b></div>
     <div class="inner">
+        <div style="font-size:14px">
+        Select dispatchable generation capacity to meet bulk of backup requirement. Tune electrolysis & methanation capacity and respective storage capacities to meet given hydrogen, synth fuel and synthetic methane demand. Select 'Stores' tab above to see store levels, ensure that the stores dont get depleted or over-fill. 50 GWh of generic storage is equivalent to a ~1.7 kWh battery store per household.<br><br>
+        For background notes on the sabatier process see:<br> <a href="https://learn.openenergymonitor.org/sustainable-energy/energy/sabatier-process">https://learn.openenergymonitor.org/sustainable-energy/energy/sabatier-process</a>
+        </div><br>
         <table class="table" style="width:100%">
         <tr>
             <td>Dispatchable generating capacity</td>
             <td><input class="modelinput" key="dispatch_gen_cap" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td><span class="modeloutput" key="max_dispatchable_capacity" dp=1></span> GW used</td>
+            <td><span class="modeloutput" key="total_electricity_from_dispatchable" dp=1></span> TWh</td>
         </tr>
         <tr>
             <td>Dispatchable generation efficiency</td>
             <td><input class="modelinput" key="dispatchable_gen_eff" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Electrolysis capacity</td>
             <td><input class="modelinput" key="electrolysis_cap" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Electrolysis efficiency</td>
             <td><input class="modelinput" key="electrolysis_eff" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Methanation capacity (max. Rate)</td>
             <td><input class="modelinput" key="methanation_capacity" type="text" style="width:70px" value="" autocomplete="off"/> GW</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Methanation efficiency (H2->CH4)</td>
             <td><input class="modelinput" key="methanation_efficiency" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Methanation raw biogas to H2 ratio</td>
             <td><input class="modelinput" key="methanation_raw_biogas_to_H2_ratio" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Methane storage capacity</td>
             <td><input class="modelinput" key="methane_store_capacity" type="text" style="width:70px" value="" autocomplete="off"/> GWh chem</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Hydrogen storage capacity</td>
             <td><input class="modelinput" key="hydrogen_storage_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh chem</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Lower H2 store limit for H2->CH4</td>
             <td><input class="modelinput" key="minimum_hydrogen_store_level" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Generic energy store capacity</td>
             <td><input class="modelinput" key="elec_store_storage_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Generic energy store rate of charge</td>
             <td><input class="modelinput" key="elec_store_charge_cap" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Enable electricity storage?</td>
             <td><input class="modelinput" key="electricity_storage_enabled" type="text" style="width:70px" value="" autocomplete="off"/> GWh</td>
+            <td></td>
+            <td></td>
         </tr>
         </table>
     </div>
@@ -836,12 +839,6 @@ table td {
         <tr>
             <td>Electricity from dispatchable (TWh)</td>
             <td><span class="modeloutput" key="total_electricity_from_dispatchable" dp=1></span></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Electricity from dispatchable (GW)</td>
-            <td><span class="modeloutput" key="max_dispatchable_capacity" dp=1></span></td>
             <td></td>
             <td></td>
         </tr>

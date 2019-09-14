@@ -563,7 +563,7 @@ function fullzcb3_run()
     max_dispatchable_capacity = 0
     total_methane_for_transport = 0
     total_methane_demand = 0
-        
+    
     // demand totals
     total_traditional_elec = 0
     total_industrial_elec_demand = 0
@@ -841,8 +841,8 @@ function fullzcb3_run()
         elres_elec_demand = heat_from_elres / elres_efficiency
         
         // heatpumps
-        heatpump_COP = 1.8+(temperature+15.0)*0.05
-        if (temperature<-15.0) heatpump_COP = 1.8
+        // heatpump_COP = 1.8+(temperature+15.0)*0.05
+        // if (temperature<-15.0) heatpump_COP = 1.8
                 
         heat_from_heatpumps = spacewater_demand_after_heatstore * spacewater_share_heatpumps
         heatpump_elec_demand = heat_from_heatpumps / heatpump_COP
@@ -1395,6 +1395,14 @@ function fullzcb3_run()
     methane_store_full_prc = 100*methane_store_full_count / hours
     hydrogen_store_empty_prc = 100*hydrogen_store_empty_count / hours
     hydrogen_store_full_prc = 100*hydrogen_store_full_count / hours
+    
+    
+    offshore_wind_capacity_factor = 100 * total_offshore_wind_supply / (offshore_wind_capacity*24*365*10)
+    onshore_wind_capacity_factor = 100 * total_onshore_wind_supply / (onshore_wind_capacity*24*365*10)
+    tidal_capacity_factor = 100 * total_tidal_supply / (tidal_capacity*24*365*10)
+    wave_capacity_factor = 100 * total_wave_supply / (wave_capacity*24*365*10)
+    solarpv_capacity_factor = 100 * total_solar_supply / (solarpv_capacity*24*365*10)
+    solarthermal_capacity_factor = 100 * total_solarthermal / (solarthermal_capacity*24*365*10)
     
     var out = "";
     var error = 0
