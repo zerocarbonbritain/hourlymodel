@@ -535,7 +535,9 @@ function fullzcb3_run()
     total_EV_charge = 0
     total_EV_demand = 0
     total_elec_trains_demand = 0
-    
+
+    total_hydrogen_produced = 0
+    total_hydrogen_demand = 0
     total_hydrogen_for_hydrogen_vehicles = 0
     unmet_hydrogen_demand = 0
     unmet_synth_fuel_demand = 0
@@ -1142,6 +1144,7 @@ function fullzcb3_run()
         balance -= electricity_for_electrolysis
         
         hydrogen_balance = hydrogen_from_electrolysis
+        total_hydrogen_produced += hydrogen_from_electrolysis
                 
         // 2. Hydrogen vehicle demand
         hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
@@ -1177,6 +1180,8 @@ function fullzcb3_run()
             unmet_hydrogen_demand += -1*hydrogen_SOC
             hydrogen_SOC = 0.0
         }
+
+        total_hydrogen_demand += hydrogen_for_hydrogen_vehicles + hydrogen_to_synth_fuel + hydrogen_for_sabatier
              
         // ----------------------------------------------------------------------------
         // Integrated High-Temperature Electrolysis and Methanation (IHTEM)
@@ -1375,9 +1380,7 @@ function fullzcb3_run()
     total_final_elec_balance_negative = total_final_elec_balance_negative / 10000.0
     total_final_elec_balance_positive = total_final_elec_balance_positive / 10000.0
     total_unmet_heat_demand = (total_unmet_heat_demand/ 10000.0).toFixed(3);
-    total_synth_fuel_produced = total_synth_fuel_produced / 10000.0
     total_synth_fuel_biomass_used = total_synth_fuel_biomass_used / 10000.0
-    total_methane_made = total_methane_made / 10000.0
     total_electricity_from_dispatchable /= 10000.0
     total_biomass_used /= 10000.0
     total_other_biomass_used = total_biomass_used - biomass_for_biogas - total_synth_fuel_biomass_used

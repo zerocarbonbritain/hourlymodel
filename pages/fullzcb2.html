@@ -334,7 +334,6 @@ table td {
             <tr><td>Fabric heat loss</td><td><span class="modeloutput" key="fabric_WK" dp=0 scale=1 units="W/K"></span></td></tr>
             <tr><td>Infiltration heat loss</td><td><span class="modeloutput" key="infiltration_WK" dp=0 scale=1 units="W/K"></span></td></tr>
             <tr><td>Total fabric efficiency</td><td><span class="modeloutput" key="domestic_space_heat_demand_WK" dp=0 scale=1 units="W/K"></span></td></tr>
-            <tr><td>MVHR not taken into account</td><td></td></tr>
             </table>
         </div>
         <div style="clear:both"></div>
@@ -788,25 +787,31 @@ table td {
         </tr>
         <tr>
             <th></th>
-            <th>TWh/yr</th>
-            <th>% diff</th>
+            <th>Production</th>
+            <th>Demand</th>
             <th></th>
         </tr>
         <tr>
-            <td>Liquid fuel produced</td>
-            <td><span class="modeloutput" key="total_synth_fuel_produced"></span></td>
-            <td><span class="modeloutput" key="liquid_fuel_produced_prc_diff" dp=1 units="%"></span></td>
+            <td>Hydrogen</td>
+            <td><span class="modeloutput" key="total_hydrogen_produced" type="10y"></span></td>
+            <td><span class="modeloutput" key="total_hydrogen_demand" type="10y"></span></td>
             <td></td>
         </tr>
         <tr>
-            <td>Total methane produced</td>
-            <td><span class="modeloutput" key="total_methane_made" dp=1></span></td>
-            <td></td>
+            <td>Liquid fuel</td>
+            <td><span class="modeloutput" key="total_synth_fuel_produced" type="10y"></span></td>
+            <td><span class="modeloutput" key="total_synth_fuel_produced" type="10y"></span></td>
             <td></td>
         </tr>
         <tr>
-            <td>Total methane demand</td>
+            <td>Methane</td>
+            <td><span class="modeloutput" key="total_methane_made" type="10y"></span></td>
             <td><span class="modeloutput" key="total_methane_demand" type="10y"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
         </tr>
