@@ -84,12 +84,12 @@ function fullzcb2_init()
     // domestic simple house model
     total_floor_area = 85 // m2
     storey_height = 2.2
-    wall_ins_thickness = 0.2
-    floor_ins_thickness = 0.2
+    wall_ins_thickness = 0.1
+    floor_ins_thickness = 0.1
     loft_ins_thickness = 0.3
-    window_type = 3
+    window_type = 2
     glazing_extent = 0.2
-    air_change_per_hour = 1.00
+    air_change_per_hour = 0.54 // non pressurised air change rate
     
     domestic_space_heat_demand_WK = 114.6 // W/K (DECC 2050 Pathway level 4) x number of households 2030 = 3.548 GW/K
     services_space_heat_demand_GWK = 1.486 // GW/K
