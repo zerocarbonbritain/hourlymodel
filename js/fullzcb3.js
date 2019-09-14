@@ -566,6 +566,7 @@ function fullzcb3_run()
     total_industrial_elec_demand = 0
     total_industrial_methane_demand = 0
     total_industrial_biomass_demand = 0
+    total_industrial_liquid_demand = 0
     
     total_grid_losses = 0
     total_electrolysis_losses = 0
@@ -1269,6 +1270,7 @@ function fullzcb3_run()
         total_FT_losses += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - synth_fuel_produced
         
         synth_fuel_demand = (daily_transport_liquid_demand + daily_industrial_biofuel) / 24.0
+        total_industrial_liquid_demand += daily_industrial_biofuel / 24.0
         
         synth_fuel_store_SOC -= synth_fuel_demand
 
