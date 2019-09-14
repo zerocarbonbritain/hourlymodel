@@ -53,8 +53,8 @@ function fullzcb3_init()
     // ---------------------------------------------------------------------------
     // dataset index:
     // 0:onshore wind, 1:offshore wind, 2:wave, 3:tidal, 4:solar, 5:traditional electricity
-    offshore_wind_capacity = 150.0
-    onshore_wind_capacity = 20.0
+    offshore_wind_capacity = 140.0
+    onshore_wind_capacity = 30.0
     wave_capacity = 10.0
     tidal_capacity = 20.0
     hydro_capacity = 3.0
@@ -111,8 +111,8 @@ function fullzcb3_init()
     methane_boiler_efficiency = 0.9
     
     // Heating system share of demand
-    spacewater_share_heatpumps = 0.8
-    spacewater_share_elres = 0.15
+    spacewater_share_heatpumps = 0.9
+    spacewater_share_elres = 0.05
     spacewater_share_biomass = 0.05
     spacewater_share_methane = 0.00
     
