@@ -155,7 +155,7 @@ function fullzcb2_init()
     transport_kerosene_demand = 40.32
     
     biomass_for_biofuel = (transport_biofuels_demand + transport_kerosene_demand + industrial_biofuel)*1.3 // 143.0
-    biomass_for_biogas = 76.0 //94.0
+    biomass_for_biogas = 74.0 //94.0
     
     FT_process_biomass_req = 1.3   // GWh/GWh fuel
     FT_process_hydrogen_req = 0.61 // GWh/GWh fuel
