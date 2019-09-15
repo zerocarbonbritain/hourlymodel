@@ -204,35 +204,81 @@ table td {
 </div>
 
 <div class="box">
-    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>LIGHTING & APPLIANCES</b></div>
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>LIGHTING, APPLIANCES & COOKING</b></div>
     <div class="inner">
-        <div style="font-size:14px">Domestic Lighting & Appliance electricity demand in 2007 was 86 TWh, falling to 76 TWh in 2017, ZCB Scenario projects 55% reduction from 2007 as a result of LED lighting and more efficient appliances. Service sector Lighting & Appliance demand was 59 TWh in 2007 increasing to 71 TWh in 2017, ZCB scenario projects 30% reduction from 2007. Cooling demand was 9 TWh in 2007, increasing to 13 TWh in 2017, scenario projects falling cooling energy demand based on increasing cooling efficiency.</div>
+        <div style="font-size:14px">Domestic Lighting & Appliance electricity demand in 2007 was 86 TWh, falling to 76 TWh in 2017, ZCB Scenario projects 55% reduction from 2007 as a result of LED lighting and more efficient appliances. Service sector Lighting & Appliance demand was 59 TWh in 2007 increasing to 71 TWh in 2017, ZCB scenario projects 30% reduction from 2007. Cooling demand was 9 TWh in 2007, increasing to 13 TWh in 2017, scenario projects falling cooling energy demand based on increasing cooling efficiency.<br><br>
+        Projected scenario domestic cooking electricity consumption: 10.47 TWh, Catering electricity consumption: 16.85 TWh. In 2007 and 2017 these were: 15 TWh, 22 TWh and 14 TWh, 21 TWh respectively.
+        </div>
         <br>
+
+        <div style="border: 1px solid #ccc; padding:10px;">
+        <b>Simple domestic lighting, appliances and cooking calculator</b><br>      
+        <table class="table" style="width:100%; margin-top:10px; margin-bottom:0px;">
+        <tr>
+            <td>Number of lights</td>
+            <td><input class="modelinput" key="LAC_number_of_lights" type="text" style="width:60px" value="" autocomplete="off"/></td>
+        </tr><tr>
+            <td>Average light power</td>
+            <td><input class="modelinput" key="LAC_lights_power" type="text" style="width:60px" value="" autocomplete="off"/> Watts</td>
+        </tr><tr>
+            <td>Average lighting hours per day</td>
+            <td><input class="modelinput" key="lighting_hours" type="text" style="width:60px" value="" autocomplete="off"/></td>
+        </tr><tr>
+            <td>Internet router + other always on<br>devices, appliances, stand-by</td>
+            <td><input class="modelinput" key="LAC_alwayson" type="text" style="width:60px" value="" autocomplete="off"/> Watts</td>
+        </tr><tr>
+            <td>Fridge/Freezer annual consumption</td>
+            <td><input class="modelinput" key="LAC_fridgefreezer" type="text" style="width:60px" value="" autocomplete="off"/> kWh</td>
+        </tr><tr>
+            <td>Washing machine annual consumption</td>
+            <td><input class="modelinput" key="LAC_washingmachine" type="text" style="width:60px" value="" autocomplete="off"/> kWh</td>
+        </tr><tr>
+            <td>Cooking annual consumption<br>(1.1 kWh x 365)</td>
+            <td><input class="modelinput" key="LAC_cooking" type="text" style="width:60px" value="" autocomplete="off"/> kWh</td>
+        </tr><tr>
+            <td>Laptops and computing<br>(2 x 0.29 kWh x 365)</td>
+            <td><input class="modelinput" key="LAC_computing" type="text" style="width:60px" value="" autocomplete="off"/> kWh</td>
+        </tr><tr>
+            <td>Other</td>
+            <td><input class="modelinput" key="LAC_other" type="text" style="width:60px" value="" autocomplete="off"/> kWh</td>
+        </tr>
+        </table>
+        </div>
+        <br>
+        
         <table class="table" style="width:100%">
         <tr>
-            <th width="20%"></th>
-            <th width="20%"></th>
+            <th width="40%"></th>
             <th width="20%">Annual demand</th>
             <th width="20%">% Reduction vs 2007</th>
             <th width="20%"></th>
         </tr>
         <tr>
             <td>Domestic Lighting & Appliances</td>
-            <td></td>
-            <td><input class="modelinput" key="trad_elec_domestic_appliances" type="text" style="width:70px" value="" autocomplete="off" /> TWh/yr</td>
+            <td><span class="modeloutput" key="trad_elec_domestic_appliances" dp=2></span> TWh/yr</td>
             <td><span class="modeloutput" key="prc_reduction_domestic_appliances" dp=0 units="%" scale=100></span></td>
             <td><span class="modeloutput" key="domestic_appliances_kwh" dp=0></span> kWh/household</td>
         </tr>
         <tr>
+            <td>Domestic Cooking</td>
+            <td><span class="modeloutput" key="annual_cooking_elec_domestic" dp=2></span> TWh/yr</td>
+            <td><span class="modeloutput" key="prc_reduction_domestic_cooking" dp=0 units="%" scale=100></span></td>
+            <td><span class="modeloutput" key="LAC_cooking" dp=0></span> kWh/household</td>
+        </tr>
+        <tr>
             <td>Services Lighting & Appliances</td>
-            <td></td>
             <td><input class="modelinput" key="trad_elec_services_appliances" type="text" style="width:70px" value="" autocomplete="off" /> TWh/yr</td>
             <td><span class="modeloutput" key="prc_reduction_services_appliances" dp=0 units="%" scale=100></span></td>
             <td></td> 
         </tr>
         <tr>
-            <td>Services Cooling</td>
+            <td>Services Catering</td>
+            <td><input class="modelinput" key="annual_cooking_elec_services" type="text" style="width:70px" value="" autocomplete="off" /> TWh/yr</td>
+            <td><span class="modeloutput" key="prc_reduction_services_catering" dp=0 units="%" scale=100></span></td>
             <td></td>
+        </tr>
+        <tr>
+            <td>Services Cooling</td>
             <td><input class="modelinput" key="trad_elec_services_cooling" type="text" style="width:70px" value="" autocomplete="off" /> TWh/yr</td>
             <td><span class="modeloutput" key="prc_reduction_services_cooling" dp=0 units="%" scale=100></span></td>
             <td></td>
@@ -245,10 +291,13 @@ table td {
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SPACE / WATER HEAT DEMAND</b></div>
     <div class="inner">
         <div style="font-size:14px">The following simple domestic fabric efficiency model is indicative of an 'average household' in the scenario. The actual domestic heat loss factor is based on more detailed analysis from the DECC 2050 level 4 pathway. Further detail including service and industry heat loss factors are available in the ZCB matrix spreadsheet.</div><br>
+
+        <p><b>1. Space Heating</b></p>
+                
+        <div style="border: 1px solid #ccc; padding:10px;">
+        <div style="margin-bottom:10px"><b>Simple domestic fabric efficiency calculator</b></div>
         
-        <p><b>1. Simple domestic fabric efficiency model</b></p>
-        
-        <table class="table" style="width:50%; float:left">
+        <table class="table" style="width:50%; float:left; margin-bottom:0px">
         <tr>
             <td>Total Floor Area</td>
             <td>
@@ -329,11 +378,12 @@ table td {
             <tr><td>Fabric heat loss</td><td><span class="modeloutput" key="fabric_WK" dp=0 scale=1 units="W/K"></span></td></tr>
             <tr><td>Infiltration heat loss</td><td><span class="modeloutput" key="infiltration_WK" dp=0 scale=1 units="W/K"></span></td></tr>
             <tr><td>Total fabric efficiency</td><td><span class="modeloutput" key="domestic_space_heat_demand_WK" dp=0 scale=1 units="W/K"></span></td></tr>
+            <tr><td>Space heating heat demand<br>by floor area</td><td><span class="modeloutput" key="spaceheatkwhm2" dp=0 scale=1 units="kWh/m2/y"></span></td></tr>
+            <tr><td><i>Passivhaus target:</i></td><td><i>15 kWh/m2.y</i></td></tr>
             </table>
         </div>
         <div style="clear:both"></div>
-
-        <p><b>2. Space Heating</b></p>
+        </div>
         
         <p>Space heat base temperature: <input class="modelinput" key="space_heat_base_temperature" type="text" style="width:70px" value="" autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span></p>
 
@@ -375,13 +425,36 @@ table td {
         </tr>
         </table>
          
-        <p><b>3. Water Heating</b></p>
+        <p><b>2. Water Heating</b></p>
         
+        <div style="border: 1px solid #ccc; padding:10px;">
+        <div style="margin-bottom:10px"><b>Simple domestic hot water demand calculator</b></div>
+        <table class="table" style="width:100%; margin-bottom:0px;">
+        <tr>
+            <td>Number of showers per day<br><span style="font-size:14px">(Based on 7.5 minute 9 kW equivalent shower)</span></td>
+            <td><input class="modelinput" key="number_showers_per_day" type="text" style="width:100px" value="" autocomplete="off"/></td>
+        </tr>
+        <tr>
+            <td>Number of baths per day<br><span style="font-size:14px">(Based on 20% higher water use than shower)</span></td>
+            <td><input class="modelinput" key="number_baths_per_day" type="text" style="width:100px" value="" autocomplete="off"/></td>
+        </tr>
+        <tr>
+            <td>Number of kitchen sink bowl fills per day<br><span style="font-size:14px">(Based on 70% fill of typical 9.5L bowl, 50C water)</span></td>
+            <td><input class="modelinput" key="number_kitchen_sink" type="text" style="width:100px" value="" autocomplete="off"/></td>
+        </tr>
+        <tr>
+            <td>Number of bathroom sink fills per day</td>
+            <td><input class="modelinput" key="number_bathroom_sink" type="text" style="width:100px" value="" autocomplete="off"/></td>
+        </tr>
+        </table>
+        </div><br>
+
+
         <table class="table" style="width:100%">
         <tr>
             <td width="20%">Domestic</td>
             <td width="20%"></td>
-            <td width="20%"><input class="modelinput" key="domestic_water_heating" type="text" style="width:70px" value="" autocomplete="off" /> TWh</td>
+            <td width="20%"><span class="modeloutput" key="domestic_water_heating" dp=1></span> TWh</td>
             <td width="20%"><span class="modeloutput" key="prc_reduction_domestic_water_heating" dp=0 units="%" scale=100></span></td>
             <td width="20%"><span class="modeloutput" key="domestic_water_heating_kwh" dp=0></span> kWh/household</td>
         </tr>
@@ -401,7 +474,7 @@ table td {
         </tr>
         </table>
 
-        <p><b>4. Heating Systems</b></p>
+        <p><b>3. Heating Systems</b></p>
 
         <table class="table" style="width:100%">  
         <tr>
@@ -718,7 +791,7 @@ table td {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>INDUSTRIAL (& cooking) FUEL INPUTS</b></div>
     <div class="inner">
-        <div style="font-size:14px">Projected scenario domestic cooking electricity consumption: 10.47 TWh, Catering electricity consumption: 16.85 TWh. In 2007 and 2017 these were: 15 TWh, 22 TWh and 14 TWh, 21 TWh respectively.<br><br>
+        <div style="font-size:14px">
         Industrial energy demand is based on 2007 levels adjusted for 2030 population (1.15x) and a 25% reduction in energy intensity. E.g High temp heat was 57 TWh in 2007 x 1.15 x 0.75 = 49.16 TWh. Actual industrial energy demand in 2017 was 256 TWh consisting of: High temp: 41 TWh, Low temp: 82 TWh, Non heat + other: 133 TWh. 11% less than projected scenario demand for 2030.
         <br><br>
         Industrial energy use is dealt with in the scenario at a high level and a cautious approach is taken. Industry energy demand is an area highlighted for further research within the ZeroCarbonBritain scenario.
@@ -736,14 +809,6 @@ table td {
           <th>Biomass CHP<br>(TWh/yr)</th>
           <th>Total</th>
         </tr>-->
-        <tr>
-            <td>Cooking/catering electricity</td>
-            <td><input class="modelinput" key="annual_cooking_elec" type="text" style="width:70px" value="" autocomplete="off" /> TWh</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
         <tr>
           <th></th>
           <th>Process Energy</th>

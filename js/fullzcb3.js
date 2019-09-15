@@ -53,7 +53,7 @@ function fullzcb3_init()
     // ---------------------------------------------------------------------------
     // dataset index:
     // 0:onshore wind, 1:offshore wind, 2:wave, 3:tidal, 4:solar, 5:traditional electricity
-    offshore_wind_capacity = 140.0
+    offshore_wind_capacity = 136.0
     onshore_wind_capacity = 30.0
     wave_capacity = 10.0
     tidal_capacity = 20.0
@@ -78,8 +78,22 @@ function fullzcb3_init()
     // ---------------------------------------------    
     // Traditional electricity demand
     // column 5 trad elec demand: 331.033 TWh/yr, normalised and scaled to:
+
+    // Lights, Appliances and Cooking
+    LAC_number_of_lights = 10.0
+    LAC_lights_power = 11.0
+    lighting_hours = 10.0
     
-    trad_elec_domestic_appliances = 38.59 // TWh/yr (45% of 2007 figure, does not include cooking)
+    LAC_alwayson = 10.0
+    LAC_fridgefreezer = 262.0
+    LAC_washingmachine = 136.0
+    LAC_cooking = 350.0
+    LAC_computing = 212.0
+    LAC_other = 200.0
+        
+    annual_cooking_elec_services = 16.85
+    
+    // trad_elec_domestic_appliances = 38.59 // TWh/yr (45% of 2007 figure, does not include cooking)
     trad_elec_services_appliances = 41.41 // TWh/yr
     trad_elec_services_cooling = 4.55     // TWh/yr
     
@@ -100,7 +114,16 @@ function fullzcb3_init()
     services_space_heat_demand_GWK = 1.486 // GW/K
     industry_space_heat_demand_GWK = 0.502 // GW/K
     space_heat_base_temperature = 13.07               // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050
-    
+
+    // Simple Domestic Hot Water Demand calculator
+    number_showers_per_day = 1.5
+    number_baths_per_day = 0.8
+    number_kitchen_sink = 2.2
+    number_bathroom_sink = 1.0
+    shower_kwh = 1.125 // 7.5 mins at 9kW
+    bath_kwh = 1.35   // uses 20% more water than shower at same temperature
+    sink_kwh = 0.3   // 6.3L × 40K × 4200 (assuming 50C water, 70% of typical bowl)
+
     domestic_water_heating = 40.80 // TWh
     services_water_heating = 15.99 // TWh
         
@@ -121,9 +144,8 @@ function fullzcb3_init()
     heatstore_storage_cap = 100.0
     heatstore_charge_cap = 50.0
     // ---------------------------------------------
-    // Industrial & cooking
+    // Industrial
     // ---------------------------------------------
-    annual_cooking_elec = 27.32
     annual_high_temp_process = 49.01          // 26.3% elec, 73.7% gas in original model
     annual_low_temp_dry_sep = 117.78          // 66% elec, 11% gas, 22% biomass CHP in original model
 
@@ -180,7 +202,7 @@ function fullzcb3_init()
     minimum_hydrogen_store_level = 0.1
 
     // biogas
-    biomass_for_biogas = 55.0    
+    biomass_for_biogas = 50.0    
     anaerobic_digestion_efficiency = 0.6                                     // HHV, originally 0.5747
     co2_tons_per_gwh_methane = (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))  // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     
@@ -337,11 +359,23 @@ function fullzcb3_run()
     total_supply = 0
     total_ambient_heat_supply = 0
 
-  
+    domestic_appliances_kwh = 0
+    domestic_appliances_kwh += (lighting_hours / 24.0) * LAC_number_of_lights * LAC_lights_power * 0.001 * 24.0 * 365.25
+    domestic_appliances_kwh += LAC_fridgefreezer
+    domestic_appliances_kwh += LAC_washingmachine
+    domestic_appliances_kwh += LAC_alwayson * 0.001 * 24.0 * 365.25
+    domestic_appliances_kwh += LAC_computing
+    trad_elec_domestic_appliances = (domestic_appliances_kwh * households_2030) / 1000000000.0
+
+    annual_cooking_elec_domestic = (LAC_cooking * households_2030) / 1000000000.0
+    annual_cooking_elec = annual_cooking_elec_domestic + annual_cooking_elec_services
+
+    prc_reduction_domestic_cooking = 1.0 - (annual_cooking_elec_domestic / 15.0)
     prc_reduction_domestic_appliances = 1.0 - (trad_elec_domestic_appliances / 86.0)
     prc_reduction_services_appliances = 1.0 - (trad_elec_services_appliances / 59.0)
     prc_reduction_services_cooling = 1.0 - (trad_elec_services_cooling / 9.0)
-    
+    prc_reduction_services_catering = 1.0 - (annual_cooking_elec_services / 22.0)
+        
     domestic_appliances_kwh = trad_elec_domestic_appliances * 1000000000.0 / households_2030
     trad_elec_demand = trad_elec_domestic_appliances + trad_elec_services_appliances + trad_elec_services_cooling 
     // ---------------------------------------------------------------------------------------------  
@@ -359,7 +393,7 @@ function fullzcb3_run()
     
     if (window_type==1) window_uvalue = 4.8 // single
     if (window_type==2) window_uvalue = 1.9 // double
-    if (window_type==3) window_uvalue = 1.3 // triple
+    if (window_type==3) window_uvalue = 0.85 // triple
 
     total_wall_area = (side * storey_height * 2) * 4
     total_window_area = total_wall_area * glazing_extent
@@ -391,9 +425,19 @@ function fullzcb3_run()
     // ---------------------------------------------------------------------------------------------
     domestic_space_heat_demand_GWK = (domestic_space_heat_demand_WK * households_2030) / 1000000000.0
     space_heat_demand_GWK = domestic_space_heat_demand_GWK + services_space_heat_demand_GWK + industry_space_heat_demand_GWK
+
+
+    // DHW Demand
+    DHW_daily_demand = 0
+    DHW_daily_demand += (shower_kwh * number_showers_per_day)
+    DHW_daily_demand += (bath_kwh * number_baths_per_day)
+    DHW_daily_demand += (sink_kwh * number_kitchen_sink)
+    DHW_daily_demand += (sink_kwh * number_bathroom_sink)
+    domestic_water_heating_kwh = DHW_daily_demand * 365.25
+    domestic_water_heating = (domestic_water_heating_kwh * households_2030) / 1000000000.0
+
     water_heating = domestic_water_heating + services_water_heating
     
-    domestic_water_heating_kwh = domestic_water_heating * 1000000000.0 / households_2030
     prc_reduction_domestic_water_heating = 1.0 - (domestic_water_heating / 71.0)
     prc_reduction_services_water_heating = 1.0 - (services_water_heating / 16.0)
 
@@ -703,8 +747,11 @@ function fullzcb3_run()
         // ---------------------------------------------------------------------------
         // Traditional electricity demand
         // ---------------------------------------------------------------------------
+        cooking_elec = cooking_profile[hour%24] * daily_cooking_elec
+        
         normalised_trad_elec = capacityfactors[5]/331.033
         traditional_elec_demand = normalised_trad_elec * trad_elec_demand
+        traditional_elec_demand += cooking_elec
         
         data.s1_traditional_elec_demand.push([time,traditional_elec_demand])
         total_traditional_elec += traditional_elec_demand
@@ -745,6 +792,7 @@ function fullzcb3_run()
     }
     
     domestic_space_heating_kwh = total_domestic_space_heat_demand*0.1*1000000 / households_2030
+    spaceheatkwhm2 = domestic_space_heating_kwh / total_floor_area
     
     prc_reduction_domestic_space_heat_demand = 1.0 - ((total_domestic_space_heat_demand*0.0001) / 266.0)
     prc_reduction_services_space_heat_demand = 1.0 - ((total_services_space_heat_demand*0.0001) / 83.0)
@@ -888,11 +936,10 @@ function fullzcb3_run()
         var time = datastarttime + (hour * 3600 * 1000);
         
         // electric demand
-        cooking_elec = cooking_profile[hour%24] * daily_cooking_elec
         non_heat_process_elec = not_heat_process_profile[hour%24] * daily_non_heat_process_elec
 
         // balance including non DSR industrial load
-        balance = data.s1_total_variable_supply[hour][1] - data.s1_traditional_elec_demand[hour][1] - s3_spacewater_elec_demand[hour] - cooking_elec - non_heat_process_elec
+        balance = data.s1_total_variable_supply[hour][1] - data.s1_traditional_elec_demand[hour][1] - s3_spacewater_elec_demand[hour] - non_heat_process_elec
 
         // High temp process: 25% elec, 75% gas in original model
         // Low temp process: 66% elec, 11% gas, 22% biomass CHP in original model
@@ -916,7 +963,7 @@ function fullzcb3_run()
         if (heat_process_DSR_elec<0) heat_process_DSR_elec = 0                      // 3. -- should never happen --
         heat_process_DSR_gas = heat_process_DSR - heat_process_DSR_elec             // 4. if there is not enough elec to meet demand, use gas
         
-        industrial_elec_demand = cooking_elec + non_heat_process_elec + heat_process_fixed_elec + heat_process_DSR_elec
+        industrial_elec_demand = non_heat_process_elec + heat_process_fixed_elec + heat_process_DSR_elec
         
         s1_industrial_elec_demand.push(industrial_elec_demand)
         total_industrial_elec_demand += industrial_elec_demand 
@@ -1609,7 +1656,7 @@ function fullzcb3_run()
 
       {"name":"Demand","height":(total_demand+total_losses)*scl,"saving":0,
         "stack":[
-          {"kwhd":total_traditional_elec*scl,"name":"Trad Elec","color":0},
+          {"kwhd":total_traditional_elec*scl,"name":"LAC","color":0},
           {"kwhd":total_space_heat_demand*scl,"name":"Space Heat","color":0},
           {"kwhd":total_water_heat_demand*scl,"name":"Water Heat","color":0},
           {"kwhd":(total_EV_demand+total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
