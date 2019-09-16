@@ -1,84 +1,101 @@
-body {
-    font-family: 'Ubuntu', sans-serif;
-    margin:0px;
-    padding:0px;
-    height:100%;
+html, body {
+  font-family: "Ubuntu", sans-serif;
+  margin:0px;
+  padding:0px;
+  height:100%;
 }
 
-#wrap {
-    min-height: 100%;
-    height: auto !important;
-    height: 100%;
-    /* Negative indent footer by it's height */
-    margin: 0 auto -40px;
+.wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by it's height */
+  margin-bottom: -40px;
 }
 
-@media (max-width: 925px) {
-    #menu {
-        padding:20px;
-    }
-
-    #model-bound {
-        padding:20px;
-        
-    }
-
-    #description {
-        padding:20px;
-    }
+h2 {
+  margin-bottom:10px;
 }
 
-@media (min-width: 925px) and (max-width: 1360px) {
-    #menu {
-        padding:20px;
-        width:200px;
-        float:left;
-    }
-
-    #model-bound {
-        padding:20px;
-        width:75%;
-        float:left;
-        
-    }
-
-    #description {
-        padding:20px;
-        float:left;
-    }
+.page {
+  margin: 0 auto;
+  max-width:960px;
+  color:#333;
 }
 
-@media (min-width: 1360px) {
-    #menu {
-        float:left;
-        padding:20px;
-        width:200px;
-    }
-
-    #model-bound {
-        float:left;
-        padding:20px;
-        width:50%;
-    }
-
-    #description {
-        float:left;
-        padding:20px;
-        width:30%;
-    }
+.page_inner {
+  padding:20px;
+  margin-bottom:20px;
 }
 
-
-
-#header {
-    background-color: #fffcaa;
-    padding:10px;
+.published {
+  color:#666;
+  font-size:14px;
 }
 
-pre {
-    border: 1px solid #ccc;
-    background-color:#eee;
-    padding:20px;
+.logo-bound-top {
+  padding:10px;
+}
+
+.logo-bound-side {
+  padding:20px;
+}
+
+.logo {
+  width:42px;
+  height:42px;
+  float:left;
+  background: url(img/solarhouse.png);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  cursor:pointer;
+}
+
+.logo:hover {
+  background: url(img/solarhouse-blue.png);
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.logo-title {
+  padding:12px;
+  float:left;  
+}
+
+.menu-item {
+  padding:8px 0px 8px 20px;
+}
+
+.menu-title {
+  padding:15px 0px 15px 20px;
+  background-color:rgba(0,0,0,0.05);
+  cursor:pointer;
+  margin-bottom:1px;
+}
+
+.menu-title:hover {
+  background-color:rgba(0,0,0,0.07);
+}
+
+.menu-items {
+  padding:10px 0px 10px 0px;
+}
+
+a {
+  text-decoration:none;
+  color:#666;
+}
+
+a:visited {
+  color:#666;
+}
+
+a:hover {
+  color:#6bace3;
+}
+
+img {
+  width:100%;
 }
 
 #footer {
@@ -87,6 +104,14 @@ pre {
     font-size: 14px;
     padding-top:10px;
     height: 30px;
+}
+
+pre {
+  border: 1px solid #ffffff;
+  background-color: #eee;
+  padding: 20px;
+  overflow-x: auto;
+  text-align: left;
 }
 
 .table {
@@ -117,44 +142,64 @@ pre {
     vertical-align: top;
 }
 
-ul {
-    list-style: outside none none;
-    margin: 0;
-    padding: 0;
+.sidenav {
+  width: 300px;
+  max-height: 100vh;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  display: block;
+  top: 0;
+  left: 0;
+  color:#aaa;
+  float: left;
+  text-align:left;
+  background-color: whitesmoke;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 1000;
 }
 
-ul li a {
-    padding: 10px 0px;
-    width:200px;
-    display: block;
-    float:left;
-    color:#888;
-    text-decoration: none;
+.sidenav_inner {
+  box-sizing: border-box;
+  padding: 0;
+  width: 300px;
 }
 
-ul li b {
-    padding: 10px 0px;
-    width:200px;
-    display: block;
-    float:left;
-    color:#888;
-    text-decoration: none;
+.topnav {
+  height:65px;
+  display: block;
+  color:#aaa;
+  text-align:left;
+  background-color: whitesmoke;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
-ul li a:hover {
-    text-decoration: none;
-    color: var(--app-color);
+.topnav_inner {
+  box-sizing: border-box;
+  padding: 0;
 }
 
-a {
-    color:#888;
-    text-decoration: none;
+.quote {
+  border: 1px solid #ffffff;
+  background-color: #eee;
+  padding: 20px;
+  overflow-x: auto;
+  text-align: left;
 }
 
-a:hover {
-    text-decoration: none;
-    color: var(--app-color);
-}
 
 .alert {
   padding: 8px 35px 8px 14px;

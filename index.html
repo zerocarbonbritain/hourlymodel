@@ -1,74 +1,108 @@
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!--<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>-->
-<script type="text/javascript" src="jquery-1.9.0.min.js"></script>
-<script type="text/javascript" src="jszip/jszip.min.js"></script>
-<script type="text/javascript" src="jszip/jszip-utils.min.js"></script>
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.min.js"></script>
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.selection.min.js"></script>
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.time.min.js"></script>
-<script language="javascript" type="text/javascript" src="flot/jquery.flot.stack.min.js"></script>
-<script type="text/javascript" src="stacks.js"></script>
-<link href="style.css" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
 
-<body>
+  <head>
+    <title>ZeroCarbonBritain Hourly Model</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="font/ubuntu.css?family=Ubuntu:light,bold&subset=Latin">
+    <!--<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>-->
+    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="jszip/jszip.min.js"></script>
+    <script type="text/javascript" src="jszip/jszip-utils.min.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.flot.min.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.flot.selection.min.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.flot.time.min.js"></script>
+    <script language="javascript" type="text/javascript" src="flot/jquery.flot.stack.min.js"></script>
+    <script type="text/javascript" src="stacks.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css?v=1" />
+  </head>
 
-    <div id="wrap">
-    
-    
-        <div id="menu">
-            <h2>Contents</h2>
-            <ul>
-                <li><b>Full Model</b></li>
-                <li><a href="#fullzcb3">ZeroCarbonBritain v3</a></li>
-                <li><a href="#fullzcb2">ZeroCarbonBritain v2</a></li>
-                <li><a href="#fullzcb">ZeroCarbonBritain v1</a></li>
-                <li><a href="#dataset">ZCB Dataset</a></li>
-                
-                <li><b>Examples</b></li>
-                <li><a href="#varsupply">1. Variable supply</a></li>
-                <li><a href="#varsupply_flatdemand">2. Variable supply and flat demand</a></li>
-                <li><a href="#varsupply_traddemand">3. Variable supply, traditional electricity demand and oversupply</a></li>
-                <li><a href="#windandsun_flatdemand">4. Mixed supply and flat demand</a></li>
-                <!--
-                <li><a href="#varsupply_spaceheatingdemand">5. Variable supply and space heating demand</a></li>
-                <li><a href="#electricvehicles">6. Electric Vehicles</a></li>
-                <li><a href="#all">7. Household electric only model</a></li>
-                <li><a href="#fullhousehold">8. Household full energy model</a></li>
-                -->
-                <li><a href="#storage_algorithm">5. Storage Algorithms</a></li>
-
-            </ul>
-            
-            <div style="clear:both"></div>
+  <body>
+    <div class="wrap">
+  
+    <div class="topnav" style="display:none">
+      <div class="logo-bound-top">
+        <div class="logo"></div>
+        <div class="logo-title">ZeroCarbonBritain Hourly Model</div>
+      </div>
+    </div>
+  
+    <div class="sidenav">
+      <div class="sidenav_inner">
+        <div class="logo-bound-side">
+          <div class="logo"></div>
+          <div class="logo-title">ZCB Hourly Model</div>
+        </div>
+        <div style="clear:both"></div>
+        
+        <br>
+        <div class="menu-title" name="fullmodel"><b>Full Model</b></div>
+        <div class="menu-items" name="fullmodel">
+          <div class="menu-item"><a href="#fullzcb3">ZeroCarbonBritain v3</a></div>
+          <div class="menu-item"><a href="#fullzcb2">ZeroCarbonBritain v2</a></div>
+          <div class="menu-item"><a href="#fullzcb">ZeroCarbonBritain v1</a></div>
+          <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
+        </div>
+              
+        <div class="menu-title" name="examples"><b>Examples</b></div>
+        <div class="menu-items" name="examples" style="display:none">
+          <div class="menu-item"><a href="#varsupply">1. Variable supply</a></div>
+          <div class="menu-item"><a href="#varsupply_flatdemand">2. Variable supply and flat demand</a></div>
+          <div class="menu-item"><a href="#varsupply_traddemand">3. Variable supply, traditional electricity demand and oversupply</a></div>
+          <div class="menu-item"><a href="#windandsun_flatdemand">4. Mixed supply and flat demand</a></div>
+          <!--
+          <div class="menu-item"><a href="#varsupply_spaceheatingdemand">5. Variable supply and space heating demand</a></div>
+          <div class="menu-item"><a href="#electricvehicles">6. Electric Vehicles</a></div>
+          <div class="menu-item"><a href="#all">7. Household electric only model</a></div>
+          <div class="menu-item"><a href="#fullhousehold">8. Household full energy model</a></div>
+          -->
+          <div class="menu-item"><a href="#storage_algorithm">5. Storage Algorithms</a></div>
         </div>
 
+        <div class="menu-title" name="methodology"><b>Methodology Papers (PDF)</b></div>
+        <div class="menu-items" name="methodology" style="display:none">
+          <div class="menu-item"><a href="Methodology/Hourly Energy Model Methodology.pdf">1. Hourly Energy Model</a></div>
+          <div class="menu-item"><a href="Methodology/Renewable Energy Supply Methodology.pdf">2. Renewable Energy Supply</a></div>
+          <div class="menu-item"><a href="Methodology/Power Down Methodology 2 7 13.pdf">3. Power Down</a></div>
+          <div class="menu-item"><a href="Methodology/Food and diets methodology.pdf">4. Food and diets</a></div>
+          <div class="menu-item"><a href="Methodology/Land Use Methodology 30.6.13.pdf">5. Land Use</a></div>          
+        </div>
         
+      </div>
+    </div>
+
+    
+    <div class="page">
+      <div class="page_inner">
         <div id="model-bound">
-        
-            <h2>Loading: <span id="loading_prc">0</span></h2>
             <div id="model">
             </div>
             
             <pre id="sourcecode" style="display:none"></pre>
         </div>
-        
-        <div id="description">
-        </div>
-    
+        <div id="description"></div>
+        <div style="clear:both"></div>
+      </div>
     </div>
-    
-    <div style="clear:both"></div>
+    </div>
+  
     <div id="footer"><a href="http://zerocarbonbritain.org/">ZeroCarbonBritain,</a> <a href="https://github.com/zerocarbonbritain/hourlymodel">Open Source on GitHub</a></div>
-    
-</body>
+
+  </body>
+</html>
 <script language="javascript" type="text/javascript" src="vishelper.js"></script>
 
 <script>
+var sidenav_visible = true;
+var window_width = 0;
+var print_view = false;
+
 loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 8;
+var v = 10;
 
 view_mode = "";
 
@@ -164,7 +198,7 @@ function load_page(page)
     $("#view-source").html("Show source code");
     
     var time_elapsed = (Date.now() - timerStart)
-    loading_prc(100,"complete "+(time_elapsed*0.001).toFixed(1)+"s");
+    loading_prc(100,"Load time "+(time_elapsed*0.001).toFixed(1)+"s");
 }
 
 $("#model").on("change",".modelinput",function(){
@@ -212,8 +246,83 @@ $("#model").on("click",".box-title",function(){
 });
 
 function loading_prc(prc,msg) {
-    $("#loading_prc").html(prc+"% "+msg);
+    $(".loading_prc").html(msg);
 }
+
+// ------------------------------------------
+
+function resize() {
+    window_width = $(window).width();
+
+    var sidenav_space = (window_width-960)*0.5;
+
+    if (sidenav_space>300) {
+        sidenav_visible = true;
+    } else {
+        sidenav_visible = false;
+    }
+    draw_sidebar();
+    
+    if (print_view) {
+        $(".topnav").hide();
+        $(".sidenav").hide();
+        $(".published").hide();
+    }
+      
+    var width = $("#placeholder_bound").width();
+    var height = $("#placeholder_bound").height();
+    $("#placeholder").width(width);
+    $("#placeholder").height(width*0.52);
+    
+    var view_fn = page+"_view";
+    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
+}
+
+
+$(window).on('load', function(){
+    resize();
+});
+
+$(window).resize(function() {
+    resize();
+});
+
+$(".logo").click(function(){
+    if (sidenav_visible) {
+        sidenav_visible = false;
+    } else {
+        sidenav_visible = true;
+    }
+    
+    draw_sidebar();
+});
+
+
+function draw_sidebar() {
+    if (sidenav_visible) {
+        $(".sidenav").show();
+        $(".topnav").hide();
+        
+        var sidenav_space = (window_width-960)*0.5;
+        if (sidenav_space>300) {
+            $(".page").css("margin","0 0 0 300px");
+        } else {
+            $(".page").css("margin","0 auto 0 auto");
+        }
+        
+    } else {
+        $(".sidenav").hide();
+        $(".topnav").show();    
+        $(".page").css("margin","0 auto 0 auto");
+    } 
+}
+
+$(".menu-title").click(function(){
+    var name = $(this).attr("name");
+    $(".menu-items[name="+name+"]").toggle();
+    
+    if (name=="twitter") window.location = "https://twitter.com/trystanlea";
+});
     
 </script>
 

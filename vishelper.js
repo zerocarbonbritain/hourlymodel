@@ -112,23 +112,6 @@ $("body").on("click","#reset",function(){
     window[view_fn](start,end,interval);
 });
 
-
-
-
-$(window).resize(function(){
-    resize();
-    var view_fn = page+"_view";
-    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
-});
-
-function resize()
-{
-    var width = $("#placeholder_bound").width();
-    var height = $("#placeholder_bound").height();
-    $("#placeholder").width(width);
-    $("#placeholder").height(width*0.52);
-}
-
 function data_view(start,end,interval)
 {
     start = Math.floor(start);
