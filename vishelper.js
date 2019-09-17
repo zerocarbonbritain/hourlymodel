@@ -1,50 +1,50 @@
-function load_capacityfactor_dataset(callback){
+function load_capacityfactor_dataset(filename,callback){
     // Load dataset as zip and decompress  - provides faster loading times
     tenyearsdatalines = []
     hours = 0
     
-    JSZipUtils.getBinaryContent('highresolution.csv.zip', function(err, data) {
+    JSZipUtils.getBinaryContent(filename, function(err, data) {
         if(err) {
         throw err; // or handle err
         }
 
         var zip = new JSZip(data);
-        capacityfactorfile = zip.file("highresolution.csv").asText();
+        capacityfactorfile = zip.file(filename.replace(".zip","")).asText();
         tenyearsdatalines = capacityfactorfile.split(/\r\n|\n/);
         hours = 87648;
         callback();
     });
 }
 
-function load_temperature_dataset(callback){
+function load_temperature_dataset(filename,callback){
     // Load dataset as zip and decompress  - provides faster loading times
     temperaturelines = []
     days = 0
     
-    JSZipUtils.getBinaryContent('temperature.csv.zip', function(err, data) {
+    JSZipUtils.getBinaryContent(filename, function(err, data) {
         if(err) {
         throw err; // or handle err
         }
 
         var zip = new JSZip(data);
-        temperaturefile = zip.file("temperature.csv").asText();
+        temperaturefile = zip.file(filename.replace(".zip","")).asText();
         temperaturelines = temperaturefile.split(/\r\n|\n/);
         days = temperaturelines.length;
         callback();
     });
 }
 
-function load_test_dataset(callback){
+function load_test_dataset(filename,callback){
     // Load dataset as zip and decompress  - provides faster loading times
     testlines = []
     
-    JSZipUtils.getBinaryContent('test.csv.zip', function(err, data) {
+    JSZipUtils.getBinaryContent(filename, function(err, data) {
         if(err) {
         throw err; // or handle err
         }
 
         var zip = new JSZip(data);
-        testfile = zip.file("test.csv").asText();
+        testfile = zip.file(filename.replace(".zip","")).asText();
         testlines = testfile.split(/\r\n|\n/);
         callback();
     });

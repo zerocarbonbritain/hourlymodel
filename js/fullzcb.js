@@ -898,59 +898,61 @@ function fullzcb_run()
     // ----------------------------------------------------------------------------
     // Tests
     // ----------------------------------------------------------------------------
-    // 1. Test definition
-    var tests = {
-      "s3_heatstore_SOC": {testdataindex:1},
-      "s4_BEV_Store_SOC": {testdataindex:2},
-      "s5_elecstore_SOC": {testdataindex:3},
-      "s5_hydrogen_SOC": {testdataindex:4},
-      "s5_methane_SOC": {testdataindex:5},
-      "s5_final_balance": {testdataindex:6}
-    }
-    // 2. Test init
-    for (var z in tests) {
-        tests[z].max_error = 0.0
-        tests[z].sum_error = 0.0
-        tests[z].sum = 0.0
-    }
-    // 3. Error calculation
-    for (var hour = 0; hour < hours; hour++) {
-        var test = testlines[hour].split(",");
-        
+    if (run_zcb_test) {
+        // 1. Test definition
+        var tests = {
+          "s3_heatstore_SOC": {testdataindex:1},
+          "s4_BEV_Store_SOC": {testdataindex:2},
+          "s5_elecstore_SOC": {testdataindex:3},
+          "s5_hydrogen_SOC": {testdataindex:4},
+          "s5_methane_SOC": {testdataindex:5},
+          "s5_final_balance": {testdataindex:6}
+        }
+        // 2. Test init
         for (var z in tests) {
-            var testval = parseFloat(test[tests[z].testdataindex]);
-            error = Math.abs(window[z][hour] - testval);
-            if (error>tests[z].max_error) tests[z].max_error = error;
-            tests[z].sum_error += error
+            tests[z].max_error = 0.0
+            tests[z].sum_error = 0.0
+            tests[z].sum = 0.0
         }
-    }
-    // 4. Test output
-    var out = "";
-    for (var z in tests) {
-    if (tests[z].sum_error/hours<0.1) status = "success"; else status = "error";
-        out += "<div class='alert alert-"+status+"'><b>"+status+":</b> "+z+" (mean:"+(tests[z].sum_error/hours).toFixed(4)+", max:"+tests[z].max_error.toFixed(2)+")</div>";
-    }
-    
-    $("#tests").html(out);
-    loading_prc(90,"tests");
-    
-    // Output
-    var out = "";
-    for (var hour = 0; hour < hours; hour++) {
-        var test = testlines[hour].split(",");
-        var heatstore_SOC = parseFloat(test[1]);
-        var BEV_Store_SOC = parseFloat(test[2]);
-        var hydrogen_SOC = parseFloat(test[4]);
-        var methane_SOC = parseFloat(test[5]);
-        var final_balance = parseFloat(test[6]);
-        
-        error = Math.abs(final_balance-s5_final_balance[hour])
-        
-        if (error>1) {
-            //out += (hour+2)+"\t"+final_balance.toFixed(1)+"\t"+s5_final_balance[hour].toFixed(1)+"\t"+error+"\n";
+        // 3. Error calculation
+        for (var hour = 0; hour < hours; hour++) {
+            var test = testlines[hour].split(",");
+            
+            for (var z in tests) {
+                var testval = parseFloat(test[tests[z].testdataindex]);
+                error = Math.abs(window[z][hour] - testval);
+                if (error>tests[z].max_error) tests[z].max_error = error;
+                tests[z].sum_error += error
+            }
+        }
+        // 4. Test output
+        var out = "";
+        for (var z in tests) {
+        if (tests[z].sum_error/hours<0.1) status = "success"; else status = "error";
+            out += "<div class='alert alert-"+status+"'><b>"+status+":</b> "+z+" (mean:"+(tests[z].sum_error/hours).toFixed(4)+", max:"+tests[z].max_error.toFixed(2)+")</div>";
         }
         
-    } 
+        $("#tests").html(out);
+        loading_prc(90,"tests");
+        
+        // Output
+        var out = "";
+        for (var hour = 0; hour < hours; hour++) {
+            var test = testlines[hour].split(",");
+            var heatstore_SOC = parseFloat(test[1]);
+            var BEV_Store_SOC = parseFloat(test[2]);
+            var hydrogen_SOC = parseFloat(test[4]);
+            var methane_SOC = parseFloat(test[5]);
+            var final_balance = parseFloat(test[6]);
+            
+            error = Math.abs(final_balance-s5_final_balance[hour])
+            
+            if (error>1) {
+                //out += (hour+2)+"\t"+final_balance.toFixed(1)+"\t"+s5_final_balance[hour].toFixed(1)+"\t"+error+"\n";
+            }
+            
+        }
+    }
         
     $(".modeloutput").each(function(){
         var type = $(this).attr("type");

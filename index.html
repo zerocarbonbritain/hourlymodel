@@ -15,7 +15,7 @@
     <script language="javascript" type="text/javascript" src="flot/jquery.flot.time.min.js"></script>
     <script language="javascript" type="text/javascript" src="flot/jquery.flot.stack.min.js"></script>
     <script type="text/javascript" src="stacks.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css?v=2" />
+    <link rel="stylesheet" type="text/css" href="style.css?v=3" />
   </head>
 
   <body>
@@ -75,6 +75,13 @@
     
     <div class="page">
       <div class="page_inner">
+        
+        <div class="loading">
+        <div style="font-size:22px; color:#888; margin-top:20px">Loading datasets for hourly energy model</div>
+        <img src="img/ajax-loader.gif" style="width:32px; margin:40px">
+        <div style="font-size:16px; color:#888; margin-bottom:20px">Downloading 906 kB</div>
+        </div>
+        
         <div id="model-bound">
             <div id="model">
             </div>
@@ -91,18 +98,21 @@
 
   </body>
 </html>
-<script language="javascript" type="text/javascript" src="vishelper.js?v=1"></script>
+<script language="javascript" type="text/javascript" src="vishelper.js?v=2"></script>
 
 <script>
 var sidenav_visible = true;
 var window_width = 0;
 var print_view = false;
+var run_zcb_test = false;
+var files_to_load = 2;
+if (run_zcb_test) files_to_load = 3;
 
 loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 10;
+var v = 11;
 
 view_mode = "";
 
@@ -117,31 +127,34 @@ if (page=="") page = "fullzcb3";
 var datasets = 0;
 var pageload = 0;
 
-load_capacityfactor_dataset(function(){
+//load_capacityfactor_dataset("highresolution.csv.zip",function(){
+load_capacityfactor_dataset("tenyearsdata.csv.zip",function(){
     console.log("capacityfactor dataset loaded");
     datasets ++;
     loading_prc(datasets*10,"capacityfactor dataset");
     
-    if (datasets==3) load_page(page);
+    if (datasets==files_to_load) load_page(page);
 });
 
 
-load_temperature_dataset(function(){
+load_temperature_dataset("temperature.csv.zip",function(){
     console.log("temperature dataset loaded");
     datasets ++;
     loading_prc(datasets*10,"temperature dataset");
 
-    if (datasets==3) load_page(page);
+    if (datasets==files_to_load) load_page(page);
 });
 
-load_test_dataset(function(){
-    console.log("test dataset loaded");
-    datasets ++;
-    loading_prc(datasets*10,"test dataset");
-    
-    if (datasets==3) load_page(page);
-});
 
+if (run_zcb_test) {
+    load_test_dataset("test.csv.zip",function(){
+        console.log("test dataset loaded");
+        datasets ++;
+        loading_prc(datasets*10,"test dataset");
+        
+        if (datasets==files_to_load) load_page(page);
+    });
+}
 
 // load_page(page);
 
@@ -153,6 +166,7 @@ $(window).on('hashchange', function() {
 
 function load_page(page)
 {
+    $(".loading").hide();
     if (view_html[page]!=undefined) {
         $("#model").html(view_html[page]);
         $("#description").html(view_desc[page]);
@@ -202,6 +216,8 @@ function load_page(page)
 }
 
 $("#model").on("change",".modelinput",function(){
+    var timerStart = Date.now();
+
     var varkey = $(this).attr("key");
     var type = $(this).attr("itype");
     var scale = 1.0;
@@ -212,6 +228,9 @@ $("#model").on("change",".modelinput",function(){
     if (window[run_fn]!=undefined) window[run_fn]();
     var view_fn = page+"_view";
     if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
+
+    var time_elapsed = (Date.now() - timerStart)
+    loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s");
 });
 
 $("#model").on("click",".viewmode",function(){
