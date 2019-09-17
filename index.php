@@ -1,3 +1,7 @@
+<?php
+    $highres = 0;
+    if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <meta charset="utf-8">
@@ -105,6 +109,7 @@ var sidenav_visible = true;
 var window_width = 0;
 var print_view = false;
 var run_zcb_test = false;
+var load_high_res = <?php echo $highres; ?>;
 var files_to_load = 2;
 if (run_zcb_test) files_to_load = 3;
 
@@ -127,8 +132,10 @@ if (page=="") page = "fullzcb3";
 var datasets = 0;
 var pageload = 0;
 
-//load_capacityfactor_dataset("highresolution.csv.zip",function(){
-load_capacityfactor_dataset("tenyearsdata.csv.zip",function(){
+var filename = "tenyearsdata.csv.zip";
+if (load_high_res) filename = "highresolution.csv.zip";
+
+load_capacityfactor_dataset(filename,function(){
     console.log("capacityfactor dataset loaded");
     datasets ++;
     loading_prc(datasets*10,"capacityfactor dataset");
