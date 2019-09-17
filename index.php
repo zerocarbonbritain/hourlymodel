@@ -25,14 +25,14 @@
   <body>
     <div class="wrap">
   
-    <div class="topnav" style="display:none">
+    <div class="topnav">
       <div class="logo-bound-top">
         <div class="logo"></div>
         <div class="logo-title">ZeroCarbonBritain Hourly Model</div>
       </div>
     </div>
   
-    <div class="sidenav">
+    <div class="sidenav" style="display:none">
       <div class="sidenav_inner">
         <div class="logo-bound-side">
           <div class="logo"></div>
