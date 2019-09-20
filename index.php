@@ -48,6 +48,11 @@
           <div class="menu-item"><a href="#fullzcb">ZeroCarbonBritain v1</a></div>
           <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
         </div>
+        
+        <div class="menu-title" name="guides"><b>Guides</b></div>
+        <div class="menu-items" name="guides">
+          <div class="menu-item"><a href="#community_scenario">1. Creating a community scale ZeroCarbonBritain scenario</a></div>
+        </div>
               
         <div class="menu-title" name="examples"><b>Examples</b></div>
         <div class="menu-items" name="examples" style="display:none">
@@ -117,7 +122,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 11;
+var v = 12;
 
 view_mode = "";
 

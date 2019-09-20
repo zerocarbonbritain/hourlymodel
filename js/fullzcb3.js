@@ -53,7 +53,7 @@ function fullzcb3_init()
     // ---------------------------------------------------------------------------
     // dataset index:
     // 0:onshore wind, 1:offshore wind, 2:wave, 3:tidal, 4:solar, 5:traditional electricity
-    offshore_wind_capacity = 136.0
+    offshore_wind_capacity = 134.0
     onshore_wind_capacity = 30.0
     wave_capacity = 10.0
     tidal_capacity = 20.0
@@ -185,7 +185,7 @@ function fullzcb3_init()
     // Storage
     // ---------------------------------------------    
     // Synth fuel production
-    synth_fuel_capacity = 9.25      // GW
+    synth_fuel_capacity = 9.4      // GW
     synth_fuel_store_SOC_start = 5000.0 // GWh
     FT_process_biomass_req = 1.3   // GWh/GWh fuel
     FT_process_hydrogen_req = 0.61 // GWh/GWh fuel
@@ -196,24 +196,24 @@ function fullzcb3_init()
     elec_store_charge_cap = 10.0
     
     // Hydrogen
-    electrolysis_cap = 20.4
+    electrolysis_cap = 25.0
     electrolysis_eff = 0.8
     hydrogen_storage_cap = 18000.0
     minimum_hydrogen_store_level = 0.1
 
     // biogas
-    biomass_for_biogas = 50.0    
+    biomass_for_biogas = 74.0    
     anaerobic_digestion_efficiency = 0.6                                     // HHV, originally 0.5747
     co2_tons_per_gwh_methane = (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))  // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     
     // Methanation
-    methanation_capacity = 3.1
+    methanation_capacity = 5.0
     methane_SOC_start = 10000.0
     methane_store_capacity = 80000.0
 
     // IHTEM Methanation
-    IHTEM_cap = 8.5         // GW
-    IHTEM_efficiency = 0.70  // mid range between store & go and helmeth
+    IHTEM_cap = 0.0          // GW
+    IHTEM_efficiency = 0.60  // store & go inc DAC
     
     // Dispatchable
     dispatch_gen_cap = 45.0
