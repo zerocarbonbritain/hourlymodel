@@ -131,14 +131,16 @@ function fullzcb3_init()
     heatpump_COP = 3.0
     elres_efficiency = 1.0
     biomass_efficiency = 0.9
-    methane_boiler_efficiency = 0.9
-    
+    methane_boiler_efficiency = 0.95
+    hydrogen_boiler_efficiency = 0.95
+        
     // Heating system share of demand
     spacewater_share_heatpumps = 0.9
     spacewater_share_elres = 0.05
     spacewater_share_biomass = 0.05
     spacewater_share_methane = 0.00
-    
+    spacewater_share_hydrogen = 0.00
+        
     // Heatstore
     heatstore_enabled = 1
     heatstore_storage_cap = 100.0
@@ -554,6 +556,7 @@ function fullzcb3_run()
     unmet_heat_demand_count = 0
     total_biomass_for_spacewaterheat_loss = 0
     total_methane_for_spacewaterheat_loss = 0
+    total_hydrogen_for_spacewaterheat_loss = 0
     total_heat_spill = 0
     max_heat_demand_elec = 0 
     
@@ -829,6 +832,7 @@ function fullzcb3_run()
     s3_balance_before_BEV_storage = []
     s3_spacewater_elec_demand = []
     s3_methane_for_spacewaterheat = []
+    s3_hydrogen_for_spacewaterheat = []
     
     for (var hour = 0; hour < hours; hour++) {
         var time = datastarttime + (hour * 3600 * 1000);
@@ -908,9 +912,15 @@ function fullzcb3_run()
         methane_for_spacewaterheat = heat_from_methane / methane_boiler_efficiency
         s3_methane_for_spacewaterheat.push(methane_for_spacewaterheat)
         total_methane_for_spacewaterheat_loss += methane_for_spacewaterheat - heat_from_methane
+
+        // hydrogen gas boiler heat
+        heat_from_hydrogen = spacewater_demand_after_heatstore * spacewater_share_hydrogen
+        hydrogen_for_spacewaterheat = heat_from_hydrogen / hydrogen_boiler_efficiency
+        s3_hydrogen_for_spacewaterheat.push(hydrogen_for_spacewaterheat)
+        total_hydrogen_for_spacewaterheat_loss += hydrogen_for_spacewaterheat - heat_from_hydrogen
         
         // check for unmet heat
-        unmet_heat_demand = spacewater_demand_after_heatstore - heat_from_heatpumps - heat_from_elres - heat_from_biomass - heat_from_methane
+        unmet_heat_demand = spacewater_demand_after_heatstore - heat_from_heatpumps - heat_from_elres - heat_from_biomass - heat_from_methane - heat_from_hydrogen
         if (unmet_heat_demand.toFixed(3)>0) {
             unmet_heat_demand_count++
             total_unmet_heat_demand += unmet_heat_demand
@@ -1192,6 +1202,9 @@ function fullzcb3_run()
         
         hydrogen_balance = hydrogen_from_electrolysis
         total_hydrogen_produced += hydrogen_from_electrolysis
+        
+        // hydrogen heating demand
+        hydrogen_balance -= s3_hydrogen_for_spacewaterheat[hour]
                 
         // 2. Hydrogen vehicle demand
         hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
@@ -1412,7 +1425,8 @@ function fullzcb3_run()
     total_losses = total_grid_losses + total_electrolysis_losses + total_CCGT_losses + total_anaerobic_digestion_losses + total_sabatier_losses + total_FT_losses + total_spill + total_IHTEM_losses
     total_losses += total_biomass_for_spacewaterheat_loss
     total_losses += total_methane_for_spacewaterheat_loss
-    
+    total_losses += total_hydrogen_for_spacewaterheat_loss
+        
     unaccounted_balance = total_supply + total_unmet_demand - total_demand - total_losses - total_exess
     console.log("unaccounted_balance: "+unaccounted_balance.toFixed(6))
     // -------------------------------------------------------------------------------------------------
@@ -1677,7 +1691,7 @@ function fullzcb3_run()
           {"kwhd":total_FT_losses*scl,"name":"FT losses","color":2},
           {"kwhd":(total_sabatier_losses+total_IHTEM_losses)*scl,"name":"Sabatier losses","color":2},
           {"kwhd":total_anaerobic_digestion_losses*scl,"name":"AD losses","color":2},
-          {"kwhd":(total_biomass_for_spacewaterheat_loss+total_methane_for_spacewaterheat_loss)*scl,"name":"Boiler loss","color":2},
+          {"kwhd":(total_biomass_for_spacewaterheat_loss+total_methane_for_spacewaterheat_loss+total_hydrogen_for_spacewaterheat_loss)*scl,"name":"Boiler loss","color":2},
           {"kwhd":total_spill*scl,"name":"Total spill","color":2},
 
           /*

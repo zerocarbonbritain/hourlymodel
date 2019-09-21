@@ -51,7 +51,8 @@
         
         <div class="menu-title" name="guides"><b>Guides</b></div>
         <div class="menu-items" name="guides">
-          <div class="menu-item"><a href="#community_scenario">1. Creating a community scale ZeroCarbonBritain scenario</a></div>
+          <div class="menu-item"><a href="#scenario_variations">1. Scenario Variations</a></div>
+          <div class="menu-item"><a href="#community_scenario">2. Creating a community scale ZeroCarbonBritain scenario</a></div>
         </div>
               
         <div class="menu-title" name="examples"><b>Examples</b></div>

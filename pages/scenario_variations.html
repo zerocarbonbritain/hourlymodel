@@ -1,0 +1,99 @@
+<h2>Variations on the ZCB scenario</h2>
+
+<p>Try the following variations in v3 of the ZeroCarbonBritain model to see how different assumptions change the results.</p>
+
+<h3>Replacing 1000 electric car and van miles with 1000 ebike miles</h3>
+
+<p>The ZCB scenario currently suggests that cycling and ebikes provide 323 miles per person in 2030, an increase of almost 7x compared to 48 miles per person today. The average person in the Netherlands today however cycles <a href="https://www.cbs.nl/en-gb/background/2015/27/factsheet-the-netherlands-cycling-country">620 miles/year with younger generation cycling 1240 miles/year</a>. What if we imagine a really ambitious drive to increase the cycling by 1000 miles per person to 1323 miles and cut car use from 4350 to 3350 miles per person? What would the effect be on the amount of offshore wind required?</p>
+
+<p>1. In the transport section: add 1000 miles to the ebike mileage giving a total of 1155 miles per person per year and subtract 1000 miles from the car & van mileage giving 3350 miles per person per year.</p>
+
+<p>2. Navigate to the 'Stores' tab to see the hydrogen, synth fuel and methane store levels, notice how the stores are filling up now that we have reduced demand, reduce offshore wind capacity in the supply tab to try to bring the end store levels back to a similar level to their starting levels without hitting empty in the 2011 winter. </p>
+
+<p>The result suggest that a reduction in offshore wind capacity from 134 GW to 126 GW is possible.</p>
+
+<p>It's important to note that the model does not currently capture the impact of such a shift on industrial energy demand, there would likely be further reductions associated with reduced industry demand for manufacturing cars and road infrastructure. A more detailed industry model coupled to domestic level choices is an area we wish to expand on in future.</p>
+
+<h3>Passivhaus standard or similar for all building stock</h3>
+
+<p>1. In the 'Simple domestic fabric efficiency calculator' select Superinsulated for Floor, Wall and Loft insulation, select triple-glazing and reduce effective ACH to 0.03, this meets the passivhaus target of 15 kWh/m2.year.</p>
+
+<p>2. Set Services heat loss factor to 0.38 GW/K and Industry to 0.125 GW/K, this matches the same 85% reduction vs 2007 given by the domestic calculator. The resulting combined annual demand should read 55.9 TWh/yr.</p>
+
+<p>3. Navigate to the 'Stores' tab, notice how the hydrogen, synth fuel and methane store levels continue to increase throughout the 10 year period, the reduction in space heating demand means we are now over producing. Click on the 'Supply' section and try reducing the capacity of Offshore wind so that the store levels finish at a similar level to where they started. Reducing capacity to 116 GW results in an even store level for synth fuel and hydrogen but the methane store is still climbing. Reducing the biomass to biogas amount from 74 TWh to 65 TWh seems to give a better result. We can also tune the electrolysis capacity to 23 GW while keeping the stores at a sufficient level.</p>
+
+<p>4. An alternative to reducing the biomass for biogas would be to tune the methanation capacity and synth fuel production capacity. With Biomass to biogas at 74 TWh, methanation at 3.6 GW and synth fuel production at 10.1 GW it appears to be possible to reduce offshore wind down to 106 GW.</p>
+
+<h3>Gas boilers: Synthetic methane heating using enhanced biogas process</h3>
+
+<p>1. Switch all heatpumps to gas boilers. Heat sources are now 5% elec resistance, 5% biomass and 90% gas boilers at 95% HHV efficiency.</p>
+
+<p>2. The enhanced biogas + sabatier process has a process energy conversion of the following magnitude:</p>
+
+<pre>1.0 TWh of biomass + 0.625 TWh of elec = 1.0 TWh of methane</pre>
+
+<p>Space and water heat demand is ~240 TWh of which our gas boilers will supply 90%. If we assume a high efficiency for gas boilers of 95% HHV this would require 227 TWh of methane, minus the methane that was previously used to produce backup electricity for the heatpumps, which is about 6 TWh of electric or 12 TWh of methane. We therefore need to generate an additional 215 TWh of methane which will require 215 TWh of biomass and 134 TWh of electricity.</p>
+
+<p>3. Adding 215 TWh to the existing 74 TWh of biomass gives 289 TWh. Entering this amount in the supply tab as a starting point and then optimising the electrolysis, synth fuel, methanation, methane store capacity to balance the system while also attempting to reduce the amount of biomass needed suggests to following mix is possible:</p>
+
+<ul>
+<li>134 GW offshore wind</li>
+<li>255 TWh of biomass for biogas (23.4% of UK land area)</li>
+<li>50 GW of electrolysis up from 25 GW</li>
+<li>15 GW of methanation capacity up from 5 GW</li>
+<li>200,000 GWh of methane storage up from 80,000 GWh</li>
+<li>Excess 91 TWh</li>
+<li>Primary energy factor 1.54</li>
+<li>Total supply 1205.2 TWh</li>
+</ul>
+
+<p>We can see that a zero carbon methane gas boiler based heating system is theoretically possible, it requires 3.4x the amount of land for growing biomass for biogas than a heatpump approach would use, twice the electrolysis capacity, 3x the methanation capacity, and 2.5x as much methane storage.</p>
+
+<h3>Gas boilers: Synthetic methane heating using integrated high temperature electrolysis and methanation with direct air capture of CO2 for carbon source.</h3>
+
+<p>An alternative to using co2 sourced from biogas for methanation would be to use direct air capture of CO2. This approach requires less land area for biomass but much more electricity generation capacity. See Store & Go, power to LNG with DAC here <a href="https://learn.openenergymonitor.org/sustainable-energy/energy/sabatier-process">https://learn.openenergymonitor.org/sustainable-energy/energy/sabatier-process</a></p>
+
+<p>215 TWh of methane produced using integrated high temperature electrolysis and methanation with DAC @ 60% efficiency requires 358 TWh of electricity, an equivalent output of 95 GW of offshore wind. Heatpump demand in the standard scenario is responsible for about 30 GW of offshore wind capacity requirement and so we might expect ~65GW of additional offshore wind capacity with this synthetic methane approach.</p>
+
+<ul>
+<li>200 GW offshore wind</li>
+<li>74 TWh of biomass for biogas (6.8% of UK land area)</li>
+<li>17.3 GW of electrolysis down from 25 GW</li>
+<li>57 GW of integrated high temperature electrolysis and methanation @ 60% efficiency</li>
+<li>200,000 GWh of methane storage up from 80,000 GWh</li>
+<li>Excess 144.4 TWh</li>
+<li>Primary energy factor 1.62</li>
+<li>Total supply 1273.5 TWh</li>
+</ul>
+
+<p>Alternatively if the integrated high temperature electrolysis and methanation process is more efficient at 80%, the Helmeth pilot plant has so far achieved 76% efficiency with an expectation to reach over 80% in future (without DAC of CO2).</p>
+
+<ul>
+<li>175 GW offshore wind</li>
+<li>74 TWh of biomass for biogas (6.8% of UK land area)</li>
+<li>18.2 GW of electrolysis down from 25 GW</li>
+<li>47 GW of integrated high temperature electrolysis and methanation @ 80% efficiency</li>
+<li>200,000 GWh of methane storage up from 80,000 GWh</li>
+<li>7.4 GW of synth fuel production capacity</li>
+<li>Excess 123.8 TWh</li>
+<li>Primary energy factor 1.5</li>
+<li>Total supply 1179.0 TWh</li>
+</ul>
+
+<h3>Gas boilers: Hydrogen</h3>
+
+<p>An alternative to using methane is to use hydrogen directly. 215 TWh of hydrogen HHV produced at an electrolyser efficiency of 80% requires 269 TWh of electricity, the same amount as an integrated integrated high temperature electrolysis and methanation unit at 80% efficiency, though without the requirement for the DAC CO2 capture component.</p>
+
+<ul>
+<li>175 GW offshore wind</li>
+<li>50 TWh of biomass for biogas</li>
+<li>70 GW of electrolysis</li>
+<li>3.0 GW of methanation cap</li>
+<li>10.8 GW of synth fuel cap</li>
+<li>200,000 GWh of hydrogen storage up from 18,000 GWh</li>
+<li>Excess 114.6 TWh</li>
+<li>Primary energy factor 1.48</li>
+<li>Total supply 1158.1 TWh</li>
+</ul>
+
+<p>We can see that a zero carbon hydrogen gas boiler based heating system is theoretically possible but requires 30% more offshore wind, 2.8x the electrolysis capacity and 11x the hydrogen storage capacity compared to the heatpump scenario.</p>
