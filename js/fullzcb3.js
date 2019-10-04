@@ -166,6 +166,7 @@ function fullzcb3_init()
     annual_non_heat_process_biomass = 5.58
     
     industrial_biofuel = 13.44
+    
     // ---------------------------------------------
     // Transport
     // ---------------------------------------------
@@ -193,7 +194,7 @@ function fullzcb3_init()
     FT_process_hydrogen_req = 0.61 // GWh/GWh fuel
     
     // Electricity Storage
-    electricity_storage_enabled = 1
+    elec_store_type = "average"
     elec_store_storage_cap = 50.0
     elec_store_charge_cap = 10.0
     
@@ -339,7 +340,17 @@ function fullzcb3_init()
     freight_BEV_demand = 10.5
     freight_H2_demand = 4.06
     freight_ICE_demand = 20.58
+
+    EE_onshorewind_GWh_per_GW = 1435.0
+    EE_offshorewind_GWh_per_GW = 2700.0
+    EE_solarpv_GWh_per_GW = 1680.0
+
+    EE_onshorewind_lifespan = 25.0
+    EE_offshorewind_lifespan = 25.0
+    EE_solarpv_lifespan = 30.0
+
     // -------------------
+   
 }
 
 function fullzcb3_run()
@@ -560,6 +571,8 @@ function fullzcb3_run()
     total_heat_spill = 0
     max_heat_demand_elec = 0 
     
+    total_industry_demand = annual_high_temp_process + annual_low_temp_dry_sep + annual_non_heat_process_elec + annual_non_heat_process_biogas + annual_non_heat_process_biomass +industrial_biofuel
+    
     // ---------------------------------------------
     // Store SOC's
     // ---------------------------------------------
@@ -628,6 +641,9 @@ function fullzcb3_run()
     
     total_synth_fuel_demand = 0
     methane_store_vented = 0
+    
+    total_elec_store_charge = 0
+    total_elec_store_discharge = 0
     
     // ---------------------------------------------
     // Convert to daily demand, used with daily usage profiles
@@ -1112,51 +1128,54 @@ function fullzcb3_run()
         average_12h_balance_before_elec_storage = sum / n;
         deviation_from_mean_elec = balance - average_12h_balance_before_elec_storage
         
-        if (electricity_storage_enabled) {
-            store_type = "average"
+        //if (electricity_storage_enabled) {
         
-            if (store_type=="basic") {
-                store_charge = 0
-                store_discharge = 0
-                if (balance>0) {
-                    elec_store_charge = balance                                                                                                // Charge by extend of available oversupply
-                    if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                     // Limit by max charge rate 
-                    if (elec_store_charge>(elec_store_storage_cap-elecstore_SOC)) elec_store_charge = elec_store_storage_cap - elecstore_SOC   // Limit by available SOC
-                    elecstore_SOC += elec_store_charge
-                    balance -= elec_store_charge
-                } else {
-                    elec_store_discharge = -1*balance                                                                                          // Discharge by extent of unmet demand
-                    if (elec_store_discharge>elec_store_charge_cap) elec_store_discharge = elec_store_charge_cap                               // Limit by max discharge rate
-                    if (elec_store_discharge>elecstore_SOC) elec_store_discharge = elecstore_SOC                                               // Limit by available SOC
-                    elecstore_SOC -= elec_store_discharge
-                    balance += elec_store_discharge
-                }
+        if (elec_store_type=="basic") {
+            store_charge = 0
+            store_discharge = 0
+            if (balance>0) {
+                elec_store_charge = balance                                                                                                // Charge by extend of available oversupply
+                if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                     // Limit by max charge rate 
+                if (elec_store_charge>(elec_store_storage_cap-elecstore_SOC)) elec_store_charge = elec_store_storage_cap - elecstore_SOC   // Limit by available SOC
+                elecstore_SOC += elec_store_charge
+                balance -= elec_store_charge
+                total_elec_store_charge += elec_store_charge
+            } else {
+                elec_store_discharge = -1*balance                                                                                          // Discharge by extent of unmet demand
+                if (elec_store_discharge>elec_store_charge_cap) elec_store_discharge = elec_store_charge_cap                               // Limit by max discharge rate
+                if (elec_store_discharge>elecstore_SOC) elec_store_discharge = elecstore_SOC                                               // Limit by available SOC
+                elecstore_SOC -= elec_store_discharge
+                balance += elec_store_discharge
+                total_elec_store_discharge += elec_store_discharge
             }
-            
-            if (store_type=="average") {
-                if (balance>=0.0) {
-                    if (deviation_from_mean_elec>=0.0) {
-                        // charge
-                        elec_store_charge = (elec_store_storage_cap-elecstore_SOC)*deviation_from_mean_elec/(elec_store_storage_cap*0.5)
-                        if (elec_store_charge>(elec_store_storage_cap - elecstore_SOC)) elec_store_charge = elec_store_storage_cap - elecstore_SOC   // Limit to available SOC
-                        if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                       // Limit to charge capacity
-                        if (elec_store_charge>balance) elec_store_charge = balance
-                        balance -= elec_store_charge
-                        elecstore_SOC += elec_store_charge
-                    }
-                } else {
-                    if (deviation_from_mean_elec<0.0) {
-                        // discharge
-                        elec_store_discharge = elecstore_SOC*-deviation_from_mean_elec/(elec_store_storage_cap*0.5)
-                        if (elec_store_discharge>elecstore_SOC) elec_store_discharge = elecstore_SOC                      // Limit to elecstore SOC
-                        if (elec_store_discharge>elec_store_charge_cap) elec_store_discharge = elec_store_charge_cap      // Limit to discharge capacity
-                        if (elec_store_discharge>-balance) elec_store_discharge = -balance
-                        balance += elec_store_discharge
-                        elecstore_SOC -= elec_store_discharge
-                    }
+        }
+        
+        else if (elec_store_type=="average") {
+            if (balance>=0.0) {
+                if (deviation_from_mean_elec>=0.0) {
+                    // charge
+                    elec_store_charge = (elec_store_storage_cap-elecstore_SOC)*deviation_from_mean_elec/(elec_store_storage_cap*0.5)
+                    if (elec_store_charge>(elec_store_storage_cap - elecstore_SOC)) elec_store_charge = elec_store_storage_cap - elecstore_SOC   // Limit to available SOC
+                    if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                       // Limit to charge capacity
+                    if (elec_store_charge>balance) elec_store_charge = balance
+                    balance -= elec_store_charge
+                    elecstore_SOC += elec_store_charge
+                    total_elec_store_charge += elec_store_charge
+                }
+            } else {
+                if (deviation_from_mean_elec<0.0) {
+                    // discharge
+                    elec_store_discharge = elecstore_SOC*-deviation_from_mean_elec/(elec_store_storage_cap*0.5)
+                    if (elec_store_discharge>elecstore_SOC) elec_store_discharge = elecstore_SOC                      // Limit to elecstore SOC
+                    if (elec_store_discharge>elec_store_charge_cap) elec_store_discharge = elec_store_charge_cap      // Limit to discharge capacity
+                    if (elec_store_discharge>-balance) elec_store_discharge = -balance
+                    balance += elec_store_discharge
+                    elecstore_SOC -= elec_store_discharge
+                    total_elec_store_discharge += elec_store_discharge
                 }
             }
         }
+        //}
         if (elecstore_SOC<0) elecstore_SOC = 0                                                              // limits here can loose energy in the calc
         if (elecstore_SOC>elec_store_storage_cap) elecstore_SOC = elec_store_storage_cap                    // limits here can loose energy in the calc
         // ----------------------------------------------------------------------------
@@ -1541,9 +1560,47 @@ function fullzcb3_run()
     
     scaled_electric_car_battery_capacity = 1000000 * electric_car_battery_capacity * number_of_households / households_2030
     scaled_landarea_for_biomass = 1000000 * 10000 * landarea_for_biomass * number_of_households / households_2030
-    
+
     // ----------------------------------------------------------------------------
-        
+    // Embodied Energy
+    // ----------------------------------------------------------------------------    
+    total_embodied_energy = 0
+    EE_onshorewind = (onshore_wind_capacity * EE_onshorewind_GWh_per_GW * 0.001) / EE_onshorewind_lifespan
+    total_embodied_energy += EE_onshorewind
+    EE_offshorewind = (offshore_wind_capacity * EE_offshorewind_GWh_per_GW * 0.001) / EE_offshorewind_lifespan
+    total_embodied_energy += EE_offshorewind
+    EE_solarpv = (solarpv_capacity * EE_solarpv_GWh_per_GW * 0.001) / EE_solarpv_lifespan
+    total_embodied_energy += EE_solarpv
+    
+    /*
+    elec_store_cycles_per_year = (total_elec_store_charge*0.1) / elec_store_storage_cap
+    EE_liion_store = 0// (((elec_store_storage_cap * 0.136) / 1500 * 0.8) * total_elec_store_charge)/3650
+    total_embodied_energy += EE_liion_store
+
+    carsvans_average_battery_size = 30.0
+    carsvans_average_battery_cycles = 1500.0
+    carsvans_lifetime_mileage = carsvans_average_battery_size * carsvans_average_battery_cycles * 4.0 // miles/kwh ~ 180k miles
+    
+    EE_ecar = 0
+    carsvans_vehicle_miles = population_2030 * carsvans_miles_pp / (carsvans_load_factor*5)
+    carsvans_manufactured_per_year = carsvans_vehicle_miles / carsvans_lifetime_mileage
+
+    if (carsvans_miles_pp>0) EE_ecar = 20000.0 * carsvans_manufactured_per_year * 0.000000001
+    total_embodied_energy += EE_ecar
+
+    if (carsvans_miles_pp>0) EE_ecarbattery = 136.0 * carsvans_average_battery_size * carsvans_manufactured_per_year * 0.000000001
+    total_embodied_energy += EE_ecarbattery
+    */
+    
+    // this all cancels out
+    // industry energy consumption for manufacturing cars is dependent on 
+    // carsvans_miles_per_car = 25000.0
+    // number_of_cars = carsvans_vehicle_miles / carsvans_miles_per_car
+    // carvans_lifetime = (150000.0/carsvans_miles_per_car)
+    // if (carsvans_miles_per_car>0) EE_ecar = 20000.0 * number_of_cars * 0.000000001 / carvans_lifetime
+    
+    prc_of_industry_demand = 100 * total_embodied_energy / total_industry_demand
+            
     $(".modeloutput").each(function(){
         var type = $(this).attr("type");
         var key = $(this).attr("key");
