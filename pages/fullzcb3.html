@@ -786,7 +786,7 @@ table td {
         </tr>
         </table>
         
-         <div style="font-size:14px"><i>See notes on sythetic fuel production using fischer-tropsch process here <a href="https://trystanlea.org.uk/aviation_notes">https://trystanlea.org.uk/aviation_notes</a></i></div>
+         <div style="font-size:14px"><i>See notes on sythetic fuel production using fischer-tropsch process here <a href="https://trystanlea.org.uk/zcb_fischer_tropsch">https://trystanlea.org.uk/zcb_fischer_tropsch</a></i></div>
         
     </div>
 </div>
@@ -871,7 +871,7 @@ table td {
     <div class="inner">
         <div style="font-size:14px">
         Select dispatchable generation capacity to meet bulk of backup requirement. Tune electrolysis & methanation capacity and respective storage capacities to meet given hydrogen, synth fuel and synthetic methane demand. Select 'Stores' tab above to see store levels, ensure that the stores dont get depleted or over-fill. 50 GWh of generic storage is equivalent to a ~1.7 kWh battery store per household.<br><br>
-        For background notes on the sabatier process see:<br> <a href="https://learn.openenergymonitor.org/sustainable-energy/energy/sabatier-process">https://learn.openenergymonitor.org/sustainable-energy/energy/sabatier-process</a>
+        For background notes on the sabatier process see:<br> <a href="https://trystanlea.org.uk/zcb_sabatier_process">https://trystanlea.org.uk/zcb_sabatier_process</a>
         </div><br>
         <table class="table" style="width:100%">
         <tr>
@@ -932,7 +932,11 @@ table td {
         </tr>
         <tr>
             <td>Enable electricity storage?</td>
-            <td><input class="modelinput" key="electricity_storage_enabled" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><select class="modelinput" key="elec_store_type" autocomplete="off">
+                    <option value="nostore">No storage</option>
+                    <option value="basic">Basic, flat out</option>
+                    <option value="average">Proportional: average</option>
+                </select></td>
             <td></td>
             <td></td>
         </tr>
@@ -1168,6 +1172,43 @@ table td {
             </tr>
         </table>
         
+        <div style="clear:both"></div>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>MANUFACTURING ENERGY<span style="float:right" class="modeloutput" key="total_embodied_energy" dp=1 units="TWh/yr"></span> </b></div>
+    <div class="inner">
+        <div style="font-size:14px">Industrial energy use is dealt with above at a high level and a cautious approach is taken. It is part of the scenario that we would like to develop in more detail. The following makes a start on exploring the manufacturing energy required to build key elements of the renewable energy supply infrastructure: Offshore wind, Onshore wind and Solar PV. We can get an initial indication from this of the proportion of the total industrial energy demand modelled above that would relate to the manufacture of these technologies.<br><br>For more detail on the calculations below including sources see <a href="https://trystanlea.org.uk/zcb_industry">https://trystanlea.org.uk/zcb_industry</a></div><br>
+        
+        <table style="width:100%">
+        <tr><th></th><th>Embodied Energy</th><th>Lifespan</th><th>Annual Demand</th></tr>
+        <tr>
+            <td>Offshore wind</td>
+            <td><input class="modelinput" key="EE_offshorewind_GWh_per_GW" type="text" style="width:50px" value="" autocomplete="off"/> GWh/GW</td>
+            <td><input class="modelinput" key="EE_offshorewind_lifespan" type="text" style="width:40px" value="" autocomplete="off"/> years</td>
+            <td><span class="modeloutput" key="EE_offshorewind" dp=1 units="TWh/yr"></span></td>
+        </tr>
+        <tr>
+            <td>Onshore wind</td>
+            <td><input class="modelinput" key="EE_onshorewind_GWh_per_GW" type="text" style="width:50px" value="" autocomplete="off"/> GWh/GW</td>
+            <td><input class="modelinput" key="EE_onshorewind_lifespan" type="text" style="width:40px" value="" autocomplete="off"/> years</td>
+            <td><span class="modeloutput" key="EE_onshorewind" dp=1 units="TWh/yr"></span></td>
+        </tr>
+        <tr>
+            <td>Solar PV</td>
+            <td><input class="modelinput" key="EE_solarpv_GWh_per_GW" type="text" style="width:50px" value="" autocomplete="off"/> GWh/GW</td>
+            <td><input class="modelinput" key="EE_solarpv_lifespan" type="text" style="width:40px" value="" autocomplete="off"/> years</td>
+            <td><span class="modeloutput" key="EE_solarpv" dp=1 units="TWh/yr"></span></td>
+        </tr>
+        <!--<tr><td>Lithium Ion Store</td><td><span class="modeloutput" key="EE_liion_store" dp=1 units="TWh/yr"></span></td></tr>
+        <tr><td>Electric Vehicle Battery</td><td><span class="modeloutput" key="EE_ecarbattery" dp=1 units="TWh/yr"></span></td></tr>
+        <tr><td>Electric Vehicle (rest)</td><td><span class="modeloutput" key="EE_ecar" dp=1 units="TWh/yr"></span></td></tr>-->
+        <tr><td>Total Annual Demand</td><td><span class="modeloutput" key="total_embodied_energy" dp=1 units="TWh/yr"></span> (<span class="modeloutput" key="prc_of_industry_demand" dp=1 units="%"></span> of industry demand)</td></tr>
+        </table>
+        <div style="float:left; width:45%">
+      
+        </div>
         <div style="clear:both"></div>
     </div>
 </div>
