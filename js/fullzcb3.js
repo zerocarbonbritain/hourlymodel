@@ -150,8 +150,10 @@ function fullzcb3_init()
     // ---------------------------------------------
     // Industrial
     // ---------------------------------------------
-    annual_high_temp_process = 49.01          // 26.3% elec, 73.7% gas in original model
-    annual_low_temp_dry_sep = 117.78          // 66% elec, 11% gas, 22% biomass CHP in original model
+    ipr = 1.0 // industry prc reduction
+    
+    annual_high_temp_process = 49.01 * ipr         // 26.3% elec, 73.7% gas in original model
+    annual_low_temp_dry_sep = 117.78 * ipr         // 66% elec, 11% gas, 22% biomass CHP in original model
 
     high_temp_process_fixed_elec_prc = 0.125
     high_temp_process_fixed_gas_prc = 0.375
@@ -163,11 +165,11 @@ function fullzcb3_init()
     low_temp_process_fixed_biomass_prc = 0.2
     low_temp_process_DSR_prc = 0.4
             
-    annual_non_heat_process_elec = 88.00
-    annual_non_heat_process_biogas = 13.44
-    annual_non_heat_process_biomass = 5.58
+    annual_non_heat_process_elec = 88.00 * ipr
+    annual_non_heat_process_biogas = 13.44 * ipr
+    annual_non_heat_process_biomass = 5.58 * ipr
     
-    industrial_biofuel = 13.44
+    industrial_biofuel = 13.44 * ipr
     
     // ---------------------------------------------
     // Transport
