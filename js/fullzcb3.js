@@ -866,6 +866,7 @@ function fullzcb3_run()
     s3_spacewater_elec_demand = []
     s3_methane_for_spacewaterheat = []
     s3_hydrogen_for_spacewaterheat = []
+    s3_spacewater_demand_after_heatstore = []
     
     for (var hour = 0; hour < hours; hour++) {
         var time = datastarttime + (hour * 3600 * 1000);
@@ -920,6 +921,7 @@ function fullzcb3_run()
         // space & water heat tab
         spacewater_demand_after_heatstore = spacewater_balance
         if (spacewater_demand_after_heatstore<0.0) spacewater_demand_after_heatstore = 0.0
+        s3_spacewater_demand_after_heatstore.push(spacewater_demand_after_heatstore)
         
         // electric resistance
         heat_from_elres = spacewater_demand_after_heatstore * spacewater_share_elres
@@ -1030,6 +1032,60 @@ function fullzcb3_run()
         
         total_biomass_used += non_heat_process_biomass
         total_biomass_used += heat_process_fixed_biomass
+    }
+
+    // -------------------------------------------------------------------------------------
+    // Bivalent heat substitution
+    // -------------------------------------------------------------------------------------
+    bivalent_backup = false
+    if (bivalent_backup) {
+        total_ambient_heat_supply = 0
+        var spacewater_elec_demand = 0;
+        var balance = 0;
+        var unmet = 0;
+        var spacewater_bivalent = 0;
+        data.spacewater_elec = []
+        for (var hour = 0; hour < hours; hour++)
+        {
+            var time = datastarttime + (hour * 3600 * 1000);
+            
+            spacewater_elec_demand = s3_spacewater_elec_demand[hour]
+            balance = data.s1_total_variable_supply[hour][1] - data.s1_traditional_elec_demand[hour][1] - spacewater_elec_demand - s1_industrial_elec_demand[hour]
+            
+            unmet = 0
+            if (balance<0) unmet = -1*balance
+            if (unmet<=spacewater_elec_demand) {
+                spacewater_elec_demand -= unmet
+                spacewater_bivalent = unmet
+            } else {
+                spacewater_bivalent = spacewater_elec_demand
+                spacewater_elec_demand = 0
+            }
+            
+            elres_elec_demand = (spacewater_elec_demand/(spacewater_share_elres+(spacewater_share_heatpumps/heatpump_COP)))*spacewater_share_elres
+            spacewater_elec_heatpumps = spacewater_elec_demand - elres_elec_demand
+            heat_from_heatpumps = spacewater_elec_heatpumps * heatpump_COP
+
+            elres_component = (spacewater_bivalent/(spacewater_share_elres+(spacewater_share_heatpumps/heatpump_COP)))*spacewater_share_elres
+            heatpump_component = (spacewater_bivalent - elres_component) * heatpump_COP
+
+            // methane/gas boiler heat
+            var spacewater_heat_bivalent = elres_component + heatpump_component
+            methane_for_spacewaterheat = spacewater_heat_bivalent / methane_boiler_efficiency
+            s3_methane_for_spacewaterheat[hour] += methane_for_spacewaterheat
+            total_methane_for_spacewaterheat_loss += methane_for_spacewaterheat - spacewater_heat_bivalent 
+            
+            
+            
+            heat_from_heatpumps = spacewater_elec_heatpumps * heatpump_COP
+            ambient_heat_used = heat_from_heatpumps * (1.0-1.0/heatpump_COP)
+            total_ambient_heat_supply += ambient_heat_used
+            
+            // repopulate
+            s3_spacewater_elec_demand[hour] = spacewater_elec_demand
+            s3_balance_before_BEV_storage[hour] = data.s1_total_variable_supply[hour][1] - data.s1_traditional_elec_demand[hour][1] - spacewater_elec_demand - s1_industrial_elec_demand[hour]
+            data.spacewater_elec[hour] = [time,spacewater_elec_demand]
+        }
     }
     
     // -------------------------------------------------------------------------------------
@@ -1462,6 +1518,12 @@ function fullzcb3_run()
     total_losses += total_biomass_for_spacewaterheat_loss
     total_losses += total_methane_for_spacewaterheat_loss
     total_losses += total_hydrogen_for_spacewaterheat_loss
+
+    console.log("total_supply: "+total_supply)
+    console.log("total_unmet_demand: "+total_unmet_demand)
+    console.log("total_demand: "+total_demand)    
+    console.log("total_losses: "+total_losses)
+    console.log("total_exess: "+total_exess)
         
     unaccounted_balance = total_supply + total_unmet_demand - total_demand - total_losses - total_exess
     console.log("unaccounted_balance: "+unaccounted_balance.toFixed(6))
