@@ -1595,26 +1595,48 @@ function fullzcb3_run()
     landarea_per_household = uk_landarea/households_2030           // m2 x 26 million households is 24 Mha
 
     // Biogas
-    biomass_landarea_factor = ((0.1/365)/0.024) / 0.51
-    landarea_for_biogas = biomass_for_biogas * biomass_landarea_factor
-    prc_landarea_for_biogas = 100 * landarea_for_biogas / 24.2495
+    // 779 kha rotational grasses (ryegrass) produces 8.18 Modt product
+    // 4.72 TWh/Modt used in MATRIX spreadsheet (or should it be 9.08?)
+    // 8.18 Modt x 4.72 TWh/Modt = 38.61 TWh / 779 kha = 0.56 W/m2
+    // 38.61 TWh per 0.779 Mha = 49.6 TWh per Mha or 0.02 Mha per TWh
+    
+    // 34.15 (20.49/0.6, ZCB MATRIX) TWh of biomass for biogas equivalent from waste sources
+    // subtracted here so that land requirement shown is just for additional 
+    // rotational grasses.
+    
+    grass_biomass_for_biogas = biomass_for_biogas - 34.15
+    if (grass_biomass_for_biogas<0.0) grass_biomass_for_biogas = 0.0
+    
+    biomass_landarea_factor = 0.02 // old: ((0.1/365.25)/0.024) / 0.51
+    grass_landarea_for_biogas = grass_biomass_for_biogas * biomass_landarea_factor
+    grass_prc_landarea_for_biogas = 100 * grass_landarea_for_biogas / 24.2495
     
     // Synth fuel
-    biomass_landarea_factor = ((0.1/365)/0.024) / 0.975
+    // 24.2 Modt/yr made up of 14.25 Modt/yr Miscanthus (950 kha) & 9.95 Modt/yr SRC (780 kha) 
+    // 24.2 Modt/yr from 1730 kha total
+    // 4.72 TWh/Modt used in MATRIX spreadsheet (or should it be 3.07?) 
+    // 24.2 Modt/yr x 4.72 TWh/Modt = 114 TWh
+    // 114 TWh per 1.730 MHa = 66 TWh/Mha or 0.0152 Mha per TWh
+    
+    biomass_landarea_factor = 0.0152 // old: ((0.1/365.25)/0.024) / 0.975
     landarea_for_synth_fuel = total_synth_fuel_biomass_used * biomass_landarea_factor
     prc_landarea_for_synth_fuel = 100 * landarea_for_synth_fuel / 24.2495
     
-    // Other
-    biomass_landarea_factor = ((0.1/365)/0.024) / 0.975
+    // Biomass for heating and CHP
+    // 8.79 Modt/yr made up of 2.99 Modt/yr SRF (1079 kha) & 5.80 Modt/yr SRC (455 kha) 
+    // 8.79 Modt/yr from 1534 kha total
+    // 4.72 TWh/Modt used in MATRIX spreadsheet
+    // 8.79 Modt/yr x 4.72 TWh/Modt = 41.5 TWh
+    // 41.5 TWh per 1.534 MHa = 27 TWh/Mha or 0.0370 Mha per TWh
+      
+    biomass_landarea_factor = 0.0370 // old: ((0.1/365.25)/0.024) / 0.975
     landarea_for_other_biomass = total_other_biomass_used * biomass_landarea_factor
     prc_landarea_for_other_biomass = 100 * landarea_for_other_biomass / 24.2495
     
-    landarea_for_biomass = landarea_for_biogas + landarea_for_synth_fuel + landarea_for_other_biomass    
+    landarea_for_biomass = grass_landarea_for_biogas + landarea_for_synth_fuel + landarea_for_other_biomass    
     prc_landarea_for_biomass = 100 * landarea_for_biomass / 24.2495
     
     // prc_landarea_for_FT = 100 * landarea_for_FT / landarea_per_household
-
-
     // prc_landarea_for_sabatier = 100 * landarea_for_sabatier / landarea_per_household
 
     // ----------------------------------------------------------------------------
