@@ -21,10 +21,10 @@ CHANGE LOG
 - Modifications to stores removes the imbalance in the model that caused dips and peaks above and below the supply line
 
 - Detailed transport model
-
 - ITHEM
-
 - Hydrogen storage
+- Synthetic liquid fuel storage
+
 
 Store performance, matching addition
 ---------------------------------------------------
@@ -36,9 +36,7 @@ Store performance, matching addition
 
 Issues to fix
 ---------------------------------------------------
-- no storage losses
 - methane losses from store capping, if biogas feed is set too high
-- search MFIX to find notes
 
 */
 
@@ -201,7 +199,8 @@ function fullzcb3_init()
     elec_store_type = "average"
     elec_store_storage_cap = 50.0
     elec_store_charge_cap = 10.0
-    
+    store_roundtrip_efficiency = 0.9
+
     // Hydrogen
     electrolysis_cap = 25.0
     electrolysis_eff = 0.8
@@ -595,6 +594,7 @@ function fullzcb3_run()
     BEV_Store_SOC_start = electric_car_battery_capacity * 0.5
     elecstore_SOC_start = elec_store_storage_cap * 1.0
     hydrogen_SOC_start = hydrogen_storage_cap * 0.5
+    store_efficiency = 1.0 - (1.0-store_roundtrip_efficiency)*0.5
     // methane_SOC_start = methane_store_capacity * 0.5
     // synth_fuel_store_SOC_start = 10000.0
     
@@ -659,6 +659,7 @@ function fullzcb3_run()
     
     total_elec_store_charge = 0
     total_elec_store_discharge = 0
+    total_store_losses = 0
     
     // ---------------------------------------------
     // Convert to daily demand, used with daily usage profiles
@@ -756,7 +757,6 @@ function fullzcb3_run()
 
         // non-variable non-backup electricity supply
         nuclear_power_supply = nuclear_capacity * nuclear_availability
-        chp_power_supply = 0.0
 
         // totals        
         total_offshore_wind_supply += offshore_wind_power_supply
@@ -769,7 +769,7 @@ function fullzcb3_run()
         total_nuclear_supply += nuclear_power_supply
         
         // total supply
-        electricity_supply = offshore_wind_power_supply + onshore_wind_power_supply + wave_power_supply + tidal_power_supply + pv_power_supply + geothermal_power_supply + hydro_power_supply + chp_power_supply + nuclear_power_supply
+        electricity_supply = offshore_wind_power_supply + onshore_wind_power_supply + wave_power_supply + tidal_power_supply + pv_power_supply + geothermal_power_supply + hydro_power_supply + nuclear_power_supply
         total_supply += electricity_supply
         
         // supply after losses
@@ -913,7 +913,6 @@ function fullzcb3_run()
             total_heat_spill += -spacewater_balance
             spacewater_balance = 0
         }
-        
         
         s3_heatstore_SOC.push(heatstore_SOC)
         data.heatstore_SOC.push([time,heatstore_SOC])
@@ -1184,8 +1183,7 @@ function fullzcb3_run()
         var balance = s4_balance_before_elec_store[hour]
         
         elec_store_charge = 0
-        elec_store_discharge = 0
-        
+        elec_store_discharge = 0        
         // ---------------------------------------------------------------------------
         // 12 h average store implementation
         // ---------------------------------------------------------------------------
@@ -1207,19 +1205,29 @@ function fullzcb3_run()
             store_charge = 0
             store_discharge = 0
             if (balance>0) {
-                elec_store_charge = balance                                                                                                // Charge by extend of available oversupply
-                if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                     // Limit by max charge rate 
-                if (elec_store_charge>(elec_store_storage_cap-elecstore_SOC)) elec_store_charge = elec_store_storage_cap - elecstore_SOC   // Limit by available SOC
-                elecstore_SOC += elec_store_charge
+                elec_store_charge = balance                                                                                                        // Charge by extend of available oversupply
+                if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                             // Limit by max charge rate
+                
+                elec_store_charge_int = elec_store_charge*store_efficiency
+                if (elec_store_charge_int>(elec_store_storage_cap-elecstore_SOC)) elec_store_charge_int = elec_store_storage_cap - elecstore_SOC   // Limit by available SOC
+                elec_store_charge = elec_store_charge_int/store_efficiency
+                
+                elecstore_SOC += elec_store_charge_int
                 balance -= elec_store_charge
                 total_elec_store_charge += elec_store_charge
+                total_store_losses += elec_store_charge - elec_store_charge_int
             } else {
                 elec_store_discharge = -1*balance                                                                                          // Discharge by extent of unmet demand
                 if (elec_store_discharge>elec_store_charge_cap) elec_store_discharge = elec_store_charge_cap                               // Limit by max discharge rate
-                if (elec_store_discharge>elecstore_SOC) elec_store_discharge = elecstore_SOC                                               // Limit by available SOC
-                elecstore_SOC -= elec_store_discharge
+                
+                elec_store_discharge_int = elec_store_discharge/store_efficiency                                                           
+                if (elec_store_discharge_int>elecstore_SOC) elec_store_discharge_int = elecstore_SOC                                       // Limit by available SOC
+                elec_store_discharge = elec_store_discharge_int*store_efficiency
+                
+                elecstore_SOC -= elec_store_discharge_int
                 balance += elec_store_discharge
                 total_elec_store_discharge += elec_store_discharge
+                total_store_losses += elec_store_discharge_int - elec_store_discharge
             }
         }
         
@@ -1228,23 +1236,33 @@ function fullzcb3_run()
                 if (deviation_from_mean_elec>=0.0) {
                     // charge
                     elec_store_charge = (elec_store_storage_cap-elecstore_SOC)*deviation_from_mean_elec/(elec_store_storage_cap*0.5)
-                    if (elec_store_charge>(elec_store_storage_cap - elecstore_SOC)) elec_store_charge = elec_store_storage_cap - elecstore_SOC   // Limit to available SOC
                     if (elec_store_charge>elec_store_charge_cap) elec_store_charge = elec_store_charge_cap                                       // Limit to charge capacity
                     if (elec_store_charge>balance) elec_store_charge = balance
+                    
+                    elec_store_charge_int = elec_store_charge*store_efficiency
+                    if (elec_store_charge_int>(elec_store_storage_cap - elecstore_SOC)) elec_store_charge_int = elec_store_storage_cap - elecstore_SOC   // Limit to available SOC
+                    elec_store_charge = elec_store_charge_int/store_efficiency
+
+                    elecstore_SOC += elec_store_charge_int
                     balance -= elec_store_charge
-                    elecstore_SOC += elec_store_charge
                     total_elec_store_charge += elec_store_charge
+                    total_store_losses += elec_store_charge - elec_store_charge_int
                 }
             } else {
                 if (deviation_from_mean_elec<0.0) {
                     // discharge
                     elec_store_discharge = elecstore_SOC*-deviation_from_mean_elec/(elec_store_storage_cap*0.5)
-                    if (elec_store_discharge>elecstore_SOC) elec_store_discharge = elecstore_SOC                      // Limit to elecstore SOC
                     if (elec_store_discharge>elec_store_charge_cap) elec_store_discharge = elec_store_charge_cap      // Limit to discharge capacity
                     if (elec_store_discharge>-balance) elec_store_discharge = -balance
+                    
+                    elec_store_discharge_int = elec_store_discharge/store_efficiency                                                           
+                    if (elec_store_discharge_int>elecstore_SOC) elec_store_discharge_int = elecstore_SOC              // Limit to elecstore SOC
+                    elec_store_discharge = elec_store_discharge_int*store_efficiency        
+
+                    elecstore_SOC -= elec_store_discharge_int    
                     balance += elec_store_discharge
-                    elecstore_SOC -= elec_store_discharge
                     total_elec_store_discharge += elec_store_discharge
+                    total_store_losses += elec_store_discharge_int - elec_store_discharge
                 }
             }
         }
@@ -1396,11 +1414,8 @@ function fullzcb3_run()
 
         methane_for_transport = daily_transport_CH4_demand / 24.0
         total_methane_for_transport += methane_for_transport
-        // s1_methane_for_industry: calculated in stage 1
-        // s1_methane_for_industryCHP
-        methane_for_industryCHP = 0 // MFIX: add this in!!
         
-        methane_demand = methane_to_dispatchable + s3_methane_for_spacewaterheat[hour] + s1_methane_for_industry[hour] + methane_for_industryCHP + methane_for_transport
+        methane_demand = methane_to_dispatchable + s3_methane_for_spacewaterheat[hour] + s1_methane_for_industry[hour] + methane_for_transport
         total_methane_demand += methane_demand
         
         methane_balance = methane_production - methane_demand
@@ -1518,6 +1533,7 @@ function fullzcb3_run()
     total_losses += total_biomass_for_spacewaterheat_loss
     total_losses += total_methane_for_spacewaterheat_loss
     total_losses += total_hydrogen_for_spacewaterheat_loss
+    total_losses += total_store_losses
 
     console.log("total_supply: "+total_supply)
     console.log("total_unmet_demand: "+total_unmet_demand)
@@ -1587,7 +1603,7 @@ function fullzcb3_run()
     } 
     
     console.log("balance error: "+error.toFixed(12));
-
+    
     // ----------------------------------------------------------------------------
     // Land area factors
     // ----------------------------------------------------------------------------
