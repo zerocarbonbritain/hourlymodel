@@ -1,6 +1,15 @@
 <h2>Variations on the ZCB scenario</h2>
 
-<p>Try the following variations in v3 of the ZeroCarbonBritain model to see how different assumptions change the results.</p>
+<p>The ZeroCarbonBritain scenario is not intended as the only way to do things. It is a starting point for conversation, a guide, that provides one potential way forward. The following explores in outline many different ideas for variations to the main scenario. We might ask: What would the scenario look like if we where more or less ambitious in insulating our homes or reducing travel? What if we can't reach the high level of heat pump use and used hydrogen from electrolysis instead?</p>
+
+<p>The following variations to v3 of the ZeroCarbonBritain model explore the results from different levels of power down ambition, heating systems and other aspects of the scenario. Some of these scenario variations are written as guides that can be used to replicate the result in the scenario tool.</p>
+
+<p><b>A note on different model versions</b></p>
+<ul>
+<li><i>ZeroCarbonBritain v1:</i> This is a precise replica of the original hourly model spreadsheet developed by Tobi Kellner for validation. The input fields require outputs from the ZCB matrix spreadsheet.</li>
+<li><i>ZeroCarbonBritain v2:</i> Used for the 'Rising to the Climate Emergency' ZCB report in conjunction with the ZCB matrix spreadsheet. Changes to inputs to reflect updated ZCB matrix spreadsheet. Minor modifications to heat and electric storage algorithms, industry DSR electric/gas heat switching. Additional technology options for scenario exploration: e.g synthetic gas heating.</li>
+<li><i>ZeroCarbonBritain v3:</i> Integrates transport model from ZCB matrix, includes simple calculators for LAC and DHW sections. Hydrogen and synthetic liquid fuel storage. Additional technology options for scenario exploration: e.g IHTEM for power to gas, bivalent synthetic gas heating. Hydrogen boiler. Selection of different electricity storage algorithms, basic vs peak removal (average). Separate treatment of CO2 stream in biogas as part of sabatier process. New scenario outputs: Land areas for biomass, Scaled to village, town, country scale, embodied energy (basic).</li>
+</ul>
 
 <p><b>More power down ambition</b></p>
 <ul>
@@ -15,8 +24,9 @@
 <p><b>Less power down ambition</b></p>
 <ul>
 <li>1. Road transport electrification without modal shifts or reduction in travel distance</li>
-<li>2. No reduction in aviation</li>
+<li>2. No reduction in aviation as well</li>
 <li>3. No reduction in space heating demand</li>
+<li>4. No reduction in space heating demand & direct electric + bivalent gas heating</li>
 </ul>
 
 <p><b>Heating systems</b></p>
@@ -25,13 +35,17 @@
 <li>2. Gas boilers: Synthetic methane using direct air capture of CO2</li>
 <li>3. Gas boilers: Hydrogen</li>
 <li>4. Electric resistance heating</li>
-<li>5. Biomass boilers</li>
+<li>5. Bivalent electric resistance heating with backup gas boilers instead of using CCGT power stations</li>
+<li>6. Biomass boilers</li>
+<li>7. Bivalent heatpumps with backup gas boilers instead of using CCGT power stations</li>
 </ul>
 
 <p><b>Other</b></p>
 <ul>
 <li>Hydrogen cars & vans</li>
 <li>A large battery instead of power to gas</li>
+<li>Industry energy consumption in line with DECC projections in 2017</li>
+<li>5GW of Nuclear</li>
 </ul>
 
 <h3>More power down ambition</h3>
@@ -44,9 +58,11 @@
 
 <p>2. Navigate to the 'Stores' tab to see the hydrogen, synth fuel and methane store levels, notice how the stores are filling up now that we have reduced demand, reduce offshore wind capacity in the supply tab to try to bring the end store levels back to a similar level to their starting levels without hitting empty in the 2011 winter. </p>
 
-<p>The result suggest that a reduction in offshore wind capacity from 134 GW to 126 GW is possible.</p>
+<p>The result suggest that a reduction in offshore wind capacity from 134 GW to 126 GW is possible. Transport electricity demand is reduced by 8.8 TWh/yr.</p>
 
 <p>It's important to note that the model does not currently capture the impact of such a shift on industrial energy demand, there would likely be further reductions associated with reduced industry demand for manufacturing cars and road infrastructure. A more detailed industry model coupled to domestic level choices is an area we wish to expand on in future.</p>
+
+<p>A rough estimation of the effect of reducing per person car mileage from 4350 to 3350 would be a reduction in annual sales from 761 thousand to 586 thousand cars. This would save ~3.2 TWh of industrial energy demand (at 18 MWh per car), subtracting half this amount from high temp heat and half from non heat process electric allows for the reduction of offshore wind to ~124 GW. This would save another ~0.2 TWh of industrial energy demand required to manufacture the offshore wind.</p>
 
 <h4>2. Replacing 1000 electric car and van miles with 1000 electric bus miles</h4>
 
