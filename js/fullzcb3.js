@@ -217,10 +217,21 @@ function fullzcb3_init()
     methane_SOC_start = 10000.0
     methane_store_capacity = 80000.0
 
-    // IHTEM Methanation
-    IHTEM_cap = 0.0          // GW
-    IHTEM_efficiency = 0.60  // store & go inc DAC
+    // Power to Gas and Liquids including integrated DAC of CO2 
+    power_to_X_cap = 0.0
     
+    // store & go inc DAC
+    power_to_X_prc_gas = 0.44
+    power_to_X_gas_efficiency = 0.6
+
+    // Power to Liquids (e.g for aviation)
+    // High temperature electrolysis & DAC
+    // Efficiencies range from 45% to 46%
+    // With CO2 from exhaust gas this can increase to 60% - 61%
+    // https://www.umweltbundesamt.de/sites/default/files/medien/377/publikationen/161005_uba_hintergrund_ptl_barrierrefrei.pdf    
+    power_to_X_prc_liquid = 0.56
+    power_to_X_liquid_efficiency = 0.6
+        
     // Dispatchable
     dispatch_gen_cap = 45.0
     dispatchable_gen_eff = 0.50
@@ -652,7 +663,7 @@ function fullzcb3_run()
     total_sabatier_losses = 0
     total_anaerobic_digestion_losses = 0
     total_FT_losses = 0
-    total_IHTEM_losses = 0
+    total_power_to_X_losses = 0
     
     total_synth_fuel_demand = 0
     methane_store_vented = 0
@@ -715,7 +726,7 @@ function fullzcb3_run()
         heatstore_discharge_GWth:[],
         spacewater_balance:[],
         spacewater_heat:[],
-        electricity_for_IHTEM:[],
+        electricity_for_power_to_X:[],
         synth_fuel_store_SOC:[]
     }
     
@@ -1354,22 +1365,37 @@ function fullzcb3_run()
         total_hydrogen_demand += hydrogen_for_hydrogen_vehicles + hydrogen_to_synth_fuel + hydrogen_for_sabatier
              
         // ----------------------------------------------------------------------------
-        // Integrated High-Temperature Electrolysis and Methanation (IHTEM)
-        // Pilot projects include Helmeth ~76% efficiency and Store & Go ~59% efficiency
-        // assumes integrated DAC of CO2
-        // DAC relatively low energy requirement compared to electrolysis and heat recovery possible
-        // ----------------------------------------------------------------------------        
-        electricity_for_IHTEM = 0
+        // Power-to-X: Gas and Liquids, includes:
+        //
+        // - Integrated High-Temperature Electrolysis and Methanation (IHTEM)
+        //   Pilot projects include Helmeth ~76% efficiency and Store & Go ~59% efficiency
+        //
+        // - Power to Liquids
+        //   e.g: paper 'Power-to-Liquids Potentials and Perspectives for the Future Supply of Renewable Aviation Fuel'
+        // 
+        //   Both pathways assumes integrated DAC of CO2, utilising heat recovery as discussed in Store & Go paper.
+        // ----------------------------------------------------------------------------
+        
+        // 1. Work out utilisation of power_to_X capacity
+        electricity_for_power_to_X = 0
         if (balance>=0.0) {
-            electricity_for_IHTEM = balance
-            if (electricity_for_IHTEM>IHTEM_cap) electricity_for_IHTEM = IHTEM_cap
+            electricity_for_power_to_X = balance
+            if (electricity_for_power_to_X>power_to_X_cap) electricity_for_power_to_X = power_to_X_cap
         }
         
-        methane_from_IHTEM = electricity_for_IHTEM * IHTEM_efficiency
-        balance -= electricity_for_IHTEM
+        // 2. Split by gaseous and liquid outputs
+        methane_from_IHTEM = electricity_for_power_to_X * power_to_X_prc_gas * power_to_X_gas_efficiency
+        synth_fuel_produced_PTL = electricity_for_power_to_X * power_to_X_prc_liquid * power_to_X_liquid_efficiency
         
-        total_IHTEM_losses += electricity_for_IHTEM - methane_from_IHTEM
-        data.electricity_for_IHTEM.push([time,electricity_for_IHTEM])
+        balance -= electricity_for_power_to_X
+        
+        // Losses and electric consumption graph
+        total_power_to_X_losses += electricity_for_power_to_X - (methane_from_IHTEM + synth_fuel_produced_PTL)
+        data.electricity_for_power_to_X.push([time,electricity_for_power_to_X])
+        
+        // Add to stores and totals
+        total_synth_fuel_produced += synth_fuel_produced_PTL
+        synth_fuel_store_SOC += synth_fuel_produced_PTL
         
         // ----------------------------------------------------------------------------
         // Dispatchable (backup power via CCGT gas turbines)
@@ -1432,14 +1458,15 @@ function fullzcb3_run()
         if ((methane_SOC/methane_store_capacity)>0.99) methane_store_full_count ++
         
         // ------------------------------------------------------------------------------------
-        // Synth fuel
-        synth_fuel_produced = hydrogen_to_synth_fuel / FT_process_hydrogen_req
-        total_synth_fuel_produced += synth_fuel_produced
+        // Synth fuel FT
+        synth_fuel_produced_FT = hydrogen_to_synth_fuel / FT_process_hydrogen_req
+        
+        total_synth_fuel_produced += synth_fuel_produced_FT
         total_synth_fuel_biomass_used += hourly_biomass_for_biofuel
         
-        synth_fuel_store_SOC += synth_fuel_produced
+        synth_fuel_store_SOC += synth_fuel_produced_FT
         
-        total_FT_losses += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - synth_fuel_produced
+        total_FT_losses += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / FT_process_hydrogen_req)
         
         synth_fuel_demand = (daily_transport_liquid_demand + daily_industrial_biofuel) / 24.0
         total_industrial_liquid_demand += daily_industrial_biofuel / 24.0
@@ -1529,7 +1556,7 @@ function fullzcb3_run()
     
     // -------------------------------------------------------------------------------------------------
     total_exess = total_final_elec_balance_positive + final_store_balance; //total_supply - total_demand
-    total_losses = total_grid_losses + total_electrolysis_losses + total_CCGT_losses + total_anaerobic_digestion_losses + total_sabatier_losses + total_FT_losses + total_spill + total_IHTEM_losses
+    total_losses = total_grid_losses + total_electrolysis_losses + total_CCGT_losses + total_anaerobic_digestion_losses + total_sabatier_losses + total_FT_losses + total_spill + total_power_to_X_losses
     total_losses += total_biomass_for_spacewaterheat_loss
     total_losses += total_methane_for_spacewaterheat_loss
     total_losses += total_hydrogen_for_spacewaterheat_loss
@@ -1597,7 +1624,7 @@ function fullzcb3_run()
         //}
         
         supply = data.s1_total_variable_supply[hour][1]
-        demand = data.s1_traditional_elec_demand[hour][1] + data.spacewater_elec[hour][1] + data.industry_elec[hour][1] + data.EL_transport[hour][1] + data.electricity_for_electrolysis[hour][1] + data.elec_store_charge[hour][1] + data.electricity_for_IHTEM[hour][1]
+        demand = data.s1_traditional_elec_demand[hour][1] + data.spacewater_elec[hour][1] + data.industry_elec[hour][1] + data.EL_transport[hour][1] + data.electricity_for_electrolysis[hour][1] + data.elec_store_charge[hour][1] + data.electricity_for_power_to_X[hour][1]
         balance = (supply + data.unmet_elec[hour][1] + data.electricity_from_dispatchable[hour][1] + data.elec_store_discharge[hour][1]) + data.EV_smart_discharge[hour][1] - demand-data.export_elec[hour][1]
         error += Math.abs(balance)
     } 
@@ -1670,7 +1697,7 @@ function fullzcb3_run()
     scaled_electrolysis_capacity = 1000000 * electrolysis_cap * number_of_households / households_2030
     scaled_hydrogen_storage_cap = 1000000 * hydrogen_storage_cap * number_of_households / households_2030
     scaled_methanation_capacity = 1000000 * methanation_capacity * number_of_households / households_2030
-    scaled_IHTEM_cap = 1000000 * IHTEM_cap * number_of_households / households_2030
+    scaled_power_to_X_cap = 1000000 * power_to_X_cap * number_of_households / households_2030
     scaled_methane_store_capacity = 1000000 * methane_store_capacity * number_of_households / households_2030
     scaled_synth_fuel_capacity = 1000000 * synth_fuel_capacity * number_of_households / households_2030
     scaled_elec_store_storage_cap = 1000000 * elec_store_storage_cap * number_of_households / households_2030
@@ -1863,7 +1890,7 @@ function fullzcb3_run()
           {"kwhd":total_electrolysis_losses*scl,"name":"H2 losses","color":2},
           {"kwhd":total_CCGT_losses*scl,"name":"CCGT losses","color":2},
           {"kwhd":total_FT_losses*scl,"name":"FT losses","color":2},
-          {"kwhd":(total_sabatier_losses+total_IHTEM_losses)*scl,"name":"Sabatier losses","color":2},
+          {"kwhd":(total_sabatier_losses+total_power_to_X_losses)*scl,"name":"Sabatier losses","color":2},
           {"kwhd":total_anaerobic_digestion_losses*scl,"name":"AD losses","color":2},
           {"kwhd":(total_biomass_for_spacewaterheat_loss+total_methane_for_spacewaterheat_loss+total_hydrogen_for_spacewaterheat_loss)*scl,"name":"Boiler loss","color":2},
           {"kwhd":total_spill*scl,"name":"Total spill","color":2},
@@ -1897,7 +1924,7 @@ function fullzcb3_view(start,end,interval)
             {stack:true, label: "Electric Transport", data:dataout.EL_transport, color:"#aac15b"},
             {stack:true, label: "Elec Store Charge", data:dataout.elec_store_charge, color:"#006a80"},
             {stack:true, label: "Electrolysis", data:dataout.electricity_for_electrolysis, color:"#00aacc"},
-            {stack:true, label: "IHTEM", data:dataout.electricity_for_IHTEM, color:"#00bbdd"},
+            {stack:true, label: "PowerToX", data:dataout.electricity_for_power_to_X, color:"#00bbdd"},
             {stack:true, label: "Exess", data:dataout.export_elec, color:"#33ccff", lines: {lineWidth:0, fill: 0.4 }},            
             {stack:false, label: "Supply", data:dataout.s1_total_variable_supply, color:"#000000", lines: {lineWidth:0.2, fill: false }}
 

@@ -123,7 +123,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 24;
+var v = 26;
 
 view_mode = "";
 
