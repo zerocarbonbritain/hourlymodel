@@ -68,6 +68,7 @@
           <div class="menu-item"><a href="#fullhousehold">8. Household full energy model</a></div>
           -->
           <div class="menu-item"><a href="#storage_algorithm">5. Storage Algorithms</a></div>
+          <div class="menu-item"><a href="#hydrogen_backup">6. Hydrogen Backup</a></div>
         </div>
 
         <div class="menu-title" name="methodology"><b>Methodology Papers (PDF)</b></div>
@@ -123,7 +124,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 27;
+var v = 29;
 
 view_mode = "";
 
@@ -241,6 +242,8 @@ $("#model").on("change",".modelinput",function(){
     if (!isNaN(window[varkey])) window[varkey] /= scale;
     var run_fn = page+"_run";
     if (window[run_fn]!=undefined) window[run_fn]();
+    var ui_fn = page+"_ui";
+    if (window[ui_fn]!=undefined) window[ui_fn]();
     var view_fn = page+"_view";
     if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
 
