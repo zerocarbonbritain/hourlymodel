@@ -1744,6 +1744,10 @@ function fullzcb3_run()
     // if (carsvans_miles_per_car>0) EE_ecar = 20000.0 * number_of_cars * 0.000000001 / carvans_lifetime
     
     prc_of_industry_demand = 100 * total_embodied_energy / total_industry_demand
+}
+// ---------------------------------------------------------------------------    
+	
+function fullzcb3_ui() {
             
     $(".modeloutput").each(function(){
         var type = $(this).attr("type");
@@ -1906,8 +1910,7 @@ function fullzcb3_run()
       }
     ];
     draw_stacks(stacks,"stacks",1000,600,units)   
-}
-// ---------------------------------------------------------------------------    
+}	
 	
 function fullzcb3_view(start,end,interval)
 {
@@ -1992,3 +1995,8 @@ function fullzcb3_view(start,end,interval)
         );
     }
 }
+
+if (typeof loading_prc === "undefined") {
+    function loading_prc(a,b){console.log(b)}
+}
+

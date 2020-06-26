@@ -123,7 +123,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 26;
+var v = 27;
 
 view_mode = "";
 
@@ -208,6 +208,8 @@ function load_page(page)
     var run_fn = page+"_run";
     if (window[run_fn]!=undefined) window[run_fn]();
     resize();
+    var ui_fn = page+"_ui";
+    if (window[ui_fn]!=undefined) window[ui_fn]();
     var view_fn = page+"_view";
     if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
     

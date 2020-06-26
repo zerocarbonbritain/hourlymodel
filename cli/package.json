@@ -1,0 +1,23 @@
+{
+  "name": "zcb_hourlymodel",
+  "version": "1.0.0",
+  "description": "ZeroCarbonBritain Hourly Model",
+  "main": "run.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/zerocarbonbritain/hourlymodel.git"
+  },
+  "keywords": [
+    "zero carbon",
+    "hourly",
+    "energy model"
+  ],
+  "author": "Trystan Lea",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "jszip": "^3.5.0"
+  }
+}
