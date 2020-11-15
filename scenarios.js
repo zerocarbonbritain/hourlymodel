@@ -253,6 +253,20 @@ var scenarios = {
     carsvans_miles_pp: 3350,
   },
   
+  passivhaus_15_kwh_m2: {
+    "offshore_wind_capacity": 116,
+    "wall_ins_thickness": 0.3,
+    "floor_ins_thickness": 0.3,
+    "window_type": 3,
+    "air_change_per_hour": 0.03,
+    "services_space_heat_demand_GWK": 0.38,
+    "industry_space_heat_demand_GWK": 0.125,
+    "electrolysis_cap": 23,
+    "hydrogen_storage_cap": 12000,
+    "biomass_for_biogas": 64.5,
+    "methane_store_capacity": 22000
+  },
+  
   RE_100_zero_biomass: {
     offshore_wind_capacity: 194,
     spacewater_share_heatpumps: 0.95,
