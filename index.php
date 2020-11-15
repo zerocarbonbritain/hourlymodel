@@ -109,9 +109,12 @@
 
   </body>
 </html>
+<script language="javascript" type="text/javascript" src="scenarios.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="vishelper.js?v=2"></script>
 
 <script>
+
+var scenario_name = "main";
 var sidenav_visible = true;
 var window_width = 0;
 var print_view = false;
@@ -124,7 +127,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 32;
+var v = 35;
 
 view_mode = "";
 
@@ -204,6 +207,14 @@ function load_page(page)
             async:false
         });
     }
+    
+    var out = "";
+    for (var scenario_name in scenarios) {
+        out += "<option>"+scenario_name+"</option>"
+    }
+    $("#select_scenario").html(out);
+
+
     var init_fn = page+"_init";
     if (window[init_fn]!=undefined) window[init_fn]();
     var run_fn = page+"_run";
@@ -226,7 +237,7 @@ function load_page(page)
     
     $("#sourcecode").hide();
     $("#view-source").html("Show source code");
-    
+        
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Load time "+(time_elapsed*0.001).toFixed(1)+"s");
 }
@@ -282,8 +293,51 @@ $("#model").on("click",".box-title",function(){
    if (box.is(":visible")) box.hide(); else box.show();
 });
 
+$("#model").on("change","#select_scenario",function(){
+    scenario_name = $(this).val();
+
+    for (var z in scenarios.main) window[z] = scenarios.main[z]     
+    if (scenario_name!="main") {
+        for (var z in scenarios[scenario_name]) window[z] = scenarios[scenario_name][z]  
+    }
+    
+    $(".modelinput").each(function(){
+        var varkey = $(this).attr("key");
+        var type = $(this).attr("itype");
+        var scale = 1.0;
+        if (type=="%") scale = 100.0;
+        
+        $(this).val(window[varkey]*scale);
+        //console.log(varkey);
+    });
+
+    var timerStart = Date.now();
+    var run_fn = page+"_run";
+    if (window[run_fn]!=undefined) window[run_fn]();
+    var ui_fn = page+"_ui";
+    if (window[ui_fn]!=undefined) window[ui_fn]();
+    var view_fn = page+"_view";
+    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
+
+    var time_elapsed = (Date.now() - timerStart)
+    loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s");
+ 
+});
+
 function loading_prc(prc,msg) {
     $(".loading_prc").html(msg);
+}
+
+function save_scenario() {
+
+    var save = {};
+
+    for (var z in scenarios.main) {
+        if (window[z] != scenarios.main[z]) {
+            save[z] = window[z]
+        }
+    }
+    console.log(JSON.stringify(save))
 }
 
 // ------------------------------------------

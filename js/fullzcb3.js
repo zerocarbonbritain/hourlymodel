@@ -259,17 +259,6 @@ function fullzcb3_init()
     low_temp_process_profile = flat_profile
     not_heat_process_profile = flat_profile
     
-    // Profiles
-    if (use_flat_profiles) {
-        cooking_profile = flat_profile
-        hot_water_profile = flat_profile
-        space_heat_profile = flat_profile
-        elec_trains_use_profile = flat_profile
-        BEV_use_profile = flat_profile
-        BEV_charge_profile = flat_profile
-        BEV_plugged_in_profile = flat_profile
-    }
-
     // -----------------------------------------------------------------------------
     // Transport model
     // -----------------------------------------------------------------------------
@@ -303,29 +292,6 @@ function fullzcb3_init()
     carsvans_mechanical_kwhppkm_full = 0.031
     aviation_mechanical_kwhppkm_full = 0.070
     
-    // Includes 10% charging loss apart from rail + 10% conv loss
-    ebikes_electric_kwhppkm_full = ebikes_mechanical_kwhppkm_full / 0.8
-    rail_electric_kwhppkm_full = rail_mechanical_kwhppkm_full / 0.9
-    bus_electric_kwhppkm_full = bus_mechanical_kwhppkm_full / 0.8
-    motorbike_electric_kwhppkm_full = motorbike_mechanical_kwhppkm_full / 0.8
-    carsvans_electric_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.8
-    aviation_electric_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.8    
-
-    // Fuel cell vehicle efficiency 90% + fuel cell efficiency 55% + transport 80% + compression 90% (liquefaction assumed for aircraft)
-    rail_hydrogen_kwhppkm_full = rail_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
-    bus_hydrogen_kwhppkm_full = bus_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
-    motorbike_hydrogen_kwhppkm_full = motorbike_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
-    carsvans_hydrogen_kwhppkm_full = carsvans_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
-    aviation_hydrogen_kwhppkm_full = aviation_mechanical_kwhppkm_full / (0.9*0.55*0.9*0.65)
-
-    // Aircraft efficiency here is 20% to match similar today
-    // note that fleet average cars & vans here is 30% lower than fleet average in 2016
-    rail_ice_kwhppkm_full = rail_mechanical_kwhppkm_full / 0.3
-    bus_ice_kwhppkm_full = bus_mechanical_kwhppkm_full / 0.3
-    motorbike_ice_kwhppkm_full = motorbike_mechanical_kwhppkm_full / 0.3
-    carsvans_ice_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.3
-    aviation_ice_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.2
-
     // Load factors (zcb)
     rail_load_factor = 0.42
     bus_load_factor = 0.42
@@ -376,10 +342,27 @@ function fullzcb3_init()
 
     // -------------------
    
+    // Copy over defined scenario
+    for (var z in scenarios.main) window[z] = scenarios.main[z]     
+    if (scenario_name!="main") {
+        for (var z in scenarios[scenario_name]) window[z] = scenarios[scenario_name][z]  
+    }
+    
 }
 
 function fullzcb3_run()
 {
+    // Profiles
+    if (use_flat_profiles) {
+        cooking_profile = flat_profile
+        hot_water_profile = flat_profile
+        space_heat_profile = flat_profile
+        elec_trains_use_profile = flat_profile
+        BEV_use_profile = flat_profile
+        BEV_charge_profile = flat_profile
+        BEV_plugged_in_profile = flat_profile
+    }
+    
     // ---------------------------------------------
     // Supply totals
     // ---------------------------------------------
@@ -482,6 +465,29 @@ function fullzcb3_run()
     // ---------------------------------------------------------------------------------------------    
     // Transport model
     // --------------------------------------------------------------------------------------------- 
+    // Includes 10% charging loss apart from rail + 10% conv loss
+    ebikes_electric_kwhppkm_full = ebikes_mechanical_kwhppkm_full / 0.8
+    rail_electric_kwhppkm_full = rail_mechanical_kwhppkm_full / 0.9
+    bus_electric_kwhppkm_full = bus_mechanical_kwhppkm_full / 0.8
+    motorbike_electric_kwhppkm_full = motorbike_mechanical_kwhppkm_full / 0.8
+    carsvans_electric_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.8
+    aviation_electric_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.8    
+
+    // Fuel cell vehicle efficiency 90% + fuel cell efficiency 55% + transport 80% + compression 90% (liquefaction assumed for aircraft)
+    rail_hydrogen_kwhppkm_full = rail_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    bus_hydrogen_kwhppkm_full = bus_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    motorbike_hydrogen_kwhppkm_full = motorbike_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    carsvans_hydrogen_kwhppkm_full = carsvans_mechanical_kwhppkm_full / (0.9*0.55*0.8*0.9)
+    aviation_hydrogen_kwhppkm_full = aviation_mechanical_kwhppkm_full / (0.9*0.55*0.9*0.65)
+
+    // Aircraft efficiency here is 20% to match similar today
+    // note that fleet average cars & vans here is 30% lower than fleet average in 2016
+    rail_ice_kwhppkm_full = rail_mechanical_kwhppkm_full / 0.3
+    bus_ice_kwhppkm_full = bus_mechanical_kwhppkm_full / 0.3
+    motorbike_ice_kwhppkm_full = motorbike_mechanical_kwhppkm_full / 0.3
+    carsvans_ice_kwhppkm_full = carsvans_mechanical_kwhppkm_full / 0.3
+    aviation_ice_kwhppkm_full = aviation_mechanical_kwhppkm_full / 0.2
+    
     // 1. Convert miles to km
     walking_km_pp = walking_miles_pp * km_per_mile
     cycling_km_pp = cycling_miles_pp * km_per_mile
