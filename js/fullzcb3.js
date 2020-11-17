@@ -2006,3 +2006,39 @@ if (typeof loading_prc === "undefined") {
     function loading_prc(a,b){console.log(b)}
 }
 
+$("#placeholder").bind("plothover", function (event, pos, item) {
+    if (item) {
+        if (previousPoint != item.datapoint) {
+            previousPoint = item.datapoint;
+            $("#tooltip").remove();
+            tooltip(item.pageX, item.pageY, item.datapoint[1], "#DDDDDD");
+        }
+    } else {
+        $("#tooltip").remove();
+        previousPoint = null;
+    }
+});
+    
+function tooltip(x, y, contents, bgColour)
+{
+    var offset = 15; // use higher values for a little spacing between `x,y` and tooltip
+    var elem = $('<div id="tooltip">' + contents + '</div>').css({
+        position: 'absolute',
+        display: 'none',
+        'font-weight':'bold',
+        border: '1px solid rgb(255, 221, 221)',
+        padding: '2px',
+        'background-color': bgColour,
+        opacity: '0.8'
+    }).appendTo("body").fadeIn(200);
+
+    var elemY = y - elem.height() - offset;
+    var elemX = x - elem.width()  - offset;
+    if (elemY < 0) { elemY = 0; } 
+    if (elemX < 0) { elemX = 0; } 
+    elem.css({
+        top: elemY,
+        left: elemX
+    });
+};
+
