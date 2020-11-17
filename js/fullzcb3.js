@@ -626,6 +626,8 @@ function fullzcb3_run()
     // ---------------------------------------------
     total_EV_charge = 0
     total_EV_demand = 0
+    unmet_EV_demand = 0
+
     total_elec_trains_demand = 0
 
     total_hydrogen_produced = 0
@@ -1159,6 +1161,11 @@ function fullzcb3_run()
         // EV DEMAND -----------------------------------
         EV_demand = BEV_use_profile[hour%24] * daily_BEV_demand
         BEV_Store_SOC -= EV_demand
+        if (BEV_Store_SOC<0) {
+            unmet_EV_demand += -1 * BEV_Store_SOC;
+            BEV_Store_SOC = 0
+        }
+        
         total_EV_demand += EV_demand
         
         // SMART DISCHARGE -----------------------------
@@ -1174,6 +1181,8 @@ function fullzcb3_run()
         // Discharge rate & quantity limits
         if (EV_smart_discharge>max_charge_rate) EV_smart_discharge = max_charge_rate
         if (EV_smart_discharge>BEV_Store_SOC) EV_smart_discharge = BEV_Store_SOC
+        if (EV_smart_discharge<0) EV_smart_discharge = 0
+               
         // Apply to SOC and balance
         BEV_Store_SOC -= EV_smart_discharge
         balance += EV_smart_discharge
@@ -1560,10 +1569,11 @@ function fullzcb3_run()
     console.log("final_store_balance: "+final_store_balance)
     
     console.log("total_heat_spill: "+total_heat_spill);
-        
+    
+    console.log("unmet_EV_demand: "+unmet_EV_demand)
     console.log("unmet_hydrogen_demand: "+unmet_hydrogen_demand)
     console.log("unmet_synth_fuel_demand: "+unmet_synth_fuel_demand)
-    total_unmet_demand += unmet_hydrogen_demand + unmet_synth_fuel_demand
+    total_unmet_demand += unmet_EV_demand + unmet_hydrogen_demand + unmet_synth_fuel_demand
     
     total_spill = methane_store_vented + total_heat_spill
     
