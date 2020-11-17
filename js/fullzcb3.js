@@ -653,6 +653,7 @@ function fullzcb3_run()
     total_methane_made = 0
     total_electricity_from_dispatchable = 0
     max_dispatchable_capacity = 0
+    max_dispatchable_capacity_hour = 0
     total_methane_for_transport = 0
     total_methane_demand = 0
     
@@ -1406,16 +1407,22 @@ function fullzcb3_run()
         // ----------------------------------------------------------------------------
         // Dispatchable (backup power via CCGT gas turbines)
         // ---------------------------------------------------------------------------- 
-        electricity_from_dispatchable = 0       
-        if (balance<0.0) electricity_from_dispatchable = -balance
-        // Limit by methane availability
-        if (electricity_from_dispatchable>(methane_SOC*dispatchable_gen_eff)) electricity_from_dispatchable = methane_SOC*dispatchable_gen_eff
-        // Limit by CCGT capacity
-        if (electricity_from_dispatchable>dispatch_gen_cap) electricity_from_dispatchable = dispatch_gen_cap
-        // Totals, losses and max capacity utilisation
-        total_CCGT_losses += ((1.0/dispatchable_gen_eff)-1.0) * electricity_from_dispatchable
-        total_electricity_from_dispatchable += electricity_from_dispatchable
-        if (electricity_from_dispatchable>max_dispatchable_capacity) max_dispatchable_capacity = electricity_from_dispatchable
+        electricity_from_dispatchable = 0
+        if (methane_SOC>0) {
+            if (balance<0.0) electricity_from_dispatchable = -balance
+            // Limit by methane availability
+            if (electricity_from_dispatchable>(methane_SOC*dispatchable_gen_eff)) electricity_from_dispatchable = methane_SOC*dispatchable_gen_eff
+            // Limit by CCGT capacity
+            if (electricity_from_dispatchable>dispatch_gen_cap) electricity_from_dispatchable = dispatch_gen_cap
+            // Totals, losses and max capacity utilisation
+            total_CCGT_losses += ((1.0/dispatchable_gen_eff)-1.0) * electricity_from_dispatchable
+            total_electricity_from_dispatchable += electricity_from_dispatchable
+            
+            if (electricity_from_dispatchable>max_dispatchable_capacity) {
+                max_dispatchable_capacity = electricity_from_dispatchable
+                max_dispatchable_capacity_hour = hour
+            }
+        }
         data.electricity_from_dispatchable.push([time,electricity_from_dispatchable])
         
         // Final electricity balance
@@ -1636,6 +1643,9 @@ function fullzcb3_run()
     } 
     
     console.log("balance error: "+error.toFixed(12));
+
+    var time = datastarttime + (max_dispatchable_capacity_hour * 3600 * 1000);
+    console.log("max_dispatchable_capacity: "+max_dispatchable_capacity+"GW at "+(new Date(time)).toString()+" "+max_dispatchable_capacity_hour+"h");
     
     // ----------------------------------------------------------------------------
     // Land area factors
