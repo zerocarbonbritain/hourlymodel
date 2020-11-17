@@ -183,6 +183,7 @@ table td {
         <tr>
             <td>Electrolysis capacity</td>
             <td><input class="modelinput" key="electrolysis_capacity" type="text" style="width:100px" value="" autocomplete="off"/> GW</td>
+            <td><input class="modelinput" key="electrolysis_capex" type="text" style="width:100px" value="" autocomplete="off"/> £bn/GW</td>
         </tr>
         <tr>
             <td>Electrolysis efficiency</td>
@@ -195,10 +196,21 @@ table td {
         <tr>
             <td>Fuel cell or hydrogen gas turbine capacity</td>
             <td><input class="modelinput" key="gasturbine_capacity" type="text" style="width:100px" value="" autocomplete="off"/> GW</td>
+            <td><input class="modelinput" key="gasturbine_capex" type="text" style="width:100px" value="" autocomplete="off"/> £bn/GW</td>
         </tr>
         <tr>
             <td>Fuel cell or hydrogen gas turbine efficiency</td>
             <td><input class="modelinput" key="gasturbine_efficiency" type="text" style="width:100px" value="" autocomplete="off"/>% HHV</td>
+        </tr>
+        <tr>
+            <td>Electrolysis annual output and CF</td>
+            <td><span class="modeloutput" key="total_electricity_for_electrolysis" type="10y"></span></td>
+            <td><span class="modeloutput" key="electrolysis_capacity_factor" dp=3 units=%></span></td>
+        </tr>
+        <tr>
+            <td>Gas Turbine annual output and CF</td>
+            <td><span class="modeloutput" key="total_gasturbine_output" type="10y"></span></td>
+            <td><span class="modeloutput" key="gasturbine_capacity_factor" dp=3 units=%></span></td>
         </tr>
         </table>
     </div>

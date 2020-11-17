@@ -222,6 +222,7 @@ function load_page(page)
     resize();
     var ui_fn = page+"_ui";
     if (window[ui_fn]!=undefined) window[ui_fn]();
+    modeloutput_ui();
     var view_fn = page+"_view";
     if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
     
@@ -259,6 +260,7 @@ $("#model").on("change",".modelinput",function(){
     if (window[run_fn]!=undefined) window[run_fn]();
     var ui_fn = page+"_ui";
     if (window[ui_fn]!=undefined) window[ui_fn]();
+    modeloutput_ui();
     var view_fn = page+"_view";
     if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
 
@@ -418,6 +420,90 @@ $(".menu-title").click(function(){
     
     if (name=="twitter") window.location = "https://twitter.com/trystanlea";
 });
+
+function modeloutput_ui() {
+    $(".modeloutput").each(function(){
+        var type = $(this).attr("type");
+        var key = $(this).attr("key");
+        var dp = $(this).attr("dp");
+        var scale = $(this).attr("scale");
+        var units = $(this).attr("units");
+        
+        if (type==undefined) {
+            if (scale==undefined) scale = 1;
+            if (units==undefined) units = ""; else units = " "+units;
+        } else if(type=="10y") {
+            if (unitsmode=="kwhd") {
+                scale = 1.0 / 3650
+                units = " kWh/d"
+                dp = 1
+            } else if (unitsmode=="kwhy") {
+                scale = 1.0 / 10
+                units = " kWh/y"
+                dp = 0
+            } else if (unitsmode=="GW") {
+                scale = (1.0 / 10)*0.001
+                units = " TWh"
+                dp = 0
+            }
+        } else if(type=="1y") {
+            if (unitsmode=="kwhd") {
+                scale = 1.0 / 365
+                units = " kWh/d"
+                dp = 1
+            } else if (unitsmode=="kwhy") {
+                scale = 1.0
+                units = " kWh/y"
+                dp = 0
+            }
+        } else if(type=="1d") {
+            if (unitsmode=="kwhd") {
+                scale = 1.0
+                units = " kWh/d"
+                dp = 2
+            } else if (unitsmode=="kwhy") {
+                scale = 1.0 * 365
+                units = " kWh/y"
+                dp = 0
+            }
+        } else if(type=="auto") {
+            var baseunit = $(this).attr("baseunit");
+            
+            if (baseunit=="kW") {
+                scale = 1; units = " kW"; dp = 0;
+                if (window[key]>=10000) {scale=0.001; units=" MW"; dp=0;}
+                if (window[key]>=10000000) {scale=0.000001; units=" GW"; dp=0;}
+            }
+            
+            if (baseunit=="kWh") {
+                scale = 1; units = " kWh"; dp = 0;
+                if (window[key]>=10000) {scale=0.001; units=" MWh"; dp=0;}
+                if (window[key]>=10000000) {scale=0.000001; units=" GWh"; dp=0;}
+                if (window[key]>=10000000000) {scale=0.000000001; units=" TWh"; dp=0;}
+            }
+
+            if (baseunit=="m2") {
+                scale = 1; units = " m2"; dp = 0;
+                if (window[key]>=10000*10) {scale=0.0001; units=" ha"; dp=0;}
+                if (window[key]>=10000*10*1000) {scale=0.0001*0.001; units=" kha"; dp=0;}
+                if (window[key]>=10000*10*1000*1000) {scale=0.0001*0.001*0.001; units=" Mha"; dp=0;}
+            } 
+        } else if(type=="%") {
+            scale = 100.0
+            units = "%"
+            dp = 0
+        } 
+        
+        $(this).html("<span>"+(1*window[key]*scale).toFixed(dp)+"</span><span style='font-size:90%'>"+units+"</span>");
+    });
+}
+
+function normalise_profile(profile) {
+    var sum = 0
+    for (var z=0; z<24; z++) sum += profile[z]
+    for (var z=0; z<24; z++) profile[z] /= sum
+    return profile
+}
     
 </script>
 

@@ -33,6 +33,9 @@ function hydrogen_backup_init()
     hydrogen_storage_capacity = 70000
     gasturbine_capacity = 64.5
     gasturbine_efficiency = 0.6
+    
+    electrolysis_capex = 0.360 // bn/GW
+    gasturbine_capex = 0.410 // bn/GW
 }
 
 function hydrogen_backup_run()
@@ -54,7 +57,8 @@ function hydrogen_backup_run()
     hydrogen_storage_soc = hydrogen_storage_capacity * 0.5
     total_electrolysis_losses = 0
     total_gasturbine_losses = 0
-    
+    total_electricity_for_electrolysis = 0
+    total_gasturbine_output = 0
     
     total_excess_initial = 0
     total_unmet_initial = 0
@@ -63,6 +67,8 @@ function hydrogen_backup_run()
     total_excess_final = 0
     total_unmet_final = 0
     max_unmet_final = 0
+    
+    
 
     data = {
         supply: [],
@@ -165,6 +171,8 @@ function hydrogen_backup_run()
             hydrogen_storage_soc += hydrogen_produced
             // subtract from balance
             balance -= electricity_for_electrolysis
+            
+            total_electricity_for_electrolysis += electricity_for_electrolysis
             // electrolysis losses
             total_electrolysis_losses += electricity_for_electrolysis - hydrogen_produced
         } else {
@@ -182,6 +190,8 @@ function hydrogen_backup_run()
             hydrogen_storage_soc -= hydrogen_demand
             // add to balance
             balance += gasturbine_output
+            
+            total_gasturbine_output += gasturbine_output
             // gas turbine losses
             total_gasturbine_losses += hydrogen_demand - gasturbine_output
         }
@@ -211,6 +221,9 @@ function hydrogen_backup_run()
     wave_capacity_factor = 100 * total_wave_supply / (wave_capacity*24*365*10)
     solarpv_capacity_factor = 100 * total_solar_supply / (solarpv_capacity*24*365*10)
     
+    gasturbine_capacity_factor = 100 * total_gasturbine_output / (gasturbine_capacity*24*365*10)
+    electrolysis_capacity_factor = 100 * total_electricity_for_electrolysis / (electrolysis_capacity*24*365*10)
+    
     prc_demand_supplied_direct = ((total_demand - total_unmet_initial) / total_demand) * 100
     prc_demand_supplied_backup = ((total_demand - total_unmet_final) / total_demand) * 100
     prc_demand_unmet = (total_unmet_final / total_demand) * 100
@@ -222,85 +235,14 @@ function hydrogen_backup_run()
     final_balance = total_supply - total_demand - total_losses - total_excess_final - final_store_balance + total_unmet_final
     console.log("Final balance error: "+final_balance.toFixed(3));
 
+    // Costs
+    electrolysis_cost = electrolysis_capex * electrolysis_capacity
+    gasturbine_cost = gasturbine_capex * gasturbine_capacity
+
 }
 // ---------------------------------------------------------------------------    
 
 function hydrogen_backup_ui() {
-            
-    $(".modeloutput").each(function(){
-        var type = $(this).attr("type");
-        var key = $(this).attr("key");
-        var dp = $(this).attr("dp");
-        var scale = $(this).attr("scale");
-        var units = $(this).attr("units");
-        
-        if (type==undefined) {
-            if (scale==undefined) scale = 1;
-            if (units==undefined) units = ""; else units = " "+units;
-        } else if(type=="10y") {
-            if (unitsmode=="kwhd") {
-                scale = 1.0 / 3650
-                units = " kWh/d"
-                dp = 1
-            } else if (unitsmode=="kwhy") {
-                scale = 1.0 / 10
-                units = " kWh/y"
-                dp = 0
-            } else if (unitsmode=="GW") {
-                scale = (1.0 / 10)*0.001
-                units = " TWh"
-                dp = 0
-            }
-        } else if(type=="1y") {
-            if (unitsmode=="kwhd") {
-                scale = 1.0 / 365
-                units = " kWh/d"
-                dp = 1
-            } else if (unitsmode=="kwhy") {
-                scale = 1.0
-                units = " kWh/y"
-                dp = 0
-            }
-        } else if(type=="1d") {
-            if (unitsmode=="kwhd") {
-                scale = 1.0
-                units = " kWh/d"
-                dp = 2
-            } else if (unitsmode=="kwhy") {
-                scale = 1.0 * 365
-                units = " kWh/y"
-                dp = 0
-            }
-        } else if(type=="auto") {
-            var baseunit = $(this).attr("baseunit");
-            
-            if (baseunit=="kW") {
-                scale = 1; units = " kW"; dp = 0;
-                if (window[key]>=10000) {scale=0.001; units=" MW"; dp=0;}
-                if (window[key]>=10000000) {scale=0.000001; units=" GW"; dp=0;}
-            }
-            
-            if (baseunit=="kWh") {
-                scale = 1; units = " kWh"; dp = 0;
-                if (window[key]>=10000) {scale=0.001; units=" MWh"; dp=0;}
-                if (window[key]>=10000000) {scale=0.000001; units=" GWh"; dp=0;}
-                if (window[key]>=10000000000) {scale=0.000000001; units=" TWh"; dp=0;}
-            }
-
-            if (baseunit=="m2") {
-                scale = 1; units = " m2"; dp = 0;
-                if (window[key]>=10000*10) {scale=0.0001; units=" ha"; dp=0;}
-                if (window[key]>=10000*10*1000) {scale=0.0001*0.001; units=" kha"; dp=0;}
-                if (window[key]>=10000*10*1000*1000) {scale=0.0001*0.001*0.001; units=" Mha"; dp=0;}
-            } 
-        } else if(type=="%") {
-            scale = 100.0
-            units = "%"
-            dp = 0
-        } 
-        
-        $(this).html("<span>"+(1*window[key]*scale).toFixed(dp)+"</span><span style='font-size:90%'>"+units+"</span>");
-    });
     
     // Energy stacks visualisation definition
     var scl = 1.0/10000.0;
