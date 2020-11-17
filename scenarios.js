@@ -389,6 +389,27 @@ var scenarios = {
     methane_store_capacity: 120000,
     dispatch_gen_cap: 85
   },
+  gas_boilers_with_enhanced_biogas: {
+    "spacewater_share_heatpumps": 0,
+    "spacewater_share_methane": 0.9,
+    "synth_fuel_capacity": 8.4,
+    "electrolysis_cap": 50,
+    "biomass_for_biogas": 255,
+    "methanation_capacity": 15,
+    "methane_SOC_start": 30000,
+    "methane_store_capacity": 200000,
+    "dispatch_gen_cap": 23
+  },
+  hydrogen_boilers: {
+    "offshore_wind_capacity": 175,
+    "spacewater_share_heatpumps": 0,
+    "spacewater_share_hydrogen": 0.9,
+    "synth_fuel_capacity": 10.8,
+    "electrolysis_cap": 70,
+    "hydrogen_storage_cap": 200000,
+    "biomass_for_biogas": 50,
+    "methanation_capacity": 3
+  },
   storage_200GW_flatout:
   {
     "synth_fuel_capacity": 9.8,
@@ -406,7 +427,23 @@ var scenarios = {
     "electrolysis_cap": 24,
     "biomass_for_biogas": 69.5
   },
-  
+  very_large_4300_GWh_battery: {
+    "synth_fuel_capacity": 10.3,
+    "elec_store_type": "basic",
+    "elec_store_storage_cap": 4300,
+    "elec_store_charge_cap": 500,
+    "electrolysis_cap": 23,
+    "hydrogen_storage_cap": 15000,
+    "biomass_for_biogas": 50.5,
+    "methanation_capacity": 3,
+    "dispatch_gen_cap": 0.001
+  },
+  flat_demand_profile: {
+    "use_flat_profiles": 1,
+    "electrolysis_cap": 24.5,
+    "biomass_for_biogas": 73.5,
+    "dispatch_gen_cap": 39.5
+  },
   offshore_wind_solarpv_1: {
     "offshore_wind_capacity": 160,
     "onshore_wind_capacity": 0,

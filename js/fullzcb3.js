@@ -357,10 +357,10 @@ function fullzcb3_run()
         cooking_profile = flat_profile
         hot_water_profile = flat_profile
         space_heat_profile = flat_profile
-        elec_trains_use_profile = flat_profile
-        BEV_use_profile = flat_profile
-        BEV_charge_profile = flat_profile
-        BEV_plugged_in_profile = flat_profile
+        //elec_trains_use_profile = flat_profile
+        //BEV_use_profile = flat_profile
+        //BEV_charge_profile = flat_profile
+        //BEV_plugged_in_profile = flat_profile
     }
     
     // ---------------------------------------------
