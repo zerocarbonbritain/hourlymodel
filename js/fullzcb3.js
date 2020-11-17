@@ -39,6 +39,7 @@ Issues to fix
 - methane losses from store capping, if biogas feed is set too high
 
 */
+previousPoint = false
 
 function fullzcb3_init()
 {
@@ -178,7 +179,12 @@ function fullzcb3_init()
     BEV_demand = 49.53
     electric_car_battery_capacity = 513.0    // GWh
     electric_car_max_charge_rate = 73.3      // GW
+    
     smart_charging_enabled = 1
+    smart_charge_type = "average"  // or flatout
+    
+    V2G_enabled = 1
+    V2G_discharge_type = "average" // or flatout
     
     // H2 and synthetic fuels
     transport_H2_demand = 9.61
@@ -258,6 +264,12 @@ function fullzcb3_init()
     high_temp_process_profile = flat_profile
     low_temp_process_profile = flat_profile
     not_heat_process_profile = flat_profile
+
+    // Flatter profile and early morning and afternoon heat up periods
+    // hot_water_profile = [0.035,0.038,0.04,0.045,0.06,0.062,0.06,0.04,0.04,0.04,0.04,0.045,0.053,0.06,0.06,0.05,0.028,0.025,0.025,0.028,0.029,0.03,0.032,0.035];    
+    // Flatter profile reflecting heat pump heat
+    // space_heat_profile = [0.02,0.02,0.02,0.03,0.045,0.05,0.05,0.05,0.05,0.05,0.045,0.04,0.04,0.04,0.04,0.045,0.05,0.052,0.052,0.051,0.05,0.048,0.037,0.025];
+    // Flatter profile reduces backup CCGT requirements by ~4GW for the same level of matching (45GW to 41GW)
     
     // -----------------------------------------------------------------------------
     // Transport model
@@ -1143,10 +1155,13 @@ function fullzcb3_run()
         
         // SMART CHARGE --------------------------------
         if (smart_charging_enabled && balance>EV_charge) {
-            // EV_charge = balance // simple smart charge
-            if (deviation_from_mean_BEV>0.0) {
-                EV_charge = (electric_car_battery_capacity-BEV_Store_SOC)*deviation_from_mean_BEV/(electric_car_battery_capacity*0.5)
-                if (EV_charge>balance) EV_charge = balance
+            if (smart_charge_type=="average") {
+                if (deviation_from_mean_BEV>0.0) {
+                    EV_charge = (electric_car_battery_capacity-BEV_Store_SOC)*deviation_from_mean_BEV/(electric_car_battery_capacity*0.5)
+                    if (EV_charge>balance) EV_charge = balance
+                }
+            } else {
+                EV_charge = balance // simple smart charge
             }
         }
         // Charging rate & quantity limits
@@ -1170,11 +1185,14 @@ function fullzcb3_run()
         
         // SMART DISCHARGE -----------------------------
         EV_smart_discharge = 0.0
-        if (smart_charging_enabled && balance<0.0) {
-            // EV_smart_discharge = -balance
-            if (deviation_from_mean_BEV<0.0) {
-                EV_smart_discharge = BEV_Store_SOC*-deviation_from_mean_BEV/(electric_car_battery_capacity*0.5)
-                if (EV_smart_discharge>-balance) EV_smart_discharge = -balance
+        if (V2G_enabled && balance<0.0) {
+            if (V2G_discharge_type=="average") {
+                if (deviation_from_mean_BEV<0.0) {
+                    EV_smart_discharge = BEV_Store_SOC*-deviation_from_mean_BEV/(electric_car_battery_capacity*0.5)
+                    if (EV_smart_discharge>-balance) EV_smart_discharge = -balance
+                }
+            } else {
+                EV_smart_discharge = -balance
             }
         }
 

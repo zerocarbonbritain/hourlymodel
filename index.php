@@ -127,7 +127,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 36;
+var v = 37;
 
 view_mode = "";
 
@@ -230,8 +230,12 @@ function load_page(page)
         var type = $(this).attr("itype");
         var scale = 1.0;
         if (type=="%") scale = 100.0;
-        
-        $(this).val(window[varkey]*scale);
+        if (isNaN(window[varkey])) {
+            $(this).val(window[varkey]);
+        } else {
+            $(this).val(window[varkey]*scale);
+        }
+
         //console.log(varkey);
     });
     

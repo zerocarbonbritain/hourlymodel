@@ -787,7 +787,31 @@ table td {
         </tr>
         <tr>
             <td>Enable smart charging?</td>
-            <td><input class="modelinput" key="smart_charging_enabled" type="text" style="width:70px" value="" autocomplete="off"/></td>
+            <td><select class="modelinput" key="smart_charging_enabled" autocomplete="off">
+                    <option value=1>Enabled</option>
+                    <option value=0>Disabled</option>
+            </select></td> 
+        </tr>
+        <tr>
+            <td>Smart charging algorithm</td>
+            <td><select class="modelinput" key="smart_charge_type" autocomplete="off">
+                    <option value=average>Deviation from mean (peaker)</option>
+                    <option value=flatout>Flat out (basic)</option>
+            </select></td>
+        </tr> 
+        <tr>
+            <td>Enable vehicle to grid?</td>
+            <td><select class="modelinput" key="V2G_enabled" autocomplete="off">
+                    <option value=1>Enabled</option>
+                    <option value=0>Disabled</option>
+            </select></td> 
+        </tr> 
+        <tr>
+            <td>Vehicle to grid discharge algorithm</td>
+            <td><select class="modelinput" key="V2G_discharge_type" autocomplete="off">
+                    <option value=average>Deviation from mean (peaker)</option>
+                    <option value=flatout>Flat out (basic)</option>
+            </select></td>
         </tr>
         <tr>
             <td></td>
