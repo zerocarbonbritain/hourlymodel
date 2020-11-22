@@ -15,7 +15,7 @@ var scenarios = {
     nuclear_capacity: 0.0,
     grid_loss_prc: 0.07,
 
-    // Availability factors,
+    // Availability factors
     offshore_wind_availability: 0.9,
     onshore_wind_availability: 0.9,
     nuclear_availability: 0.9,
@@ -29,7 +29,7 @@ var scenarios = {
     // Traditional electricity demand
     // column 5 trad elec demand: 331.033 TWh/yr, normalised and scaled to:
 
-    // Lights, Appliances and Cooking
+    // Lights, Appliances and Cooking,
     LAC_number_of_lights: 10.0,
     LAC_lights_power: 11.0,
     lighting_hours: 10.0,
@@ -43,9 +43,9 @@ var scenarios = {
 
     annual_cooking_elec_services: 16.85,
 
-    // trad_elec_domestic_appliances: 38.59 // TWh/yr (45% of 2007 figure, does not include cooking)
-    trad_elec_services_appliances: 41.41, // TWh/yr
-    trad_elec_services_cooling: 4.55,     // TWh/yr
+    // trad_elec_domestic_appliances: 38.59, // TWh/yr (45% of 2007 figure, does not include cooking)
+    trad_elec_services_appliances: 41.41,    // TWh/yr
+    trad_elec_services_cooling: 4.55,        // TWh/yr
 
     use_flat_profiles: false,
 
@@ -62,46 +62,46 @@ var scenarios = {
     glazing_extent: 0.2,
     air_change_per_hour: 0.54, // non pressurised air change rate
 
-    // domestic_space_heat_demand_WK: 114.6, // W/K (DECC 2050 Pathway level 4) x number of households 2030: 3.548 GW/K
-    services_space_heat_demand_GWK: 1.486, // GW/K,
-    industry_space_heat_demand_GWK: 0.502, // GW/K,
-    space_heat_base_temperature: 13.07,               // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050
+    // domestic_space_heat_demand_WK: 114.6,  // W/K (DECC 2050 Pathway level 4) x number of households 2030: 3.548 GW/K
+    services_space_heat_demand_GWK: 1.486, // GW/K
+    industry_space_heat_demand_GWK: 0.502, // GW/K
+    space_heat_base_temperature: 13.07,    // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050
 
     // Simple Domestic Hot Water Demand calculator
     number_showers_per_day: 1.5,
     number_baths_per_day: 0.8,
     number_kitchen_sink: 2.2,
     number_bathroom_sink: 1.0,
-    shower_kwh: 1.125, // 7.5 mins at 9kW,
+    shower_kwh: 1.125, // 7.5 mins at 9kW
     bath_kwh: 1.35,   // uses 20% more water than shower at same temperature
     sink_kwh: 0.3,   // 6.3L × 40K × 4200 (assuming 50C water, 70% of typical bowl)
 
     // domestic_water_heating: 40.80, // TWh
     services_water_heating: 15.99, // TWh
 
-    // Heating system efficiencies
+    // Heating system efficiencies,
     heatpump_COP: 3.0,
     elres_efficiency: 1.0,
     biomass_efficiency: 0.9,
     methane_boiler_efficiency: 0.95,
     hydrogen_boiler_efficiency: 0.95,
 
-    // Heating system share of demand
+    // Heating system share of demand,
     spacewater_share_heatpumps: 0.9,
     spacewater_share_elres: 0.05,
     spacewater_share_biomass: 0.05,
     spacewater_share_methane: 0.00,
     spacewater_share_hydrogen: 0.00,
 
-    // Heatstore
+    // Heatstore,
     heatstore_enabled: 1,
     heatstore_storage_cap: 100.0,
     heatstore_charge_cap: 50.0,
     // ---------------------------------------------
     // Industrial
     // ---------------------------------------------
-    annual_high_temp_process: 49.01,
-    annual_low_temp_dry_sep: 117.78,
+    annual_high_temp_process: 49.01,     // 26.3% elec, 73.7% gas in original model
+    annual_low_temp_dry_sep: 117.78,     // 66% elec, 11% gas, 22% biomass CHP in original model
 
     high_temp_process_fixed_elec_prc: 0.125,
     high_temp_process_fixed_gas_prc: 0.375,
@@ -118,19 +118,24 @@ var scenarios = {
     annual_non_heat_process_biomass: 5.58,
 
     industrial_biofuel: 13.44,
-    
+
     // ---------------------------------------------
     // Transport
     // ---------------------------------------------
     // electrains_demand: 12.22, // and ships?
 
-    // Electric cars
+    // Electric cars,
     // BEV_demand: 49.53,
     electric_car_battery_capacity: 513.0,    // GWh
     electric_car_max_charge_rate: 73.3,      // GW
-    smart_charging_enabled: 1,
 
-    // H2 and synthetic fuels
+    smart_charging_enabled: 1,
+    smart_charge_type: "average",  // or flatout
+
+    V2G_enabled: 1,
+    V2G_discharge_type: "average", // or flatout
+
+    // H2 and synthetic fuels,
     // transport_H2_demand: 9.61,
     transport_CH4_demand: 0.0,
     // transport_biofuels_demand: 33.45,
@@ -139,33 +144,33 @@ var scenarios = {
     // ---------------------------------------------
     // Storage
     // ---------------------------------------------
-    // Synth fuel production
-    synth_fuel_capacity: 9.4,           // GW
+    // Synth fuel production,
+    synth_fuel_capacity: 9.4,      // GW
     synth_fuel_store_SOC_start: 5000.0, // GWh
-    FT_process_biomass_req: 1.3,        // GWh/GWh fuel
-    FT_process_hydrogen_req: 0.61,      // GWh/GWh fuel
+    FT_process_biomass_req: 1.3,   // GWh/GWh fuel
+    FT_process_hydrogen_req: 0.61, // GWh/GWh fuel
 
-    // Electricity Storage
+    // Electricity Storage,
     elec_store_type: "average",
     elec_store_storage_cap: 50.0,
     elec_store_charge_cap: 10.0,
     store_roundtrip_efficiency: 0.9,
 
-    // Hydrogen
+    // Hydrogen,
     electrolysis_cap: 25.0,
     electrolysis_eff: 0.8,
-    hydrogen_storage_cap: 18000.0,
+    hydrogen_storage_cap: 15000.0,
     minimum_hydrogen_store_level: 0.1,
-    
-    // biogas
+
+    // biogas,
     biomass_for_biogas: 74.0,
     anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
     co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425)),  // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
-
-    // Methanation
+    
+    // Methanation,
     methanation_capacity: 5.0,
     methane_SOC_start: 10000.0,
-    methane_store_capacity: 80000.0,
+    methane_store_capacity: 52000.0,
 
     // Power to Gas and Liquids including integrated DAC of CO2
     power_to_X_cap: 0.0,
@@ -182,13 +187,15 @@ var scenarios = {
     power_to_X_prc_liquid: 0.56,
     power_to_X_liquid_efficiency: 0.6,
 
-    // Dispatchable
+    // Dispatchable,
     dispatch_gen_cap: 45.0,
     dispatchable_gen_eff: 0.50,
 
     // -----------------------------------------------------------------------------
-    // Transport model,
+    // Transport model
     // -----------------------------------------------------------------------------
+
+    // zcb figures
     walking_miles_pp: 186,
     cycling_miles_pp: 168,
     ebikes_miles_pp: 155,
@@ -197,7 +204,7 @@ var scenarios = {
     motorbike_miles_pp: 186,
     carsvans_miles_pp: 4350,
     aviation_miles_pp: 1118,
-    
+
     // Mechanical assumed 80% of electric vehicle economy including charging losses, trains 90%
     ebikes_mechanical_kwhppkm_full: 0.0081,
     rail_mechanical_kwhppkm_full: 0.027,
@@ -206,13 +213,14 @@ var scenarios = {
     carsvans_mechanical_kwhppkm_full: 0.031,
     aviation_mechanical_kwhppkm_full: 0.070,
 
-    // Load factors (zcb),
+    // Load factors (zcb)
     rail_load_factor: 0.42,
     bus_load_factor: 0.42,
     motorbike_load_factor: 1.1,
     carsvans_load_factor: 0.4,
     aviation_load_factor: 0.85,
 
+    // PRC of different powertrains
     rail_prc_EV: 0.9,
     rail_prc_H2: 0.04,
     rail_prc_ICE: 0.06,
@@ -220,7 +228,7 @@ var scenarios = {
     bus_prc_EV: 0.9,
     bus_prc_H2: 0.04,
     bus_prc_ICE: 0.06,
-    
+
     motorbike_prc_EV: 0.9,
     motorbike_prc_H2: 0.0,
     motorbike_prc_ICE: 0.1,
