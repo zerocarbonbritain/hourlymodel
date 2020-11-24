@@ -210,7 +210,7 @@ function fullzcb3_init()
     // Hydrogen
     electrolysis_cap = 25.0
     electrolysis_eff = 0.8
-    hydrogen_storage_cap = 18000.0
+    hydrogen_storage_cap = 15000.0
     minimum_hydrogen_store_level = 0.1
 
     // biogas
@@ -221,7 +221,7 @@ function fullzcb3_init()
     // Methanation
     methanation_capacity = 5.0
     methane_SOC_start = 10000.0
-    methane_store_capacity = 80000.0
+    methane_store_capacity = 52000.0
 
     // Power to Gas and Liquids including integrated DAC of CO2 
     power_to_X_cap = 0.0
@@ -270,6 +270,10 @@ function fullzcb3_init()
     // Flatter profile reflecting heat pump heat
     // space_heat_profile = [0.02,0.02,0.02,0.03,0.045,0.05,0.05,0.05,0.05,0.05,0.045,0.04,0.04,0.04,0.04,0.045,0.05,0.052,0.052,0.051,0.05,0.048,0.037,0.025];
     // Flatter profile reduces backup CCGT requirements by ~4GW for the same level of matching (45GW to 41GW)
+
+    // hours                 00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23
+    // BEV_charge_profile = [04,06,06,06,06,03,00,00,00,00,01,02,04,04,04,03,02,01,00,00,00,01,02,03]
+    // BEV_charge_profile = normalise_profile(BEV_charge_profile)
     
     // -----------------------------------------------------------------------------
     // Transport model
@@ -633,6 +637,14 @@ function fullzcb3_run()
     hydrogen_SOC = hydrogen_SOC_start
     methane_SOC = methane_SOC_start
     synth_fuel_store_SOC = synth_fuel_store_SOC_start
+    
+    max_methane_SOC = 0
+    max_hydrogen_SOC = 0
+    max_synth_fuel_store_SOC = 0
+    
+    min_methane_SOC = methane_store_capacity
+    min_hydrogen_SOC = hydrogen_storage_cap
+    min_synth_fuel_store_SOC = 1000000
     // ---------------------------------------------
     // Transport
     // ---------------------------------------------
@@ -643,10 +655,13 @@ function fullzcb3_run()
     total_elec_trains_demand = 0
 
     total_hydrogen_produced = 0
+    total_electricity_for_electrolysis = 0
     total_hydrogen_demand = 0
     total_hydrogen_for_hydrogen_vehicles = 0
     unmet_hydrogen_demand = 0
     unmet_synth_fuel_demand = 0
+    
+    total_electricity_for_power_to_X = 0
     
     // --------------------------------------------- 
     // Final balance
@@ -668,6 +683,8 @@ function fullzcb3_run()
     total_electricity_from_dispatchable = 0
     max_dispatchable_capacity = 0
     max_dispatchable_capacity_hour = 0
+    max_shortfall = 0
+    max_shortfall_hour = 0
     total_methane_for_transport = 0
     total_methane_demand = 0
     
@@ -1198,6 +1215,8 @@ function fullzcb3_run()
 
         // Discharge rate & quantity limits
         if (EV_smart_discharge>max_charge_rate) EV_smart_discharge = max_charge_rate
+        //EV_V2G_min_SOC = electric_car_battery_capacity * 0.3
+        //if ((BEV_Store_SOC-EV_smart_discharge)<EV_V2G_min_SOC) EV_smart_discharge = BEV_Store_SOC-EV_V2G_min_SOC
         if (EV_smart_discharge>BEV_Store_SOC) EV_smart_discharge = BEV_Store_SOC
         if (EV_smart_discharge<0) EV_smart_discharge = 0
                
@@ -1355,6 +1374,8 @@ function fullzcb3_run()
         data.electricity_for_electrolysis.push([time,electricity_for_electrolysis])
         balance -= electricity_for_electrolysis
         
+        total_electricity_for_electrolysis += electricity_for_electrolysis
+        
         hydrogen_balance = hydrogen_from_electrolysis
         total_hydrogen_produced += hydrogen_from_electrolysis
         
@@ -1395,6 +1416,9 @@ function fullzcb3_run()
             unmet_hydrogen_demand += -1*hydrogen_SOC
             hydrogen_SOC = 0.0
         }
+        
+        if (hydrogen_SOC>max_hydrogen_SOC) max_hydrogen_SOC = hydrogen_SOC
+        if (hydrogen_SOC<min_hydrogen_SOC) min_hydrogen_SOC = hydrogen_SOC
 
         total_hydrogen_demand += hydrogen_for_hydrogen_vehicles + hydrogen_to_synth_fuel + hydrogen_for_sabatier
              
@@ -1422,6 +1446,8 @@ function fullzcb3_run()
         synth_fuel_produced_PTL = electricity_for_power_to_X * power_to_X_prc_liquid * power_to_X_liquid_efficiency
         
         balance -= electricity_for_power_to_X
+        
+        total_electricity_for_power_to_X += electricity_for_power_to_X
         
         // Losses and electric consumption graph
         total_power_to_X_losses += electricity_for_power_to_X - (methane_from_IHTEM + synth_fuel_produced_PTL)
@@ -1466,6 +1492,11 @@ function fullzcb3_run()
             unmet_elec = -balance
             total_final_elec_balance_negative += unmet_elec
             final_elec_balance_negative++
+            
+            if (unmet_elec>max_shortfall) {
+                max_shortfall = unmet_elec
+                max_shortfall_hour = hour
+            }
         }
         data.export_elec.push([time,export_elec])
         data.unmet_elec.push([time,unmet_elec])
@@ -1497,6 +1528,8 @@ function fullzcb3_run()
         if ((methane_SOC/methane_store_capacity)<0.01) methane_store_empty_count ++
         if ((methane_SOC/methane_store_capacity)>0.99) methane_store_full_count ++
         
+        if (methane_SOC>max_methane_SOC) max_methane_SOC = methane_SOC
+        if (methane_SOC<min_methane_SOC) min_methane_SOC = methane_SOC
         // ------------------------------------------------------------------------------------
         // Synth fuel FT
         synth_fuel_produced_FT = hydrogen_to_synth_fuel / FT_process_hydrogen_req
@@ -1520,7 +1553,10 @@ function fullzcb3_run()
         
         total_synth_fuel_demand += synth_fuel_demand
 
-        data.synth_fuel_store_SOC.push([time,synth_fuel_store_SOC])        
+        data.synth_fuel_store_SOC.push([time,synth_fuel_store_SOC])   
+        
+        if (synth_fuel_store_SOC>max_synth_fuel_store_SOC) max_synth_fuel_store_SOC = synth_fuel_store_SOC
+        if (synth_fuel_store_SOC<min_synth_fuel_store_SOC) min_synth_fuel_store_SOC = synth_fuel_store_SOC   
         // ------------------------------------------------------------------------------------
         // Biomass
         total_biomass_used += biogas_supply / anaerobic_digestion_efficiency 
@@ -1647,6 +1683,9 @@ function fullzcb3_run()
     solarpv_capacity_factor = 100 * total_solar_supply / (solarpv_capacity*24*365*10)
     solarthermal_capacity_factor = 100 * total_solarthermal / (solarthermal_capacity*24*365*10)
     
+    electrolysis_capacity_factor = 100*(total_electricity_for_electrolysis / (electrolysis_cap * 87600))
+    power_to_X_capacity_factor = 100*(total_electricity_for_power_to_X / (power_to_X_cap * 87600))
+    
     var out = "";
     var error = 0
     for (var hour = 0; hour < hours; hour++) {
@@ -1671,9 +1710,20 @@ function fullzcb3_run()
     } 
     
     console.log("balance error: "+error.toFixed(12));
+    
+    min_hydrogen_SOC_prc = 100 * min_hydrogen_SOC / hydrogen_storage_cap
+    min_synth_fuel_store_SOC_prc = 100 * min_synth_fuel_store_SOC / max_synth_fuel_store_SOC
+    min_methane_SOC_prc = 100 * min_methane_SOC / methane_store_capacity
 
-    var time = datastarttime + (max_dispatchable_capacity_hour * 3600 * 1000);
-    console.log("max_dispatchable_capacity: "+max_dispatchable_capacity+"GW at "+(new Date(time)).toString()+" "+max_dispatchable_capacity_hour+"h");
+    var d = new Date(datastarttime + (max_dispatchable_capacity_hour * 3600 * 1000));
+    var h = d.getHours();
+    if (h<10) h = "0"+h
+    max_dispatchable_capacity_date = h+":00 "+(d.getDay()+1)+"/"+d.getMonth()+"/"+d.getFullYear();
+
+    d = new Date(datastarttime + (max_shortfall_hour * 3600 * 1000));
+    h = d.getHours();
+    if (h<10) h = "0"+h
+    max_shortfall_date = h+":00 "+(d.getDay()+1)+"/"+d.getMonth()+"/"+d.getFullYear();
     
     // ----------------------------------------------------------------------------
     // Land area factors
@@ -1877,7 +1927,22 @@ function fullzcb3_ui() {
         ]
       }
     ];
-    draw_stacks(stacks,"stacks",1000,600,units)   
+    draw_stacks(stacks,"stacks",1000,600,units)
+    
+    /*
+    var out = "";
+    for (var z in scenarios.main) {
+        if (window[z] != scenarios.main[z]) {
+            out += "<tr><td>"+z+"</td><td>"+scenarios.main[z]+"</td><td>"+window[z]+"</td></tr>";
+        }
+    }
+    $("#compare").html(out);
+    if (out=="") $("#compare").parent().hide(); else $("#compare").parent().show();
+    
+    $.ajax({url: "scenario_descriptions/"+scenario_name+".html?v="+v, async: true, success: function(result){
+        $("#scenario_description").html(result);
+    }});*/
+    v++;
 }	
 	
 function fullzcb3_view(start,end,interval)

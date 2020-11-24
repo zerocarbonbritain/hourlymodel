@@ -127,7 +127,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 37;
+var v = 41;
 
 view_mode = "";
 
@@ -327,6 +327,8 @@ $("#model").on("change","#select_scenario",function(){
 
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s");
+
+    modeloutput_ui();
  
 });
 
@@ -417,8 +419,6 @@ function draw_sidebar() {
 $(".menu-title").click(function(){
     var name = $(this).attr("name");
     $(".menu-items[name="+name+"]").toggle();
-    
-    if (name=="twitter") window.location = "https://twitter.com/trystanlea";
 });
 
 function modeloutput_ui() {
@@ -494,7 +494,11 @@ function modeloutput_ui() {
             dp = 0
         } 
         
-        $(this).html("<span>"+(1*window[key]*scale).toFixed(dp)+"</span><span style='font-size:90%'>"+units+"</span>");
+        if (isNaN(window[key])) {
+            $(this).html("<span>"+window[key]+"</span>");
+        } else {
+            $(this).html("<span>"+(1*window[key]*scale).toFixed(dp)+"</span><span style='font-size:90%'>"+units+"</span>");
+        }
     });
 }
 

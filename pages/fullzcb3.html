@@ -88,7 +88,11 @@ table td {
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SCENARIO DESCRIPTION</b></div>
     <div class="inner">
         <div style="font-size:14px">
-        testing
+            <div id="scenario_description"></div>
+            <table class="table">
+                <tr><th>Name</th><th>ZCB</th><th>Scenario</th></tr>
+                <tbody id="compare"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -1077,6 +1081,7 @@ table td {
             <td><span class="modeloutput" key="total_unmet_heat_demand" dp=1></span></td>
             <td></td>
         </tr>
+        <!--
         <tr>
             <td>Methane store empty</td>
             <td><span class="modeloutput" key="methane_store_empty_count"></span></td>
@@ -1100,6 +1105,36 @@ table td {
             <td><span class="modeloutput" key="hydrogen_store_full_count"></span></td>
             <td><span class="modeloutput" key="hydrogen_store_full_prc" dp=1 units="%"></span></td>
             <td></td>
+        </tr>-->
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th></th>
+            <th>Min</th>
+            <th>Min %</th>
+            <th>Max</th>
+        </tr>
+        <tr>
+            <td>Hydrogen Store</td>
+            <td><span class="modeloutput" key="min_hydrogen_SOC" dp=0 units=GWh></span></td>
+            <td><span class="modeloutput" key="min_hydrogen_SOC_prc" dp=1 units="%"></span></td>
+            <td><span class="modeloutput" key="max_hydrogen_SOC" dp=0 units=GWh></span></td>
+        </tr>
+        <tr>
+            <td>Liquid fuel Store</td>
+            <td><span class="modeloutput" key="min_synth_fuel_store_SOC" dp=0 units=GWh></span></td>
+            <td><span class="modeloutput" key="min_synth_fuel_store_SOC_prc" dp=1 units="%"></span></td>
+            <td><span class="modeloutput" key="max_synth_fuel_store_SOC" dp=0 units=GWh></span></td>
+        </tr>
+        <tr>
+            <td>Methane Store</td>
+            <td><span class="modeloutput" key="min_methane_SOC" dp=0 units=GWh></span></td>
+            <td><span class="modeloutput" key="min_methane_SOC_prc" dp=1 units="%"></span></td>
+            <td><span class="modeloutput" key="max_methane_SOC" dp=0 units=GWh></span></td>
         </tr>
         <tr>
             <td></td>
@@ -1129,6 +1164,24 @@ table td {
             <td>Methane</td>
             <td><span class="modeloutput" key="total_methane_made" type="10y"></span></td>
             <td><span class="modeloutput" key="total_methane_demand" type="10y"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Hydrogen Electrolysis capacity factor</td>
+            <td><span class="modeloutput" key="electrolysis_capacity_factor" dp=1 units="%"></span></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Power-to-X capacity factor</td>
+            <td><span class="modeloutput" key="power_to_X_capacity_factor" dp=1 units="%"></span></td>
+            <td></td>
             <td></td>
         </tr>
         <tr>
@@ -1181,12 +1234,19 @@ table td {
             <td></td>
         </tr>
         <tr>
-            <td>Electricity from dispatchable (GW)</td>
-            <td><span class="modeloutput" key="max_dispatchable_capacity" dp=1></span></td>
+            <td>Max Dispatchable Output (GW)</td>
+            <td><span class="modeloutput" key="max_dispatchable_capacity" dp=1 units=GW></span></td>
+            <td><span class="modeloutput" key="max_dispatchable_capacity_date"></span></td>
             <td></td>
+        </tr>
+        <tr>
+            <td>Max Electricity Shortfall (GW)</td>
+            <td><span class="modeloutput" key="max_shortfall" dp=1 units=GW></span></td>
+            <td><span class="modeloutput" key="max_shortfall_date"></span></td>
             <td></td>
         </tr>
         </table>
+        <div style="font-size:14px">Note: The main ZCB scenario targets a 99.9% supply/demand matching level. Note that the max short fall with dispatchable capacity sized to meet this matching level can be quite high. There are several limitations with the model that could in reality reduce this maximum shortfall without increasing the capacity of dispatchable generation, including more sophisticated battery storage algorithms and higher levels of demand-side-response.</div>
     </div>
 </div>
 
