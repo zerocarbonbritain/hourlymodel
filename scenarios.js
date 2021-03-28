@@ -514,7 +514,18 @@ var scenarios = {
     "biomass_for_biogas": 55.3,
     "methanation_capacity": 3.8,
     "methane_store_capacity": 40000,
-    "dispatch_gen_cap": 33
+    "dispatch_gen_cap": 33.8
+  },
+  nuclear_19GW_v2: {
+    "offshore_wind_capacity": 73,
+    "nuclear_capacity": 19.25,
+    "synth_fuel_capacity": 9.7,
+    "electrolysis_cap": 25,
+    "hydrogen_storage_cap": 15000,
+    "biomass_for_biogas": 64,
+    "methanation_capacity": 3.8,
+    "methane_store_capacity": 52000,
+    "dispatch_gen_cap": 37
   },
   nuclear_48GW_50prc: {
     "offshore_wind_capacity": 61,
