@@ -47,7 +47,7 @@ var scenarios = {
     trad_elec_services_appliances: 41.41,    // TWh/yr
     trad_elec_services_cooling: 4.55,        // TWh/yr
 
-    use_flat_profiles: false,
+    use_flat_profiles: 0,
 
     // ---------------------------------------------
     // Space & water heating demand
