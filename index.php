@@ -9,16 +9,20 @@
   <head>
     <title>ZeroCarbonBritain Hourly Model</title>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="font/ubuntu.css?family=Ubuntu:light,bold&subset=Latin">
-    <!--<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>-->
-    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
-    <script type="text/javascript" src="jszip/jszip.min.js"></script>
-    <script type="text/javascript" src="jszip/jszip-utils.min.js"></script>
-    <script language="javascript" type="text/javascript" src="flot/jquery.flot.min.js"></script>
-    <script language="javascript" type="text/javascript" src="flot/jquery.flot.selection.min.js"></script>
-    <script language="javascript" type="text/javascript" src="flot/jquery.flot.time.min.js"></script>
-    <script language="javascript" type="text/javascript" src="flot/jquery.flot.stack.min.js"></script>
-    <script type="text/javascript" src="stacks.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet"> 
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.selection.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.time.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.stack.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+    <script type="text/javascript" src="stacks.js?v=1"></script>
     <link rel="stylesheet" type="text/css" href="style.css?v=3" />
   </head>
 
@@ -44,8 +48,6 @@
         <div class="menu-title" name="fullmodel"><b>Full Model</b></div>
         <div class="menu-items" name="fullmodel">
           <div class="menu-item"><a href="#fullzcb3">ZeroCarbonBritain v3</a></div>
-          <div class="menu-item"><a href="#fullzcb2">ZeroCarbonBritain v2</a></div>
-          <div class="menu-item"><a href="#fullzcb">ZeroCarbonBritain v1</a></div>
           <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
         </div>
         
@@ -53,22 +55,6 @@
         <div class="menu-items" name="guides">
           <div class="menu-item"><a href="#scenario_variations">1. Scenario Variations</a></div>
           <div class="menu-item"><a href="#community_scenario">2. Creating a community scale ZeroCarbonBritain scenario</a></div>
-        </div>
-              
-        <div class="menu-title" name="examples"><b>Examples</b></div>
-        <div class="menu-items" name="examples" style="display:none">
-          <div class="menu-item"><a href="#varsupply">1. Variable supply</a></div>
-          <div class="menu-item"><a href="#varsupply_flatdemand">2. Variable supply and flat demand</a></div>
-          <div class="menu-item"><a href="#varsupply_traddemand">3. Variable supply, traditional electricity demand and oversupply</a></div>
-          <div class="menu-item"><a href="#windandsun_flatdemand">4. Mixed supply and flat demand</a></div>
-          <!--
-          <div class="menu-item"><a href="#varsupply_spaceheatingdemand">5. Variable supply and space heating demand</a></div>
-          <div class="menu-item"><a href="#electricvehicles">6. Electric Vehicles</a></div>
-          <div class="menu-item"><a href="#all">7. Household electric only model</a></div>
-          <div class="menu-item"><a href="#fullhousehold">8. Household full energy model</a></div>
-          -->
-          <div class="menu-item"><a href="#storage_algorithm">5. Storage Algorithms</a></div>
-          <div class="menu-item"><a href="#hydrogen_backup">6. Hydrogen Backup</a></div>
         </div>
 
         <div class="menu-title" name="methodology"><b>Methodology Papers (PDF)</b></div>
@@ -95,11 +81,9 @@
         
         <div id="model-bound">
             <div id="model">
+            <?php require "pages/fullzcb3.html"; ?>
             </div>
-            
-            <pre id="sourcecode" style="display:none"></pre>
         </div>
-        <div id="description"></div>
         <div style="clear:both"></div>
       </div>
     </div>
@@ -109,8 +93,11 @@
 
   </body>
 </html>
+
 <script language="javascript" type="text/javascript" src="scenarios.js?v=2"></script>
-<script language="javascript" type="text/javascript" src="vishelper.js?v=2"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=2"></script>
+<script language="javascript" type="text/javascript" src="js/fullzcb3.js?v=3"></script>
+<script language="javascript" type="text/javascript" src="vishelper.js?v=3"></script>
 
 <script>
 
@@ -127,17 +114,18 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 42;
+var data = {}
+var v = 43;
+var o = {transport:{}}
+    
 
-view_mode = "";
+var view_mode = "electricity";
 
-var datastarttime = 32*365.25*24*3600*1000;
-start = datastarttime;
-end = datastarttime + 10*24*365*3600*1000;
-interval = (end - start)/1000;
+view.start = 32*365.25*24*3600;
+view.end = view.start + 87648*3600;
+view.calc_interval();
 
-page = (window.location.hash).substring(1);
-if (page=="") page = "fullzcb3";
+var page = "fullzcb3";
 
 var datasets = 0;
 var pageload = 0;
@@ -184,29 +172,6 @@ $(window).on('hashchange', function() {
 function load_page(page)
 {
     $(".loading").hide();
-    if (view_html[page]!=undefined) {
-        $("#model").html(view_html[page]);
-        $("#description").html(view_desc[page]);
-    } else {
-        $.ajax({url: "pages/"+page+".html?v="+v, async: false, success: function(data){
-            view_html[page] = data;
-        }});
-        
-        view_desc[page] = "";
-        $.ajax({url: "descriptions/"+page+".html?v="+v, async: false, success: function(data){
-            view_desc[page] = data;
-        }});
-        
-        $("#model").html(view_html[page]);
-        $("#description").html(view_desc[page]);
-        
-        // Load js
-        $.ajax({
-            url: "js/"+page+".js",
-            dataType: 'script',
-            async:false
-        });
-    }
     
     var out = "";
     for (var scenario_name in scenarios) {
@@ -215,83 +180,75 @@ function load_page(page)
     $("#select_scenario").html(out);
 
 
-    var init_fn = page+"_init";
-    if (window[init_fn]!=undefined) window[init_fn]();
-    var run_fn = page+"_run";
-    if (window[run_fn]!=undefined) window[run_fn]();
-    resize();
-    var ui_fn = page+"_ui";
-    if (window[ui_fn]!=undefined) window[ui_fn]();
-    modeloutput_ui();
-    var view_fn = page+"_view";
-    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
-    
-    $(".modelinput").each(function(){
-        var varkey = $(this).attr("key");
-        var type = $(this).attr("itype");
-        var scale = 1.0;
-        if (type=="%") scale = 100.0;
-        if (isNaN(window[varkey])) {
-            $(this).val(window[varkey]);
-        } else {
-            $(this).val(window[varkey]*scale);
-        }
+    fullzcb3_init();
+    fullzcb3_run();
 
-        //console.log(varkey);
-    });
-    
-    $("#sourcecode").hide();
-    $("#view-source").html("Show source code");
-        
+            
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Load time "+(time_elapsed*0.001).toFixed(1)+"s");
+    
+    modeloutput_ui();
+    
+    var app = new Vue({
+        el: '#app',
+        data: {
+            i: i,
+            o: o
+        },
+        methods: {
+          update: function () {},
+          pan_left: function () {
+            view.pan_left();
+            fullzcb3_view();
+          },
+          pan_right: function () {
+            view.pan_right();
+            fullzcb3_view();          
+          },
+          zoom_in: function () {
+            view.zoom_in();
+            fullzcb3_view(); 
+          },
+          zoom_out: function () {
+            view.zoom_out();
+            fullzcb3_view();      
+          },
+          reset: function () {
+            view.start = 32*365.25*24*3600;
+            view.end = view.start + 87648*3600;
+            view.calc_interval();
+            fullzcb3_view();
+          },
+          view_mode: function (_view_mode) {
+            view_mode = _view_mode
+            fullzcb3_view();
+          }      
+        },
+        filters: {
+          format_energy: function(val) {
+            return (val * 0.1 * 0.001).toFixed(1);
+          },
+          format_prc: function(val) {
+            return (val * 100).toFixed(1);
+          },
+          toFixed: function(val,dp) {
+            if (isNaN(val)) {
+              return val;
+            } else {
+              return val.toFixed(dp)
+            }
+          }        
+        }
+    });
+
+    resize();
+    fullzcb3_ui();
+        
 }
 
-$("#model").on("change",".modelinput",function(){
-    var timerStart = Date.now();
-
-    var varkey = $(this).attr("key");
-    var type = $(this).attr("itype");
-    var scale = 1.0;
-    if (type=="%") scale = 100.0;
-    window[varkey] = $(this).val();
-    if (!isNaN(window[varkey])) window[varkey] /= scale;
-    var run_fn = page+"_run";
-    if (window[run_fn]!=undefined) window[run_fn]();
-    var ui_fn = page+"_ui";
-    if (window[ui_fn]!=undefined) window[ui_fn]();
-    modeloutput_ui();
-    var view_fn = page+"_view";
-    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
-
-    var time_elapsed = (Date.now() - timerStart)
-    loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s");
-});
-
 $("#model").on("click",".viewmode",function(){
-    
     view_mode = $(this).attr("view");
-    
-    var view_fn = page+"_view";
-    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
-});
-
-$("#model").on("click",".view-source",function(){
-    if (!$("#sourcecode").is(":visible")) {
-        $.ajax({
-            url: "js/"+page+".js",
-            dataType: 'text',
-            async:true,
-            success: function (data){
-                $("#sourcecode").html("Model file js/"+page+".js:\n\n"+data);
-                $("#sourcecode").show();
-                $(".view-source").html("Hide source code");
-            }
-        });
-    } else {
-        $("#sourcecode").hide();
-        $(".view-source").html("Show source code");
-    }
+    fullzcb3_view();
 });
 
 $("#model").on("click",".box-title",function(){
@@ -306,30 +263,16 @@ $("#model").on("change","#select_scenario",function(){
     if (scenario_name!="main") {
         for (var z in scenarios[scenario_name]) window[z] = scenarios[scenario_name][z]  
     }
-    
-    $(".modelinput").each(function(){
-        var varkey = $(this).attr("key");
-        var type = $(this).attr("itype");
-        var scale = 1.0;
-        if (type=="%") scale = 100.0;
-        
-        $(this).val(window[varkey]*scale);
-        //console.log(varkey);
-    });
 
     var timerStart = Date.now();
-    var run_fn = page+"_run";
-    if (window[run_fn]!=undefined) window[run_fn]();
-    var ui_fn = page+"_ui";
-    if (window[ui_fn]!=undefined) window[ui_fn]();
-    var view_fn = page+"_view";
-    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
+    
+    fullzcb3_run();
+    fullzcb3_ui();
+    modeloutput_ui();
+    fullzcb3_view();
 
     var time_elapsed = (Date.now() - timerStart)
-    loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s");
-
-    modeloutput_ui();
- 
+    loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s"); 
 });
 
 function loading_prc(prc,msg) {
@@ -373,8 +316,7 @@ function resize() {
     $("#placeholder").width(width);
     $("#placeholder").height(width*0.52);
     
-    var view_fn = page+"_view";
-    if (window[view_fn]!=undefined) window[view_fn](start,end,interval);
+    fullzcb3_view();
 }
 
 

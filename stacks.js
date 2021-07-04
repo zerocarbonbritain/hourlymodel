@@ -24,7 +24,7 @@
 
     // Find max height to find how much the graph needs to be scaled by to fit everything on the page
     var top = 0;
-    for (var i in stacks) if (top<stacks[i]['height']) top = stacks[i]['height'];
+    for (var b in stacks) if (top<stacks[b]['height']) top = stacks[b]['height'];
     //top =176;
     var scale = (height-90) / top;
 
@@ -32,18 +32,18 @@
     $('.stacktotal').remove();
 
     var mov; var x = 5;
-    for (var i in stacks)
+    for (var b in stacks)
     {
       mov = height-80;
 
-      var textwidth = (""+stacks[i]['name']).length*8.0;
-      //if (textwidth<(bwidth-10)) draw_text(ctx,x+(bwidth-10)/2,mov,stacks[i]['name']);
+      var textwidth = (""+stacks[b]['name']).length*8.0;
+      //if (textwidth<(bwidth-10)) draw_text(ctx,x+(bwidth-10)/2,mov,stacks[b]['name']);
 
-      var textwidth = (stacks[i]['height'].toFixed(0)+" "+units).length*6.0;
-      //if (textwidth<(bwidth-10)) draw_text(ctx,x+(bwidth-10)/2,mov+20,stacks[i]['height'].toFixed(0)+" "+units);
+      var textwidth = (stacks[b]['height'].toFixed(0)+" "+units).length*6.0;
+      //if (textwidth<(bwidth-10)) draw_text(ctx,x+(bwidth-10)/2,mov+20,stacks[b]['height'].toFixed(0)+" "+units);
 
-     // if (stacks[i].context) stacks[i]['name'] = "H"+stacks[i]['name']; // Complete hack!
-      $('<a class="stacktotal" stackid='+stacks[i]['name']+' data-placement="bottom">'+stacks[i]['name']+'<br>'+(stacks[i]['height']-stacks[i]['saving']).toFixed(0)+' '+units+'</a>').css({
+     // if (stacks[b].context) stacks[b]['name'] = "H"+stacks[b]['name']; // Complete hack!
+      $('<a class="stacktotal" stackid='+stacks[b]['name']+' data-placement="bottom">'+stacks[b]['name']+'<br>'+(stacks[b]['height']-stacks[b]['saving']).toFixed(0)+' '+units+'</a>').css({
 	      position: "absolute",
         width: bwidth-16,
 	      top: height,
@@ -54,9 +54,9 @@
         "line-height":(textscale*1.5)+'px'
      	}).appendTo("#can_bound");
 
-      if (stacks[i].context) {  // Complete hack!
-        var stackid = parseInt(stacks[i]['name']);
-        var context = stacks[i].context;
+      if (stacks[b].context) {  // Complete hack!
+        var stackid = parseInt(stacks[b]['name']);
+        var context = stacks[b].context;
         /*
         $("a[stackid="+stackid+"]").popover({
           // trigger:'hover',
@@ -73,7 +73,7 @@
         */
       }
       
-      var stack = stacks[i]['stack'];
+      var stack = stacks[b]['stack'];
       for (var b in stack)
       {
         var block = stack[b];
