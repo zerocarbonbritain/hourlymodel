@@ -99,81 +99,81 @@ input[type='text'] {
 
         <table class="table" style="width:100%">
         <tr>
-            <th></th>
-            <th>GW cap.</th>
-            <th>TWh/yr</th>
-            <th>CF</th>
-            <th>availability</th>
+          <th></th>
+          <th>GW cap.</th>
+          <th>TWh/yr</th>
+          <th>CF</th>
+          <th>availability</th>
         </tr>
         <tr>
-            <td>Offshore wind</td>
-            <td><input v-model.value="i.offshore_wind_capacity" type="text" style="width:70px" autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_offshore_wind_supply" type="10y"></span></td>
-            <td><span class="modeloutput" key="offshore_wind_capacity_factor"></span>%</td>
-            <td><input v-model.value="i.offshore_wind_availability" type="text" style="width:70px"  autocomplete="off"/></td>
+          <td>Offshore wind</td>
+          <td><input v-model.number="i.supply.offshore_wind_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_offshore_wind | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.offshore_wind_capacity_factor | format_prc }} <span class="unit">%</span></td>
+          <td><input v-model.number="i.supply.offshore_wind_availability" type="text" @change="update" /></td>
         </tr>
         <tr>
-            <td>Onshore wind</td>
-            <td><input v-model.value="i.onshore_wind_capacity" type="text" style="width:70px" autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_onshore_wind_supply" type="10y"></span></td>
-            <td><span class="modeloutput" key="onshore_wind_capacity_factor"></span>%</td>
-            <td><input v-model.value="i.onshore_wind_availability" type="text" style="width:70px"  autocomplete="off"/></td>
+          <td>Onshore wind</td>
+          <td><input v-model.number="i.supply.onshore_wind_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_onshore_wind | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.onshore_wind_capacity_factor | format_prc }} <span class="unit">%</span></td>
+          <td><input v-model.number="i.supply.onshore_wind_availability" type="text" @change="update" /></td>
         </tr>
         <tr>
-            <td>Wave</td>
-            <td><input v-model.value="i.wave_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_wave_supply" type="10y"></span></td>
-            <td><span class="modeloutput" key="wave_capacity_factor"></span>%</td>
-            <td></td>
+          <td>Wave</td>
+          <td><input v-model.number="i.supply.wave_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_wave | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.wave_capacity_factor | format_prc }} <span class="unit">%</span></td>
+          <td></td>
         </tr>
         <tr>
-            <td>Tidal (range + stream)</td>
-            <td><input v-model.value="i.tidal_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_tidal_supply" type="10y"></span></td>
-            <td><span class="modeloutput" key="tidal_capacity_factor"></span>%</td>
-            <td></td>
+          <td>Tidal (range + stream)</td>
+          <td><input v-model.number="i.supply.tidal_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_tidal | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.tidal_capacity_factor | format_prc }} <span class="unit">%</span></td>
+          <td></td>
         </tr>
         <tr>
-            <td>Hydro</td>
-            <td><input v-model.value="i.hydro_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_hydro_supply" type="10y"></span></td>
-            <td><input v-model.value="i.hydro_cf" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td></td>
+          <td>Hydro</td>
+          <td><input v-model.number="i.supply.hydro_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_hydro | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td><input v-model.number="i.supply.hydro_capacity_factor" type="text" @change="update" /></td>
+          <td></td>
         </tr>
         <tr>
-            <td>Solar PV</td>
-            <td><input v-model.value="i.solarpv_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_solar_supply" type="10y"></span></td>
-            <td><span class="modeloutput" key="solarpv_capacity_factor"></span>%</td>
-            <td></td>
+          <td>Solar PV</td>
+          <td><input v-model.number="i.supply.solarpv_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_solarpv | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.solarpv_capacity_factor | format_prc }} <span class="unit">%</span></td>
+          <td></td>
         </tr>
         <tr>
-            <td>Solar Thermal (heat)</td>
-            <td><input v-model.value="i.solarthermal_capacity" type="text" style="width:70px"  autocomplete="off"/> *</td>
-            <td><span class="modeloutput" key="total_solarthermal" type="10y"></span></td>
-            <td><span class="modeloutput" key="solarthermal_capacity_factor"></span>% *</td>
-            <td></td>
+          <td>Solar Thermal (heat)</td>
+          <td><input v-model.number="i.supply.solarthermal_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_solarthermal | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.solarthermal_capacity_factor | format_prc }} <span class="unit">%</span></td>
+          <td></td>
         </tr>
         <tr>
-            <td>Geo Thermal Electricity</td>
-            <td><input v-model.value="i.geothermal_elec_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_geothermal_elec" type="10y"></span></td>
-            <td><input v-model.value="i.geothermal_elec_cf" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td></td>
+          <td>Geo Thermal Electricity</td>
+          <td><input v-model.number="i.supply.geothermal_elec_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_geothermal_elec | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td><input v-model.number="i.supply.geothermal_elec_capacity_factor" type="text" @change="update" /></td>
+          <td></td>
         </tr>
         <tr>
-            <td>Geo Thermal Heat</td>
-            <td><input v-model.value="i.geothermal_heat_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_geothermal_heat" type="10y"></span></td>
-            <td><input v-model.value="i.geothermal_heat_cf" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td></td>
+          <td>Geo Thermal Heat</td>
+          <td><input v-model.number="i.supply.geothermal_heat_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_geothermal_heat | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td><input v-model.number="i.supply.geothermal_heat_capacity_factor" type="text" @change="update" /></td>
+          <td></td>
         </tr>   
         <tr>
-            <td>Nuclear</td>
-            <td><input v-model.value="i.nuclear_capacity" type="text" style="width:70px"  autocomplete="off"/></td>
-            <td><span class="modeloutput" key="total_nuclear_supply" type="10y"></span></td>
-            <td>100%</td>
-            <td><input v-model.value="i.nuclear_availability" type="text" style="width:70px"  autocomplete="off"/></td>
+          <td>Nuclear</td>
+          <td><input v-model.number="i.supply.nuclear_capacity" type="text" @change="update" /></td>
+          <td>{{ o.supply.total_nuclear | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td><input v-model.number="i.supply.nuclear_capacity_factor" type="text" @change="update" /></td>
+          <td></td>
         </tr>
         <tr>
             <td></td>
@@ -184,7 +184,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Grid loss</td>
-            <td><input v-model.value="i.grid_loss_prc" type="text" style="width:70px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.supply.grid_loss_prc" type="text" style="width:70px"  autocomplete="off"/></td>
             <td></td>
             <td></td>
             <td></td>

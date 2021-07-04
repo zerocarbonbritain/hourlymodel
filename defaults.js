@@ -1,32 +1,29 @@
 var i = {
+    hours: 87648,
     population_2030: 70499802,
     households_2030: 29941701,
     number_of_households: 29941701,
-    // ---------------------------------------------------------------------------
-    // dataset index:
-    // 0:onshore wind, 1:offshore wind, 2:wave, 3:tidal, 4:solar, 5:traditional electricity
-    offshore_wind_capacity: 134.0,
-    onshore_wind_capacity: 30.0,
-    wave_capacity: 10.0,
-    tidal_capacity: 20.0,
-    hydro_capacity: 3.0,
-    solarpv_capacity: 90.0,
-    solarthermal_capacity: 30.0,
-    geothermal_elec_capacity: 3.0,
-    geothermal_heat_capacity: 2.0,
-    nuclear_capacity: 0.0,
-    grid_loss_prc: 0.07,
     
-    // Availability factors,
-    offshore_wind_availability: 0.9,
-    onshore_wind_availability: 0.9,
-    nuclear_availability: 0.9,
+    supply: {
+        offshore_wind_capacity: 134.0,
+        offshore_wind_availability: 0.9,
+        onshore_wind_capacity: 30.0,
+        onshore_wind_availability: 0.9,
+        wave_capacity: 10.0,
+        tidal_capacity: 20.0,
+        solarpv_capacity: 90.0,
+        solarthermal_capacity: 30.0,
+        hydro_capacity: 3.0,
+        hydro_capacity_factor: 0.3,
+        geothermal_elec_capacity: 3.0,
+        geothermal_elec_capacity_factor: 0.9,
+        geothermal_heat_capacity: 2.0,
+        geothermal_heat_capacity_factor: 0.9,
+        nuclear_capacity: 0.0,
+        nuclear_capacity_factor: 0.9,
+        grid_loss_prc: 0.07
+    },
     
-    // Capacity factors,
-    // All other technologies based on hourly datasets,
-    hydro_cf: 0.3,
-    geothermal_elec_cf: 0.9,
-    geothermal_heat_cf: 0.9,
     // --------------------------------------------- 
     // Traditional electricity demand
     // column 5 trad elec demand: 331.033 TWh/yr, normalised and scaled to:

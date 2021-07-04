@@ -110,6 +110,7 @@ var view = {
 
 function timeseries(data)
 {
+    if (data==undefined) return [];
     var datastarttime = 32*365.25*24*3600;
     var len = data.length;
     var ts = [];

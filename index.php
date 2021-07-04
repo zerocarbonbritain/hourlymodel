@@ -114,7 +114,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var data = {}
+var d = {};
 var v = 43;
 var o = {transport:{}}
     

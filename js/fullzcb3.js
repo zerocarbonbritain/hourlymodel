@@ -116,21 +116,7 @@ function fullzcb3_run()
         space_heat_profile = JSON.parse(JSON.stringify(flat_profile))  
     }
     
-    // ---------------------------------------------
-    // Supply totals
-    // ---------------------------------------------
-    total_offshore_wind_supply = 0
-    total_onshore_wind_supply = 0
-    total_solar_supply = 0
-    total_solarthermal = 0
-    total_wave_supply = 0
-    total_geothermal_heat = 0
-    total_tidal_supply = 0
-    total_geothermal_elec = 0
-    total_nuclear_supply = 0
-    total_hydro_supply = 0
     total_biomass_used = 0
-    total_supply = 0
     total_ambient_heat_supply = 0
 
     domestic_appliances_kwh = 0
@@ -343,7 +329,7 @@ function fullzcb3_run()
     total_industrial_biomass_demand = 0
     total_industrial_liquid_demand = 0
     
-    total_grid_losses = 0
+
     total_electrolysis_losses = 0
     total_CCGT_losses = 0
     total_sabatier_losses = 0
@@ -385,8 +371,7 @@ function fullzcb3_run()
     
     var check = [];
     
-    data = {
-        s1_total_variable_supply: [],
+    d = {
         s1_traditional_elec_demand: [],
         industry_elec: [],
         spacewater_elec: [],
@@ -425,6 +410,81 @@ function fullzcb3_run()
         }
         capacityfactors_all.push(capacityfactors)
     }
+
+    // Supply totals
+    o.supply = {
+        total_onshore_wind: 0,
+        total_offshore_wind: 0,
+        total_wave: 0,
+        total_tidal: 0,
+        total_solarpv: 0,
+        total_solarthermal: 0,
+        total_hydro: 0,
+        total_geothermal_elec: 0,
+        total_geothermal_heat: 0,
+        total_nuclear: 0,
+        total_electricity: 0,
+        total_fixed_heat: 0
+    }
+    
+    o.total_losses = {
+        grid: 0
+    }
+    
+    d.balance_hourly = []
+    d.elec_supply_hourly = []
+    d.heat_supply_hourly = []
+    
+    for (var hour = 0; hour < i.hours; hour++) {
+        let capacityfactors = capacityfactors_all[hour]
+
+        let onshore_wind = i.supply.onshore_wind_capacity * capacityfactors[0] * i.supply.onshore_wind_availability            
+        let offshore_wind = i.supply.offshore_wind_capacity * capacityfactors[1] * i.supply.offshore_wind_availability
+        let wave = i.supply.wave_capacity * capacityfactors[2]
+        let tidal = i.supply.tidal_capacity * capacityfactors[3]
+        let solarpv = i.supply.solarpv_capacity * capacityfactors[4]
+        let solarthermal = i.supply.solarthermal_capacity * capacityfactors[4]
+        // Todo: Hydro output is somewhat weather dependent as well
+        let hydro = i.supply.hydro_capacity * i.supply.hydro_capacity_factor
+        // Todo: Direct use of heat storage options could be considered for geothermal and nuclear
+        let geothermal_elec = i.supply.geothermal_elec_capacity * i.supply.geothermal_elec_capacity_factor
+        let geothermal_heat = i.supply.geothermal_heat_capacity * i.supply.geothermal_heat_capacity_factor
+        let nuclear = i.supply.nuclear_capacity * i.supply.nuclear_capacity_factor
+        
+        // Totals
+        o.supply.total_onshore_wind += onshore_wind            
+        o.supply.total_offshore_wind += offshore_wind
+        o.supply.total_wave += wave
+        o.supply.total_tidal += tidal
+        o.supply.total_solarpv += solarpv
+        o.supply.total_solarthermal += solarthermal
+        o.supply.total_hydro += hydro
+        o.supply.total_geothermal_elec += geothermal_elec
+        o.supply.total_geothermal_heat += geothermal_heat
+        o.supply.total_nuclear += nuclear
+        
+        // Electricity supply
+        let electricity_supply_before_grid_loss = onshore_wind + offshore_wind + wave + tidal + solarpv + hydro + geothermal_elec + nuclear
+        o.supply.total_electricity += electricity_supply_before_grid_loss
+                    
+        let electricity_supply = electricity_supply_before_grid_loss * (1.0-i.supply.grid_loss_prc)
+        o.total_losses.grid += electricity_supply_before_grid_loss - electricity_supply
+        d.elec_supply_hourly.push(electricity_supply)
+        d.balance_hourly.push(electricity_supply)
+        
+        // Heat supply
+        let heat_supply = solarthermal + geothermal_heat
+        o.supply.total_fixed_heat += heat_supply
+        d.heat_supply_hourly.push(heat_supply)
+    }
+    // Calculate capacity factors
+    o.supply.onshore_wind_capacity_factor = o.supply.total_onshore_wind / (i.supply.onshore_wind_capacity * i.hours)
+    o.supply.offshore_wind_capacity_factor = o.supply.total_offshore_wind / (i.supply.offshore_wind_capacity * i.hours)
+    o.supply.wave_capacity_factor = o.supply.total_wave / (i.supply.wave_capacity * i.hours)
+    o.supply.tidal_capacity_factor = o.supply.total_tidal / (i.supply.tidal_capacity * i.hours)
+    o.supply.solarpv_capacity_factor = o.supply.total_solarpv / (i.supply.solarpv_capacity * i.hours)
+    o.supply.solarthermal_capacity_factor = o.supply.total_solarthermal / (i.supply.solarthermal_capacity * i.hours)
+
     
     // --------------------------------------------------------------------------------------------------------------
     // Stage 1: First run calculates arrays used for second stage in +-12h storage models
@@ -436,41 +496,6 @@ function fullzcb3_run()
         var day = parseInt(Math.floor(hour / 24))
         var temperature = parseFloat(temperaturelines[day].split(",")[1]);
         
-        // --------------------------------------------------------------------------------------------------------------
-        // Electricity Supply
-        // --------------------------------------------------------------------------------------------------------------
-        // variable supply
-        offshore_wind_power_supply = i.offshore_wind_capacity * capacityfactors[1] * i.offshore_wind_availability
-        onshore_wind_power_supply = i.onshore_wind_capacity * capacityfactors[0] * i.onshore_wind_availability
-        wave_power_supply = i.wave_capacity * capacityfactors[2]
-        tidal_power_supply = i.tidal_capacity * capacityfactors[3]
-        pv_power_supply = i.solarpv_capacity * capacityfactors[4]
-        geothermal_power_supply = i.geothermal_elec_capacity * i.geothermal_elec_cf
-        hydro_power_supply = i.hydro_capacity * i.hydro_cf
-
-        // non-variable non-backup electricity supply
-        nuclear_power_supply = i.nuclear_capacity * i.nuclear_availability
-
-        // totals        
-        total_offshore_wind_supply += offshore_wind_power_supply
-        total_onshore_wind_supply += onshore_wind_power_supply
-        total_solar_supply += pv_power_supply
-        total_wave_supply += wave_power_supply
-        total_tidal_supply += tidal_power_supply
-        total_geothermal_elec += geothermal_power_supply
-        total_hydro_supply += hydro_power_supply
-        total_nuclear_supply += nuclear_power_supply
-        
-        // total supply
-        electricity_supply = offshore_wind_power_supply + onshore_wind_power_supply + wave_power_supply + tidal_power_supply + pv_power_supply + geothermal_power_supply + hydro_power_supply + nuclear_power_supply
-        total_supply += electricity_supply
-        
-        // supply after losses
-        supply = electricity_supply * (1.0-i.grid_loss_prc)
-        data.s1_total_variable_supply.push(supply)
-        // total losses
-        total_grid_losses += electricity_supply - supply
-
         // ---------------------------------------------------------------------------
         // Traditional electricity demand
         // ---------------------------------------------------------------------------
@@ -482,7 +507,7 @@ function fullzcb3_run()
         if (i.use_flat_profiles) traditional_elec_demand = daily_trad_elec_demand / 24.0
         traditional_elec_demand += cooking_elec
         
-        data.s1_traditional_elec_demand.push(traditional_elec_demand)
+        d.s1_traditional_elec_demand.push(traditional_elec_demand)
         total_traditional_elec += traditional_elec_demand
         // ---------------------------------------------------------------------------
         // Space & Water Heat part 1
@@ -506,17 +531,9 @@ function fullzcb3_run()
         
         // water heat
         hot_water_demand = hot_water_profile[hour%24] * water_heating_daily_demand
-        total_water_heat_demand += hot_water_demand       
+        total_water_heat_demand += hot_water_demand 
         
-        // solar thermal
-        solarthermal_supply = i.solarthermal_capacity * capacityfactors[4]
-        total_solarthermal += solarthermal_supply
-        
-        // geothermal
-        geothermal_heat_supply = i.geothermal_heat_capacity * i.geothermal_heat_cf
-        total_geothermal_heat += geothermal_heat_supply
-        
-        spacewater_demand_before_heatstore = space_heat_demand + hot_water_demand - geothermal_heat_supply - solarthermal_supply
+        spacewater_demand_before_heatstore = space_heat_demand + hot_water_demand - d.heat_supply_hourly[hour]
         s1_spacewater_demand_before_heatstore.push(spacewater_demand_before_heatstore)
     }
     
@@ -565,7 +582,7 @@ function fullzcb3_run()
         var temperature = parseFloat(temperaturelines[day].split(",")[1]);
         
         spacewater_balance = s1_spacewater_demand_before_heatstore[hour]
-        data.spacewater_balance.push(spacewater_balance)  
+        d.spacewater_balance.push(spacewater_balance)  
         
         // ---------------------------------------------------------------------------------------------
         // HEATSTORE
@@ -598,7 +615,7 @@ function fullzcb3_run()
             heatstore_SOC -= heatstore_discharge_GWth
         }
         
-        data.heatstore_discharge_GWth.push(heatstore_discharge_GWth)        
+        d.heatstore_discharge_GWth.push(heatstore_discharge_GWth)        
         // ---------------------------------------------------------------------------------------------
         if (spacewater_balance<0.0) {
             total_heat_spill += -spacewater_balance
@@ -606,8 +623,8 @@ function fullzcb3_run()
         }
         
         s3_heatstore_SOC.push(heatstore_SOC)
-        data.heatstore_SOC.push(heatstore_SOC)
-        data.spacewater_heat.push(spacewater_balance)
+        d.heatstore_SOC.push(heatstore_SOC)
+        d.spacewater_heat.push(spacewater_balance)
         // space & water heat tab
         spacewater_demand_after_heatstore = spacewater_balance
         if (spacewater_demand_after_heatstore<0.0) spacewater_demand_after_heatstore = 0.0
@@ -655,7 +672,7 @@ function fullzcb3_run()
         if (spacewater_elec_demand>max_heat_demand_elec) max_heat_demand_elec = spacewater_elec_demand
         
         s3_spacewater_elec_demand.push(spacewater_elec_demand)
-        data.spacewater_elec.push(spacewater_elec_demand)
+        d.spacewater_elec.push(spacewater_elec_demand)
         
     }
     loading_prc(60,"model stage 3");
@@ -673,7 +690,7 @@ function fullzcb3_run()
         non_heat_process_elec = not_heat_process_profile[hour%24] * daily_non_heat_process_elec
 
         // balance including non DSR industrial load
-        balance = data.s1_total_variable_supply[hour] - data.s1_traditional_elec_demand[hour] - s3_spacewater_elec_demand[hour] - non_heat_process_elec
+        balance = d.elec_supply_hourly[hour] - d.s1_traditional_elec_demand[hour] - s3_spacewater_elec_demand[hour] - non_heat_process_elec
 
         // High temp process: 25% elec, 75% gas in original model
         // Low temp process: 66% elec, 11% gas, 22% biomass CHP in original model
@@ -701,7 +718,7 @@ function fullzcb3_run()
         
         s1_industrial_elec_demand.push(industrial_elec_demand)
         total_industrial_elec_demand += industrial_elec_demand 
-        data.industry_elec.push(industrial_elec_demand)
+        d.industry_elec.push(industrial_elec_demand)
         
         // methane demand
         non_heat_process_biogas = not_heat_process_profile[hour%24] * daily_non_heat_process_biogas
@@ -711,7 +728,7 @@ function fullzcb3_run()
         total_industrial_methane_demand += industrial_methane_demand
         
         // Balance calculation for BEV storage stage
-        s3_balance_before_BEV_storage.push(data.s1_total_variable_supply[hour] - data.s1_traditional_elec_demand[hour] - s3_spacewater_elec_demand[hour] - industrial_elec_demand)
+        s3_balance_before_BEV_storage.push(d.elec_supply_hourly[hour] - d.s1_traditional_elec_demand[hour] - s3_spacewater_elec_demand[hour] - industrial_elec_demand)
         
         // Not heat biomass demand
         non_heat_process_biomass = not_heat_process_profile[hour%24] * daily_non_heat_process_biomass
@@ -733,12 +750,12 @@ function fullzcb3_run()
         var balance = 0;
         var unmet = 0;
         var spacewater_bivalent = 0;
-        data.spacewater_elec = []
+        d.spacewater_elec = []
         for (var hour = 0; hour < hours; hour++)
         {
             
             spacewater_elec_demand = s3_spacewater_elec_demand[hour]
-            balance = data.s1_total_variable_supply[hour] - data.s1_traditional_elec_demand[hour] - spacewater_elec_demand - s1_industrial_elec_demand[hour]
+            balance = d.elec_supply_hourly[hour] - d.s1_traditional_elec_demand[hour] - spacewater_elec_demand - s1_industrial_elec_demand[hour]
             
             unmet = 0
             if (balance<0) unmet = -1*balance
@@ -771,8 +788,8 @@ function fullzcb3_run()
             
             // repopulate
             s3_spacewater_elec_demand[hour] = spacewater_elec_demand
-            s3_balance_before_BEV_storage[hour] = data.s1_total_variable_supply[hour] - data.s1_traditional_elec_demand[hour] - spacewater_elec_demand - s1_industrial_elec_demand[hour]
-            data.spacewater_elec[hour] = [time,spacewater_elec_demand]
+            s3_balance_before_BEV_storage[hour] = d.elec_supply_hourly[hour] - d.s1_traditional_elec_demand[hour] - spacewater_elec_demand - s1_industrial_elec_demand[hour]
+            d.spacewater_elec[hour] = [time,spacewater_elec_demand]
         }
     }
     
@@ -827,7 +844,7 @@ function fullzcb3_run()
         balance -= EV_charge
         BEV_Store_SOC += EV_charge
         total_EV_charge += EV_charge
-        data.EV_charge.push(EV_charge)
+        d.EV_charge.push(EV_charge)
         
         // EV DEMAND -----------------------------------
         EV_demand = BEV_use_profile[hour%24] * daily_BEV_demand
@@ -864,10 +881,10 @@ function fullzcb3_run()
         balance += EV_smart_discharge
         
         // Timeseries
-        data.EV_smart_discharge.push(EV_smart_discharge)
+        d.EV_smart_discharge.push(EV_smart_discharge)
         s4_BEV_Store_SOC.push(BEV_Store_SOC)
-        data.BEV_Store_SOC.push(BEV_Store_SOC)
-        data.EL_transport.push(elec_trains_demand + EV_charge)
+        d.BEV_Store_SOC.push(BEV_Store_SOC)
+        d.EL_transport.push(elec_trains_demand + EV_charge)
         s4_balance_before_elec_store.push(balance)        
     }
     loading_prc(70,"model stage 4");
@@ -974,9 +991,9 @@ function fullzcb3_run()
         // ----------------------------------------------------------------------------
           
         s5_elecstore_SOC.push(elecstore_SOC)
-        data.elecstore_SOC.push(elecstore_SOC)        
-        data.elec_store_charge.push(elec_store_charge)
-        data.elec_store_discharge.push(elec_store_discharge)
+        d.elecstore_SOC.push(elecstore_SOC)        
+        d.elec_store_charge.push(elec_store_charge)
+        d.elec_store_discharge.push(elec_store_discharge)
         
         if (balance>=0.0) {
             total_initial_elec_balance_positive += balance
@@ -1009,7 +1026,7 @@ function fullzcb3_run()
         
         hydrogen_from_electrolysis = electricity_for_electrolysis * i.electrolysis_eff
         total_electrolysis_losses += electricity_for_electrolysis - hydrogen_from_electrolysis
-        data.electricity_for_electrolysis.push(electricity_for_electrolysis)
+        d.electricity_for_electrolysis.push(electricity_for_electrolysis)
         balance -= electricity_for_electrolysis
         
         total_electricity_for_electrolysis += electricity_for_electrolysis
@@ -1089,7 +1106,7 @@ function fullzcb3_run()
         
         // Losses and electric consumption graph
         total_power_to_X_losses += electricity_for_power_to_X - (methane_from_IHTEM + synth_fuel_produced_PTL)
-        data.electricity_for_power_to_X.push(electricity_for_power_to_X)
+        d.electricity_for_power_to_X.push(electricity_for_power_to_X)
         
         // Add to stores and totals
         total_synth_fuel_produced += synth_fuel_produced_PTL
@@ -1114,7 +1131,7 @@ function fullzcb3_run()
                 max_dispatchable_capacity_hour = hour
             }
         }
-        data.electricity_from_dispatchable.push(electricity_from_dispatchable)
+        d.electricity_from_dispatchable.push(electricity_from_dispatchable)
         
         // Final electricity balance
         balance += electricity_from_dispatchable
@@ -1136,8 +1153,8 @@ function fullzcb3_run()
                 max_shortfall_hour = hour
             }
         }
-        data.export_elec.push(export_elec)
-        data.unmet_elec.push(unmet_elec)
+        d.export_elec.push(export_elec)
+        d.unmet_elec.push(unmet_elec)
         
         // ----------------------------------------------------------------------------
         // Methane
@@ -1159,7 +1176,7 @@ function fullzcb3_run()
         }
 
         s5_methane_SOC.push(methane_SOC)
-        data.methane_SOC.push(methane_SOC)
+        d.methane_SOC.push(methane_SOC)
         if ((methane_SOC/i.methane_store_capacity)<0.01) methane_store_empty_count ++
         if ((methane_SOC/i.methane_store_capacity)>0.99) methane_store_full_count ++
         
@@ -1188,7 +1205,7 @@ function fullzcb3_run()
         
         total_synth_fuel_demand += synth_fuel_demand
 
-        data.synth_fuel_store_SOC.push(synth_fuel_store_SOC)   
+        d.synth_fuel_store_SOC.push(synth_fuel_store_SOC)   
         
         if (synth_fuel_store_SOC>max_synth_fuel_store_SOC) max_synth_fuel_store_SOC = synth_fuel_store_SOC
         if (synth_fuel_store_SOC<min_synth_fuel_store_SOC) min_synth_fuel_store_SOC = synth_fuel_store_SOC   
@@ -1199,7 +1216,7 @@ function fullzcb3_run()
         
         // Hydrogen SOC data
         s5_hydrogen_SOC.push(hydrogen_SOC)
-        data.hydrogen_SOC.push(hydrogen_SOC)
+        d.hydrogen_SOC.push(hydrogen_SOC)
         if ((hydrogen_SOC/i.hydrogen_storage_cap)<0.01) hydrogen_store_empty_count ++
         if ((hydrogen_SOC/i.hydrogen_storage_cap)>0.99) hydrogen_store_full_count ++
     }
@@ -1209,10 +1226,7 @@ function fullzcb3_run()
     
     total_unmet_demand = total_final_elec_balance_negative
     
-    total_supply += total_ambient_heat_supply
-    total_supply += total_solarthermal
-    total_supply += total_geothermal_heat
-    total_supply += total_biomass_used
+    total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + total_biomass_used + total_ambient_heat_supply 
     
     total_demand = 0
     total_demand += total_traditional_elec 
@@ -1267,7 +1281,7 @@ function fullzcb3_run()
     
     // -------------------------------------------------------------------------------------------------
     total_exess = total_final_elec_balance_positive + final_store_balance; //total_supply - total_demand
-    total_losses = total_grid_losses + total_electrolysis_losses + total_CCGT_losses + total_anaerobic_digestion_losses + total_sabatier_losses + total_FT_losses + total_spill + total_power_to_X_losses
+    total_losses = o.total_losses.grid + total_electrolysis_losses + total_CCGT_losses + total_anaerobic_digestion_losses + total_sabatier_losses + total_FT_losses + total_spill + total_power_to_X_losses
     total_losses += total_biomass_for_spacewaterheat_loss
     total_losses += total_methane_for_spacewaterheat_loss
     total_losses += total_hydrogen_for_spacewaterheat_loss
@@ -1309,14 +1323,6 @@ function fullzcb3_run()
     hydrogen_store_empty_prc = 100*hydrogen_store_empty_count / hours
     hydrogen_store_full_prc = 100*hydrogen_store_full_count / hours
     
-    
-    offshore_wind_capacity_factor = 100 * total_offshore_wind_supply / (i.offshore_wind_capacity*24*365*10)
-    onshore_wind_capacity_factor = 100 * total_onshore_wind_supply / (i.onshore_wind_capacity*24*365*10)
-    tidal_capacity_factor = 100 * total_tidal_supply / (i.tidal_capacity*24*365*10)
-    wave_capacity_factor = 100 * total_wave_supply / (i.wave_capacity*24*365*10)
-    solarpv_capacity_factor = 100 * total_solar_supply / (i.solarpv_capacity*24*365*10)
-    solarthermal_capacity_factor = 100 * total_solarthermal / (i.solarthermal_capacity*24*365*10)
-    
     electrolysis_capacity_factor = 100*(total_electricity_for_electrolysis / (i.electrolysis_cap * 87600))
     power_to_X_capacity_factor = 100*(total_electricity_for_power_to_X / (i.power_to_X_cap * 87600))
     
@@ -1337,9 +1343,9 @@ function fullzcb3_run()
             //out += (hour+2)+"\t"+final_balance.toFixed(1)+"\t"+s5_final_balance[hour].toFixed(1)+"\t"+error+"\n";
         //}
         
-        supply = data.s1_total_variable_supply[hour]
-        demand = data.s1_traditional_elec_demand[hour] + data.spacewater_elec[hour] + data.industry_elec[hour] + data.EL_transport[hour] + data.electricity_for_electrolysis[hour] + data.elec_store_charge[hour] + data.electricity_for_power_to_X[hour]
-        balance = (supply + data.unmet_elec[hour] + data.electricity_from_dispatchable[hour] + data.elec_store_discharge[hour]) + data.EV_smart_discharge[hour] - demand-data.export_elec[hour]
+        supply = d.elec_supply_hourly[hour]
+        demand = d.s1_traditional_elec_demand[hour] + d.spacewater_elec[hour] + d.industry_elec[hour] + d.EL_transport[hour] + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
+        balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.export_elec[hour]
         error += Math.abs(balance)
     } 
     
@@ -1351,15 +1357,15 @@ function fullzcb3_run()
 
     var datastarttime = 32*365.25*24*3600*1000;
 
-    var d = new Date(datastarttime + (max_dispatchable_capacity_hour * 3600 * 1000));
-    var h = d.getHours();
+    var date = new Date(datastarttime + (max_dispatchable_capacity_hour * 3600 * 1000));
+    var h = date.getHours();
     if (h<10) h = "0"+h
-    max_dispatchable_capacity_date = h+":00 "+(d.getDay()+1)+"/"+d.getMonth()+"/"+d.getFullYear();
+    max_dispatchable_capacity_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
 
-    d = new Date(datastarttime + (max_shortfall_hour * 3600 * 1000));
-    h = d.getHours();
+    date = new Date(datastarttime + (max_shortfall_hour * 3600 * 1000));
+    h = date.getHours();
     if (h<10) h = "0"+h
-    max_shortfall_date = h+":00 "+(d.getDay()+1)+"/"+d.getMonth()+"/"+d.getFullYear();
+    max_shortfall_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
     
     // ----------------------------------------------------------------------------
     // Land area factors
@@ -1503,16 +1509,16 @@ function fullzcb3_ui() {
       },
       {"name":"Supply","height":(total_supply+total_unmet_demand)*scl,"saving":0,
         "stack":[
-          {"kwhd":total_offshore_wind_supply*scl,"name":"Offshore Wind","color":1},
-          {"kwhd":total_onshore_wind_supply*scl,"name":"Onshore Wind","color":1},
-          {"kwhd":total_solar_supply*scl,"name":"Solar PV","color":1},
-          {"kwhd":total_solarthermal*scl,"name":"Solar Thermal","color":1},
-          {"kwhd":total_wave_supply*scl,"name":"Wave","color":1},
-          {"kwhd":total_tidal_supply*scl,"name":"Tidal","color":1},
-          {"kwhd":total_hydro_supply*scl,"name":"Hydro","color":1},
-          {"kwhd":total_geothermal_elec*scl,"name":"Geo Thermal Elec","color":1},
-          {"kwhd":total_geothermal_heat*scl,"name":"Geo Thermal Heat","color":1},
-          {"kwhd":total_nuclear_supply*scl,"name":"Nuclear","color":1},
+          {"kwhd":o.supply.total_offshore_wind*scl,"name":"Offshore Wind","color":1},
+          {"kwhd":o.supply.total_onshore_wind*scl,"name":"Onshore Wind","color":1},
+          {"kwhd":o.supply.total_solarpv*scl,"name":"Solar PV","color":1},
+          {"kwhd":o.supply.total_solarthermal*scl,"name":"Solar Thermal","color":1},
+          {"kwhd":o.supply.total_wave*scl,"name":"Wave","color":1},
+          {"kwhd":o.supply.total_tidal*scl,"name":"Tidal","color":1},
+          {"kwhd":o.supply.total_hydro*scl,"name":"Hydro","color":1},
+          {"kwhd":o.supply.total_geothermal_elec*scl,"name":"Geo Thermal Elec","color":1},
+          {"kwhd":o.supply.total_geothermal_heat*scl,"name":"Geo Thermal Heat","color":1},
+          {"kwhd":o.supply.total_nuclear*scl,"name":"Nuclear","color":1},
           {"kwhd":10000*total_biomass_used*scl,"name":"Biomass","color":1},
           {"kwhd":total_ambient_heat_supply*scl,"name":"Ambient","color":1},
           {"kwhd":total_unmet_demand*scl,"name":"Unmet","color":3}
@@ -1543,7 +1549,7 @@ function fullzcb3_ui() {
           {"kwhd":10000*industrial_biofuel*scl,"name":"Industry Biofuel","color":0},/*
           {"kwhd":total_industry_solid/3650,"name":"Industry Biomass","color":0},
           // Backup, liquid and gas processes*/
-          {"kwhd":total_grid_losses*scl,"name":"Grid losses","color":2},
+          {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},
           {"kwhd":total_electrolysis_losses*scl,"name":"H2 losses","color":2},
           {"kwhd":total_CCGT_losses*scl,"name":"CCGT losses","color":2},
           {"kwhd":total_FT_losses*scl,"name":"FT losses","color":2},
@@ -1587,17 +1593,17 @@ function fullzcb3_view()
         console.log("view mode electric")
         $.plot("#placeholder", [
 
-            // {label: "Heatstore", data:timeseries(data.heatstore, color:"#cc3311"},
+            // {label: "Heatstore", data:timeseries(d.heatstore, color:"#cc3311"},
 
-            {stack:true, label: "Traditional", data:timeseries(data.s1_traditional_elec_demand), color:"#0044aa"},
-            {stack:true, label: "Industry & Cooking", data:timeseries(data.industry_elec), color:"#1960d5"},
-            {stack:true, label: "Electric Heat", data:timeseries(data.spacewater_elec), color:"#cc6622"},
-            {stack:true, label: "Electric Transport", data:timeseries(data.EL_transport), color:"#aac15b"},
-            {stack:true, label: "Elec Store Charge", data:timeseries(data.elec_store_charge), color:"#006a80"},
-            {stack:true, label: "Electrolysis", data:timeseries(data.electricity_for_electrolysis), color:"#00aacc"},
-            {stack:true, label: "PowerToX", data:timeseries(data.electricity_for_power_to_X), color:"#00bbdd"},
-            {stack:true, label: "Exess", data:timeseries(data.export_elec), color:"#33ccff", lines: {lineWidth:0, fill: 0.4 }},            
-            {stack:false, label: "Supply", data:timeseries(data.s1_total_variable_supply), color:"#000000", lines: {lineWidth:0.2, fill: false }}
+            {stack:true, label: "Traditional", data:timeseries(d.s1_traditional_elec_demand), color:"#0044aa"},
+            {stack:true, label: "Industry & Cooking", data:timeseries(d.industry_elec), color:"#1960d5"},
+            {stack:true, label: "Electric Heat", data:timeseries(d.spacewater_elec), color:"#cc6622"},
+            {stack:true, label: "Electric Transport", data:timeseries(d.EL_transport), color:"#aac15b"},
+            {stack:true, label: "Elec Store Charge", data:timeseries(d.elec_store_charge), color:"#006a80"},
+            {stack:true, label: "Electrolysis", data:timeseries(d.electricity_for_electrolysis), color:"#00aacc"},
+            {stack:true, label: "PowerToX", data:timeseries(d.electricity_for_power_to_X), color:"#00bbdd"},
+            {stack:true, label: "Exess", data:timeseries(d.export_elec), color:"#33ccff", lines: {lineWidth:0, fill: 0.4 }},            
+            {stack:false, label: "Supply", data:timeseries(d.elec_supply_hourly), color:"#000000", lines: {lineWidth:0.2, fill: false }}
 
             ], {
                 canvas: true,
@@ -1612,12 +1618,12 @@ function fullzcb3_view()
     if (view_mode=="stores")
     {
         $.plot("#placeholder", [
-                {stack:true, label: "Battery Store", data:timeseries(data.elecstore_SOC), yaxis:3, color:"#1960d5", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:true, label: "Heat Store", data:timeseries(data.heatstore_SOC), yaxis:3, color:"#cc3311", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:true, label: "BEV Store", data:timeseries(data.BEV_Store_SOC), yaxis:3, color:"#aac15b", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:true, label: "Hydrogen Store", data:timeseries(data.hydrogen_SOC), yaxis:3, color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:true, label: "Synth Fuel Store", data:timeseries(data.synth_fuel_store_SOC), yaxis:3, color:"#cb9950", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:true, label: "Methane Store", data:timeseries(data.methane_SOC), yaxis:3, color:"#ccaa00", lines: {lineWidth:0, fill: 0.8 }}
+                {stack:true, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:3, color:"#1960d5", lines: {lineWidth:0, fill: 0.8 }},
+                {stack:true, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:3, color:"#cc3311", lines: {lineWidth:0, fill: 0.8 }},
+                {stack:true, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:3, color:"#aac15b", lines: {lineWidth:0, fill: 0.8 }},
+                {stack:true, label: "Hydrogen Store", data:timeseries(d.hydrogen_SOC), yaxis:3, color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
+                {stack:true, label: "Synth Fuel Store", data:timeseries(d.synth_fuel_store_SOC), yaxis:3, color:"#cb9950", lines: {lineWidth:0, fill: 0.8 }},
+                {stack:true, label: "Methane Store", data:timeseries(d.methane_SOC), yaxis:3, color:"#ccaa00", lines: {lineWidth:0, fill: 0.8 }}
             ], {
                 xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 yaxes: [{},{min: 0},{}],
@@ -1630,12 +1636,12 @@ function fullzcb3_view()
     if (view_mode=="backup")
     {
         $.plot("#placeholder", [
-                {stack:true, label: "CCGT output", data:timeseries(data.electricity_from_dispatchable), yaxis:1, color:"#ccaa00", lines: {lineWidth:0, fill: 1.0 }},
-                {stack:true, label: "Elec Store discharge", data:timeseries(data.elec_store_discharge), yaxis:1, color:"#1960d5", lines: {lineWidth:0, fill: 1.0 }},
-                {stack:true, label: "EV Smart discharge", data:timeseries(data.EV_smart_discharge), yaxis:1, color:"#aac15b", lines: {lineWidth:0, fill: 1.0 }},
-                {stack:false, label: "Heat Store", data:timeseries(data.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
-                {stack:false, label: "Battery Store", data:timeseries(data.elecstore_SOC), yaxis:2, color:"#1960d5", lines: {lineWidth:1, fill: false }},
-                {stack:false, label: "BEV Store", data:timeseries(data.BEV_Store_SOC), yaxis:2, color:"#aac15b", lines: {lineWidth:1, fill: false }},       
+                {stack:true, label: "CCGT output", data:timeseries(d.electricity_from_dispatchable), yaxis:1, color:"#ccaa00", lines: {lineWidth:0, fill: 1.0 }},
+                {stack:true, label: "Elec Store discharge", data:timeseries(d.elec_store_discharge), yaxis:1, color:"#1960d5", lines: {lineWidth:0, fill: 1.0 }},
+                {stack:true, label: "EV Smart discharge", data:timeseries(d.EV_smart_discharge), yaxis:1, color:"#aac15b", lines: {lineWidth:0, fill: 1.0 }},
+                {stack:false, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
+                {stack:false, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:2, color:"#1960d5", lines: {lineWidth:1, fill: false }},
+                {stack:false, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:2, color:"#aac15b", lines: {lineWidth:1, fill: false }},       
             ], {
                 xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 yaxes: [{},{min: 0},{}],
@@ -1648,11 +1654,11 @@ function fullzcb3_view()
     if (view_mode=="heat")
     {
         $.plot("#placeholder", [
-                {stack:true, label: "Direct heat", data:timeseries(data.spacewater_heat), color:"#cc6622", lines: {lineWidth:0, fill: 1.0 }},
-                {stack:true, label: "Heatstore discharge", data:timeseries(data.heatstore_discharge_GWth), color:"#a3511b", lines: {lineWidth:0, fill: 1.0 }} ,
-                {stack:false, label: "Heatstore SOC", data:timeseries(data.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
-                {stack:false, label: "Electric for heat", data:timeseries(data.spacewater_elec), color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:false, label: "Heat Demand", data:timeseries(data.spacewater_balance), yaxis:1, color:"#000", lines: {lineWidth:1, fill: false }}
+                {stack:true, label: "Direct heat", data:timeseries(d.spacewater_heat), color:"#cc6622", lines: {lineWidth:0, fill: 1.0 }},
+                {stack:true, label: "Heatstore discharge", data:timeseries(d.heatstore_discharge_GWth), color:"#a3511b", lines: {lineWidth:0, fill: 1.0 }} ,
+                {stack:false, label: "Heatstore SOC", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
+                {stack:false, label: "Electric for heat", data:timeseries(d.spacewater_elec), color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
+                {stack:false, label: "Heat Demand", data:timeseries(d.spacewater_balance), yaxis:1, color:"#000", lines: {lineWidth:1, fill: false }}
             ], {
                 xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 yaxes: [{},{min: 0},{}],
