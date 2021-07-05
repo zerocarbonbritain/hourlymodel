@@ -180,8 +180,8 @@ function load_page(page)
     $("#select_scenario").html(out);
 
 
-    fullzcb3_init();
-    fullzcb3_run();
+    model.init();
+    model.run();
 
             
     var time_elapsed = (Date.now() - timerStart)
@@ -266,7 +266,7 @@ $("#model").on("change","#select_scenario",function(){
 
     var timerStart = Date.now();
     
-    fullzcb3_run();
+    model.run();
     fullzcb3_ui();
     modeloutput_ui();
     fullzcb3_view();

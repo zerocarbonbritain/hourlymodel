@@ -270,7 +270,7 @@ input[type='text'] {
             <td>Domestic Lighting & Appliances</td>
             <td><span class="modeloutput" key="trad_elec_domestic_appliances" dp=2></span> TWh/yr</td>
             <td><span class="modeloutput" key="prc_reduction_domestic_appliances" dp=0 units="%" scale=100></span></td>
-            <td><span class="modeloutput" key="domestic_appliances_kwh" dp=0></span> kWh/household</td>
+            <td>{{ o.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
@@ -388,10 +388,10 @@ input[type='text'] {
 
         <div style="float:left;">
             <table style="font-size:14px">
-            <tr><td>Fabric heat loss</td><td><span class="modeloutput" key="fabric_WK" dp=0 scale=1 units="W/K"></span></td></tr>
-            <tr><td>Infiltration heat loss</td><td><span class="modeloutput" key="infiltration_WK" dp=0 scale=1 units="W/K"></span></td></tr>
-            <tr><td>Total fabric efficiency</td><td><span class="modeloutput" key="domestic_space_heat_demand_WK" dp=0 scale=1 units="W/K"></span></td></tr>
-            <tr><td>Space heating heat demand<br>by floor area</td><td><span class="modeloutput" key="spaceheatkwhm2" dp=0 scale=1 units="kWh/m2/y"></span></td></tr>
+            <tr><td>Fabric heat loss</td><td>{{ o.fabric_WK | toFixed(1) }} <span class="unit">W/K</span></td></tr>
+            <tr><td>Infiltration heat loss</td><td>{{ o.infiltration_WK | toFixed(1) }} <span class="unit">W/K</span></td></tr>
+            <tr><td>Total fabric efficiency</td><td>{{ o.domestic_space_heat_demand_WK | toFixed(1) }} <span class="unit">W/K</span></td></tr>
+            <tr><td>Space heating heat demand<br>by floor area</td><td>{{ o.spaceheatkwhm2 | toFixed(0) }} <span class="unit">kWh/m2/y</span></td></tr>
             <tr><td><i>Passivhaus target:</i></td><td><i>15 kWh/m2.y</i></td></tr>
             </table>
         </div>
