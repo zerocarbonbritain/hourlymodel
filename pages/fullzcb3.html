@@ -91,7 +91,7 @@ input[type='text'] {
 </div>
 
 <div class="box">
-    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SUPPLY<!--<span style="float:right" class="modeloutput" key="total_supply" type="10y"></span>--></b></div>
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SUPPLY</b></div>
     <div class="inner">
         <div style="font-size:14px">The following renewable supply mix is detailed in full on page 57-61 of the ZCB report. Capacities reflect proportions of available resource e.g: the Offshore Valuation Group report (2010) estimates that we could produce more than 1,500 TWh/year from floating offshore wind turbines, 400 TWh/year from fixed offshore wind turbines, 40 TWh/year from wave power and 116 TWh/year from tidal stream. The ZCB scenario suggests that only a proportion of this potential would need to be developed. 
         
@@ -198,7 +198,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for biogas</td>
-            <td><input v-model.value="i.biomass_for_biogas" type="text" style="width:70px"  autocomplete="off" dp=1 /> TWh</td>
+            <td><input v-model.value="i.biomass_for_biogas" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
             <td></td>
             <td></td>
             <td></td>
@@ -268,32 +268,32 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Domestic Lighting & Appliances</td>
-            <td><span class="modeloutput" key="trad_elec_domestic_appliances" dp=2></span> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_domestic_appliances" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.trad_elec_domestic_appliances | toFixed(2) }} TWh/yr</td>
+            <td>{{ o.prc_reduction_domestic_appliances*100 | toFixed(0) }}%</td>
             <td>{{ o.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
-            <td><span class="modeloutput" key="annual_cooking_elec_domestic" dp=2></span> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_domestic_cooking" dp=0 units="%" scale=100></span></td>
-            <td><span class="modeloutput" key="LAC_cooking" dp=0></span> kWh/household</td>
+            <td>{{ o.annual_cooking_elec_domestic | toFixed(2) }} TWh/yr</td>
+            <td>{{ o.prc_reduction_domestic_cooking*100 | toFixed(0) }}%</td>
+            <td>{{ i.LAC_cooking | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services Lighting & Appliances</td>
             <td><input v-model.value="i.trad_elec_services_appliances" type="text" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_services_appliances" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.prc_reduction_services_appliances*100 | toFixed(0) }}%</td>
             <td></td> 
         </tr>
         <tr>
             <td>Services Catering</td>
             <td><input v-model.value="i.annual_cooking_elec_services" type="text" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_services_catering" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.prc_reduction_services_catering*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Services Cooling</td>
             <td><input v-model.value="i.trad_elec_services_cooling" type="text" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_services_cooling" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.prc_reduction_services_cooling*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -410,30 +410,30 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Domestic</td>
-            <td><span class="modeloutput" key="domestic_space_heat_demand_GWK" dp=3></span> GW/K</td>
-            <td><span class="modeloutput" key="total_domestic_space_heat_demand" dp=1 scale=0.0001></span> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_domestic_space_heat_demand" dp=0 units="%" scale=100></span></td>
-            <td><span class="modeloutput" key="domestic_space_heating_kwh" dp=0></span> kWh/household</td>
+            <td>{{ o.domestic_space_heat_demand_GWK | toFixed(3) }} GW/K</td>
+            <td>{{ o.total_domestic_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+            <td>{{ o.prc_reduction_domestic_space_heat_demand*100 | toFixed(0) }}%</td>
+            <td>{{ o.domestic_space_heating_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td><input v-model.value="i.services_space_heat_demand_GWK" type="text" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td><span class="modeloutput" key="total_services_space_heat_demand" dp=1 scale=0.0001></span> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_services_space_heat_demand" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.total_services_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+            <td>{{ o.prc_reduction_services_space_heat_demand*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Industry</td>
             <td><input v-model.value="i.industry_space_heat_demand_GWK" type="text" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td><span class="modeloutput" key="total_industry_space_heat_demand" dp=1 scale=0.0001></span> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_industry_space_heat_demand" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.total_industry_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+            <td>{{ o.prc_reduction_industry_space_heat_demand*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Combined</td>
-            <td><span class="modeloutput" key="space_heat_demand_GWK" dp=3></span> GW/K</td>
-            <td><span class="modeloutput" key="total_space_heat_demand" dp=1 scale=0.0001></span> TWh/yr</td>
-            <td><span class="modeloutput" key="prc_reduction_space_heat_demand" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.space_heat_demand_GWK | toFixed(3) }} GW/K</td>
+            <td>{{ o.total_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>     
+            <td>{{ o.prc_reduction_space_heat_demand*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -467,21 +467,21 @@ input[type='text'] {
         <tr>
             <td width="20%">Domestic</td>
             <td width="20%"></td>
-            <td width="20%"><span class="modeloutput" key="domestic_water_heating" dp=1></span> TWh</td>
-            <td width="20%"><span class="modeloutput" key="prc_reduction_domestic_water_heating" dp=0 units="%" scale=100></span></td>
-            <td width="20%"><span class="modeloutput" key="domestic_water_heating_kwh" dp=0></span> kWh/household</td>
+            <td width="20%">{{ o.domestic_water_heating | toFixed(1) }} TWh</td>
+            <td width="20%">{{ o.prc_reduction_domestic_water_heating*100 | toFixed(0) }}%</td>
+            <td width="20%">{{ o.domestic_water_heating_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td></td>
             <td><input v-model.value="i.services_water_heating" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><span class="modeloutput" key="prc_reduction_services_water_heating" dp=0 units="%" scale=100></span></td>
+            <td>{{ o.prc_reduction_services_water_heating*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Combined</td>
             <td></td>
-            <td><span class="modeloutput" key="water_heating" dp=1></span> TWh</td>
+            <td>{{ o.water_heating | toFixed(1) }} TWh</td>
             <td></td>
             <td></td>
         </tr>
@@ -793,10 +793,10 @@ input[type='text'] {
         <tr><td></td><td></td><td></td><td></td><td></td></tr>
         <tr>
             <td>Total demand by fuel</td>
-            <td><span class="modeloutput" key="total_industrial_elec_demand" type="10y"></span></td>
-            <td><span class="modeloutput" key="total_industrial_methane_demand" type="10y"></span></td>
-            <td><span class="modeloutput" key="total_industrial_biomass_demand" type="10y"></span></td>
-            <td><span class="modeloutput" key="total_industrial_liquid_demand" type="10y"></span></td>
+            <td>{{ o.total_industrial_elec_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.total_industrial_methane_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.total_industrial_biomass_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.total_industrial_liquid_demand*0.0001 | toFixed(0) }} TWh</td>
             <td></td>
         </tr>
         </table>
@@ -908,7 +908,7 @@ input[type='text'] {
 <div class="box">
     <div class="box-title">
         <img class="icon-expand" src="img/expand.png"><b>FINAL SUPPLY DEMAND MATCHING
-        <span style="float:right" class="modeloutput" key="final_elec_balance_positive_prc" dp=3 scale=1 units="%"></span>
+        <span style="float:right">{{ o.final_elec_balance_positive_prc | toFixed(3) }}%</span>
         </b>
     </div>
     <div class="inner" style="display:block">
@@ -918,11 +918,11 @@ input[type='text'] {
         </div>
         
         <div style="float:left; width:35%;">
-            <p style="font-size:18px">Total supply: <span class="modeloutput" key="total_supply" type="10y"></span></p>
-            <p style="font-size:18px">Total demand: <span class="modeloutput" key="total_demand" type="10y"></span></p>
-            <p style="font-size:18px">Primary energy factor: <span class="modeloutput" key="primary_energy_factor" dp=2 scale=1 units=""></span></p>
-            <p style="font-size:18px">Exess generation: <span class="modeloutput" key="total_exess" type="10y"></span></p>
-            <p style="font-size:18px">Unmet demand: <span class="modeloutput" key="total_unmet_demand" type="10y"></span></p>
+            <p style="font-size:18px">Total supply: {{ o.total_supply*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:18px">Total demand: {{ o.total_demand*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:18px">Primary energy factor: {{ o.primary_energy_factor | toFixed(2) }}</p>
+            <p style="font-size:18px">Exess generation: {{ o.total_exess*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:18px">Unmet demand: {{ o.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
         </div>
         
         <div style="clear:both"></div>
@@ -945,33 +945,33 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Total hours of simulation</td>
-            <td><span class="modeloutput" key="hours"></span></td>
+            <td>{{ i.hours }}</td>
             <td>100%</td>
             <td></td>
         </tr>
         <tr>
             <td>Initial el. balance positive</td>
-            <td><span class="modeloutput" key="initial_elec_balance_positive"></span></td>
-            <td><span class="modeloutput" key="initial_elec_balance_positive_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="total_initial_elec_balance_positive" dp=1></span></td>
+            <td>{{ o.initial_elec_balance_positive }}</td>
+            <td>{{ o.initial_elec_balance_positive_prc | toFixed(1) }}%</td>
+            <td>{{ o.total_initial_elec_balance_positive | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Final el. balance negative</td>
-            <td><span class="modeloutput" key="final_elec_balance_negative"></span></td>
-            <td><span class="modeloutput" key="final_elec_balance_negative_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="total_final_elec_balance_negative" dp=3></span></td>
+            <td>{{ o.final_elec_balance_negative }}</td>
+            <td>{{ o.final_elec_balance_negative_prc | toFixed(1) }}%</td>
+            <td>{{ o.total_final_elec_balance_negative | toFixed(3) }}</td>
         </tr>
         <tr>
             <td>Final el. balance positive</td>
-            <td><span class="modeloutput" key="final_elec_balance_positive"></span></td>
-            <td><span class="modeloutput" key="final_elec_balance_positive_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="total_final_elec_balance_positive"dp=1></span></td>
+            <td>{{ o.final_elec_balance_positive }}</td>
+            <td>{{ o.final_elec_balance_positive_prc | toFixed(1) }}%</td>
+            <td>{{ o.total_final_elec_balance_positive | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Unmet heat demand</td>
-            <td><span class="modeloutput" key="unmet_heat_demand_count"></span></td>
-            <td><span class="modeloutput" key="unmet_heat_demand_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="total_unmet_heat_demand" dp=1></span></td>
+            <td>{{ o.unmet_heat_demand_count }}</td>
+            <td>{{ o.unmet_heat_demand_prc | toFixed(1) }}%</td>
+            <td>{{ o.total_unmet_heat_demand | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
@@ -988,21 +988,21 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen Store</td>
-            <td><span class="modeloutput" key="min_hydrogen_SOC" dp=0 units=GWh></span></td>
-            <td><span class="modeloutput" key="min_hydrogen_SOC_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="max_hydrogen_SOC" dp=0 units=GWh></span></td>
+            <td>{{ o.min_hydrogen_SOC | toFixed(0) }} GWh</td>
+            <td>{{ o.min_hydrogen_SOC_prc | toFixed(1) }}%</td>
+            <td>{{ o.max_hydrogen_SOC | toFixed(0) }} GWh</td>
         </tr>
         <tr>
             <td>Liquid fuel Store</td>
-            <td><span class="modeloutput" key="min_synth_fuel_store_SOC" dp=0 units=GWh></span></td>
-            <td><span class="modeloutput" key="min_synth_fuel_store_SOC_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="max_synth_fuel_store_SOC" dp=0 units=GWh></span></td>
+            <td>{{ o.min_synth_fuel_store_SOC | toFixed(0) }} GWh</td>
+            <td>{{ o.min_synth_fuel_store_SOC_prc | toFixed(1) }}%</td>
+            <td>{{ o.max_synth_fuel_store_SOC | toFixed(0) }} GWh</td>
         </tr>
         <tr>
             <td>Methane Store</td>
-            <td><span class="modeloutput" key="min_methane_SOC" dp=0 units=GWh></span></td>
-            <td><span class="modeloutput" key="min_methane_SOC_prc" dp=1 units="%"></span></td>
-            <td><span class="modeloutput" key="max_methane_SOC" dp=0 units=GWh></span></td>
+            <td>{{ o.min_methane_SOC | toFixed(0) }} GWh</td>
+            <td>{{ o.min_methane_SOC_prc | toFixed(1) }}%</td>
+            <td>{{ o.max_methane_SOC | toFixed(0) }} GWh</td>
         </tr>
         <tr>
             <td></td>
@@ -1018,20 +1018,20 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen</td>
-            <td><span class="modeloutput" key="total_hydrogen_produced" type="10y"></span></td>
-            <td><span class="modeloutput" key="total_hydrogen_demand" type="10y"></span></td>
+            <td>{{ o.total_hydrogen_produced*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.total_hydrogen_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Liquid fuel</td>
-            <td><span class="modeloutput" key="total_synth_fuel_produced" type="10y"></span></td>
-            <td><span class="modeloutput" key="total_synth_fuel_produced" type="10y"></span></td>
+            <td>{{ o.total_synth_fuel_produced*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.total_synth_fuel_produced*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Methane</td>
-            <td><span class="modeloutput" key="total_methane_made" type="10y"></span></td>
-            <td><span class="modeloutput" key="total_methane_demand" type="10y"></span></td>
+            <td>{{ o.total_methane_made*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.total_methane_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
@@ -1042,13 +1042,13 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen Electrolysis capacity factor</td>
-            <td><span class="modeloutput" key="electrolysis_capacity_factor" dp=1 units="%"></span></td>
+            <td>{{ o.electrolysis_capacity_factor | toFixed(1) }}%</span></td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Power-to-X capacity factor</td>
-            <td><span class="modeloutput" key="power_to_X_capacity_factor" dp=1 units="%"></span></td>
+            <td>{{ o.power_to_X_capacity_factor | toFixed(1) }}%</span></td>
             <td></td>
             <td></td>
         </tr>
@@ -1060,34 +1060,34 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for biogas (includes biomass from wastes)</td>
-            <td><span class="modeloutput" key="biomass_for_biogas" dp=1></span></td>
+            <td>{{ i.biomass_for_biogas | toFixed(1) }}</td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Of which rotational grasses (e.g ryegrass)</td>
-            <td><span class="modeloutput" key="grass_biomass_for_biogas" dp=1></span></td>
-            <td><span class="modeloutput" key="grass_landarea_for_biogas" dp=1></span> Mha</td>
-            <td><span class="modeloutput" key="grass_prc_landarea_for_biogas" dp=1></span>% of UK</td>
+            <td>{{ o.grass_biomass_for_biogas | toFixed(1) }}</td>
+            <td>{{ o.grass_landarea_for_biogas | toFixed(1) }} Mha</td>
+            <td>{{ o.grass_prc_landarea_for_biogas | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
-            <td><span class="modeloutput" key="total_synth_fuel_biomass_used" dp=1></span></td>
-            <td><span class="modeloutput" key="landarea_for_synth_fuel" dp=1></span> Mha</td>
-            <td><span class="modeloutput" key="prc_landarea_for_synth_fuel" dp=1></span>% of UK</td>
+            <td>{{ o.total_synth_fuel_biomass_used | toFixed(1) }}</td>
+            <td>{{ o.landarea_for_synth_fuel | toFixed(1) }} Mha</td>
+            <td>{{ o.prc_landarea_for_synth_fuel | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
-            <td><span class="modeloutput" key="total_other_biomass_used" dp=1></span></td>
-            <td><span class="modeloutput" key="landarea_for_other_biomass" dp=1></span> Mha</td>
-            <td><span class="modeloutput" key="prc_landarea_for_other_biomass" dp=1></span>% of UK</td>
+            <td>{{ o.total_other_biomass_used | toFixed(1) }}</td>
+            <td>{{ o.landarea_for_other_biomass | toFixed(1) }} Mha</td>
+            <td>{{ o.prc_landarea_for_other_biomass | toFixed(1) }}% of UK</td>
             <td></td>
         </tr>
         <tr>
             <td>All input biomass energy</td>
-            <td><span class="modeloutput" key="total_biomass_used" dp=1></span></td>
-            <td><span class="modeloutput" key="landarea_for_biomass" dp=1></span> Mha</td>
-            <td><span class="modeloutput" key="prc_landarea_for_biomass" dp=1></span>% of UK</td>
+            <td>{{ o.total_biomass_used | toFixed(1) }}</td>
+            <td>{{ o.landarea_for_biomass | toFixed(1) }} Mha</td>
+            <td>{{ o.prc_landarea_for_biomass | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td></td>
@@ -1097,20 +1097,20 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Electricity from dispatchable (TWh)</td>
-            <td><span class="modeloutput" key="total_electricity_from_dispatchable" dp=1></span></td>
+            <td>{{ o.total_electricity_from_dispatchable | toFixed(1) }}</td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Max Dispatchable Output (GW)</td>
-            <td><span class="modeloutput" key="max_dispatchable_capacity" dp=1 units=GW></span></td>
-            <td><span class="modeloutput" key="max_dispatchable_capacity_date"></span></td>
+            <td>{{ o.max_dispatchable_capacity | toFixed(1) }} GW</td>
+            <td>{{ o.max_dispatchable_capacity_date }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Max Electricity Shortfall (GW)</td>
-            <td><span class="modeloutput" key="max_shortfall" dp=1 units=GW></span></td>
-            <td><span class="modeloutput" key="max_shortfall_date"></span></td>
+            <td>{{ o.max_shortfall | toFixed(1) }} GW</td>
+            <td>{{ o.max_shortfall_date }}</td>
             <td></td>
         </tr>
         </table>
@@ -1133,39 +1133,39 @@ input[type='text'] {
         <table>
             <tr><th>Supply</th><th width="100px"></th><th>Storage, Gas & Liquids</th><th width="100px"></th></tr>
             <tr>
-                <td>Onshore Wind</td><td><span class="modeloutput" key="scaled_onshorewind_capacity" type="auto" baseunit="kW"></td>
-                <td>Electrolysis capacity</td><td><span class="modeloutput" key="scaled_electrolysis_capacity" type="auto" baseunit="kW"></td>
-                <td>Hydrogen storage</td><td><span class="modeloutput" key="scaled_hydrogen_storage_cap" type="auto" baseunit="kWh"></td>
+                <td>Onshore Wind</td><td v-html="auto_scale(o.scaled.onshorewind_capacity,'kW')"></td>
+                <td>Electrolysis capacity</td><td v-html="auto_scale(o.scaled.electrolysis_capacity,'kW')"></td>
+                <td>Hydrogen storage</td><td v-html="auto_scale(o.scaled.hydrogen_storage_cap,'kWh')"></td>
             </tr>
             <tr>
-                <td>Offshore Wind</td><td><span class="modeloutput" key="scaled_offshorewind_capacity" type="auto" baseunit="kW"></td>
-                <td>Methanation capacity</td><td><span class="modeloutput" key="scaled_methanation_capacity" type="auto" baseunit="kW"></td>
-                <td>IHTEM capacity</td><td><span class="modeloutput" key="scaled_IHTEM_cap" type="auto" baseunit="kW"></td>
+                <td>Offshore Wind</td><td v-html="auto_scale(o.scaled.offshorewind_capacity,'kW')"></td>
+                <td>Methanation capacity</td><td v-html="auto_scale(o.scaled.methanation_capacity,'kW')"></td>
+                <td>IHTEM capacity</td><td v-html="auto_scale(o.scaled.IHTEM_cap,'kW')"></td>
             </tr>
             <tr>
-                <td>Solar PV</td><td><span class="modeloutput" key="scaled_solarpv_capacity" type="auto" baseunit="kW"></td>
-                <td>Methane storage</td><td><span class="modeloutput" key="scaled_methane_store_capacity" type="auto" baseunit="kWh"></td>
-                <td>Biomass land area</td><td><span class="modeloutput" key="scaled_landarea_for_biomass" type="auto" baseunit="m2"></td>
+                <td>Solar PV</td><td v-html="auto_scale(o.scaled.solarpv_capacity,'kW')"></td>
+                <td>Methane storage</td><td v-html="auto_scale(o.scaled.methane_store_capacity,'kWh')"></td>
+                <td>Biomass land area</td><td v-html="auto_scale(o.scaled.landarea_for_biomass,'m2')"></td>
             </tr>
             <tr>
-                <td>Hydro</td><td><span class="modeloutput" key="scaled_hydro_capacity" type="auto" baseunit="kW"></td>
-                <td>Synth fuel prod capacity</td><td><span class="modeloutput" key="scaled_synth_fuel_capacity" type="auto" baseunit="kW"></td>
+                <td>Hydro</td><td v-html="auto_scale(o.scaled.hydro_capacity,'kW')"></td>
+                <td>Synth fuel prod capacity</td><td v-html="auto_scale(o.scaled.synth_fuel_capacity,'kW')"></td>
             </tr>
             
             <tr>
-                <td>Wave</td><td><span class="modeloutput" key="scaled_wave_capacity" type="auto" baseunit="kW"></td>
-                <td>Elec storage cap</td><td><span class="modeloutput" key="scaled_elec_store_storage_cap" type="auto" baseunit="kWh"></td>
+                <td>Wave</td><td v-html="auto_scale(o.scaled.wave_capacity,'kW')"></td>
+                <td>Elec storage cap</td><td v-html="auto_scale(o.scaled.elec_store_storage_cap,'kWh')"></td>
             </tr>
             <tr>
-                <td>Tidal</td><td><span class="modeloutput" key="scaled_tidal_capacity" type="auto" baseunit="kW"></td>
-                <td>BEV storage cap</td><td><span class="modeloutput" key="scaled_electric_car_battery_capacity" type="auto" baseunit="kWh"></td>
+                <td>Tidal</td><td v-html="auto_scale(o.scaled.tidal_capacity,'kW')"></td>
+                <td>BEV storage cap</td><td v-html="auto_scale(o.scaled.electric_car_battery_capacity,'kWh')"></td>
             </tr>
             <tr>
-                <td>Nuclear</td><td><span class="modeloutput" key="scaled_nuclear_capacity" type="auto" baseunit="kW"></td>
+                <td>Nuclear</td><td v-html="auto_scale(o.scaled.nuclear_capacity,'kW')"></td>
 
             </tr>
             <tr>
-                <td>CCGT Backup</td><td><span class="modeloutput" key="scaled_CCGT_capacity" type="auto" baseunit="kW"></td>
+                <td>CCGT Backup</td><td v-html="auto_scale(o.scaled.CCGT_capacity,'kW')"></td>
 
             </tr>
         </table>
@@ -1175,7 +1175,7 @@ input[type='text'] {
 </div>
 
 <div class="box">
-    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>MANUFACTURING ENERGY<span style="float:right" class="modeloutput" key="total_embodied_energy" dp=1 units="TWh/yr"></span> </b></div>
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>MANUFACTURING ENERGY<span style="float:right">{{ o.total_embodied_energy | toFixed(1) }} TWh/yr</span></b></div>
     <div class="inner">
         <div style="font-size:14px">Industrial energy use is dealt with above at a high level and a cautious approach is taken. It is part of the scenario that we would like to develop in more detail. The following makes a start on exploring the manufacturing energy required to build key elements of the renewable energy supply infrastructure: Offshore wind, Onshore wind and Solar PV. We can get an initial indication from this of the proportion of the total industrial energy demand modelled above that would relate to the manufacture of these technologies.<br><br>For more detail on the calculations below including sources see <a href="https://trystanlea.org.uk/zcb_industry">https://trystanlea.org.uk/zcb_industry</a></div><br>
         
@@ -1185,24 +1185,24 @@ input[type='text'] {
             <td>Offshore wind</td>
             <td><input v-model.value="i.EE_offshorewind_GWh_per_GW" type="text" style="width:50px"  autocomplete="off"/> GWh/GW</td>
             <td><input v-model.value="i.EE_offshorewind_lifespan" type="text" style="width:40px"  autocomplete="off"/> years</td>
-            <td><span class="modeloutput" key="EE_offshorewind" dp=1 units="TWh/yr"></span></td>
+            <td>{{ o.EE_offshorewind | toFixed(1) }} TWh/yr</span></td>
         </tr>
         <tr>
             <td>Onshore wind</td>
             <td><input v-model.value="i.EE_onshorewind_GWh_per_GW" type="text" style="width:50px"  autocomplete="off"/> GWh/GW</td>
             <td><input v-model.value="i.EE_onshorewind_lifespan" type="text" style="width:40px"  autocomplete="off"/> years</td>
-            <td><span class="modeloutput" key="EE_onshorewind" dp=1 units="TWh/yr"></span></td>
+            <td>{{ o.EE_onshorewind | toFixed(1) }} TWh/yr</span></td>
         </tr>
         <tr>
             <td>Solar PV</td>
             <td><input v-model.value="i.EE_solarpv_GWh_per_GW" type="text" style="width:50px"  autocomplete="off"/> GWh/GW</td>
             <td><input v-model.value="i.EE_solarpv_lifespan" type="text" style="width:40px"  autocomplete="off"/> years</td>
-            <td><span class="modeloutput" key="EE_solarpv" dp=1 units="TWh/yr"></span></td>
+            <td>{{ o.EE_solarpv | toFixed(1) }} TWh/yr</span></td>
         </tr>
-        <!--<tr><td>Lithium Ion Store</td><td><span class="modeloutput" key="EE_liion_store" dp=1 units="TWh/yr"></span></td></tr>
-        <tr><td>Electric Vehicle Battery</td><td><span class="modeloutput" key="EE_ecarbattery" dp=1 units="TWh/yr"></span></td></tr>
-        <tr><td>Electric Vehicle (rest)</td><td><span class="modeloutput" key="EE_ecar" dp=1 units="TWh/yr"></span></td></tr>-->
-        <tr><td>Total Annual Demand</td><td><span class="modeloutput" key="total_embodied_energy" dp=1 units="TWh/yr"></span> (<span class="modeloutput" key="prc_of_industry_demand" dp=1 units="%"></span> of industry demand)</td></tr>
+        <!--<tr><td>Lithium Ion Store</td><td>{{ o.EE_liion_store | toFixed(1) }} TWh/yr</span></td></tr>
+        <tr><td>Electric Vehicle Battery</td><td>{{ o.EE_ecarbattery | toFixed(1) }} TWh/yr</span></td></tr>
+        <tr><td>Electric Vehicle (rest)</td><td>{{ o.EE_ecar | toFixed(1) }} TWh/yr</span></td></tr>-->
+        <tr><td>Total Annual Demand</td><td>{{ o.total_embodied_energy | toFixed(1) }} TWh/yr</span> ({{ o.prc_of_industry_demand | toFixed(1) }}%</span> of industry demand)</td></tr>
         </table>
         <div style="float:left; width:45%">
       
