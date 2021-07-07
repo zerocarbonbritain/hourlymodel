@@ -22,8 +22,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
-    <script type="text/javascript" src="stacks.js?v=1"></script>
-    <link rel="stylesheet" type="text/css" href="style.css?v=3" />
+    <script type="text/javascript" src="ui/stacks.js?v=1"></script>
+    <link rel="stylesheet" type="text/css" href="ui/style.css?v=1" />
   </head>
 
   <body>
@@ -94,10 +94,10 @@
   </body>
 </html>
 
-<script language="javascript" type="text/javascript" src="scenarios.js?v=2"></script>
-<script language="javascript" type="text/javascript" src="defaults.js?v=2"></script>
-<script language="javascript" type="text/javascript" src="js/fullzcb3.js?v=3"></script>
-<script language="javascript" type="text/javascript" src="vishelper.js?v=3"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=1"></script>
+<script language="javascript" type="text/javascript" src="model.js?v=1"></script>
+<script language="javascript" type="text/javascript" src="ui/vishelper.js?v=1"></script>
+<script language="javascript" type="text/javascript" src="ui/zcem.js?v=1"></script>
 
 <script>
 
@@ -173,16 +173,15 @@ function load_page(page)
 {
     $(".loading").hide();
     
-    var out = "";
-    for (var scenario_name in scenarios) {
-        out += "<option>"+scenario_name+"</option>"
-    }
-    $("#select_scenario").html(out);
+    //var out = "";
+    //for (var scenario_name in scenarios) {
+    //    out += "<option>"+scenario_name+"</option>"
+    //}
+    //$("#select_scenario").html(out);
 
 
     model.init();
     model.run();
-
             
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Load time "+(time_elapsed*0.001).toFixed(1)+"s");
@@ -283,6 +282,7 @@ $("#model").on("click",".box-title",function(){
    if (box.is(":visible")) box.hide(); else box.show();
 });
 
+/*
 $("#model").on("change","#select_scenario",function(){
     scenario_name = $(this).val();
 
@@ -299,12 +299,13 @@ $("#model").on("change","#select_scenario",function(){
 
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s"); 
-});
+});*/
 
 function loading_prc(prc,msg) {
     $(".loading_prc").html(msg);
 }
 
+/*
 function save_scenario() {
 
     var save = {};
@@ -315,7 +316,7 @@ function save_scenario() {
         }
     }
     console.log(JSON.stringify(save))
-}
+}*/
 
 // ------------------------------------------
 
