@@ -166,22 +166,31 @@ var i = {
     // ---------------------------------------------
     // Storage,
     // ---------------------------------------------
-
-    // Electricity Storage,
-    elec_store_type: "average",
-    elec_store_storage_cap: 50.0,
-    elec_store_charge_cap: 10.0,
-    store_roundtrip_efficiency: 0.9,
-
-    // Hydrogen,
-    electrolysis_cap: 25.0,
-    electrolysis_eff: 0.8,
-    hydrogen_storage_cap: 15000.0,
-    minimum_hydrogen_store_level: 0.1,
-
-    // biogas,
-    biomass_for_biogas: 75.0,
-    anaerobic_digestion_efficiency: 0.6,                                 // HHV, originally 0.5747,
+        
+    // Electricity Storage
+    electric_storage: {
+        type:"average",
+        capacity_GWh: 50.0,
+        charge_capacity_GW: 10.0,
+        discharge_capacity_GW: 10.0,
+        charge_efficiency: 0.95,
+        discharge_efficiency: 0.95
+    },
+    
+    // Hydrogen
+    hydrogen: {
+        electrolysis_capacity_GW: 25.0,
+        electrolysis_efficiency: 0.8,
+        storage_capacity_GWh: 15000.0,
+        minimum_store_level: 0.1
+    },
+    
+    // biogas
+    biogas: {
+        biomass_for_biogas: 75.0,
+        anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
+        co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))   // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
+    },
     
     // Methanation
     methane: {

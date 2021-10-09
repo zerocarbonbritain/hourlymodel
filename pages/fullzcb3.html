@@ -198,14 +198,14 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for biogas</td>
-            <td><input v-model.value="i.biomass_for_biogas" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.biogas.biomass_for_biogas" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td></td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Anaerobic digestion efficiency</td>
-            <td><input v-model.value="i.anaerobic_digestion_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.biogas.anaerobic_digestion_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             <td></td>
             <td></td>
             <td></td>
@@ -629,6 +629,72 @@ input[type='text'] {
     </div>
 </div>
 
+<!------------------------------------------------------------------------------------------------------->
+<!-- Electric storage -->
+<!------------------------------------------------------------------------------------------------------->
+<div class="box" name="elec_storage">
+  <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>ELECTRIC STORAGE</b></div>
+  <div class="inner" name="elec_storage">
+    <table class="table" style="width:100%">
+      <tr>
+          <td>Enable electricity storage?</td>
+          <td><select v-model.value="i.electric_storage.type" autocomplete="off" @change="update">
+                  <option value="nostore">No storage</option>
+                  <option value="basic">Basic, flat out</option>
+                  <option value="average">Proportional: average</option>
+              </select></td>
+          <td></td>
+          <td></td>
+      </tr>    
+      <tr>
+        <td>Electricity storage capacity</td>
+        <td><input v-model.number="i.electric_storage.capacity_GWh" type="text" @change="update" /> <span class="unit">GWh</span></td>
+        <td>({{ o.electric_storage.kwh_per_household | toFixed(1) }} kWh/household)</td>
+      </tr>
+      <tr>
+        <td>Electricity charge capacity</td>
+        <td><input v-model.number="i.electric_storage.charge_capacity_GW" type="text" @change="update" /> <span class="unit">GW</span></td>
+        <td>(Used: {{ o.electric_storage.max_charge | toFixed(0) }} <span class="unit">GW</span>)</td>
+      </tr>
+      <tr>
+        <td>Electricity discharge capacity</td>
+        <td><input v-model.number="i.electric_storage.discharge_capacity_GW" type="text" @change="update" /> <span class="unit">GW</span></td>
+        <td>(Used: {{ o.electric_storage.max_discharge | toFixed(0) }} <span class="unit">GW</span>)</td>                  
+      </tr>
+      <tr>
+        <td>Charge efficiency</td>
+        <td><input v-model.number="i.electric_storage.charge_efficiency" type="text" @change="update" /> <span class="unit">%</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Discharge efficiency</td>
+        <td><input v-model.number="i.electric_storage.discharge_efficiency" type="text" @change="update" /> <span class="unit">%</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Total charge</td>
+        <td>{{ o.electric_storage.total_charge*0.0001 | toFixed(3) }} <span class="unit">TWh/yr</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Total discharge</td>
+        <td>{{ o.electric_storage.total_discharge*0.0001 | toFixed(3) }} <span class="unit">TWh/yr</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Storage losses</td>
+        <td>{{ o.total_losses.electric_storage*0.0001 | toFixed(3) }} <span class="unit">TWh/yr</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Number of cycles (total discharge / storage capacity)</td>
+        <td>{{ o.electric_storage.cycles_per_year | toFixed(1) }} <span class="unit">cycles/yr</span></td>
+        <td></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>STORAGE & BACKUP</b></div>
     <div class="inner">
@@ -651,15 +717,15 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Electrolysis</td>
-            <td><input v-model.value="i.electrolysis_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
+            <td><input v-model.value="i.hydrogen.electrolysis_capacity_GW" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
             <td style="text-align:right">Efficiency</td>
-            <td><input v-model.value="i.electrolysis_eff" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>
+            <td><input v-model.value="i.hydrogen.electrolysis_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>
         </tr>
         <tr>
             <td>Hydrogen storage<br><span style="font-size:12px"><i>GWh chemical energy HHV</i></span></td>
-            <td><input v-model.value="i.hydrogen_storage_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.hydrogen.storage_capacity_GWh" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
             <td style="text-align:right">Lower limit</td>
-            <td><input v-model.value="i.minimum_hydrogen_store_level" type="text" @change="update" style="width:70px"  autocomplete="off"/> (Fraction)</td>            
+            <td><input v-model.value="i.hydrogen.minimum_store_level" type="text" @change="update" style="width:70px"  autocomplete="off"/> (Fraction)</td>            
         </tr>
         <tr>
             <td>Methanation (without heat integration)<br><span style="font-size:12px"><i>Capacity given is for H2 feed to process</i></span></td>
@@ -706,22 +772,6 @@ input[type='text'] {
             <td><input v-model.value="i.synth_fuel.FT_process_biomass_req" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
             <td>FT process: hydrogen required</td>
             <td><input v-model.value="i.synth_fuel.FT_process_hydrogen_req" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
-        </tr>
-        <tr>
-            <td>Generic energy store<br><span style="font-size:12px"><i>E.g High efficiency lithium ion, flow batteries etc</i></span></td>
-            <td><input v-model.value="i.elec_store_storage_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
-            <td style="text-align:right">Charge rate</td>
-            <td><input v-model.value="i.elec_store_charge_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>            
-        </tr>
-        <tr>
-            <td>Enable electricity storage?</td>
-            <td><select v-model.value="i.elec_store_type" autocomplete="off" @change="update">
-                    <option value="nostore">No storage</option>
-                    <option value="basic">Basic, flat out</option>
-                    <option value="average">Proportional: average</option>
-                </select></td>
-            <td></td>
-            <td></td>
         </tr>
         <tr>
             <td>Use flat demand profiles</td>
@@ -891,7 +941,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for biogas (includes biomass from wastes)</td>
-            <td>{{ i.biomass_for_biogas | toFixed(1) }}</td>
+            <td>{{ i.biogas.biomass_for_biogas | toFixed(1) }}</td>
             <td></td>
             <td></td>
         </tr>
