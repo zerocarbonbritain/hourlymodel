@@ -3,7 +3,8 @@ var i = {
     population_2030: 70499802,
     households_2030: 29941701,
     number_of_households: 29941701,
-    
+    use_flat_profiles: 0,
+      
     supply: {
         offshore_wind_capacity: 134.0,
         offshore_wind_availability: 0.9,
@@ -24,22 +25,35 @@ var i = {
         grid_loss_prc: 0.07
     },
     
-    trad_elec_domestic_appliances: 32.92,
-    annual_cooking_elec_domestic: 10.48,
-    annual_cooking_elec_services: 16.85,
-    trad_elec_services_appliances: 41.41,
-    trad_elec_services_cooling: 4.55,
+    LAC: {
+        domestic: {
+            lighting_and_appliances_TWhy: 32.92,
+            cooking_TWhy: 10.48
+        },
+        services: {
+            lighting_and_appliances_TWhy: 41.41,
+            catering_TWhy: 16.85,
+            cooling_TWhy: 4.55
+        }   
+    },
 
-    use_flat_profiles: 0,
+    space_heating: {
+        domestic_demand_GWK: 3.435,      // GW/K  3.548
+        services_demand_GWK: 1.486,      // GW/K
+        industry_demand_GWK: 0.502,      // GW/K
+        base_temperature: 13.07          // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050
+    },
+
+    water_heating: {
+        domestic_TWhy: 40.80,
+        services_TWhy: 15.99
+    },
     
-    // W/K (DECC 2050 Pathway level 4) x number of households 2030: 3.548 GW/K,
-    domestic_space_heat_demand_GWK: 3.548, // GW/K,
-    services_space_heat_demand_GWK: 1.486, // GW/K,
-    industry_space_heat_demand_GWK: 0.502, // GW/K,
-    space_heat_base_temperature: 13.07,               // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050,
-    
-    domestic_water_heating: 40.80, // TWh,
-    services_water_heating: 15.99, // TWh,
+    heatstore: {
+        enabled: true,
+        storage_capacity: 100.0,
+        charge_capacity: 50.0,
+    },
         
     heating_systems: {
         heatpump: {
@@ -63,107 +77,7 @@ var i = {
             efficiency: 90
         }
     },
-    
-    // Heatstore,
-    heatstore_enabled: 1,
-    heatstore_storage_cap: 100.0,
-    heatstore_charge_cap: 50.0,
-    // ---------------------------------------------
-    // Industrial
-    // ---------------------------------------------
-    ipr: 1.0, // industry prc reduction,
 
-    high_temp_process_fixed_elec_prc: 0.125,
-    high_temp_process_fixed_gas_prc: 0.375,
-    high_temp_process_fixed_biomass_prc: 0.0,
-    high_temp_process_DSR_prc: 0.5,
-
-    low_temp_process_fixed_elec_prc: 0.3,
-    low_temp_process_fixed_gas_prc: 0.1,
-    low_temp_process_fixed_biomass_prc: 0.2,
-    low_temp_process_DSR_prc: 0.4,
-
-    // ---------------------------------------------
-    // Transport,
-    // ---------------------------------------------
-    electrains_demand: 12.22, // and ships?
-
-    // Electric cars,
-    BEV_demand: 49.53,
-    electric_car_battery_capacity: 513.0,    // GWh
-    electric_car_max_charge_rate: 73.3,      // GW
-
-    smart_charging_enabled: 1,
-    smart_charge_type: "average",  // or flatout
-
-    V2G_enabled: 1,
-    V2G_discharge_type: "average", // or flatout
-
-    // H2 and synthetic fuels,
-    // transport_H2_demand: 9.61
-    transport_CH4_demand: 0.0,
-    // transport_biofuels_demand: 33.45
-    // transport_kerosene_demand: 40.32
-
-    // ---------------------------------------------
-    // Storage,
-    // ---------------------------------------------
-    // Synth fuel production
-    synth_fuel_capacity: 9.4,            // GW
-    synth_fuel_store_SOC_start: 5000.0,  // GWh
-    FT_process_biomass_req: 1.3,         // GWh/GWh fuel
-    FT_process_hydrogen_req: 0.61,       // GWh/GWh fuel
-
-    // Electricity Storage,
-    elec_store_type: "average",
-    elec_store_storage_cap: 50.0,
-    elec_store_charge_cap: 10.0,
-    store_roundtrip_efficiency: 0.9,
-
-    // Hydrogen,
-    electrolysis_cap: 25.0,
-    electrolysis_eff: 0.8,
-    hydrogen_storage_cap: 15000.0,
-    minimum_hydrogen_store_level: 0.1,
-
-    // biogas,
-    biomass_for_biogas: 75.0,
-    anaerobic_digestion_efficiency: 0.6,                                 // HHV, originally 0.5747,
-
-    // Methanation
-    methanation_capacity: 5.0,
-    methane_SOC_start: 10000.0,
-    methane_store_capacity: 52000.0,
-
-    // Power to Gas and Liquids including integrated DAC of CO2
-    power_to_X_cap: 0.0,
-
-    // store & go inc DAC
-    power_to_X_prc_gas: 0.44,
-    power_to_X_gas_efficiency: 0.6,
-
-    // Power to Liquids (e.g for aviation)
-    // High temperature electrolysis & DAC
-    // Efficiencies range from 45% to 46%
-    // With CO2 from exhaust gas this can increase to 60% - 61%
-    // https://www.umweltbundesamt.de/sites/default/files/medien/377/publikationen/161005_uba_hintergrund_ptl_barrierrefrepdf
-    power_to_X_prc_liquid: 0.56,
-    power_to_X_liquid_efficiency: 0.6,
-
-    // Dispatchable
-    dispatch_gen_cap: 45.0,
-    dispatchable_gen_eff: 0.50,
-
-    // Embodied Energy
-    EE: {
-        onshorewind_GWh_per_GW: 1435.0,
-        offshorewind_GWh_per_GW: 2700.0,
-        solarpv_GWh_per_GW: 1680.0,
-        onshorewind_lifespan: 25.0,
-        offshorewind_lifespan: 25.0,
-        solarpv_lifespan: 30.0,
-    },
-    
     transport: {
                 
         km_per_mile: 1.609344,
@@ -222,16 +136,102 @@ var i = {
         electric_car_battery_capacity: 513.0,    // GWh
         electric_car_max_charge_rate: 73.3,      // GW
 
-        smart_charging_enabled: true,
+        smart_charging_enabled: 1,
         smart_charge_type: "average",  // or flatout
         
-        V2G_enabled: true,
+        V2G_enabled: 1,
         V2G_discharge_type: "average", // or flatout
 
         rail_freight_elec_demand: 2.0,
         freight_BEV_demand: 10.5,
         freight_H2_demand: 4.06,
         freight_IC_demand: 20.58
+    },
+
+    // ---------------------------------------------
+    // Industrial
+    // ---------------------------------------------
+    ipr: 1.0, // industry prc reduction,
+
+    high_temp_process_fixed_elec_prc: 0.125,
+    high_temp_process_fixed_gas_prc: 0.375,
+    high_temp_process_fixed_biomass_prc: 0.0,
+    high_temp_process_DSR_prc: 0.5,
+
+    low_temp_process_fixed_elec_prc: 0.3,
+    low_temp_process_fixed_gas_prc: 0.1,
+    low_temp_process_fixed_biomass_prc: 0.2,
+    low_temp_process_DSR_prc: 0.4,
+
+    // ---------------------------------------------
+    // Storage,
+    // ---------------------------------------------
+
+    // Electricity Storage,
+    elec_store_type: "average",
+    elec_store_storage_cap: 50.0,
+    elec_store_charge_cap: 10.0,
+    store_roundtrip_efficiency: 0.9,
+
+    // Hydrogen,
+    electrolysis_cap: 25.0,
+    electrolysis_eff: 0.8,
+    hydrogen_storage_cap: 15000.0,
+    minimum_hydrogen_store_level: 0.1,
+
+    // biogas,
+    biomass_for_biogas: 75.0,
+    anaerobic_digestion_efficiency: 0.6,                                 // HHV, originally 0.5747,
+    
+    // Methanation
+    methane: {
+        methanation_capacity: 5.15,
+        SOC_start: 10000.0,
+        storage_capacity_GWh: 52000.0
+    },
+
+    // Synth fuel production
+    synth_fuel: {
+        capacity_GW: 9.4,
+        store_capacity_GWh: 50000,
+        store_start_GWh: 5000.0,
+        FT_process_biomass_req: 1.3,   // GWh/GWh fuel
+        FT_process_hydrogen_req: 0.61  // GWh/GWh fuel
+    },
+
+    power_to_X: {
+        // Power to Gas and Liquids including integrated DAC of CO2 
+        capacity: 0.0,
+        
+        // store & go inc DAC
+        prc_gas: 0.44,
+        gas_efficiency: 0.6,
+
+        // Power to Liquids (e.g for aviation)
+        // High temperature electrolysis & DAC
+        // Efficiencies range from 45% to 46%
+        // With CO2 from exhaust gas this can increase to 60% - 61%
+        // https://www.umweltbundesamt.de/sites/default/files/medien/377/publikationen/161005_uba_hintergrund_ptl_barrierrefrei.pdf    
+        prc_liquid: 0.56,
+        liquid_efficiency: 0.6
+    },
+
+    // Dispatchable
+    electric_backup: {
+        methane_turbine_capacity: 45.0,
+        methane_turbine_efficiency: 0.6,
+        hydrogen_turbine_capacity: 0.0,
+        hydrogen_turbine_efficiency: 0.6
+    },
+
+    // Embodied Energy
+    EE: {
+        onshorewind_GWh_per_GW: 1435.0,
+        offshorewind_GWh_per_GW: 2700.0,
+        solarpv_GWh_per_GW: 1680.0,
+        onshorewind_lifespan: 25.0,
+        offshorewind_lifespan: 25.0,
+        solarpv_lifespan: 30.0,
     }
 }
 
