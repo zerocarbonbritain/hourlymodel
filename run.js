@@ -37,10 +37,6 @@ function load_dataset(filename,callback) {
 }
 
 function run() {
-
-    o = {}
-    d = {}
-
     model.init()
     model.run()
     console.log(o)

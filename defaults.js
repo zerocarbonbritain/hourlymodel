@@ -26,22 +26,22 @@ var i = {
     
     // --------------------------------------------- 
     // Traditional electricity demand
-    // column 5 trad elec demand: 331.033 TWh/yr, normalised and scaled to:
-    
+    // column 5 trad elec demand: 331.033 TWh/yr, normalised and scaled to
     // Lights, Appliances and Cooking
-    LAC_number_of_lights: 10.0,
-    LAC_lights_power: 11.0,
-    lighting_hours: 10.0,
-
-    LAC_alwayson: 10.0,
-    LAC_fridgefreezer: 262.0,
-    LAC_washingmachine: 136.0,
-    LAC_cooking: 350.0,
-    LAC_computing: 212.0,
-    LAC_other: 200.0,
-
+    /*simple_LAC: {
+        number_of_lights: 10.0,
+        lights_power: 11.0,
+        lighting_hours: 10.0,
+        alwayson: 10.0,
+        fridgefreezer: 262.0,
+        washingmachine: 136.0,
+        cooking: 350.0,
+        computing: 212.0
+    },*/
+    
+    trad_elec_domestic_appliances: 32.92,
+    annual_cooking_elec_domestic: 10.48,
     annual_cooking_elec_services: 16.85,
-
     trad_elec_services_appliances: 41.41,
     trad_elec_services_cooling: 4.55,
 
@@ -51,46 +51,58 @@ var i = {
     // Space & water heating demand
     // ---------------------------------------------
     // domestic simple house model
-    total_floor_area: 85, // m2
-    storey_height: 2.2,
-    wall_ins_thickness: 0.1,
-    floor_ins_thickness: 0.1,
-    loft_ins_thickness: 0.3,
-    window_type: 2,
-    glazing_extent: 0.2,
-    air_change_per_hour: 0.54, // non pressurised air change rate
-
+    /*simple_BEM: {
+        TFA: 85, // m2
+        storey_height: 2.2,
+        wall_ins_thickness: 0.1,
+        floor_ins_thickness: 0.1,
+        loft_ins_thickness: 0.3,
+        window_type: 2,
+        glazing_extent: 0.2,
+        air_change_per_hour: 0.54, // non pressurised air change rate
+    },*/
+    
     //domestic_space_heat_demand_WK: 114.6 // W/K (DECC 2050 Pathway level 4) x number of households 2030: 3.548 GW/K,
+    domestic_space_heat_demand_GWK: 3.548, // GW/K,
     services_space_heat_demand_GWK: 1.486, // GW/K,
     industry_space_heat_demand_GWK: 0.502, // GW/K,
     space_heat_base_temperature: 13.07,               // Uses 16.7°C as average internal temp. and gains & losses from DECC 2050,
 
     // Simple Domestic Hot Water Demand calculator,
-    number_showers_per_day: 1.5,
+    /*number_showers_per_day: 1.5,
     number_baths_per_day: 0.8,
     number_kitchen_sink: 2.2,
     number_bathroom_sink: 1.0,
     shower_kwh: 1.125, // 7.5 mins at 9kW,
     bath_kwh: 1.35,   // uses 20% more water than shower at same temperature,
-    sink_kwh: 0.3,   // 6.3L × 40K × 4200 (assuming 50C water, 70% of typical bowl),
+    sink_kwh: 0.3,   // 6.3L × 40K × 4200 (assuming 50C water, 70% of typical bowl),*/
 
-    // domestic_water_heating: 40.80 // TWh,
+    domestic_water_heating: 40.80, // TWh,
     services_water_heating: 15.99, // TWh,
-
-    // Heating system efficiencies,
-    heatpump_COP: 3.0,
-    elres_efficiency: 1.0,
-    biomass_efficiency: 0.9,
-    methane_boiler_efficiency: 0.95,
-    hydrogen_boiler_efficiency: 0.95,
-
-    // Heating system share of demand,
-    spacewater_share_heatpumps: 0.9,
-    spacewater_share_elres: 0.05,
-    spacewater_share_biomass: 0.05,
-    spacewater_share_methane: 0.00,
-    spacewater_share_hydrogen: 0.00,
-
+        
+    heating_systems: {
+        heatpump: {
+            share: 90,
+            efficiency:300
+        },
+        elres: {
+            share: 5,
+            efficiency: 100
+        },
+        methane: {
+            share: 0,
+            efficiency: 90
+        },
+        hydrogen: {
+            share: 0,
+            efficiency: 90
+        },
+        biomass: {
+            share: 5,
+            efficiency: 90
+        }
+    },
+    
     // Heatstore,
     heatstore_enabled: 1,
     heatstore_storage_cap: 100.0,
@@ -154,7 +166,7 @@ var i = {
     minimum_hydrogen_store_level: 0.1,
 
     // biogas,
-    biomass_for_biogas: 74.0,
+    biomass_for_biogas: 75.0,
     anaerobic_digestion_efficiency: 0.6,                                 // HHV, originally 0.5747,
 
     // Methanation
@@ -181,13 +193,15 @@ var i = {
     dispatch_gen_cap: 45.0,
     dispatchable_gen_eff: 0.50,
 
-    EE_onshorewind_GWh_per_GW: 1435.0,
-    EE_offshorewind_GWh_per_GW: 2700.0,
-    EE_solarpv_GWh_per_GW: 1680.0,
-
-    EE_onshorewind_lifespan: 25.0,
-    EE_offshorewind_lifespan: 25.0,
-    EE_solarpv_lifespan: 30.0,
+    // Embodied Energy
+    EE: {
+        onshorewind_GWh_per_GW: 1435.0,
+        offshorewind_GWh_per_GW: 2700.0,
+        solarpv_GWh_per_GW: 1680.0,
+        onshorewind_lifespan: 25.0,
+        offshorewind_lifespan: 25.0,
+        solarpv_lifespan: 30.0,
+    },
     
     transport: {
                 

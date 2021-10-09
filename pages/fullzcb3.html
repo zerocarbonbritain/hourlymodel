@@ -184,7 +184,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Grid loss</td>
-            <td><input v-model.value="i.supply.grid_loss_prc" type="text" style="width:70px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.supply.grid_loss_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             <td></td>
             <td></td>
             <td></td>
@@ -198,14 +198,14 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for biogas</td>
-            <td><input v-model.value="i.biomass_for_biogas" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.biomass_for_biogas" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td></td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Anaerobic digestion efficiency</td>
-            <td><input v-model.value="i.anaerobic_digestion_efficiency" type="text" style="width:70px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.anaerobic_digestion_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             <td></td>
             <td></td>
             <td></td>
@@ -224,39 +224,38 @@ input[type='text'] {
         </div>
         <br>
 
+        <!--
         <div style="border: 1px solid #ccc; padding:10px;">
         <b>Simple domestic lighting, appliances and cooking calculator</b><br>      
         <table class="table" style="width:100%; margin-top:10px; margin-bottom:0px;">
         <tr>
             <td>Number of lights</td>
-            <td><input v-model.value="i.LAC_number_of_lights" type="text" style="width:60px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.simple_LAC.number_of_lights" type="text" @change="update" style="width:60px"  autocomplete="off"/></td>
         </tr><tr>
             <td>Average light power</td>
-            <td><input v-model.value="i.LAC_lights_power" type="text" style="width:60px"  autocomplete="off"/> Watts</td>
+            <td><input v-model.value="i.simple_LAC.lights_power" type="text" @change="update" style="width:60px"  autocomplete="off"/> Watts</td>
         </tr><tr>
             <td>Average lighting hours per day</td>
-            <td><input v-model.value="i.lighting_hours" type="text" style="width:60px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.simple_LAC.lighting_hours" type="text" @change="update" style="width:60px"  autocomplete="off"/></td>
         </tr><tr>
             <td>Internet router + other always on<br>devices, appliances, stand-by</td>
-            <td><input v-model.value="i.LAC_alwayson" type="text" style="width:60px"  autocomplete="off"/> Watts</td>
+            <td><input v-model.value="i.simple_LAC.alwayson" type="text" @change="update" style="width:60px"  autocomplete="off"/> Watts</td>
         </tr><tr>
             <td>Fridge/Freezer annual consumption</td>
-            <td><input v-model.value="i.LAC_fridgefreezer" type="text" style="width:60px"  autocomplete="off"/> kWh</td>
+            <td><input v-model.value="i.simple_LAC.fridgefreezer" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
         </tr><tr>
             <td>Washing machine annual consumption</td>
-            <td><input v-model.value="i.LAC_washingmachine" type="text" style="width:60px"  autocomplete="off"/> kWh</td>
+            <td><input v-model.value="i.simple_LAC.washingmachine" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
         </tr><tr>
             <td>Cooking annual consumption<br>(1.1 kWh x 365)</td>
-            <td><input v-model.value="i.LAC_cooking" type="text" style="width:60px"  autocomplete="off"/> kWh</td>
+            <td><input v-model.value="i.simple_LAC.cooking" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
         </tr><tr>
             <td>Laptops and computing<br>(2 x 0.29 kWh x 365)</td>
-            <td><input v-model.value="i.LAC_computing" type="text" style="width:60px"  autocomplete="off"/> kWh</td>
-        </tr><tr>
-            <td>Other</td>
-            <td><input v-model.value="i.LAC_other" type="text" style="width:60px"  autocomplete="off"/> kWh</td>
+            <td><input v-model.value="i.simple_LAC.computing" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
         </tr>
         </table>
         </div>
+        -->
         <br>
         
         <table class="table" style="width:100%">
@@ -268,31 +267,31 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Domestic Lighting & Appliances</td>
-            <td>{{ o.trad_elec_domestic_appliances | toFixed(2) }} TWh/yr</td>
+            <td><input v-model.value="i.trad_elec_domestic_appliances" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>   
             <td>{{ o.prc_reduction_domestic_appliances*100 | toFixed(0) }}%</td>
             <td>{{ o.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
-            <td>{{ o.annual_cooking_elec_domestic | toFixed(2) }} TWh/yr</td>
+            <td><input v-model.value="i.annual_cooking_elec_domestic" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
             <td>{{ o.prc_reduction_domestic_cooking*100 | toFixed(0) }}%</td>
-            <td>{{ i.LAC_cooking | toFixed(0) }} kWh/household</td>
+            <td>{{ o.domestic_cooking_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services Lighting & Appliances</td>
-            <td><input v-model.value="i.trad_elec_services_appliances" type="text" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td><input v-model.value="i.trad_elec_services_appliances" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
             <td>{{ o.prc_reduction_services_appliances*100 | toFixed(0) }}%</td>
             <td></td> 
         </tr>
         <tr>
             <td>Services Catering</td>
-            <td><input v-model.value="i.annual_cooking_elec_services" type="text" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td><input v-model.value="i.annual_cooking_elec_services" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
             <td>{{ o.prc_reduction_services_catering*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Services Cooling</td>
-            <td><input v-model.value="i.trad_elec_services_cooling" type="text" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td><input v-model.value="i.trad_elec_services_cooling" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
             <td>{{ o.prc_reduction_services_cooling*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
@@ -303,9 +302,9 @@ input[type='text'] {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SPACE / WATER HEAT DEMAND</b></div>
     <div class="inner">
-        <div style="font-size:14px">The following simple domestic fabric efficiency model is indicative of an 'average household' in the scenario. The actual domestic heat loss factor is based on more detailed analysis from the DECC 2050 level 4 pathway. Further detail including service and industry heat loss factors are available in the ZCB matrix spreadsheet.</div><br>
-
         <p><b>1. Space Heating</b></p>
+        <!--
+        <div style="font-size:14px">The following simple domestic fabric efficiency model is indicative of an 'average household' in the scenario. The actual domestic heat loss factor is based on more detailed analysis from the DECC 2050 level 4 pathway. Further detail including service and industry heat loss factors are available in the ZCB matrix spreadsheet.</div><br>
                 
         <div style="border: 1px solid #ccc; padding:10px;">
         <div style="margin-bottom:10px"><b>Simple domestic fabric efficiency calculator</b></div>
@@ -314,7 +313,7 @@ input[type='text'] {
         <tr>
             <td>Total Floor Area</td>
             <td>
-            <input v-model.value="i.total_floor_area" type="text" style="width:100px"  autocomplete="off"/> m2
+            <input v-model.value="i.simple_BEM.TFA" type="text" @change="update" style="width:100px"  autocomplete="off"/> m2
             </td>
             <td></td>
             <td></td>
@@ -322,7 +321,7 @@ input[type='text'] {
         <tr>
             <td>Floor insulation</td>
             <td>
-            <select v-model.value="i.floor_ins_thickness" autocomplete="off">
+            <select v-model.value="i.simple_BEM.floor_ins_thickness" autocomplete="off" @change="update" >
                 <option value=0.0 selected="selected">Uninsulated</option>
                 <option value=0.05>50mm insulation</option>
                 <option value=0.1>100mm insulation</option>
@@ -334,7 +333,7 @@ input[type='text'] {
         <tr>
             <td>Wall insulation</td>
             <td>
-            <select v-model.value="i.wall_ins_thickness" autocomplete="off">
+            <select v-model.value="i.simple_BEM.wall_ins_thickness" autocomplete="off" @change="update">
                 <option value=0.0>Uninsulated</option>
                 <option value=0.05>50mm insulation</option>
                 <option value=0.1>100mm insulation</option>
@@ -346,7 +345,7 @@ input[type='text'] {
         <tr>
             <td>Loft insulation</td>
             <td>
-            <select v-model.value="i.loft_ins_thickness" autocomplete="off">
+            <select v-model.value="i.simple_BEM.loft_ins_thickness" autocomplete="off" @change="update">
                 <option value=0.0>Uninsulated</option>
                 <option value=0.05>50mm insulation</option>
                 <option value=0.1>100mm insulation</option>
@@ -358,7 +357,7 @@ input[type='text'] {
         <tr>
             <td>Window type</td>
             <td>
-            <select v-model.value="i.window_type" autocomplete="off">
+            <select v-model.value="i.simple_BEM.window_type" autocomplete="off" @change="update">
                 <option value=1>Single glazing</option>
                 <option value=2>Double glazing</option>
                 <option value=3>Triple glazing</option>
@@ -368,7 +367,7 @@ input[type='text'] {
         <tr>
             <td>Glazing extent<br><span style="font-size:14px">(% of total wall area)</span></td>
             <td>
-            <select v-model.value="i.glazing_extent" autocomplete="off">
+            <select v-model.value="i.simple_BEM.glazing_extent" autocomplete="off" @change="update">
                 <option value=0.1>10%</option>
                 <option value=0.2>20%</option>
                 <option value=0.3>30%</option>
@@ -380,7 +379,7 @@ input[type='text'] {
         <tr>
             <td>Infiltration & Ventilation</td>
             <td>
-            <input v-model.value="i.air_change_per_hour" type="text" style="width:100px"  autocomplete="off"/> ACH (effective)
+            <input v-model.value="i.simple_BEM.air_change_per_hour" type="text" @change="update" style="width:100px"  autocomplete="off"/> ACH (effective)
             </td>
         </tr>
 
@@ -397,8 +396,9 @@ input[type='text'] {
         </div>
         <div style="clear:both"></div>
         </div>
-        
-        <p>Space heat base temperature: <input v-model.value="i.space_heat_base_temperature" type="text" style="width:70px"  autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span></p>
+        -->
+                
+        <p>Space heat base temperature: <input v-model.value="i.space_heat_base_temperature" type="text" @change="update" style="width:70px"  autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span></p>
 
         <table class="table" style="width:100%">
         <tr>
@@ -410,21 +410,21 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Domestic</td>
-            <td>{{ o.domestic_space_heat_demand_GWK | toFixed(3) }} GW/K</td>
+            <td><input v-model.value="i.domestic_space_heat_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.total_domestic_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
             <td>{{ o.prc_reduction_domestic_space_heat_demand*100 | toFixed(0) }}%</td>
             <td>{{ o.domestic_space_heating_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
-            <td><input v-model.value="i.services_space_heat_demand_GWK" type="text" style="width:70px"  autocomplete="off" /> GW/K</td>
+            <td><input v-model.value="i.services_space_heat_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.total_services_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
             <td>{{ o.prc_reduction_services_space_heat_demand*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Industry</td>
-            <td><input v-model.value="i.industry_space_heat_demand_GWK" type="text" style="width:70px"  autocomplete="off" /> GW/K</td>
+            <td><input v-model.value="i.industry_space_heat_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.total_industry_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
             <td>{{ o.prc_reduction_industry_space_heat_demand*100 | toFixed(0) }}%</td>
             <td></td>
@@ -439,42 +439,41 @@ input[type='text'] {
         </table>
          
         <p><b>2. Water Heating</b></p>
-        
+        <!--
         <div style="border: 1px solid #ccc; padding:10px;">
         <div style="margin-bottom:10px"><b>Simple domestic hot water demand calculator</b></div>
         <table class="table" style="width:100%; margin-bottom:0px;">
         <tr>
             <td>Number of showers per day<br><span style="font-size:14px">(Based on 7.5 minute 9 kW equivalent shower)</span></td>
-            <td><input v-model.value="i.number_showers_per_day" type="text" style="width:100px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.number_showers_per_day" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
         </tr>
         <tr>
             <td>Number of baths per day<br><span style="font-size:14px">(Based on 20% higher water use than shower)</span></td>
-            <td><input v-model.value="i.number_baths_per_day" type="text" style="width:100px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.number_baths_per_day" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
         </tr>
         <tr>
             <td>Number of kitchen sink bowl fills per day<br><span style="font-size:14px">(Based on 70% fill of typical 9.5L bowl, 50C water)</span></td>
-            <td><input v-model.value="i.number_kitchen_sink" type="text" style="width:100px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.number_kitchen_sink" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
         </tr>
         <tr>
             <td>Number of bathroom sink fills per day</td>
-            <td><input v-model.value="i.number_bathroom_sink" type="text" style="width:100px"  autocomplete="off"/></td>
+            <td><input v-model.value="i.number_bathroom_sink" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
         </tr>
         </table>
         </div><br>
-
-
+        -->
         <table class="table" style="width:100%">
         <tr>
             <td width="20%">Domestic</td>
             <td width="20%"></td>
-            <td width="20%">{{ o.domestic_water_heating | toFixed(1) }} TWh</td>
+            <td width="20%"><input v-model.value="i.domestic_water_heating" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td width="20%">{{ o.prc_reduction_domestic_water_heating*100 | toFixed(0) }}%</td>
             <td width="20%">{{ o.domestic_water_heating_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td></td>
-            <td><input v-model.value="i.services_water_heating" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.services_water_heating" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td>{{ o.prc_reduction_services_water_heating*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
@@ -486,51 +485,40 @@ input[type='text'] {
             <td></td>
         </tr>
         </table>
-
-        <p><b>3. Heating Systems</b></p>
-
+    </div>
+</div>
+<div class="box">
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>HEATING SYSTEMS</b></div>
+    <div class="inner">
+        <table class="table" style="width:100%">  
+            <tr>
+                <th></th>
+                <th>Share</th>
+                <th>Heat demand</th>         
+                <th>Efficiency</th>
+                <th>Fuel demand</th>
+            </tr>
+            <tr v-for="(system,index) in i.heating_systems">
+                <td>{{ index }}</td>
+                <td><input v-model.value="system.share" type="text" @change="update" style="width:70px"  autocomplete="off" itype="%" /></td>
+                <td>{{ o.heating_systems[index].heat_demand | format_energy }} <span class="unit">TWh/yr</span></td>
+                <td><input v-model.value="system.efficiency" type="text" @change="update" style="width:70px"  autocomplete="off" itype="%" /></td>
+                <td>{{ o.heating_systems[index].fuel_demand | format_energy }} <span class="unit">TWh/yr</span></td>
+            </tr>
+        </table>
+    
         <table class="table" style="width:100%">  
         <tr>
-            <th></th>
-            <th>Heatpumps</th>
-            <th>Elec. resist.</th>
-            <th>Biomass boiler</th>
-            <th>Methane<br>Gas boiler</th>
-            <th>Hydrogen<br>Gas boiler</th>
-        </tr>
-        <tr>
-            <td>Space & water heating share (%)</td>
-            <td><input v-model.value="i.spacewater_share_heatpumps" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.spacewater_share_elres" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.spacewater_share_biomass" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.spacewater_share_methane" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.spacewater_share_hydrogen" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-        </tr>
-        <tr>
-            <td>Efficiency (%)</td>
-            <td><input v-model.value="i.heatpump_COP" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.elres_efficiency" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.biomass_efficiency" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.methane_boiler_efficiency" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-            <td><input v-model.value="i.hydrogen_boiler_efficiency" type="text" style="width:70px"  autocomplete="off" itype="%" /></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
             <td>Heat store storage capacity</td>
-            <td><input v-model.value="i.heatstore_storage_cap" type="text" style="width:70px"  autocomplete="off" /> GWh therm</td>
+            <td><input v-model.value="i.heatstore_storage_cap" type="text" @change="update" style="width:70px"  autocomplete="off" /> GWh therm</td>
         </tr>
         <tr>
             <td>Heat store charging capacity</td>
-            <td><input v-model.value="i.heatstore_charge_cap" type="text" style="width:70px"  autocomplete="off" /> GW therm</td>
+            <td><input v-model.value="i.heatstore_charge_cap" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW therm</td>
         </tr>
         <tr>
             <td>Heat storage enabled?</td>
-            <td><input v-model.value="i.heatstore_enabled" type="text" style="width:70px"  autocomplete="off" /></td>
+            <td><input v-model.value="i.heatstore_enabled" type="text" @change="update" style="width:70px"  autocomplete="off" /></td>
         </tr>
         </table>
     </div>
@@ -676,36 +664,36 @@ input[type='text'] {
         <table class="table" style="width:100%">
         <tr>
             <td>Total useable EV battery capacity</td>
-            <td><input v-model.value="i.electric_car_battery_capacity" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.electric_car_battery_capacity" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
         </tr>
         <tr>
             <td>Maximum rate of charge</td>
-            <td><input v-model.value="i.electric_car_max_charge_rate" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.electric_car_max_charge_rate" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
         </tr>
         <tr>
             <td>Enable smart charging?</td>
-            <td><select v-model.value="i.smart_charging_enabled" autocomplete="off">
+            <td><select v-model.value="i.smart_charging_enabled" autocomplete="off" @change="update">
                     <option value=1>Enabled</option>
                     <option value=0>Disabled</option>
             </select></td> 
         </tr>
         <tr>
             <td>Smart charging algorithm</td>
-            <td><select v-model.value="i.smart_charge_type" autocomplete="off">
+            <td><select v-model.value="i.smart_charge_type" autocomplete="off" @change="update">
                     <option value=average>Deviation from mean (peaker)</option>
                     <option value=flatout>Flat out (basic)</option>
             </select></td>
         </tr> 
         <tr>
             <td>Enable vehicle to grid?</td>
-            <td><select v-model.value="i.V2G_enabled" autocomplete="off">
+            <td><select v-model.value="i.V2G_enabled" autocomplete="off" @change="update">
                     <option value=1>Enabled</option>
                     <option value=0>Disabled</option>
             </select></td> 
         </tr> 
         <tr>
             <td>Vehicle to grid discharge algorithm</td>
-            <td><select v-model.value="i.V2G_discharge_type" autocomplete="off">
+            <td><select v-model.value="i.V2G_discharge_type" autocomplete="off" @change="update">
                     <option value=average>Deviation from mean (peaker)</option>
                     <option value=flatout>Flat out (basic)</option>
             </select></td>
@@ -716,11 +704,11 @@ input[type='text'] {
         </tr>
         <tr>
             <td>FT process: biomass required</td>
-            <td><input v-model.value="i.FT_process_biomass_req" type="text" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
+            <td><input v-model.value="i.FT_process_biomass_req" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
         </tr>
         <tr>
             <td>FT process: hydrogen required</td>
-            <td><input v-model.value="i.FT_process_hydrogen_req" type="text" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
+            <td><input v-model.value="i.FT_process_hydrogen_req" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
         </tr>
         </table>
         
@@ -760,19 +748,19 @@ input[type='text'] {
         </tr>
         <tr>
             <td>High temp process</td>
-            <td><input v-model.value="i.annual_high_temp_process" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.high_temp_process_fixed_elec_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.high_temp_process_fixed_gas_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.high_temp_process_fixed_biomass_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.high_temp_process_DSR_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.annual_high_temp_process" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.high_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.high_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.high_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.high_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
         </tr>
         <tr>
             <td>Low temp drying & separation</td>
-            <td><input v-model.value="i.annual_low_temp_dry_sep" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.low_temp_process_fixed_elec_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.low_temp_process_fixed_gas_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.low_temp_process_fixed_biomass_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.low_temp_process_DSR_prc" type="text" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.annual_low_temp_dry_sep" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.low_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.low_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.low_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.low_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
         </tr>
         <tr>
           <th></th>
@@ -784,10 +772,10 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Non heat process</td>
-            <td><input v-model.value="i.annual_non_heat_process_elec" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.annual_non_heat_process_biogas" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.annual_non_heat_process_biomass" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.industrial_biofuel" type="text" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.annual_non_heat_process_elec" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.annual_non_heat_process_biogas" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.annual_non_heat_process_biomass" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industrial_biofuel" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td></td>
         </tr>
         <tr><td></td><td></td><td></td><td></td><td></td></tr>
@@ -820,31 +808,31 @@ input[type='text'] {
         </tr>
         <tr>
             <td style="width:55%">Dispatchable generation<br><span style="font-size:12px"><i>E.g High efficiency and high flexibility CCGT gas turbines</i></span></td>
-            <td><input v-model.value="i.dispatch_gen_cap" type="text" style="width:70px"  autocomplete="off"/> GW</td>
+            <td><input v-model.value="i.dispatch_gen_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
             <td style="text-align:right">Efficiency</td>
-            <td><input v-model.value="i.dispatchable_gen_eff" type="text" style="width:70px"  autocomplete="off"/> (HHV)</td>              
+            <td><input v-model.value="i.dispatchable_gen_eff" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>              
         </tr>
         <tr>
             <td>Electrolysis</td>
-            <td><input v-model.value="i.electrolysis_cap" type="text" style="width:70px"  autocomplete="off"/> GW</td>
+            <td><input v-model.value="i.electrolysis_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
             <td style="text-align:right">Efficiency</td>
-            <td><input v-model.value="i.electrolysis_eff" type="text" style="width:70px"  autocomplete="off"/> (HHV)</td>
+            <td><input v-model.value="i.electrolysis_eff" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>
         </tr>
         <tr>
             <td>Hydrogen storage<br><span style="font-size:12px"><i>GWh chemical energy HHV</i></span></td>
-            <td><input v-model.value="i.hydrogen_storage_cap" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.hydrogen_storage_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
             <td style="text-align:right">Lower limit</td>
-            <td><input v-model.value="i.minimum_hydrogen_store_level" type="text" style="width:70px"  autocomplete="off"/> (Fraction)</td>            
+            <td><input v-model.value="i.minimum_hydrogen_store_level" type="text" @change="update" style="width:70px"  autocomplete="off"/> (Fraction)</td>            
         </tr>
         <tr>
             <td>Methanation (without heat integration)<br><span style="font-size:12px"><i>Capacity given is for H2 feed to process</i></span></td>
-            <td><input v-model.value="i.methanation_capacity" type="text" style="width:70px"  autocomplete="off"/> GW</td>
+            <td><input v-model.value="i.methanation_capacity" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Power to X: Methane and Liquids overall capacity</td>
-            <td><input v-model.value="i.power_to_X_cap" type="text" style="width:70px"  autocomplete="off"/> GW (elec)</td>
+            <td><input v-model.value="i.power_to_X_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW (elec)</td>
             <td></td>
             <td></td>            
         </tr>
@@ -852,39 +840,39 @@ input[type='text'] {
             <td>Power to X: Methane<br>
             <span style="font-size:12px"><i>E.g Helmeth SOEC technology. Includes DAC of CO2 using waste heat.</i></span>
             </td>
-            <td><input v-model.value="i.power_to_X_prc_gas" type="text" style="width:70px"  autocomplete="off"/> %</td>
+            <td><input v-model.value="i.power_to_X_prc_gas" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
             <td style="text-align:right">Efficiency</td>
-            <td><input v-model.value="i.power_to_X_gas_efficiency" type="text" style="width:70px"  autocomplete="off"/> (HHV)</td>            
+            <td><input v-model.value="i.power_to_X_gas_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>            
         </tr>
         <tr>
             <td>Power to X: Liquids<br>
             <span style="font-size:12px"><i>'E.g Power-to-Liquids Potentials and Perspectives for the Future Supply of Renewable Aviation Fuel'</i></span>
             </td>
-            <td><input v-model.value="i.power_to_X_prc_liquid" type="text" style="width:70px"  autocomplete="off"/> %</td>
+            <td><input v-model.value="i.power_to_X_prc_liquid" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
             <td style="text-align:right">Efficiency</td>
-            <td><input v-model.value="i.power_to_X_liquid_efficiency" type="text" style="width:70px"  autocomplete="off"/> (HHV)</td>            
+            <td><input v-model.value="i.power_to_X_liquid_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>            
         </tr>
         <tr>
             <td>Methane storage<br><span style="font-size:12px"><i>GWh chemical energy HHV</i></span></td>
-            <td><input v-model.value="i.methane_store_capacity" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.methane_store_capacity" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
             <td style="text-align:right">Store start</td>
-            <td><input v-model.value="i.methane_SOC_start" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.methane_SOC_start" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
         </tr>
         <tr>
             <td>Synth Fuel<br><span style="font-size:12px"><i>Capacity given is for H2 feed to process</i></span></td>
-            <td><input v-model.value="i.synth_fuel_capacity" type="text" style="width:70px"  autocomplete="off"/> GW</td>
+            <td><input v-model.value="i.synth_fuel_capacity" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
             <td style="text-align:right">Store start</td>
-            <td><input v-model.value="i.synth_fuel_store_SOC_start" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.synth_fuel_store_SOC_start" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
         </tr>
         <tr>
             <td>Generic energy store<br><span style="font-size:12px"><i>E.g High efficiency lithium ion, flow batteries etc</i></span></td>
-            <td><input v-model.value="i.elec_store_storage_cap" type="text" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td><input v-model.value="i.elec_store_storage_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
             <td style="text-align:right">Charge rate</td>
-            <td><input v-model.value="i.elec_store_charge_cap" type="text" style="width:70px"  autocomplete="off"/> GW</td>            
+            <td><input v-model.value="i.elec_store_charge_cap" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>            
         </tr>
         <tr>
             <td>Enable electricity storage?</td>
-            <td><select v-model.value="i.elec_store_type" autocomplete="off">
+            <td><select v-model.value="i.elec_store_type" autocomplete="off" @change="update">
                     <option value="nostore">No storage</option>
                     <option value="basic">Basic, flat out</option>
                     <option value="average">Proportional: average</option>
@@ -894,7 +882,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Use flat demand profiles</td>
-            <td><select v-model.value="i.use_flat_profiles" autocomplete="off">
+            <td><select v-model.value="i.use_flat_profiles" autocomplete="off" @change="update">
                     <option value=0>Default (variable profiles)</option>
                     <option value=1>Flat demand profile</option>
                 </select></td>
@@ -928,7 +916,7 @@ input[type='text'] {
         <div style="clear:both"></div>
         
         Energy stack units: 
-        <select v-model.value="i.units_mode" autocomplete="off">
+        <select v-model.value="i.units_mode" autocomplete="off" @change="update">
             <option value="national">National TWh/yr</option>
             <option value="kwhdperhousehold">kWh/d per household</option>
             <option value="kwhdperperson">kWh/d per person</option>
@@ -1127,7 +1115,7 @@ input[type='text'] {
         
         <table><tr>
         <td>Number of households:</td>
-        <td><input v-model.value="i.number_of_households" type="text" style="width:100px"  autocomplete="off"/></td>
+        <td><input v-model.value="i.number_of_households" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
         </tr></table>
         <br>
         <table>
@@ -1183,21 +1171,21 @@ input[type='text'] {
         <tr><th></th><th>Embodied Energy</th><th>Lifespan</th><th>Annual Demand</th></tr>
         <tr>
             <td>Offshore wind</td>
-            <td><input v-model.value="i.EE_offshorewind_GWh_per_GW" type="text" style="width:50px"  autocomplete="off"/> GWh/GW</td>
-            <td><input v-model.value="i.EE_offshorewind_lifespan" type="text" style="width:40px"  autocomplete="off"/> years</td>
-            <td>{{ o.EE_offshorewind | toFixed(1) }} TWh/yr</span></td>
+            <td><input v-model.value="i.EE.offshorewind_GWh_per_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GWh/GW</td>
+            <td><input v-model.value="i.EE.offshorewind_lifespan" type="text" @change="update" style="width:40px"  autocomplete="off"/> years</td>
+            <td>{{ o.EE.offshorewind | toFixed(1) }} TWh/yr</span></td>
         </tr>
         <tr>
             <td>Onshore wind</td>
-            <td><input v-model.value="i.EE_onshorewind_GWh_per_GW" type="text" style="width:50px"  autocomplete="off"/> GWh/GW</td>
-            <td><input v-model.value="i.EE_onshorewind_lifespan" type="text" style="width:40px"  autocomplete="off"/> years</td>
-            <td>{{ o.EE_onshorewind | toFixed(1) }} TWh/yr</span></td>
+            <td><input v-model.value="i.EE.onshorewind_GWh_per_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GWh/GW</td>
+            <td><input v-model.value="i.EE.onshorewind_lifespan" type="text" @change="update" style="width:40px"  autocomplete="off"/> years</td>
+            <td>{{ o.EE.onshorewind | toFixed(1) }} TWh/yr</span></td>
         </tr>
         <tr>
             <td>Solar PV</td>
-            <td><input v-model.value="i.EE_solarpv_GWh_per_GW" type="text" style="width:50px"  autocomplete="off"/> GWh/GW</td>
-            <td><input v-model.value="i.EE_solarpv_lifespan" type="text" style="width:40px"  autocomplete="off"/> years</td>
-            <td>{{ o.EE_solarpv | toFixed(1) }} TWh/yr</span></td>
+            <td><input v-model.value="i.EE.solarpv_GWh_per_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GWh/GW</td>
+            <td><input v-model.value="i.EE.solarpv_lifespan" type="text" @change="update" style="width:40px"  autocomplete="off"/> years</td>
+            <td>{{ o.EE.solarpv | toFixed(1) }} TWh/yr</span></td>
         </tr>
         <!--<tr><td>Lithium Ion Store</td><td>{{ o.EE_liion_store | toFixed(1) }} TWh/yr</span></td></tr>
         <tr><td>Electric Vehicle Battery</td><td>{{ o.EE_ecarbattery | toFixed(1) }} TWh/yr</span></td></tr>

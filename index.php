@@ -94,8 +94,8 @@
   </body>
 </html>
 
-<script language="javascript" type="text/javascript" src="defaults.js?v=1"></script>
-<script language="javascript" type="text/javascript" src="model.js?v=1"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=2"></script>
+<script language="javascript" type="text/javascript" src="model.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=1"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=1"></script>
 
@@ -193,7 +193,10 @@ function load_page(page)
             o: o
         },
         methods: {
-          update: function () {},
+          update: function () {
+            model.run();
+            fullzcb3_view();
+          },
           pan_left: function () {
             view.pan_left();
             fullzcb3_view();

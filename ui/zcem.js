@@ -73,7 +73,7 @@ function fullzcb3_ui() {
           {"kwhd":total_FT_losses*scl,"name":"FT losses","color":2},
           {"kwhd":(total_sabatier_losses+total_power_to_X_losses)*scl,"name":"Sabatier losses","color":2},
           {"kwhd":total_anaerobic_digestion_losses*scl,"name":"AD losses","color":2},
-          {"kwhd":(total_biomass_for_spacewaterheat_loss+total_methane_for_spacewaterheat_loss+total_hydrogen_for_spacewaterheat_loss)*scl,"name":"Boiler loss","color":2},
+          {"kwhd":o.total_losses.heating_systems*scl,"name":"Boiler loss","color":2},
           {"kwhd":total_spill*scl,"name":"Total spill","color":2},
 
           /*
