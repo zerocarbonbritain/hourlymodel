@@ -147,25 +147,25 @@ var i = {
         freight_H2_demand: 4.06,
         freight_IC_demand: 20.58
     },
+    
+    industry: {
+        high_temp_process_TWhy: 49.01,                 // 26.3% elec, 73.7% gas in original model
+        low_temp_dry_sep_TWhy: 117.78,                 // 66% elec, 11% gas, 22% biomass CHP in original model      
+        non_heat_process_elec_TWhy: 88.00,
+        non_heat_process_biogas_TWhy: 13.44,
+        non_heat_process_biomass_TWhy: 5.58,
+        biofuel_TWhy: 13.44,
 
-    // ---------------------------------------------
-    // Industrial
-    // ---------------------------------------------
-    ipr: 1.0, // industry prc reduction,
+        high_temp_process_fixed_elec_prc: 0.125,
+        high_temp_process_fixed_gas_prc: 0.375,
+        high_temp_process_fixed_biomass_prc: 0.0,
+        high_temp_process_DSR_prc: 0.5,
 
-    high_temp_process_fixed_elec_prc: 0.125,
-    high_temp_process_fixed_gas_prc: 0.375,
-    high_temp_process_fixed_biomass_prc: 0.0,
-    high_temp_process_DSR_prc: 0.5,
-
-    low_temp_process_fixed_elec_prc: 0.3,
-    low_temp_process_fixed_gas_prc: 0.1,
-    low_temp_process_fixed_biomass_prc: 0.2,
-    low_temp_process_DSR_prc: 0.4,
-
-    // ---------------------------------------------
-    // Storage,
-    // ---------------------------------------------
+        low_temp_process_fixed_elec_prc: 0.3,
+        low_temp_process_fixed_gas_prc: 0.1,
+        low_temp_process_fixed_biomass_prc: 0.2,
+        low_temp_process_DSR_prc: 0.4
+    },
         
     // Electricity Storage
     electric_storage: {

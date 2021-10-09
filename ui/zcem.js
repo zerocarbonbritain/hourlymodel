@@ -64,7 +64,7 @@ function fullzcb3_ui() {
           {"kwhd":o.total_industrial_elec_demand*scl,"name":"Industry Electric","color":0},
           {"kwhd":o.total_industrial_methane_demand*scl,"name":"Industry Methane","color":0},
           {"kwhd":o.total_industrial_biomass_demand*scl,"name":"Industry Biomas","color":0},
-          {"kwhd":10000*i.industrial_biofuel*scl,"name":"Industry Biofuel","color":0},/*
+          {"kwhd":10000*i.industry.biofuel_TWhy*scl,"name":"Industry Biofuel","color":0},/*
           {"kwhd":total_industry_solid/3650,"name":"Industry Biomass","color":0},
           // Backup, liquid and gas processes*/
           {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},

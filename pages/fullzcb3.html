@@ -565,16 +565,6 @@ input[type='text'] {
         </div><br>
         
         <table class="table" style="width:100%">
-        <!--
-        <tr>
-          <th></th>
-          <th>Electricity<br>(TWh/yr)</th>
-          <th>Biogas direct<br>(TWh/yr)</th>
-          <th>Biomass direct<br>(TWh/yr)</th>
-          <th>Biogas CHP<br>(TWh/yr)</th>
-          <th>Biomass CHP<br>(TWh/yr)</th>
-          <th>Total</th>
-        </tr>-->
         <tr>
           <th></th>
           <th>Process Energy</th>
@@ -585,19 +575,19 @@ input[type='text'] {
         </tr>
         <tr>
             <td>High temp process</td>
-            <td><input v-model.value="i.annual_high_temp_process" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.high_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.high_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.high_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.high_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.high_temp_process_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industry.high_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.high_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.high_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.high_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
         </tr>
         <tr>
             <td>Low temp drying & separation</td>
-            <td><input v-model.value="i.annual_low_temp_dry_sep" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.low_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.low_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.low_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.value="i.low_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.low_temp_dry_sep_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industry.low_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.low_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.low_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.value="i.industry.low_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
         </tr>
         <tr>
           <th></th>
@@ -609,10 +599,10 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Non heat process</td>
-            <td><input v-model.value="i.annual_non_heat_process_elec" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.annual_non_heat_process_biogas" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.annual_non_heat_process_biomass" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.value="i.industrial_biofuel" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industry.non_heat_process_elec_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industry.non_heat_process_biogas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industry.non_heat_process_biomass_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.value="i.industry.biofuel_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td></td>
         </tr>
         <tr><td></td><td></td><td></td><td></td><td></td></tr>

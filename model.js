@@ -426,24 +426,23 @@ var model = {
     // Industrial
     // ---------------------------------------------------------------------------    
     industry: function() {
-    
-        i.annual_high_temp_process = 49.01 * i.ipr         // 26.3% elec, 73.7% gas in original model
-        i.annual_low_temp_dry_sep = 117.78 * i.ipr         // 66% elec, 11% gas, 22% biomass CHP in original model      
-        i.annual_non_heat_process_elec = 88.00 * i.ipr
-        i.annual_non_heat_process_biogas = 13.44 * i.ipr
-        i.annual_non_heat_process_biomass = 5.58 * i.ipr    
-        i.industrial_biofuel = 13.44 * i.ipr
-
-        o.total_industry_demand = i.annual_high_temp_process + i.annual_low_temp_dry_sep + i.annual_non_heat_process_elec + i.annual_non_heat_process_biogas + i.annual_non_heat_process_biomass +i.industrial_biofuel
         
-        daily_high_temp_process = i.annual_high_temp_process * 1000.0 / 365.25
-        daily_low_temp_dry_sep = i.annual_low_temp_dry_sep * 1000.0 / 365.25
-              
-        daily_non_heat_process_elec = i.annual_non_heat_process_elec * 1000.0 / 365.25
-        daily_non_heat_process_biogas = i.annual_non_heat_process_biogas * 1000.0 / 365.25
-        daily_non_heat_process_biomass = i.annual_non_heat_process_biomass * 1000.0 / 365.25
+        o.total_industry_demand = 0
+        o.total_industry_demand += i.industry.high_temp_process_TWhy
+        o.total_industry_demand += i.industry.low_temp_dry_sep_TWhy
+        o.total_industry_demand += i.industry.non_heat_process_elec_TWhy
+        o.total_industry_demand += i.industry.non_heat_process_biogas_TWhy
+        o.total_industry_demand += i.industry.non_heat_process_biomass_TWhy
+        o.total_industry_demand += i.industry.biofuel_TWhy
             
-        daily_industrial_biofuel = i.industrial_biofuel * 1000.0 / 365.25
+        daily_high_temp_process = i.industry.high_temp_process_TWhy * 1000.0 / 365.25
+        daily_low_temp_dry_sep = i.industry.low_temp_dry_sep_TWhy * 1000.0 / 365.25
+              
+        daily_non_heat_process_elec = i.industry.non_heat_process_elec_TWhy * 1000.0 / 365.25
+        daily_non_heat_process_biogas = i.industry.non_heat_process_biogas_TWhy * 1000.0 / 365.25
+        daily_non_heat_process_biomass = i.industry.non_heat_process_biomass_TWhy * 1000.0 / 365.25
+            
+        daily_industrial_biofuel = i.industry.biofuel_TWhy * 1000.0 / 365.25
         
     
         d.industrial_elec_demand = []
@@ -476,10 +475,10 @@ var model = {
             high_temp_process = high_temp_process_profile[hour%24] * daily_high_temp_process
             low_temp_process = low_temp_process_profile[hour%24] * daily_low_temp_dry_sep
             
-            heat_process_fixed_elec = (high_temp_process*i.high_temp_process_fixed_elec_prc) + (low_temp_process*i.low_temp_process_fixed_elec_prc)
-            heat_process_fixed_gas = (high_temp_process*i.high_temp_process_fixed_gas_prc) + (low_temp_process*i.low_temp_process_fixed_gas_prc)
-            heat_process_fixed_biomass = (high_temp_process*i.high_temp_process_fixed_biomass_prc) + (low_temp_process*i.low_temp_process_fixed_biomass_prc)
-            heat_process_DSR = (high_temp_process*i.high_temp_process_DSR_prc) + (low_temp_process*i.low_temp_process_DSR_prc)
+            heat_process_fixed_elec = (high_temp_process*i.industry.high_temp_process_fixed_elec_prc) + (low_temp_process*i.industry.low_temp_process_fixed_elec_prc)
+            heat_process_fixed_gas = (high_temp_process*i.industry.high_temp_process_fixed_gas_prc) + (low_temp_process*i.industry.low_temp_process_fixed_gas_prc)
+            heat_process_fixed_biomass = (high_temp_process*i.industry.high_temp_process_fixed_biomass_prc) + (low_temp_process*i.industry.low_temp_process_fixed_biomass_prc)
+            heat_process_DSR = (high_temp_process*i.industry.high_temp_process_DSR_prc) + (low_temp_process*i.industry.low_temp_process_DSR_prc)
             
             // Industrial DSR
             heat_process_DSR_elec = heat_process_DSR                                    // 1. provide all heat demand with direct elec resistance heaters
