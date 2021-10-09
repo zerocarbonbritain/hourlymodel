@@ -222,41 +222,6 @@ input[type='text'] {
         <div style="font-size:14px">Domestic Lighting & Appliance electricity demand in 2007 was 86 TWh, falling to 76 TWh in 2017, ZCB Scenario projects 55% reduction from 2007 as a result of LED lighting and more efficient appliances. Service sector Lighting & Appliance demand was 59 TWh in 2007 increasing to 71 TWh in 2017, ZCB scenario projects 30% reduction from 2007. Cooling demand was 9 TWh in 2007, increasing to 13 TWh in 2017, scenario projects falling cooling energy demand based on increasing cooling efficiency.<br><br>
         Projected scenario domestic cooking electricity consumption: 10.47 TWh, Catering electricity consumption: 16.85 TWh. In 2007 and 2017 these were: 15 TWh, 22 TWh and 14 TWh, 21 TWh respectively.
         </div>
-        <br>
-
-        <!--
-        <div style="border: 1px solid #ccc; padding:10px;">
-        <b>Simple domestic lighting, appliances and cooking calculator</b><br>      
-        <table class="table" style="width:100%; margin-top:10px; margin-bottom:0px;">
-        <tr>
-            <td>Number of lights</td>
-            <td><input v-model.value="i.simple_LAC.number_of_lights" type="text" @change="update" style="width:60px"  autocomplete="off"/></td>
-        </tr><tr>
-            <td>Average light power</td>
-            <td><input v-model.value="i.simple_LAC.lights_power" type="text" @change="update" style="width:60px"  autocomplete="off"/> Watts</td>
-        </tr><tr>
-            <td>Average lighting hours per day</td>
-            <td><input v-model.value="i.simple_LAC.lighting_hours" type="text" @change="update" style="width:60px"  autocomplete="off"/></td>
-        </tr><tr>
-            <td>Internet router + other always on<br>devices, appliances, stand-by</td>
-            <td><input v-model.value="i.simple_LAC.alwayson" type="text" @change="update" style="width:60px"  autocomplete="off"/> Watts</td>
-        </tr><tr>
-            <td>Fridge/Freezer annual consumption</td>
-            <td><input v-model.value="i.simple_LAC.fridgefreezer" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
-        </tr><tr>
-            <td>Washing machine annual consumption</td>
-            <td><input v-model.value="i.simple_LAC.washingmachine" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
-        </tr><tr>
-            <td>Cooking annual consumption<br>(1.1 kWh x 365)</td>
-            <td><input v-model.value="i.simple_LAC.cooking" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
-        </tr><tr>
-            <td>Laptops and computing<br>(2 x 0.29 kWh x 365)</td>
-            <td><input v-model.value="i.simple_LAC.computing" type="text" @change="update" style="width:60px"  autocomplete="off"/> kWh</td>
-        </tr>
-        </table>
-        </div>
-        -->
-        <br>
         
         <table class="table" style="width:100%">
         <tr>
@@ -303,100 +268,6 @@ input[type='text'] {
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SPACE / WATER HEAT DEMAND</b></div>
     <div class="inner">
         <p><b>1. Space Heating</b></p>
-        <!--
-        <div style="font-size:14px">The following simple domestic fabric efficiency model is indicative of an 'average household' in the scenario. The actual domestic heat loss factor is based on more detailed analysis from the DECC 2050 level 4 pathway. Further detail including service and industry heat loss factors are available in the ZCB matrix spreadsheet.</div><br>
-                
-        <div style="border: 1px solid #ccc; padding:10px;">
-        <div style="margin-bottom:10px"><b>Simple domestic fabric efficiency calculator</b></div>
-        
-        <table class="table" style="width:50%; float:left; margin-bottom:0px">
-        <tr>
-            <td>Total Floor Area</td>
-            <td>
-            <input v-model.value="i.simple_BEM.TFA" type="text" @change="update" style="width:100px"  autocomplete="off"/> m2
-            </td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Floor insulation</td>
-            <td>
-            <select v-model.value="i.simple_BEM.floor_ins_thickness" autocomplete="off" @change="update" >
-                <option value=0.0 selected="selected">Uninsulated</option>
-                <option value=0.05>50mm insulation</option>
-                <option value=0.1>100mm insulation</option>
-                <option value=0.2>200mm insulation</option>
-                <option value=0.3>Superinsulated 300mm</option>
-            </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Wall insulation</td>
-            <td>
-            <select v-model.value="i.simple_BEM.wall_ins_thickness" autocomplete="off" @change="update">
-                <option value=0.0>Uninsulated</option>
-                <option value=0.05>50mm insulation</option>
-                <option value=0.1>100mm insulation</option>
-                <option value=0.2>200mm insulation</option>
-                <option value=0.3>Superinsulated 300mm</option>
-            </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Loft insulation</td>
-            <td>
-            <select v-model.value="i.simple_BEM.loft_ins_thickness" autocomplete="off" @change="update">
-                <option value=0.0>Uninsulated</option>
-                <option value=0.05>50mm insulation</option>
-                <option value=0.1>100mm insulation</option>
-                <option value=0.2>200mm insulation</option>
-                <option value=0.3>Superinsulated 300mm</option>
-            </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Window type</td>
-            <td>
-            <select v-model.value="i.simple_BEM.window_type" autocomplete="off" @change="update">
-                <option value=1>Single glazing</option>
-                <option value=2>Double glazing</option>
-                <option value=3>Triple glazing</option>
-            </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Glazing extent<br><span style="font-size:14px">(% of total wall area)</span></td>
-            <td>
-            <select v-model.value="i.simple_BEM.glazing_extent" autocomplete="off" @change="update">
-                <option value=0.1>10%</option>
-                <option value=0.2>20%</option>
-                <option value=0.3>30%</option>
-                <option value=0.4>40%</option>
-                <option value=0.5>50%</option>
-            </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Infiltration & Ventilation</td>
-            <td>
-            <input v-model.value="i.simple_BEM.air_change_per_hour" type="text" @change="update" style="width:100px"  autocomplete="off"/> ACH (effective)
-            </td>
-        </tr>
-
-        </table>
-
-        <div style="float:left;">
-            <table style="font-size:14px">
-            <tr><td>Fabric heat loss</td><td>{{ o.fabric_WK | toFixed(1) }} <span class="unit">W/K</span></td></tr>
-            <tr><td>Infiltration heat loss</td><td>{{ o.infiltration_WK | toFixed(1) }} <span class="unit">W/K</span></td></tr>
-            <tr><td>Total fabric efficiency</td><td>{{ o.domestic_space_heat_demand_WK | toFixed(1) }} <span class="unit">W/K</span></td></tr>
-            <tr><td>Space heating heat demand<br>by floor area</td><td>{{ o.spaceheatkwhm2 | toFixed(0) }} <span class="unit">kWh/m2/y</span></td></tr>
-            <tr><td><i>Passivhaus target:</i></td><td><i>15 kWh/m2.y</i></td></tr>
-            </table>
-        </div>
-        <div style="clear:both"></div>
-        </div>
-        -->
                 
         <p>Space heat base temperature: <input v-model.value="i.space_heat_base_temperature" type="text" @change="update" style="width:70px"  autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span></p>
 
@@ -439,29 +310,7 @@ input[type='text'] {
         </table>
          
         <p><b>2. Water Heating</b></p>
-        <!--
-        <div style="border: 1px solid #ccc; padding:10px;">
-        <div style="margin-bottom:10px"><b>Simple domestic hot water demand calculator</b></div>
-        <table class="table" style="width:100%; margin-bottom:0px;">
-        <tr>
-            <td>Number of showers per day<br><span style="font-size:14px">(Based on 7.5 minute 9 kW equivalent shower)</span></td>
-            <td><input v-model.value="i.number_showers_per_day" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
-        </tr>
-        <tr>
-            <td>Number of baths per day<br><span style="font-size:14px">(Based on 20% higher water use than shower)</span></td>
-            <td><input v-model.value="i.number_baths_per_day" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
-        </tr>
-        <tr>
-            <td>Number of kitchen sink bowl fills per day<br><span style="font-size:14px">(Based on 70% fill of typical 9.5L bowl, 50C water)</span></td>
-            <td><input v-model.value="i.number_kitchen_sink" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
-        </tr>
-        <tr>
-            <td>Number of bathroom sink fills per day</td>
-            <td><input v-model.value="i.number_bathroom_sink" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
-        </tr>
-        </table>
-        </div><br>
-        -->
+        
         <table class="table" style="width:100%">
         <tr>
             <td width="20%">Domestic</td>

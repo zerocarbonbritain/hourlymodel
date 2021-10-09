@@ -39,10 +39,7 @@ var model = {
         }
         
         o.total_biomass_used = 0
-    
-        // model.simple_LAC()
-        // model.simple_BEM()
-        // model.simple_domestic_dhw()
+        
         model.transport_model()
         model.supply();
         model.lac();
@@ -58,83 +55,6 @@ var model = {
         model.scaled_by();
         model.embodied_energy();
     },
-
-    // ---------------------------------------------------------------------------------------------  
-    // Simple domestic lighting appliances and cooking calculator
-    // ---------------------------------------------------------------------------------------------     
-    /*simple_LAC: function() {
-
-        o.domestic_appliances_kwh = 0
-        o.domestic_appliances_kwh += (i.simple_LAC.lighting_hours / 24.0) * i.simple_LAC.number_of_lights * i.simple_LAC.lights_power * 0.001 * 24.0 * 365.25
-        o.domestic_appliances_kwh += i.simple_LAC.fridgefreezer
-        o.domestic_appliances_kwh += i.simple_LAC.washingmachine
-        o.domestic_appliances_kwh += i.simple_LAC.alwayson * 0.001 * 24.0 * 365.25
-        o.domestic_appliances_kwh += i.simple_LAC.computing
-        
-        o.trad_elec_domestic_appliances = (o.domestic_appliances_kwh * i.households_2030) / 1000000000.0
-
-        o.annual_cooking_elec_domestic = (i.simple_LAC.cooking * i.households_2030) / 1000000000.0        
-    },*/
-
-    // ---------------------------------------------------------------------------------------------  
-    // Simple domestic heat loss rate calculator
-    // ---------------------------------------------------------------------------------------------    
-    /*simple_BEM: function() {
-        // 3. Solar gains calculator from window areas and orientations
-        // 4. Seperate out cooking, lighting and appliances and water heating demand.
-        
-        var floor_area = i.simple_BEM.TFA / 2.0 
-        var side = Math.sqrt(floor_area)
-        var building_volume = floor_area * i.simple_BEM.storey_height * 2.0
-            
-        var walls_uvalue = 1/((1/1.5)+(1/(0.03/i.simple_BEM.wall_ins_thickness))) // Base U-value is uninsulated cavity wall
-        var floor_uvalue = 1/((1/0.7)+(1/(0.04/i.simple_BEM.floor_ins_thickness))) // Base U-value is uninsulated solid floor
-        var loft_uvalue = 1/((1/2.0)+(1/(0.03/i.simple_BEM.loft_ins_thickness))) // Base U-value is uninsulated loft
-        
-        var window_uvalue = 1.9;
-        if (i.window_type==1) window_uvalue = 4.8 // single
-        if (i.window_type==2) window_uvalue = 1.9 // double
-        if (i.window_type==3) window_uvalue = 0.85 // triple
-
-        var total_wall_area = (side * i.simple_BEM.storey_height * 2) * 4
-        var total_window_area = total_wall_area * i.simple_BEM.glazing_extent
-        
-        var windows_south = total_window_area * 0.4
-        var windows_west = total_window_area * 0.2
-        var windows_east = total_window_area * 0.2
-        var windows_north = total_window_area * 0.2
-        
-        // var solar_gains_capacity = total_window_area / 3.0
-
-        var floor_WK = floor_uvalue * floor_area
-        var loft_WK = loft_uvalue * floor_area
-        
-        var wall_south_WK = walls_uvalue * ((side * i.simple_BEM.storey_height * 2) - windows_south)
-        var wall_west_WK = walls_uvalue * ((side * i.simple_BEM.storey_height * 2) - windows_west)
-        var wall_east_WK = walls_uvalue * ((side * i.simple_BEM.storey_height * 2) - windows_east)
-        var wall_north_WK = walls_uvalue * ((side * i.simple_BEM.storey_height * 2) - windows_north)
-        
-        var window_WK = (windows_south + windows_west + windows_east + windows_north) * window_uvalue
-        
-        o.fabric_WK = floor_WK + loft_WK + wall_south_WK + wall_west_WK + wall_east_WK + wall_north_WK + window_WK
-        o.infiltration_WK = 0.33 * i.simple_BEM.air_change_per_hour * building_volume        
-        o.domestic_space_heat_demand_WK = o.fabric_WK + o.infiltration_WK
-        o.domestic_space_heat_demand_GWK = (o.domestic_space_heat_demand_WK * i.households_2030) / 1000000000.0
-    },*/
-
-    // ---------------------------------------------------------------------------------------------  
-    // Simple domestic hot water calculator
-    // ---------------------------------------------------------------------------------------------        
-    /*simple_domestic_dhw: function() {
-        // DHW Demand
-        DHW_daily_demand = 0
-        DHW_daily_demand += (i.shower_kwh * i.number_showers_per_day)
-        DHW_daily_demand += (i.bath_kwh * i.number_baths_per_day)
-        DHW_daily_demand += (i.sink_kwh * i.number_kitchen_sink)
-        DHW_daily_demand += (i.sink_kwh * i.number_bathroom_sink)
-        o.domestic_water_heating_kwh = DHW_daily_demand * 365.25
-        o.domestic_water_heating = (o.domestic_water_heating_kwh * i.households_2030) / 1000000000.0
-    },*/
 
     // ---------------------------------------------------------------------------------------------    
     // Transport model
