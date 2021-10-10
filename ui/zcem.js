@@ -54,8 +54,8 @@ function fullzcb3_ui() {
       {"name":"Demand","height":(o.total_demand+total_losses)*scl,"saving":0,
         "stack":[
           {"kwhd":o.total_traditional_elec*scl,"name":"LAC","color":0},
-          {"kwhd":o.total_space_heat_demand*scl,"name":"Space Heat","color":0},
-          {"kwhd":o.total_water_heat_demand*scl,"name":"Water Heat","color":0},
+          {"kwhd":o.space_heating.total_demand*scl,"name":"Space Heat","color":0},
+          {"kwhd":o.water_heating.total_demand*scl,"name":"Water Heat","color":0},
           {"kwhd":(total_EV_demand+total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
           {"kwhd":o.total_hydrogen_for_hydrogen_vehicles*scl,"name":"Hydrogen Transport","color":0},
           {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Biofuel Transport","color":0},

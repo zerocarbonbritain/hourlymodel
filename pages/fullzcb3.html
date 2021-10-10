@@ -80,13 +80,13 @@ input[type='text'] {
         <div id="placeholder_bound" style="width:100%">
             <div id="placeholder"></div>
         </div>
-        
+        <!--
         <br>
         
         Select scenario: 
         <select id="select_scenario">
         </select>
-                
+        -->     
     </div>
 </div>
 
@@ -282,29 +282,29 @@ input[type='text'] {
         <tr>
             <td>Domestic</td>
             <td><input v-model.value="i.space_heating.domestic_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td>{{ o.total_domestic_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-            <td>{{ o.prc_reduction_domestic_space_heat_demand*100 | toFixed(0) }}%</td>
-            <td>{{ o.domestic_space_heating_kwh | toFixed(0) }} kWh/household</td>
+            <td>{{ o.space_heating.total_domestic_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+            <td>{{ (1.0-((o.space_heating.total_domestic_demand*0.0001) / 266.0))*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td><input v-model.value="i.space_heating.services_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td>{{ o.total_services_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-            <td>{{ o.prc_reduction_services_space_heat_demand*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.total_services_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+            <td>{{ (1.0-((o.space_heating.total_services_demand*0.0001) / 83.0))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Industry</td>
             <td><input v-model.value="i.space_heating.industry_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td>{{ o.total_industry_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-            <td>{{ o.prc_reduction_industry_space_heat_demand*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.total_industry_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+            <td>{{ (1.0-((o.space_heating.total_industry_demand*0.0001) / 28.0))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Combined</td>
-            <td>{{ o.space_heat_demand_GWK | toFixed(3) }} GW/K</td>
-            <td>{{ o.total_space_heat_demand*0.0001 | toFixed(1) }} TWh/yr</td>     
-            <td>{{ o.prc_reduction_space_heat_demand*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.demand_GWK | toFixed(3) }} GW/K</td>
+            <td>{{ o.space_heating.total_demand*0.0001 | toFixed(1) }} TWh/yr</td>     
+            <td>{{ (1.0-((o.space_heating.total_demand*0.0001)/(266.0+83.0+28.0)))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -317,7 +317,7 @@ input[type='text'] {
             <td width="20%"></td>
             <td width="20%"><input v-model.value="i.water_heating.domestic_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td width="20%">{{ (1-i.water_heating.domestic_TWhy/71)*100 | toFixed(0) }}%</td>
-            <td width="20%">{{ o.domestic_water_heating_kwh | toFixed(0) }} kWh/household</td>
+            <td width="20%">{{ o.water_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
@@ -329,7 +329,7 @@ input[type='text'] {
         <tr>
             <td>Combined</td>
             <td></td>
-            <td>{{ o.water_heating | toFixed(1) }} TWh</td>
+            <td>{{ o.water_heating.demand_TWhy | toFixed(1) }} TWh</td>
             <td></td>
             <td></td>
         </tr>
@@ -1004,39 +1004,39 @@ input[type='text'] {
         <table>
             <tr><th>Supply</th><th width="100px"></th><th>Storage, Gas & Liquids</th><th width="100px"></th></tr>
             <tr>
-                <td>Onshore Wind</td><td v-html="auto_scale(o.scaled.onshorewind_capacity,'kW')"></td>
-                <td>Electrolysis capacity</td><td v-html="auto_scale(o.scaled.electrolysis_capacity,'kW')"></td>
-                <td>Hydrogen storage</td><td v-html="auto_scale(o.scaled.hydrogen_storage_cap,'kWh')"></td>
+                <td>Onshore Wind</td><td v-html="auto_scale(i.supply.onshore_wind_capacity*o.scaleby,'kW')"></td>
+                <td>Electrolysis capacity</td><td v-html="auto_scale(i.hydrogen.electrolysis_capacity_GW*o.scaleby,'kW')"></td>
+                <td>Hydrogen storage</td><td v-html="auto_scale(i.hydrogen.storage_capacity_GWh*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
-                <td>Offshore Wind</td><td v-html="auto_scale(o.scaled.offshorewind_capacity,'kW')"></td>
-                <td>Methanation capacity</td><td v-html="auto_scale(o.scaled.methanation_capacity,'kW')"></td>
-                <td>IHTEM capacity</td><td v-html="auto_scale(o.scaled.IHTEM_cap,'kW')"></td>
+                <td>Offshore Wind</td><td v-html="auto_scale(i.supply.offshore_wind_capacity*o.scaleby,'kW')"></td>
+                <td>Methanation capacity</td><td v-html="auto_scale(i.methane.methanation_capacity*o.scaleby,'kW')"></td>
+                <td>IHTEM capacity</td><td v-html="auto_scale(i.power_to_X.capacity*o.scaleby,'kW')"></td>
             </tr>
             <tr>
-                <td>Solar PV</td><td v-html="auto_scale(o.scaled.solarpv_capacity,'kW')"></td>
-                <td>Methane storage</td><td v-html="auto_scale(o.scaled.methane_store_capacity,'kWh')"></td>
-                <td>Biomass land area</td><td v-html="auto_scale(o.scaled.landarea_for_biomass,'m2')"></td>
+                <td>Solar PV</td><td v-html="auto_scale(i.supply.solarpv_capacity*o.scaleby,'kW')"></td>
+                <td>Methane storage</td><td v-html="auto_scale(i.methane.storage_capacity_GWh*o.scaleby,'kWh')"></td>
+                <td>Biomass land area</td><td v-html="auto_scale(10000*o.landarea_for_biomass*o.scaleby,'m2')"></td>
             </tr>
             <tr>
-                <td>Hydro</td><td v-html="auto_scale(o.scaled.hydro_capacity,'kW')"></td>
-                <td>Synth fuel prod capacity</td><td v-html="auto_scale(o.scaled.synth_fuel_capacity,'kW')"></td>
+                <td>Hydro</td><td v-html="auto_scale(i.supply.hydro_capacity*o.scaleby,'kW')"></td>
+                <td>Synth fuel prod capacity</td><td v-html="auto_scale(i.synth_fuel.capacity_GW*o.scaleby,'kW')"></td>
             </tr>
             
             <tr>
-                <td>Wave</td><td v-html="auto_scale(o.scaled.wave_capacity,'kW')"></td>
-                <td>Elec storage cap</td><td v-html="auto_scale(o.scaled.elec_store_storage_cap,'kWh')"></td>
+                <td>Wave</td><td v-html="auto_scale(i.supply.wave_capacity*o.scaleby,'kW')"></td>
+                <td>Elec storage cap</td><td v-html="auto_scale(i.electric_storage.capacity_GWh*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
-                <td>Tidal</td><td v-html="auto_scale(o.scaled.tidal_capacity,'kW')"></td>
-                <td>BEV storage cap</td><td v-html="auto_scale(o.scaled.electric_car_battery_capacity,'kWh')"></td>
+                <td>Tidal</td><td v-html="auto_scale(i.supply.tidal_capacity*o.scaleby,'kW')"></td>
+                <td>BEV storage cap</td><td v-html="auto_scale(i.electric_car_battery_capacity*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
-                <td>Nuclear</td><td v-html="auto_scale(o.scaled.nuclear_capacity,'kW')"></td>
+                <td>Nuclear</td><td v-html="auto_scale(i.supply.nuclear_capacity*o.scaleby,'kW')"></td>
 
             </tr>
             <tr>
-                <td>CCGT Backup</td><td v-html="auto_scale(o.scaled.CCGT_capacity,'kW')"></td>
+                <td>Methane turbine</td><td v-html="auto_scale(i.electric_backup.methane_turbine_capacity*o.scaleby,'kW')"></td>
 
             </tr>
         </table>

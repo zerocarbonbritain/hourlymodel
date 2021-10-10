@@ -211,17 +211,21 @@ var model = {
     // ---------------------------------------------------------------------------------------------     
     space_water_heat_demand: function() {
 
-        o.space_heat_demand_GWK = i.space_heating.domestic_demand_GWK + i.space_heating.services_demand_GWK + i.space_heating.industry_demand_GWK
+        o.space_heating = {}
+        o.water_heating = {}
 
-        o.water_heating = i.water_heating.domestic_TWhy + i.water_heating.services_TWhy
-        let water_heating_daily_demand = o.water_heating * 1000.0 / 365.2
+        o.space_heating.demand_GWK = i.space_heating.domestic_demand_GWK + i.space_heating.services_demand_GWK + i.space_heating.industry_demand_GWK
 
-        o.total_domestic_space_heat_demand = 0
-        o.total_services_space_heat_demand = 0
-        o.total_industry_space_heat_demand = 0
-        o.total_space_heat_demand = 0
-        o.total_water_heat_demand = 0
-
+        o.water_heating.demand_TWhy = i.water_heating.domestic_TWhy + i.water_heating.services_TWhy
+        
+        let water_heating_daily_demand = o.water_heating.demand_TWhy * 1000.0 / 365.2
+        
+        o.space_heating.total_domestic_demand = 0
+        o.space_heating.total_services_demand = 0
+        o.space_heating.total_industry_demand = 0
+        o.space_heating.total_demand = 0
+        o.water_heating.total_demand = 0
+                
         d.spacewater_demand_before_heatstore = []
         
         for (var hour = 0; hour < i.hours; hour++) {
@@ -233,33 +237,27 @@ var model = {
             
             // Domestic space heat
             let domestic_space_heat_demand = degree_hours * i.space_heating.domestic_demand_GWK * 24.0 * space_heat_profile[hour%24]
-            o.total_domestic_space_heat_demand += domestic_space_heat_demand
+            o.space_heating.total_domestic_demand += domestic_space_heat_demand
             // Services space heat        
             let services_space_heat_demand = degree_hours * i.space_heating.services_demand_GWK * 24.0 * space_heat_profile[hour%24]
-            o.total_services_space_heat_demand += services_space_heat_demand
+            o.space_heating.total_services_demand += services_space_heat_demand
             // Industry space heat        
             let industry_space_heat_demand = degree_hours * i.space_heating.industry_demand_GWK * 24.0 * space_heat_profile[hour%24]        
-            o.total_industry_space_heat_demand += industry_space_heat_demand
+            o.space_heating.total_industry_demand += industry_space_heat_demand
             // Combined space heat         
             let space_heat_demand = domestic_space_heat_demand + services_space_heat_demand + industry_space_heat_demand
-            o.total_space_heat_demand += space_heat_demand
+            o.space_heating.total_demand += space_heat_demand
             
             // water heat
             let hot_water_demand = hot_water_profile[hour%24] * water_heating_daily_demand
-            o.total_water_heat_demand += hot_water_demand 
+            o.water_heating.total_demand += hot_water_demand 
             
             let spacewater_demand_before_heatstore = space_heat_demand + hot_water_demand - d.heat_supply_hourly[hour]
             d.spacewater_demand_before_heatstore.push(spacewater_demand_before_heatstore)
         }
 
-        o.domestic_space_heating_kwh = o.total_domestic_space_heat_demand*0.1*1000000 / i.households_2030
-        o.domestic_water_heating_kwh = i.domestic_water_heating*1000000000 / i.households_2030
-        // o.spaceheatkwhm2 = o.domestic_space_heating_kwh / i.simple_BEM.TFA
-        
-        o.prc_reduction_domestic_space_heat_demand = 1.0 - ((o.total_domestic_space_heat_demand*0.0001) / 266.0)
-        o.prc_reduction_services_space_heat_demand = 1.0 - ((o.total_services_space_heat_demand*0.0001) / 83.0)
-        o.prc_reduction_industry_space_heat_demand = 1.0 - ((o.total_industry_space_heat_demand*0.0001) / 28.0)
-        o.prc_reduction_space_heat_demand = 1.0 - ((o.total_space_heat_demand*0.0001) / (266.0+83.0+28.0))
+        o.space_heating.domestic_kwh = o.space_heating.total_domestic_demand*0.1*1000000 / i.households_2030
+        o.water_heating.domestic_kwh = i.water_heating.domestic_TWhy*1000000000 / i.households_2030
         
         // move to hourly model if needed
         // i.heatpump_COP_hourly = i.heatpump_COP
@@ -1130,8 +1128,8 @@ var model = {
         
         o.total_demand = 0
         o.total_demand += o.total_traditional_elec 
-        o.total_demand += o.total_space_heat_demand
-        o.total_demand += o.total_water_heat_demand
+        o.total_demand += o.space_heating.total_demand
+        o.total_demand += o.water_heating.total_demand
         o.total_demand += o.total_industrial_elec_demand
         o.total_demand += o.total_industrial_methane_demand
         o.total_demand += o.total_industrial_biomass_demand
@@ -1313,30 +1311,7 @@ var model = {
     // Scaled up to village, town, country scale
     // ----------------------------------------------------------------------------    
     scaled_by: function() {
-    
-        let scale = 1000 * 1000 * i.number_of_households / i.households_2030
-    
-        o.scaled = {}
-
-        o.scaled.onshorewind_capacity = i.supply.onshore_wind_capacity * scale
-        o.scaled.offshorewind_capacity = i.supply.offshore_wind_capacity * scale
-        o.scaled.solarpv_capacity = i.supply.solarpv_capacity * scale
-        o.scaled.hydro_capacity = i.supply.hydro_capacity * scale
-        o.scaled.tidal_capacity = i.supply.tidal_capacity * scale
-        o.scaled.wave_capacity = i.supply.wave_capacity * scale
-        o.scaled.nuclear_capacity = i.supply.nuclear_capacity * scale   
-        o.scaled.CCGT_capacity = i.electric_backup.methane_turbine_capacity * scale
-        
-        o.scaled.electrolysis_capacity = i.hydrogen.electrolysis_capacity_GW * scale
-        o.scaled.hydrogen_storage_cap = i.hydrogen.storage_capacity_GWh * scale
-        o.scaled.methanation_capacity = i.methane.methanation_capacity * scale
-        o.scaled.power_to_X_cap = i.power_to_X.capacity * scale
-        o.scaled.methane_store_capacity = i.methane.storage_capacity_GWh * scale
-        o.scaled.synth_fuel_capacity = i.synth_fuel.capacity_GW * scale
-        o.scaled.elec_store_storage_cap = i.electric_storage.capacity_GWh * scale
-        
-        o.scaled.electric_car_battery_capacity = i.electric_car_battery_capacity * scale
-        o.scaled.landarea_for_biomass = 10000 * o.landarea_for_biomass * scale
+        o.scaleby = 1000 * 1000 * i.number_of_households / i.households_2030
     },
 
     // ----------------------------------------------------------------------------
