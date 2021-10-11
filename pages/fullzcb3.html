@@ -824,25 +824,25 @@ input[type='text'] {
             <td>Initial el. balance positive</td>
             <td>{{ o.initial_elec_balance_positive }}</td>
             <td>{{ o.initial_elec_balance_positive_prc | toFixed(1) }}%</td>
-            <td>{{ o.total_initial_elec_balance_positive | toFixed(1) }}</td>
+            <td>{{ o.total_initial_elec_balance_positive*0.0001 | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Final el. balance negative</td>
             <td>{{ o.final_elec_balance_negative }}</td>
             <td>{{ o.final_elec_balance_negative_prc | toFixed(1) }}%</td>
-            <td>{{ o.total_final_elec_balance_negative | toFixed(3) }}</td>
+            <td>{{ o.total_final_elec_balance_negative*0.0001 | toFixed(3) }}</td>
         </tr>
         <tr>
             <td>Final el. balance positive</td>
             <td>{{ o.final_elec_balance_positive }}</td>
             <td>{{ o.final_elec_balance_positive_prc | toFixed(1) }}%</td>
-            <td>{{ o.total_final_elec_balance_positive | toFixed(1) }}</td>
+            <td>{{ o.total_final_elec_balance_positive*0.0001 | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Unmet heat demand</td>
             <td>{{ o.unmet_heat_demand_count }}</td>
             <td>{{ o.unmet_heat_demand_prc | toFixed(1) }}%</td>
-            <td>{{ o.total_unmet_heat_demand | toFixed(1) }}</td>
+            <td>{{ o.total_unmet_heat_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
@@ -943,20 +943,20 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
-            <td>{{ o.total_synth_fuel_biomass_used | toFixed(1) }}</td>
+            <td>{{ o.total_synth_fuel_biomass_used*0.0001 | toFixed(1) }}</td>
             <td>{{ o.landarea_for_synth_fuel | toFixed(1) }} Mha</td>
             <td>{{ o.prc_landarea_for_synth_fuel | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
-            <td>{{ o.total_other_biomass_used | toFixed(1) }}</td>
+            <td>{{ o.total_other_biomass_used*0.0001 | toFixed(1) }}</td>
             <td>{{ o.landarea_for_other_biomass | toFixed(1) }} Mha</td>
             <td>{{ o.prc_landarea_for_other_biomass | toFixed(1) }}% of UK</td>
             <td></td>
         </tr>
         <tr>
             <td>All input biomass energy</td>
-            <td>{{ o.total_biomass_used | toFixed(1) }}</td>
+            <td>{{ o.total_biomass_used*0.0001 | toFixed(1) }}</td>
             <td>{{ o.landarea_for_biomass | toFixed(1) }} Mha</td>
             <td>{{ o.prc_landarea_for_biomass | toFixed(1) }}% of UK</td>
         </tr>
@@ -968,7 +968,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Electricity from dispatchable (TWh)</td>
-            <td>{{ o.total_electricity_from_dispatchable | toFixed(1) }}</td>
+            <td>{{ o.total_methane_turbine_output*0.0001 | toFixed(1) }}</td>
             <td></td>
             <td></td>
         </tr>

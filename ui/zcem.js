@@ -37,26 +37,26 @@ function fullzcb3_ui() {
           {"kwhd":o.supply.total_geothermal_elec*scl,"name":"Geo Thermal Elec","color":1},
           {"kwhd":o.supply.total_geothermal_heat*scl,"name":"Geo Thermal Heat","color":1},
           {"kwhd":o.supply.total_nuclear*scl,"name":"Nuclear","color":1},
-          {"kwhd":10000*o.total_biomass_used*scl,"name":"Biomass","color":1},
-          {"kwhd":total_ambient_heat_supply*scl,"name":"Ambient","color":1},
+          {"kwhd":o.total_biomass_used*scl,"name":"Biomass","color":1},
+          {"kwhd":o.total_ambient_heat_supply*scl,"name":"Ambient","color":1},
           {"kwhd":o.total_unmet_demand*scl,"name":"Unmet","color":3}
         ]
       },
       
-      {"name":"Demand","height":(o.total_demand+total_losses+o.total_exess)*scl,"saving":0,
+      {"name":"Demand","height":(o.total_demand+o.total_losses_combined+o.total_exess)*scl,"saving":0,
         "stack":[
           {"kwhd":o.total_demand*scl,"name":"Demand","color":0},
-          {"kwhd":total_losses*scl,"name":"Losses","color":2},
+          {"kwhd":o.total_losses_combined*scl,"name":"Losses","color":2},
           {"kwhd":o.total_exess*scl,"name":"Exess","color":3}
         ]
       },
 
-      {"name":"Demand","height":(o.total_demand+total_losses)*scl,"saving":0,
+      {"name":"Demand","height":(o.total_demand+o.total_losses_combined)*scl,"saving":0,
         "stack":[
           {"kwhd":o.total_traditional_elec*scl,"name":"LAC","color":0},
           {"kwhd":o.space_heating.total_demand*scl,"name":"Space Heat","color":0},
           {"kwhd":o.water_heating.total_demand*scl,"name":"Water Heat","color":0},
-          {"kwhd":(total_EV_demand+total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
+          {"kwhd":(o.total_EV_demand+o.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
           {"kwhd":o.total_hydrogen_for_hydrogen_vehicles*scl,"name":"Hydrogen Transport","color":0},
           {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Biofuel Transport","color":0},
           {"kwhd":10000*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
@@ -68,13 +68,13 @@ function fullzcb3_ui() {
           {"kwhd":total_industry_solid/3650,"name":"Industry Biomass","color":0},
           // Backup, liquid and gas processes*/
           {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},
-          {"kwhd":total_electrolysis_losses*scl,"name":"H2 losses","color":2},
-          {"kwhd":total_CCGT_losses*scl,"name":"CCGT losses","color":2},
-          {"kwhd":total_FT_losses*scl,"name":"FT losses","color":2},
-          {"kwhd":(total_sabatier_losses+total_power_to_X_losses)*scl,"name":"Sabatier losses","color":2},
-          {"kwhd":total_anaerobic_digestion_losses*scl,"name":"AD losses","color":2},
+          {"kwhd":o.total_losses.electrolysis*scl,"name":"H2 losses","color":2},
+          {"kwhd":o.total_losses.methane_turbine*scl,"name":"CCGT losses","color":2},
+          {"kwhd":o.total_losses.FT*scl,"name":"FT losses","color":2},
+          {"kwhd":(o.total_losses.sabatier+o.total_losses.power_to_X)*scl,"name":"Sabatier losses","color":2},
+          {"kwhd":o.total_losses.anaerobic_digestion*scl,"name":"AD losses","color":2},
           {"kwhd":o.total_losses.heating_systems*scl,"name":"Boiler loss","color":2},
-          {"kwhd":total_spill*scl,"name":"Total spill","color":2},
+          {"kwhd":o.total_spill*scl,"name":"Total spill","color":2},
 
           /*
           {"kwhd":total_direct_gas_losses/3650,"name":"Direct gas loss","color":2},
@@ -192,12 +192,19 @@ if (typeof loading_prc === "undefined") {
     function loading_prc(a,b){console.log(b)}
 }
 
-$("#placeholder").bind("plothover", function (event, pos, item) {
+$("body").bind("plotselected","#placeholder", function (event, ranges) {
+    view.start = ranges.xaxis.from*0.001;
+    view.end = ranges.xaxis.to*0.001;
+    view.calc_interval();
+    fullzcb3_view();
+});
+
+$("body").bind("plothover","#placeholder", function (event, pos, item) {
     if (item) {
         if (previousPoint != item.datapoint) {
             previousPoint = item.datapoint;
             $("#tooltip").remove();
-            tooltip(item.pageX, item.pageY, item.datapoint[1], "#DDDDDD");
+            tooltip(item.pageX, item.pageY, item.datapoint[1].toFixed(3), "#DDDDDD");
         }
     } else {
         $("#tooltip").remove();

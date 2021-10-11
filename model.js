@@ -269,8 +269,10 @@ var model = {
     // --------------------------------------------------------------------------------------------------------------    
     heatstore: function () {
 
-        heatstore_SOC_start = i.heatstore.storage_capacity * 0.5        
-        heatstore_SOC = heatstore_SOC_start
+        o.heatstore = {}
+
+        o.heatstore.SOC_start = i.heatstore.storage_capacity * 0.5
+        o.heatstore.SOC = o.heatstore.SOC_start
     
         d.deviation_from_mean_GWth = []
         
@@ -284,10 +286,10 @@ var model = {
                 sum += d.spacewater_demand_before_heatstore[index]
                 n++;
             }
-            average_12h_balance_heat = sum / n;
+            let average_12h_balance_heat = sum / n;
             
-            deviation_from_mean_GWe = d.spacewater_demand_before_heatstore[hour] - average_12h_balance_heat
-            deviation_from_mean_GWth = deviation_from_mean_GWe //* GWth_GWe
+            let deviation_from_mean_GWe = d.spacewater_demand_before_heatstore[hour] - average_12h_balance_heat
+            let deviation_from_mean_GWth = deviation_from_mean_GWe //* GWth_GWe
             
             d.deviation_from_mean_GWth.push(deviation_from_mean_GWth)
         }
@@ -298,54 +300,52 @@ var model = {
         d.heatstore_SOC = []
         d.spacewater_heat = []
 
-        total_heat_spill = 0
+        o.total_heat_spill = 0
         
         for (var hour = 0; hour < i.hours; hour++) {
 
-            spacewater_balance = d.spacewater_demand_before_heatstore[hour]
+            let spacewater_balance = d.spacewater_demand_before_heatstore[hour]
             d.spacewater_balance.push(spacewater_balance)  
         
-            heatstore_charge_GWth = 0
-            heatstore_discharge_GWth = 0
-            
-
+            let heatstore_charge_GWth = 0
+            let heatstore_discharge_GWth = 0
             
             if (i.heatstore.enabled) {
                 // CHARGE
                 if (d.deviation_from_mean_GWth[hour]<0.0) {
                     heatstore_charge_GWth = -d.deviation_from_mean_GWth[hour] * 0.40 * (i.heatstore.storage_capacity / 100.0)
-                    //heatstore_charge_GWth = (i.heatstore.storage_capacity-heatstore_SOC)*-d.deviation_from_mean_GWth[hour]/(i.heatstore.storage_capacity*0.5)
+                    //heatstore_charge_GWth = (i.heatstore.storage_capacity-o.heatstore.SOC)*-d.deviation_from_mean_GWth[hour]/(i.heatstore.storage_capacity*0.5)
                 }
                 if (heatstore_charge_GWth>i.heatstore.charge_capacity) heatstore_charge_GWth = i.heatstore.charge_capacity
-                if ((heatstore_charge_GWth+heatstore_SOC)>i.heatstore.storage_capacity) heatstore_charge_GWth = i.heatstore.storage_capacity - heatstore_SOC
+                if ((heatstore_charge_GWth+o.heatstore.SOC)>i.heatstore.storage_capacity) heatstore_charge_GWth = i.heatstore.storage_capacity - o.heatstore.SOC
                 
                 spacewater_balance += heatstore_charge_GWth
-                heatstore_SOC += heatstore_charge_GWth
+                o.heatstore.SOC += heatstore_charge_GWth
                 
                 // DISCHARGE
                 if (d.deviation_from_mean_GWth[hour]>=0.0) {  
                     heatstore_discharge_GWth = d.deviation_from_mean_GWth[hour] * 0.32 * (i.heatstore.storage_capacity / 100.0)
-                    //heatstore_discharge_GWth = heatstore_SOC*d.deviation_from_mean_GWth[hour]/(i.heatstore.storage_capacity*0.5)
+                    //heatstore_discharge_GWth = o.heatstore.SOC*d.deviation_from_mean_GWth[hour]/(i.heatstore.storage_capacity*0.5)
                     if (heatstore_discharge_GWth>spacewater_balance) heatstore_discharge_GWth = spacewater_balance
                 }
                 if (heatstore_discharge_GWth>i.heatstore.charge_capacity) heatstore_discharge_GWth = i.heatstore.charge_capacity
-                if (heatstore_discharge_GWth>heatstore_SOC)  heatstore_discharge_GWth = heatstore_SOC
+                if (heatstore_discharge_GWth>o.heatstore.SOC)  heatstore_discharge_GWth = o.heatstore.SOC
                 
                 spacewater_balance -= heatstore_discharge_GWth
-                heatstore_SOC -= heatstore_discharge_GWth
+                o.heatstore.SOC -= heatstore_discharge_GWth
             }
             
             d.heatstore_discharge_GWth.push(heatstore_discharge_GWth)        
             // ---------------------------------------------------------------------------------------------
             if (spacewater_balance<0.0) {
-                total_heat_spill += -spacewater_balance
+                o.total_heat_spill += -spacewater_balance
                 spacewater_balance = 0
             }
             
-            d.heatstore_SOC.push(heatstore_SOC)
+            d.heatstore_SOC.push(o.heatstore.SOC)
             d.spacewater_heat.push(spacewater_balance)
             // space & water heat tab
-            spacewater_demand_after_heatstore = spacewater_balance
+            let spacewater_demand_after_heatstore = spacewater_balance
             if (spacewater_demand_after_heatstore<0.0) spacewater_demand_after_heatstore = 0.0
             d.spacewater_demand_after_heatstore.push(spacewater_demand_after_heatstore)
         }
@@ -363,8 +363,8 @@ var model = {
         o.total_unmet_heat_demand = 0
         o.unmet_heat_demand_count = 0
         
-        max_heat_demand_elec = 0
-        total_ambient_heat_supply = 0
+        o.max_heat_demand_elec = 0
+        o.total_ambient_heat_supply = 0
         
         d.spacewater_elec = []
         
@@ -397,7 +397,7 @@ var model = {
                 heat_supplied += system_heat_demand[z]
                 
                 if (system_fuel_demand[z]<system_heat_demand[z]) {
-                    total_ambient_heat_supply += system_heat_demand[z] - system_fuel_demand[z]   
+                    o.total_ambient_heat_supply += system_heat_demand[z] - system_fuel_demand[z]   
                 } else {
                     o.total_losses.heating_systems += system_fuel_demand[z] - system_heat_demand[z]
                 }
@@ -415,7 +415,7 @@ var model = {
             d.hydrogen_for_spacewaterheat.push(system_fuel_demand.hydrogen)
             
             let spacewater_elec_demand = system_fuel_demand.elres + system_fuel_demand.heatpump
-            if (spacewater_elec_demand>max_heat_demand_elec) max_heat_demand_elec = spacewater_elec_demand
+            if (spacewater_elec_demand>o.max_heat_demand_elec) o.max_heat_demand_elec = spacewater_elec_demand
             d.spacewater_elec.push(spacewater_elec_demand)       
         }
     },
@@ -433,20 +433,18 @@ var model = {
         o.total_industry_demand += i.industry.non_heat_process_biomass_TWhy
         o.total_industry_demand += i.industry.biofuel_TWhy
             
-        daily_high_temp_process = i.industry.high_temp_process_TWhy * 1000.0 / 365.25
-        daily_low_temp_dry_sep = i.industry.low_temp_dry_sep_TWhy * 1000.0 / 365.25
+        var daily_high_temp_process = i.industry.high_temp_process_TWhy * 1000.0 / 365.25
+        var daily_low_temp_dry_sep = i.industry.low_temp_dry_sep_TWhy * 1000.0 / 365.25
               
-        daily_non_heat_process_elec = i.industry.non_heat_process_elec_TWhy * 1000.0 / 365.25
-        daily_non_heat_process_biogas = i.industry.non_heat_process_biogas_TWhy * 1000.0 / 365.25
-        daily_non_heat_process_biomass = i.industry.non_heat_process_biomass_TWhy * 1000.0 / 365.25
+        var daily_non_heat_process_elec = i.industry.non_heat_process_elec_TWhy * 1000.0 / 365.25
+        var daily_non_heat_process_biogas = i.industry.non_heat_process_biogas_TWhy * 1000.0 / 365.25
+        var daily_non_heat_process_biomass = i.industry.non_heat_process_biomass_TWhy * 1000.0 / 365.25
             
-        daily_industrial_biofuel = i.industry.biofuel_TWhy * 1000.0 / 365.25
+        o.hourly_industrial_biofuel = i.industry.biofuel_TWhy * 1000.0 / (365.25*24.0)
         
-    
         d.industrial_elec_demand = []
         d.methane_for_industry = []
         d.balance_before_BEV_storage = []
-
 
         o.total_industrial_elec_demand = 0
         o.total_industrial_methane_demand = 0
@@ -457,10 +455,10 @@ var model = {
         {
             
             // electric demand
-            non_heat_process_elec = not_heat_process_profile[hour%24] * daily_non_heat_process_elec
+            let non_heat_process_elec = not_heat_process_profile[hour%24] * daily_non_heat_process_elec
 
             // balance including non DSR industrial load
-            balance = d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - non_heat_process_elec
+            let balance = d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - non_heat_process_elec
 
             // High temp process: 25% elec, 75% gas in original model
             // Low temp process: 66% elec, 11% gas, 22% biomass CHP in original model
@@ -470,34 +468,34 @@ var model = {
             // originally produced from excess renewable supply when direct supply is not sufficient
                     
             // industry heat demand
-            high_temp_process = high_temp_process_profile[hour%24] * daily_high_temp_process
-            low_temp_process = low_temp_process_profile[hour%24] * daily_low_temp_dry_sep
+            let high_temp_process = high_temp_process_profile[hour%24] * daily_high_temp_process
+            let low_temp_process = low_temp_process_profile[hour%24] * daily_low_temp_dry_sep
             
-            heat_process_fixed_elec = (high_temp_process*i.industry.high_temp_process_fixed_elec_prc) + (low_temp_process*i.industry.low_temp_process_fixed_elec_prc)
-            heat_process_fixed_gas = (high_temp_process*i.industry.high_temp_process_fixed_gas_prc) + (low_temp_process*i.industry.low_temp_process_fixed_gas_prc)
-            heat_process_fixed_biomass = (high_temp_process*i.industry.high_temp_process_fixed_biomass_prc) + (low_temp_process*i.industry.low_temp_process_fixed_biomass_prc)
-            heat_process_DSR = (high_temp_process*i.industry.high_temp_process_DSR_prc) + (low_temp_process*i.industry.low_temp_process_DSR_prc)
+            let heat_process_fixed_elec = (high_temp_process*i.industry.high_temp_process_fixed_elec_prc) + (low_temp_process*i.industry.low_temp_process_fixed_elec_prc)
+            let heat_process_fixed_gas = (high_temp_process*i.industry.high_temp_process_fixed_gas_prc) + (low_temp_process*i.industry.low_temp_process_fixed_gas_prc)
+            let heat_process_fixed_biomass = (high_temp_process*i.industry.high_temp_process_fixed_biomass_prc) + (low_temp_process*i.industry.low_temp_process_fixed_biomass_prc)
+            let heat_process_DSR = (high_temp_process*i.industry.high_temp_process_DSR_prc) + (low_temp_process*i.industry.low_temp_process_DSR_prc)
             
             // Industrial DSR
-            heat_process_DSR_elec = heat_process_DSR                                    // 1. provide all heat demand with direct elec resistance heaters
+            let heat_process_DSR_elec = heat_process_DSR                                    // 1. provide all heat demand with direct elec resistance heaters
             if (heat_process_DSR_elec>balance) heat_process_DSR_elec = balance          // 2. limited to available electricity balance
             if (heat_process_DSR_elec<0) heat_process_DSR_elec = 0                      // 3. -- should never happen --
-            heat_process_DSR_gas = heat_process_DSR - heat_process_DSR_elec             // 4. if there is not enough elec to meet demand, use gas
+            let heat_process_DSR_gas = heat_process_DSR - heat_process_DSR_elec             // 4. if there is not enough elec to meet demand, use gas
             
-            industrial_elec_demand = non_heat_process_elec + heat_process_fixed_elec + heat_process_DSR_elec
+            let industrial_elec_demand = non_heat_process_elec + heat_process_fixed_elec + heat_process_DSR_elec
             
             d.industrial_elec_demand.push(industrial_elec_demand)
             o.total_industrial_elec_demand += industrial_elec_demand
             
             // methane demand
-            non_heat_process_biogas = not_heat_process_profile[hour%24] * daily_non_heat_process_biogas
-            industrial_methane_demand = non_heat_process_biogas + heat_process_fixed_gas + heat_process_DSR_gas
+            let non_heat_process_biogas = not_heat_process_profile[hour%24] * daily_non_heat_process_biogas
+            let industrial_methane_demand = non_heat_process_biogas + heat_process_fixed_gas + heat_process_DSR_gas
             
             d.methane_for_industry.push(industrial_methane_demand)
             o.total_industrial_methane_demand += industrial_methane_demand
             
             // Not heat biomass demand
-            non_heat_process_biomass = not_heat_process_profile[hour%24] * daily_non_heat_process_biomass
+            let non_heat_process_biomass = not_heat_process_profile[hour%24] * daily_non_heat_process_biomass
             
             o.total_industrial_biomass_demand += non_heat_process_biomass
             o.total_industrial_biomass_demand += heat_process_fixed_biomass
@@ -518,7 +516,7 @@ var model = {
 
         bivalent_backup = false
         if (bivalent_backup) {
-            total_ambient_heat_supply = 0
+            o.total_ambient_heat_supply = 0
             var spacewater_elec_demand = 0;
             var balance = 0;
             var unmet = 0;
@@ -557,7 +555,7 @@ var model = {
                 
                 heat_from_heatpumps = spacewater_elec_heatpumps * i.heatpump_COP
                 ambient_heat_used = heat_from_heatpumps * (1.0-1.0/i.heatpump_COP)
-                total_ambient_heat_supply += ambient_heat_used
+                o.total_ambient_heat_supply += ambient_heat_used
                 
                 // repopulate
                 d.spacewater_elec[hour] = spacewater_elec_demand
@@ -571,17 +569,17 @@ var model = {
     // -------------------------------------------------------------------------------------    
     electric_transport: function() {
 
-        daily_BEV_demand = o.transport.fuel_totals.BEV * 1000.0 / 365.25
-        daily_elec_trains_demand = o.transport.fuel_totals.DEV * 1000.0 / 365.25
+        let daily_BEV_demand = o.transport.fuel_totals.BEV * 1000.0 / 365.25
+        let daily_elec_trains_demand = o.transport.fuel_totals.DEV * 1000.0 / 365.25
 
-        BEV_Store_SOC_start = i.transport.electric_car_battery_capacity * 0.5
-        BEV_Store_SOC = BEV_Store_SOC_start
+        o.BEV_Store_SOC_start = i.transport.electric_car_battery_capacity * 0.5
+        o.BEV_Store_SOC = o.BEV_Store_SOC_start
         
-        total_EV_charge = 0
-        total_EV_demand = 0
-        unmet_EV_demand = 0
+        o.total_EV_charge = 0
+        o.total_EV_demand = 0
+        o.unmet_EV_demand = 0
 
-        total_elec_trains_demand = 0
+        o.total_elec_trains_demand = 0
         
         d.balance_before_elec_store = []
         
@@ -592,7 +590,7 @@ var model = {
         
         for (var hour = 0; hour < i.hours; hour++)
         {
-            balance = d.balance_before_BEV_storage[hour]
+            let balance = d.balance_before_BEV_storage[hour]
             
             // ---------------------------------------------
             // +- 12 h average of balance before BEV Storage
@@ -604,25 +602,25 @@ var model = {
                 sum += d.balance_before_BEV_storage[index]
                 n++;
             }
-            average_12h_balance_before_BEV_storage = sum / n;
-            deviation_from_mean_BEV = balance - average_12h_balance_before_BEV_storage   
+            let average_12h_balance_before_BEV_storage = sum / n;
+            let deviation_from_mean_BEV = balance - average_12h_balance_before_BEV_storage   
             // ---------------------------------------------
             
             // Electric trains
-            elec_trains_demand = elec_trains_use_profile[hour%24] * daily_elec_trains_demand
-            total_elec_trains_demand += elec_trains_demand
+            let elec_trains_demand = elec_trains_use_profile[hour%24] * daily_elec_trains_demand
+            o.total_elec_trains_demand += elec_trains_demand
             balance -= elec_trains_demand 
             
             // Standard EV charge
-            EV_charge = BEV_charge_profile[hour%24] * daily_BEV_demand
+            let EV_charge = BEV_charge_profile[hour%24] * daily_BEV_demand
             
-            max_charge_rate = BEV_plugged_in_profile[hour%24] * i.transport.electric_car_max_charge_rate
+            let max_charge_rate = BEV_plugged_in_profile[hour%24] * i.transport.electric_car_max_charge_rate
             
             // SMART CHARGE --------------------------------
             if (i.transport.smart_charging_enabled==1 && balance>EV_charge) {
                 if (i.transport.smart_charge_type=="average") {
                     if (deviation_from_mean_BEV>0.0) {
-                        EV_charge = (i.transport.electric_car_battery_capacity-BEV_Store_SOC)*deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
+                        EV_charge = (i.transport.electric_car_battery_capacity-o.BEV_Store_SOC)*deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
                         if (EV_charge>balance) EV_charge = balance
                     }
                 } else {
@@ -631,30 +629,30 @@ var model = {
             }
             // Charging rate & quantity limits
             if (EV_charge>max_charge_rate) EV_charge = max_charge_rate
-            if ((BEV_Store_SOC+EV_charge)>i.transport.electric_car_battery_capacity) EV_charge = i.transport.electric_car_battery_capacity - BEV_Store_SOC
+            if ((o.BEV_Store_SOC+EV_charge)>i.transport.electric_car_battery_capacity) EV_charge = i.transport.electric_car_battery_capacity - o.BEV_Store_SOC
             // Subtract EV charge from balance and add to SOC
             balance -= EV_charge
-            BEV_Store_SOC += EV_charge
-            total_EV_charge += EV_charge
+            o.BEV_Store_SOC += EV_charge
+            o.total_EV_charge += EV_charge
             d.EV_charge.push(EV_charge)
             
             // EV DEMAND -----------------------------------
-            EV_demand = BEV_use_profile[hour%24] * daily_BEV_demand
-            BEV_Store_SOC -= EV_demand
-            if (BEV_Store_SOC<0) {
-                unmet_EV_demand += -1 * BEV_Store_SOC;
-                BEV_Store_SOC = 0
+            let EV_demand = BEV_use_profile[hour%24] * daily_BEV_demand
+            o.BEV_Store_SOC -= EV_demand
+            if (o.BEV_Store_SOC<0) {
+                o.unmet_EV_demand += -1 * o.BEV_Store_SOC;
+                o.BEV_Store_SOC = 0
             }
             
-            total_EV_demand += EV_demand
+            o.total_EV_demand += EV_demand
             
             // SMART DISCHARGE -----------------------------
-            EV_smart_discharge = 0.0
+            let EV_smart_discharge = 0.0
             
             if (i.transport.V2G_enabled==1 && balance<0.0) {
                 if (i.transport.V2G_discharge_type=="average") {
                     if (deviation_from_mean_BEV<0.0) {
-                        EV_smart_discharge = BEV_Store_SOC*-deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
+                        EV_smart_discharge = o.BEV_Store_SOC*-deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
                         if (EV_smart_discharge>-balance) EV_smart_discharge = -balance
                     }
                 } else {
@@ -665,17 +663,17 @@ var model = {
             // Discharge rate & quantity limits
             if (EV_smart_discharge>max_charge_rate) EV_smart_discharge = max_charge_rate
             //EV_V2G_min_SOC = i.transport.electric_car_battery_capacity * 0.3
-            //if ((BEV_Store_SOC-EV_smart_discharge)<EV_V2G_min_SOC) EV_smart_discharge = BEV_Store_SOC-EV_V2G_min_SOC
-            if (EV_smart_discharge>BEV_Store_SOC) EV_smart_discharge = BEV_Store_SOC
+            //if ((o.BEV_Store_SOC-EV_smart_discharge)<EV_V2G_min_SOC) EV_smart_discharge = o.BEV_Store_SOC-EV_V2G_min_SOC
+            if (EV_smart_discharge>o.BEV_Store_SOC) EV_smart_discharge = o.BEV_Store_SOC
             if (EV_smart_discharge<0) EV_smart_discharge = 0
                    
             // Apply to SOC and balance
-            BEV_Store_SOC -= EV_smart_discharge
+            o.BEV_Store_SOC -= EV_smart_discharge
             balance += EV_smart_discharge
             
             // Timeseries
             d.EV_smart_discharge.push(EV_smart_discharge)
-            d.BEV_Store_SOC.push(BEV_Store_SOC)
+            d.BEV_Store_SOC.push(o.BEV_Store_SOC)
             d.EL_transport.push(elec_trains_demand + EV_charge)
             d.balance_before_elec_store.push(balance)        
         }    
@@ -686,15 +684,15 @@ var model = {
         // ---------------------------------------------
         // Store SOC's
         // ---------------------------------------------
-        elecstore_SOC_start = i.electric_storage.capacity_GWh * 1.0
-        hydrogen_SOC_start = i.hydrogen.storage_capacity_GWh * 0.5
+        o.elecstore_SOC_start = i.electric_storage.capacity_GWh * 1.0
+        o.hydrogen_SOC_start = i.hydrogen.storage_capacity_GWh * 0.5
         // i.methane.SOC_start = i.methane.storage_capacity_GWh * 0.5
         // i.synth_fuel_store_SOC_start = 10000.0
 
-        elecstore_SOC = elecstore_SOC_start
-        hydrogen_SOC = hydrogen_SOC_start
-        methane_SOC = i.methane.SOC_start
-        synth_fuel_store_SOC = i.synth_fuel.store_start_GWh
+        o.elecstore_SOC = o.elecstore_SOC_start
+        o.hydrogen_SOC = o.hydrogen_SOC_start
+        o.methane_SOC = i.methane.SOC_start
+        o.synth_fuel_store_SOC = i.synth_fuel.store_start_GWh
         
         o.max_methane_SOC = 0
         o.max_hydrogen_SOC = 0
@@ -723,36 +721,37 @@ var model = {
         o.total_final_elec_balance_negative = 0
         o.total_final_elec_balance_positive = 0
 
-        methane_store_empty_count = 0
-        methane_store_full_count = 0
-        hydrogen_store_empty_count = 0
-        hydrogen_store_full_count = 0
+        o.methane_store_empty_count = 0
+        o.methane_store_full_count = 0
+        o.hydrogen_store_empty_count = 0
+        o.hydrogen_store_full_count = 0
         o.total_synth_fuel_produced = 0
         o.total_synth_fuel_biomass_used = 0
         o.total_methane_made = 0
-        o.total_electricity_from_dispatchable = 0
         o.max_dispatchable_capacity = 0
         o.max_dispatchable_capacity_hour = 0
         o.max_shortfall = 0
-        max_shortfall_hour = 0
+        o.max_shortfall_hour = 0
         o.total_methane_demand = 0
         
+        o.total_methane_turbine_output = 0
+        
         // demand totals
-        total_electrolysis_losses = 0
-        total_CCGT_losses = 0
-        total_sabatier_losses = 0
-        total_anaerobic_digestion_losses = 0
-        total_FT_losses = 0
-        total_power_to_X_losses = 0
+        o.total_losses.electrolysis = 0
+        o.total_losses.methane_turbine = 0
+        o.total_losses.sabatier = 0
+        o.total_losses.anaerobic_digestion = 0
+        o.total_losses.FT = 0
+        o.total_losses.power_to_X = 0
         
-        total_synth_fuel_demand = 0
-        methane_store_vented = 0
+        o.total_synth_fuel_demand = 0
+        o.methane_store_vented = 0
         
-        daily_transport_H2_demand = o.transport.fuel_totals.H2 * 1000.0 / 365.25
-        daily_transport_liquid_demand = o.transport.fuel_totals.IC * 1000.0 / 365.25
+        let daily_transport_H2_demand = o.transport.fuel_totals.H2 * 1000.0 / 365.25
+        let daily_transport_liquid_demand = o.transport.fuel_totals.IC * 1000.0 / 365.25
 
-        daily_biomass_for_biogas = i.biogas.biomass_for_biogas * 1000.0 / 365.25
-        hourly_biomass_for_biogas = daily_biomass_for_biogas / 24.0
+        let daily_biomass_for_biogas = i.biogas.biomass_for_biogas * 1000.0 / 365.25
+        let hourly_biomass_for_biogas = daily_biomass_for_biogas / 24.0
         
         d.elecstore_SOC = []
         d.elec_store_charge = []
@@ -799,12 +798,10 @@ var model = {
                 sum += d.balance_before_elec_store[index]
                 n++;
             }
-            average_12h_balance_before_elec_storage = sum / n;
-            deviation_from_mean_elec = balance - average_12h_balance_before_elec_storage
+            let average_12h_balance_before_elec_storage = sum / n;
+            let deviation_from_mean_elec = balance - average_12h_balance_before_elec_storage
             
             if (i.electric_storage.type=="basic") {
-                store_charge = 0
-                store_discharge = 0
                 if (balance>0) {
                     elec_store_charge = balance                                                                                                        // Charge by extend of available oversupply
                     if (elec_store_charge > i.electric_storage.charge_capacity_GW) {
@@ -812,10 +809,10 @@ var model = {
                     }
                     
                     elec_store_charge_int = elec_store_charge*i.electric_storage.charge_efficiency
-                    if (elec_store_charge_int>(i.electric_storage.capacity_GWh-elecstore_SOC)) elec_store_charge_int = i.electric_storage.capacity_GWh - elecstore_SOC   // Limit by available SOC
+                    if (elec_store_charge_int>(i.electric_storage.capacity_GWh-o.elecstore_SOC)) elec_store_charge_int = i.electric_storage.capacity_GWh - o.elecstore_SOC   // Limit by available SOC
                     elec_store_charge = elec_store_charge_int/i.electric_storage.charge_efficiency
                     
-                    elecstore_SOC += elec_store_charge_int
+                    o.elecstore_SOC += elec_store_charge_int
                     balance -= elec_store_charge
                     o.total_losses.electric_storage += elec_store_charge - elec_store_charge_int
                                         
@@ -826,10 +823,10 @@ var model = {
                     }
                     
                     elec_store_discharge_int = elec_store_discharge/i.electric_storage.discharge_efficiency                                                           
-                    if (elec_store_discharge_int>elecstore_SOC) elec_store_discharge_int = elecstore_SOC                                       // Limit by available SOC
+                    if (elec_store_discharge_int>o.elecstore_SOC) elec_store_discharge_int = o.elecstore_SOC                                       // Limit by available SOC
                     elec_store_discharge = elec_store_discharge_int*i.electric_storage.discharge_efficiency
                     
-                    elecstore_SOC -= elec_store_discharge_int
+                    o.elecstore_SOC -= elec_store_discharge_int
                     balance += elec_store_discharge
                     o.total_losses.electric_storage += elec_store_discharge_int - elec_store_discharge
                 }
@@ -839,42 +836,42 @@ var model = {
                 if (balance>=0.0) {
                     if (deviation_from_mean_elec>=0.0) {
                         // charge
-                        elec_store_charge = (i.electric_storage.capacity_GWh-elecstore_SOC)*deviation_from_mean_elec/(i.electric_storage.capacity_GWh*0.5)
+                        elec_store_charge = (i.electric_storage.capacity_GWh-o.elecstore_SOC)*deviation_from_mean_elec/(i.electric_storage.capacity_GWh*0.5)
                         if (elec_store_charge > i.electric_storage.charge_capacity_GW) {
                             elec_store_charge = i.electric_storage.charge_capacity_GW                                       // Limit to charge capacity
                         }
                         if (elec_store_charge>balance) elec_store_charge = balance
                         
                         elec_store_charge_int = elec_store_charge*i.electric_storage.charge_efficiency
-                        if (elec_store_charge_int>(i.electric_storage.capacity_GWh - elecstore_SOC)) elec_store_charge_int = i.electric_storage.capacity_GWh - elecstore_SOC   // Limit to available SOC
+                        if (elec_store_charge_int>(i.electric_storage.capacity_GWh - o.elecstore_SOC)) elec_store_charge_int = i.electric_storage.capacity_GWh - o.elecstore_SOC   // Limit to available SOC
                         elec_store_charge = elec_store_charge_int/i.electric_storage.charge_efficiency
 
-                        elecstore_SOC += elec_store_charge_int
+                        o.elecstore_SOC += elec_store_charge_int
                         balance -= elec_store_charge
                         o.total_losses.electric_storage += elec_store_charge - elec_store_charge_int
                     }
                 } else {
                     if (deviation_from_mean_elec<0.0) {
                         // discharge
-                        elec_store_discharge = elecstore_SOC*-deviation_from_mean_elec/(i.electric_storage.capacity_GWh*0.5)
+                        elec_store_discharge = o.elecstore_SOC*-deviation_from_mean_elec/(i.electric_storage.capacity_GWh*0.5)
                         if (elec_store_discharge > i.electric_storage.discharge_capacity_GW) {
                             elec_store_discharge = i.electric_storage.discharge_capacity_GW      // Limit to discharge capacity
                         }
                         if (elec_store_discharge>-balance) elec_store_discharge = -balance
                         
                         elec_store_discharge_int = elec_store_discharge/i.electric_storage.discharge_efficiency                                                          
-                        if (elec_store_discharge_int>elecstore_SOC) elec_store_discharge_int = elecstore_SOC              // Limit to elecstore SOC
+                        if (elec_store_discharge_int>o.elecstore_SOC) elec_store_discharge_int = o.elecstore_SOC              // Limit to elecstore SOC
                         elec_store_discharge = elec_store_discharge_int*i.electric_storage.discharge_efficiency        
 
-                        elecstore_SOC -= elec_store_discharge_int    
+                        o.elecstore_SOC -= elec_store_discharge_int    
                         balance += elec_store_discharge
                         o.total_losses.electric_storage += elec_store_discharge_int - elec_store_discharge
                     }
                 }
             }
             
-            if (elecstore_SOC<0) elecstore_SOC = 0                                                              // limits here can loose energy in the calc
-            if (elecstore_SOC>i.electric_storage.capacity_GWh) elecstore_SOC = i.electric_storage.capacity_GWh                    // limits here can loose energy in the calc
+            if (o.elecstore_SOC<0) o.elecstore_SOC = 0                                                              // limits here can loose energy in the calc
+            if (o.elecstore_SOC>i.electric_storage.capacity_GWh) o.elecstore_SOC = i.electric_storage.capacity_GWh                    // limits here can loose energy in the calc
             // ----------------------------------------------------------------------------
 
             o.electric_storage.total_charge += elec_store_charge
@@ -882,7 +879,7 @@ var model = {
             if (elec_store_charge>o.electric_storage.max_charge) o.electric_storage.max_charge = elec_store_charge
             if (elec_store_discharge>o.electric_storage.max_discharge) o.electric_storage.max_discharge = elec_store_discharge
                         
-            d.elecstore_SOC.push(elecstore_SOC)        
+            d.elecstore_SOC.push(o.elecstore_SOC)        
             d.elec_store_charge.push(elec_store_charge)
             d.elec_store_discharge.push(elec_store_discharge)
             
@@ -897,46 +894,46 @@ var model = {
             // The first stage here covers methane produced directly from biogas
             // A biogas methane content by volume of 60% is assumed
             // The remainder is CO2 which is used here as a feed for further methanation using hydrogen
-            biogas_supply = hourly_biomass_for_biogas * i.biogas.anaerobic_digestion_efficiency                   // biogas supply from biomass input
-            methane_from_biogas = biogas_supply                                                          // energy content of methane in biogas is same as biogas itself
-            total_anaerobic_digestion_losses += hourly_biomass_for_biogas - biogas_supply                // biogas AD losses
-            co2_from_biogas = i.biogas.co2_tons_per_gwh_methane * biogas_supply                                   // biogas co2 content in tons
+            let biogas_supply = hourly_biomass_for_biogas * i.biogas.anaerobic_digestion_efficiency                   // biogas supply from biomass input
+            let methane_from_biogas = biogas_supply                                                          // energy content of methane in biogas is same as biogas itself
+            o.total_losses.anaerobic_digestion += hourly_biomass_for_biogas - biogas_supply                // biogas AD losses
+            let co2_from_biogas = i.biogas.co2_tons_per_gwh_methane * biogas_supply                                   // biogas co2 content in tons
                             
             // ----------------------------------------------------------------------------
             // Hydrogen
             // ----------------------------------------------------------------------------
             // 1. Electrolysis input
-            electricity_for_electrolysis = 0
+            let electricity_for_electrolysis = 0
             if (balance>=0.0) {
                 electricity_for_electrolysis = balance
                 // Limit by hydrogen electrolysis capacity
                 if (electricity_for_electrolysis>i.hydrogen.electrolysis_capacity_GW) electricity_for_electrolysis = i.hydrogen.electrolysis_capacity_GW
                 // Limit by hydrogen store capacity
-                if (electricity_for_electrolysis>((i.hydrogen.storage_capacity_GWh-hydrogen_SOC)/i.hydrogen.electrolysis_efficiency)) electricity_for_electrolysis = (i.hydrogen.storage_capacity_GWh-hydrogen_SOC)/i.hydrogen.electrolysis_efficiency
+                if (electricity_for_electrolysis>((i.hydrogen.storage_capacity_GWh-o.hydrogen_SOC)/i.hydrogen.electrolysis_efficiency)) electricity_for_electrolysis = (i.hydrogen.storage_capacity_GWh-o.hydrogen_SOC)/i.hydrogen.electrolysis_efficiency
             }
             
-            hydrogen_from_electrolysis = electricity_for_electrolysis * i.hydrogen.electrolysis_efficiency
-            total_electrolysis_losses += electricity_for_electrolysis - hydrogen_from_electrolysis
+            let hydrogen_from_electrolysis = electricity_for_electrolysis * i.hydrogen.electrolysis_efficiency
+            o.total_losses.electrolysis += electricity_for_electrolysis - hydrogen_from_electrolysis
             d.electricity_for_electrolysis.push(electricity_for_electrolysis)
             balance -= electricity_for_electrolysis
             
             o.total_electricity_for_electrolysis += electricity_for_electrolysis
             
-            hydrogen_balance = hydrogen_from_electrolysis
+            let hydrogen_balance = hydrogen_from_electrolysis
             o.total_hydrogen_produced += hydrogen_from_electrolysis
             
             // hydrogen heating demand
             hydrogen_balance -= d.hydrogen_for_spacewaterheat[hour]
                     
             // 2. Hydrogen vehicle demand
-            hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
+            let hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
             o.total_hydrogen_for_hydrogen_vehicles += hydrogen_for_hydrogen_vehicles
             hydrogen_balance -= hydrogen_for_hydrogen_vehicles
             
             // 3. Hydrogen to synthetic liquid fuels
-            hourly_biomass_for_biofuel = 0.0
-            hydrogen_to_synth_fuel = 0.0
-            if ((hydrogen_SOC>i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level) && hydrogen_balance>0.0) {
+            let hourly_biomass_for_biofuel = 0.0
+            let hydrogen_to_synth_fuel = 0.0
+            if ((o.hydrogen_SOC>i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level) && hydrogen_balance>0.0) {
                 hydrogen_to_synth_fuel = hydrogen_balance
                 if (hydrogen_to_synth_fuel>i.synth_fuel.capacity_GW) hydrogen_to_synth_fuel = i.synth_fuel.capacity_GW
                 hourly_biomass_for_biofuel = (hydrogen_to_synth_fuel/i.synth_fuel.FT_process_hydrogen_req)*i.synth_fuel.FT_process_biomass_req
@@ -944,27 +941,27 @@ var model = {
             }
             
             // 4. Hydrogen to Methanation
-            co2_for_sabatier = co2_from_biogas
-            hydrogen_for_sabatier = co2_for_sabatier * (8.064/44.009) * 39.4 * 0.001                     // 1000 tCO2, requires 7.2 GWh of H2 (HHV)
+            let co2_for_sabatier = co2_from_biogas
+            let hydrogen_for_sabatier = co2_for_sabatier * (8.064/44.009) * 39.4 * 0.001                     // 1000 tCO2, requires 7.2 GWh of H2 (HHV)
             
-            available_hydrogen = hydrogen_SOC-(i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level)        // calculate available hydrogen
+            let available_hydrogen = o.hydrogen_SOC-(i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level)        // calculate available hydrogen
             if (hydrogen_for_sabatier>available_hydrogen) hydrogen_for_sabatier = available_hydrogen     // limit by available hydrogen
             if (hydrogen_for_sabatier>i.methane.methanation_capacity) hydrogen_for_sabatier = i.methane.methanation_capacity // limit by methanation capacity
             if (hydrogen_for_sabatier<0.0) hydrogen_for_sabatier = 0.0
             hydrogen_balance -= hydrogen_for_sabatier                                                    // subtract from hydrogen store
             // Methanation process itself
-            methane_from_sabatier = hydrogen_for_sabatier * (889.0/1144.0)                               // 78% efficiency based on HHV kj/mol of CH4/4H2
-            total_sabatier_losses += hydrogen_for_sabatier - methane_from_sabatier
+            let methane_from_sabatier = hydrogen_for_sabatier * (889.0/1144.0)                               // 78% efficiency based on HHV kj/mol of CH4/4H2
+            o.total_losses.sabatier += hydrogen_for_sabatier - methane_from_sabatier
             
-            hydrogen_SOC += hydrogen_balance
+            o.hydrogen_SOC += hydrogen_balance
             
-            if (hydrogen_SOC<0.0) {
-                o.unmet_hydrogen_demand += -1*hydrogen_SOC
-                hydrogen_SOC = 0.0
+            if (o.hydrogen_SOC<0.0) {
+                o.unmet_hydrogen_demand += -1*o.hydrogen_SOC
+                o.hydrogen_SOC = 0.0
             }
             
-            if (hydrogen_SOC>o.max_hydrogen_SOC) o.max_hydrogen_SOC = hydrogen_SOC
-            if (hydrogen_SOC<o.min_hydrogen_SOC) o.min_hydrogen_SOC = hydrogen_SOC
+            if (o.hydrogen_SOC>o.max_hydrogen_SOC) o.max_hydrogen_SOC = o.hydrogen_SOC
+            if (o.hydrogen_SOC<o.min_hydrogen_SOC) o.min_hydrogen_SOC = o.hydrogen_SOC
 
             o.total_hydrogen_demand += hydrogen_for_hydrogen_vehicles + hydrogen_to_synth_fuel + hydrogen_for_sabatier
                  
@@ -981,45 +978,45 @@ var model = {
             // ----------------------------------------------------------------------------
             
             // 1. Work out utilisation of power_to_X capacity
-            electricity_for_power_to_X = 0
+            let electricity_for_power_to_X = 0
             if (balance>=0.0) {
                 electricity_for_power_to_X = balance
                 if (electricity_for_power_to_X>i.power_to_X.capacity) electricity_for_power_to_X = i.power_to_X.capacity
             }
             
             // 2. Split by gaseous and liquid outputs
-            methane_from_IHTEM = electricity_for_power_to_X * i.power_to_X.prc_gas * i.power_to_X.gas_efficiency
-            synth_fuel_produced_PTL = electricity_for_power_to_X * i.power_to_X.prc_liquid * i.power_to_X.liquid_efficiency
+            let methane_from_IHTEM = electricity_for_power_to_X * i.power_to_X.prc_gas * i.power_to_X.gas_efficiency
+            let synth_fuel_produced_PTL = electricity_for_power_to_X * i.power_to_X.prc_liquid * i.power_to_X.liquid_efficiency
             
             balance -= electricity_for_power_to_X
             
             o.total_electricity_for_power_to_X += electricity_for_power_to_X
             
             // Losses and electric consumption graph
-            total_power_to_X_losses += electricity_for_power_to_X - (methane_from_IHTEM + synth_fuel_produced_PTL)
+            o.total_losses.power_to_X += electricity_for_power_to_X - (methane_from_IHTEM + synth_fuel_produced_PTL)
             d.electricity_for_power_to_X.push(electricity_for_power_to_X)
             
             // Add to stores and totals
             o.total_synth_fuel_produced += synth_fuel_produced_PTL
-            synth_fuel_store_SOC += synth_fuel_produced_PTL
+            o.synth_fuel_store_SOC += synth_fuel_produced_PTL
             
             // ----------------------------------------------------------------------------
             // Dispatchable (backup power via CCGT gas turbines)
             // ---------------------------------------------------------------------------- 
             let methane_turbine_output = 0
-            if (balance<0.0 && methane_SOC>0.0) {
+            if (balance<0.0 && o.methane_SOC>0.0) {
                 methane_turbine_output = -1 * balance
                 
                 // Limit by methane availability
-                if (methane_turbine_output>(methane_SOC*i.electric_backup.methane_turbine_efficiency)) {
-                    methane_turbine_output = methane_SOC*i.electric_backup.methane_turbine_efficiency
+                if (methane_turbine_output>(o.methane_SOC*i.electric_backup.methane_turbine_efficiency)) {
+                    methane_turbine_output = o.methane_SOC*i.electric_backup.methane_turbine_efficiency
                 }
                 // Limit by CCGT capacity
                 if (methane_turbine_output > i.electric_backup.methane_turbine_capacity) {
                     methane_turbine_output = i.electric_backup.methane_turbine_capacity
                 }
                 // Totals, losses and max capacity utilisation
-                total_CCGT_losses += ((1.0/i.electric_backup.methane_turbine_efficiency)-1.0) * methane_turbine_output
+                o.total_losses.methane_turbine += ((1.0/i.electric_backup.methane_turbine_efficiency)-1.0) * methane_turbine_output
                 o.total_methane_turbine_output += methane_turbine_output
                 
                 if (methane_turbine_output>o.max_dispatchable_capacity) {
@@ -1032,8 +1029,8 @@ var model = {
             // Final electricity balance
             balance += methane_turbine_output
 
-            export_elec = 0.0
-            unmet_elec = 0.0
+            let export_elec = 0.0
+            let unmet_elec = 0.0
             if (balance>=0.0) {
                 export_elec = balance
                 o.total_final_elec_balance_positive += export_elec
@@ -1045,7 +1042,7 @@ var model = {
                 
                 if (unmet_elec>o.max_shortfall) {
                     o.max_shortfall = unmet_elec
-                    max_shortfall_hour = hour
+                    o.max_shortfall_hour = hour
                 }
             }
             d.export_elec.push(export_elec)
@@ -1055,63 +1052,63 @@ var model = {
             // Methane
             // ---------------------------------------------------------------------------- 
             // Total methane production
-            methane_production = methane_from_sabatier + methane_from_biogas + methane_from_IHTEM
+            let methane_production = methane_from_sabatier + methane_from_biogas + methane_from_IHTEM
             o.total_methane_made += methane_production
-            methane_to_dispatchable = methane_turbine_output / i.electric_backup.methane_turbine_efficiency
+            let methane_to_dispatchable = methane_turbine_output / i.electric_backup.methane_turbine_efficiency
             
-            methane_demand = methane_to_dispatchable + d.methane_for_spacewaterheat[hour] + d.methane_for_industry[hour]
+            let methane_demand = methane_to_dispatchable + d.methane_for_spacewaterheat[hour] + d.methane_for_industry[hour]
             o.total_methane_demand += methane_demand
             
-            methane_balance = methane_production - methane_demand
+            let methane_balance = methane_production - methane_demand
                     
-            methane_SOC += methane_balance
-            if (methane_SOC>i.methane.storage_capacity_GWh) {
-                methane_store_vented += methane_SOC - i.methane.storage_capacity_GWh
-                methane_SOC = i.methane.storage_capacity_GWh
+            o.methane_SOC += methane_balance
+            if (o.methane_SOC>i.methane.storage_capacity_GWh) {
+                o.methane_store_vented += o.methane_SOC - i.methane.storage_capacity_GWh
+                o.methane_SOC = i.methane.storage_capacity_GWh
             }
             
-            d.methane_SOC.push(methane_SOC)
-            if ((methane_SOC/i.methane.storage_capacity_GWh)<0.01) methane_store_empty_count ++
-            if ((methane_SOC/i.methane.storage_capacity_GWh)>0.99) methane_store_full_count ++
+            d.methane_SOC.push(o.methane_SOC)
+            if ((o.methane_SOC/i.methane.storage_capacity_GWh)<0.01) o.methane_store_empty_count ++
+            if ((o.methane_SOC/i.methane.storage_capacity_GWh)>0.99) o.methane_store_full_count ++
             
-            if (methane_SOC>o.max_methane_SOC) o.max_methane_SOC = methane_SOC
-            if (methane_SOC<o.min_methane_SOC) o.min_methane_SOC = methane_SOC
+            if (o.methane_SOC>o.max_methane_SOC) o.max_methane_SOC = o.methane_SOC
+            if (o.methane_SOC<o.min_methane_SOC) o.min_methane_SOC = o.methane_SOC
             // ------------------------------------------------------------------------------------
             // Synth fuel FT
-            synth_fuel_produced_FT = hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req
+            let synth_fuel_produced_FT = hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req
             
             o.total_synth_fuel_produced += synth_fuel_produced_FT
             o.total_synth_fuel_biomass_used += hourly_biomass_for_biofuel
             
-            synth_fuel_store_SOC += synth_fuel_produced_FT
+            o.synth_fuel_store_SOC += synth_fuel_produced_FT
             
-            total_FT_losses += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req)
+            o.total_losses.FT += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req)
             
-            synth_fuel_demand = (daily_transport_liquid_demand + daily_industrial_biofuel) / 24.0
-            o.total_industrial_liquid_demand += daily_industrial_biofuel / 24.0
+            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + o.hourly_industrial_biofuel
+            o.total_industrial_liquid_demand += o.hourly_industrial_biofuel
             
-            synth_fuel_store_SOC -= synth_fuel_demand
+            o.synth_fuel_store_SOC -= synth_fuel_demand
 
-            if (synth_fuel_store_SOC<0.0) {
-                o.unmet_synth_fuel_demand += -1*synth_fuel_store_SOC
-                synth_fuel_store_SOC = 0.0
+            if (o.synth_fuel_store_SOC<0.0) {
+                o.unmet_synth_fuel_demand += -1*o.synth_fuel_store_SOC
+                o.synth_fuel_store_SOC = 0.0
             }
             
-            total_synth_fuel_demand += synth_fuel_demand
+            o.total_synth_fuel_demand += synth_fuel_demand
 
-            d.synth_fuel_store_SOC.push(synth_fuel_store_SOC)   
+            d.synth_fuel_store_SOC.push(o.synth_fuel_store_SOC)   
             
-            if (synth_fuel_store_SOC>o.max_synth_fuel_store_SOC) o.max_synth_fuel_store_SOC = synth_fuel_store_SOC
-            if (synth_fuel_store_SOC<o.min_synth_fuel_store_SOC) o.min_synth_fuel_store_SOC = synth_fuel_store_SOC   
+            if (o.synth_fuel_store_SOC>o.max_synth_fuel_store_SOC) o.max_synth_fuel_store_SOC = o.synth_fuel_store_SOC
+            if (o.synth_fuel_store_SOC<o.min_synth_fuel_store_SOC) o.min_synth_fuel_store_SOC = o.synth_fuel_store_SOC   
             // ------------------------------------------------------------------------------------
             // Biomass
             o.total_biomass_used += biogas_supply / i.biogas.anaerobic_digestion_efficiency 
             o.total_biomass_used += hourly_biomass_for_biofuel
             
             // Hydrogen SOC data
-            d.hydrogen_SOC.push(hydrogen_SOC)
-            if ((hydrogen_SOC/i.hydrogen.storage_capacity_GWh)<0.01) hydrogen_store_empty_count ++
-            if ((hydrogen_SOC/i.hydrogen.storage_capacity_GWh)>0.99) hydrogen_store_full_count ++
+            d.hydrogen_SOC.push(o.hydrogen_SOC)
+            if ((o.hydrogen_SOC/i.hydrogen.storage_capacity_GWh)<0.01) o.hydrogen_store_empty_count ++
+            if ((o.hydrogen_SOC/i.hydrogen.storage_capacity_GWh)>0.99) o.hydrogen_store_full_count ++
         }
     },
     
@@ -1124,7 +1121,7 @@ var model = {
         
         o.total_unmet_demand = o.total_final_elec_balance_negative
         
-        o.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.total_biomass_used + total_ambient_heat_supply 
+        o.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.total_biomass_used + o.total_ambient_heat_supply 
         
         o.total_demand = 0
         o.total_demand += o.total_traditional_elec 
@@ -1134,90 +1131,85 @@ var model = {
         o.total_demand += o.total_industrial_methane_demand
         o.total_demand += o.total_industrial_biomass_demand
         
-        o.total_demand += total_EV_demand
-        o.total_demand += total_elec_trains_demand
+        o.total_demand += o.total_EV_demand
+        o.total_demand += o.total_elec_trains_demand
         o.total_demand += o.total_hydrogen_for_hydrogen_vehicles
-        o.total_demand += total_synth_fuel_demand
+        o.total_demand += o.total_synth_fuel_demand
         
         // -------------------------------------------------------------------------------------------------
         let final_store_balance = 0
         
-        heatstore_additions =  heatstore_SOC - heatstore_SOC_start
+        let heatstore_additions =  o.heatstore.SOC - o.heatstore.SOC_start
         console.log("heatstore_additions: "+heatstore_additions)
         final_store_balance += heatstore_additions
 
-        BEV_store_additions =  BEV_Store_SOC - BEV_Store_SOC_start
+        let BEV_store_additions =  o.BEV_Store_SOC - o.BEV_Store_SOC_start
         console.log("BEV_store_additions: "+BEV_store_additions)
         final_store_balance += BEV_store_additions
 
-        elecstore_additions =  elecstore_SOC - elecstore_SOC_start
+        let elecstore_additions =  o.elecstore_SOC - o.elecstore_SOC_start
         console.log("elecstore_additions: "+elecstore_additions)
         final_store_balance += elecstore_additions
             
-        hydrogen_store_additions = hydrogen_SOC - hydrogen_SOC_start
+        let hydrogen_store_additions = o.hydrogen_SOC - o.hydrogen_SOC_start
         console.log("hydrogen_store_additions: "+hydrogen_store_additions)
         final_store_balance += hydrogen_store_additions
         
-        methane_store_additions = methane_SOC - i.methane.SOC_start
+        let methane_store_additions = o.methane_SOC - i.methane.SOC_start
         console.log("methane_store_additions: "+methane_store_additions)
         final_store_balance += methane_store_additions
 
-        synth_fuel_store_additions = synth_fuel_store_SOC - i.synth_fuel.store_start_GWh
+        let synth_fuel_store_additions = o.synth_fuel_store_SOC - i.synth_fuel.store_start_GWh
         console.log("synth_fuel_store_additions: "+synth_fuel_store_additions)
         final_store_balance += synth_fuel_store_additions
 
         console.log("final_store_balance: "+final_store_balance)
         
-        console.log("total_heat_spill: "+total_heat_spill);
+        console.log("total_heat_spill: "+o.total_heat_spill);
         
-        console.log("unmet_EV_demand: "+unmet_EV_demand)
+        console.log("unmet_EV_demand: "+o.unmet_EV_demand)
         console.log("o.unmet_hydrogen_demand: "+o.unmet_hydrogen_demand)
         console.log("o.unmet_synth_fuel_demand: "+o.unmet_synth_fuel_demand)
-        o.total_unmet_demand += unmet_EV_demand + o.unmet_hydrogen_demand + o.unmet_synth_fuel_demand
+        o.total_unmet_demand += o.unmet_EV_demand + o.unmet_hydrogen_demand + o.unmet_synth_fuel_demand
         
-        total_spill = methane_store_vented + total_heat_spill
+        o.total_spill = o.methane_store_vented + o.total_heat_spill
         
         // -------------------------------------------------------------------------------------------------
         o.total_exess = o.total_final_elec_balance_positive + final_store_balance; //o.total_supply - o.total_demand
-        total_losses = o.total_losses.grid + total_electrolysis_losses + total_CCGT_losses + total_anaerobic_digestion_losses + total_sabatier_losses + total_FT_losses + total_spill + total_power_to_X_losses
-        total_losses += o.total_losses.heating_systems
-        total_losses += o.total_losses.electric_storage
+        
+        o.total_losses_combined = o.total_spill
+        for (var z in o.total_losses) {
+            o.total_losses_combined += o.total_losses[z];
+        }
 
         console.log("total_supply: "+o.total_supply)
         console.log("total_unmet_demand: "+o.total_unmet_demand)
         console.log("total_demand: "+o.total_demand)    
-        console.log("total_losses: "+total_losses)
+        console.log("total_losses_combined: "+o.total_losses_combined)
         console.log("total_exess: "+o.total_exess)
             
-        let unaccounted_balance = o.total_supply + o.total_unmet_demand - o.total_demand - total_losses - o.total_exess
+        let unaccounted_balance = o.total_supply + o.total_unmet_demand - o.total_demand - o.total_losses_combined - o.total_exess
         console.log("unaccounted_balance: "+unaccounted_balance.toFixed(6))
         // -------------------------------------------------------------------------------------------------
         
-        console.log("max heat elec demand: "+max_heat_demand_elec);
+        console.log("max heat elec demand: "+o.max_heat_demand_elec);
         
         o.primary_energy_factor = o.total_supply / o.total_demand
         
         // -------------------------------------------------------------------------------
         
-        o.total_initial_elec_balance_positive = o.total_initial_elec_balance_positive / 10000.0
-        o.total_final_elec_balance_negative = o.total_final_elec_balance_negative / 10000.0
-        o.total_final_elec_balance_positive = o.total_final_elec_balance_positive / 10000.0
-        o.total_unmet_heat_demand = (o.total_unmet_heat_demand/ 10000.0).toFixed(3);
-        o.total_synth_fuel_biomass_used = o.total_synth_fuel_biomass_used / 10000.0
-        o.total_electricity_from_dispatchable /= 10000.0
-        o.total_biomass_used /= 10000.0
-        o.total_other_biomass_used = o.total_biomass_used - i.biogas.biomass_for_biogas - o.total_synth_fuel_biomass_used
+        o.total_other_biomass_used = o.total_biomass_used - (i.biogas.biomass_for_biogas*10000) - o.total_synth_fuel_biomass_used
         
-        liquid_fuel_produced_prc_diff = 100 * (o.total_synth_fuel_produced - (o.transport.fuel_totals.IC+i.industrial_biofuel)) / (o.transport.fuel_totals.IC+i.industrial_biofuel)
+        // liquid_fuel_produced_prc_diff = 100 * (o.total_synth_fuel_produced - (o.transport.fuel_totals.IC+i.industrial_biofuel)) / (o.transport.fuel_totals.IC+i.industrial_biofuel)
 
         o.initial_elec_balance_positive_prc = 100*o.initial_elec_balance_positive / i.hours
         o.final_elec_balance_negative_prc = 100*o.final_elec_balance_negative / i.hours
         o.final_elec_balance_positive_prc = 100*o.final_elec_balance_positive / i.hours
         o.unmet_heat_demand_prc = 100*o.unmet_heat_demand_count / i.hours
-        o.methane_store_empty_prc = 100*methane_store_empty_count / i.hours
-        o.methane_store_full_prc = 100*methane_store_full_count / i.hours
-        o.hydrogen_store_empty_prc = 100*hydrogen_store_empty_count / i.hours
-        o.hydrogen_store_full_prc = 100*hydrogen_store_full_count / i.hours
+        o.methane_store_empty_prc = 100*o.methane_store_empty_count / i.hours
+        o.methane_store_full_prc = 100*o.methane_store_full_count / i.hours
+        o.hydrogen_store_empty_prc = 100*o.hydrogen_store_empty_count / i.hours
+        o.hydrogen_store_full_prc = 100*o.hydrogen_store_full_count / i.hours
         
         o.electrolysis_capacity_factor = 100*(o.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * 87600))
         o.power_to_X_capacity_factor = 100*(o.total_electricity_for_power_to_X / (i.power_to_X.capacity * 87600))
@@ -1226,9 +1218,9 @@ var model = {
         var error = 0
         for (var hour = 0; hour < i.hours; hour++) {
             
-            supply = d.elec_supply_hourly[hour]
-            demand = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour] + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
-            balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.export_elec[hour]
+            let supply = d.elec_supply_hourly[hour]
+            let demand = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour] + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
+            let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.export_elec[hour]
             error += Math.abs(balance)
         } 
         
@@ -1245,7 +1237,7 @@ var model = {
         if (h<10) h = "0"+h
         o.max_dispatchable_capacity_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
 
-        date = new Date(datastarttime + (max_shortfall_hour * 3600 * 1000));
+        date = new Date(datastarttime + (o.max_shortfall_hour * 3600 * 1000));
         h = date.getHours();
         if (h<10) h = "0"+h
         o.max_shortfall_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
@@ -1270,7 +1262,7 @@ var model = {
         // subtracted here so that land requirement shown is just for additional 
         // rotational grasses.
         
-        o.grass_biomass_for_biogas = i.biomass_for_biogas - 34.15
+        o.grass_biomass_for_biogas = i.biogas.biomass_for_biogas - 34.15
         if (o.grass_biomass_for_biogas<0.0) o.grass_biomass_for_biogas = 0.0
         
         let biomass_landarea_factor = 0.02 // old: ((0.1/365.25)/0.024) / 0.51
@@ -1285,7 +1277,7 @@ var model = {
         // 114 TWh per 1.730 MHa = 66 TWh/Mha or 0.0152 Mha per TWh
         
         biomass_landarea_factor = 0.0152 // old: ((0.1/365.25)/0.024) / 0.975
-        o.landarea_for_synth_fuel = o.total_synth_fuel_biomass_used * biomass_landarea_factor
+        o.landarea_for_synth_fuel = o.total_synth_fuel_biomass_used * 0.0001 * biomass_landarea_factor
         o.prc_landarea_for_synth_fuel = 100 * o.landarea_for_synth_fuel / 24.2495
         
         // Biomass for heating and CHP
@@ -1296,7 +1288,7 @@ var model = {
         // 41.5 TWh per 1.534 MHa = 27 TWh/Mha or 0.0370 Mha per TWh
           
         biomass_landarea_factor = 0.0370 // old: ((0.1/365.25)/0.024) / 0.975
-        o.landarea_for_other_biomass = o.total_other_biomass_used * biomass_landarea_factor
+        o.landarea_for_other_biomass = o.total_other_biomass_used * 0.0001 * biomass_landarea_factor
         o.prc_landarea_for_other_biomass = 100 * o.landarea_for_other_biomass / 24.2495
         
         o.landarea_for_biomass = o.grass_landarea_for_biogas + o.landarea_for_synth_fuel + o.landarea_for_other_biomass    
