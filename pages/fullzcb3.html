@@ -608,10 +608,10 @@ input[type='text'] {
         <tr><td></td><td></td><td></td><td></td><td></td></tr>
         <tr>
             <td>Total demand by fuel</td>
-            <td>{{ o.total_industrial_elec_demand*0.0001 | toFixed(0) }} TWh</td>
-            <td>{{ o.total_industrial_methane_demand*0.0001 | toFixed(0) }} TWh</td>
-            <td>{{ o.total_industrial_biomass_demand*0.0001 | toFixed(0) }} TWh</td>
-            <td>{{ o.total_industrial_liquid_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.industry.total_elec_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.industry.total_methane_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.industry.total_biomass_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>{{ o.industry.total_synth_fuel_demand*0.0001 | toFixed(0) }} TWh</td>
             <td></td>
         </tr>
         </table>
@@ -779,7 +779,7 @@ input[type='text'] {
 <div class="box">
     <div class="box-title">
         <img class="icon-expand" src="img/expand.png"><b>FINAL SUPPLY DEMAND MATCHING
-        <span style="float:right">{{ o.final_elec_balance_positive_prc | toFixed(3) }}%</span>
+        <span style="float:right">{{ (100*o.final_elec_balance_positive/i.hours) | toFixed(3) }}%</span>
         </b>
     </div>
     <div class="inner" style="display:block">
@@ -823,25 +823,25 @@ input[type='text'] {
         <tr>
             <td>Initial el. balance positive</td>
             <td>{{ o.initial_elec_balance_positive }}</td>
-            <td>{{ o.initial_elec_balance_positive_prc | toFixed(1) }}%</td>
+            <td>{{ (100*o.initial_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
             <td>{{ o.total_initial_elec_balance_positive*0.0001 | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Final el. balance negative</td>
             <td>{{ o.final_elec_balance_negative }}</td>
-            <td>{{ o.final_elec_balance_negative_prc | toFixed(1) }}%</td>
+            <td>{{ (100*o.final_elec_balance_negative/i.hours) | toFixed(1) }}%</td>
             <td>{{ o.total_final_elec_balance_negative*0.0001 | toFixed(3) }}</td>
         </tr>
         <tr>
             <td>Final el. balance positive</td>
             <td>{{ o.final_elec_balance_positive }}</td>
-            <td>{{ o.final_elec_balance_positive_prc | toFixed(1) }}%</td>
+            <td>{{ (100*o.final_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
             <td>{{ o.total_final_elec_balance_positive*0.0001 | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Unmet heat demand</td>
             <td>{{ o.unmet_heat_demand_count }}</td>
-            <td>{{ o.unmet_heat_demand_prc | toFixed(1) }}%</td>
+            <td>{{ (100*o.unmet_heat_demand_count / i.hours) | toFixed(1) }}%</td>
             <td>{{ o.total_unmet_heat_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
@@ -859,21 +859,21 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen Store</td>
-            <td>{{ o.min_hydrogen_SOC | toFixed(0) }} GWh</td>
-            <td>{{ o.min_hydrogen_SOC_prc | toFixed(1) }}%</td>
-            <td>{{ o.max_hydrogen_SOC | toFixed(0) }} GWh</td>
+            <td>{{ o.hydrogen.min_SOC | toFixed(0) }} GWh</td>
+            <td>{{ (100*o.hydrogen.min_SOC /i.hydrogen.storage_capacity_GWh) | toFixed(1) }}%</td>
+            <td>{{ o.hydrogen.max_SOC | toFixed(0) }} GWh</td>
         </tr>
         <tr>
             <td>Liquid fuel Store</td>
-            <td>{{ o.min_synth_fuel_store_SOC | toFixed(0) }} GWh</td>
-            <td>{{ o.min_synth_fuel_store_SOC_prc | toFixed(1) }}%</td>
-            <td>{{ o.max_synth_fuel_store_SOC | toFixed(0) }} GWh</td>
+            <td>{{ o.synth_fuel.store_min_SOC | toFixed(0) }} GWh</td>
+            <td>{{ (100*o.synth_fuel.store_min_SOC/o.synth_fuel.store_max_SOC) | toFixed(1) }}%</td>
+            <td>{{ o.synth_fuel.store_max_SOC | toFixed(0) }} GWh</td>
         </tr>
         <tr>
             <td>Methane Store</td>
-            <td>{{ o.min_methane_SOC | toFixed(0) }} GWh</td>
-            <td>{{ o.min_methane_SOC_prc | toFixed(1) }}%</td>
-            <td>{{ o.max_methane_SOC | toFixed(0) }} GWh</td>
+            <td>{{ o.methane.min_SOC | toFixed(0) }} GWh</td>
+            <td>{{ (100*o.methane.min_SOC/i.methane.storage_capacity_GWh) | toFixed(1) }}%</td>
+            <td>{{ o.methane.max_SOC | toFixed(0) }} GWh</td>
         </tr>
         <tr>
             <td></td>
@@ -889,20 +889,20 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen</td>
-            <td>{{ o.total_hydrogen_produced*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.total_hydrogen_demand*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.hydrogen.total_produced*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.hydrogen.total_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Liquid fuel</td>
-            <td>{{ o.total_synth_fuel_produced*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.total_synth_fuel_produced*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.synth_fuel.total_produced*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.synth_fuel.total_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Methane</td>
-            <td>{{ o.total_methane_made*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.total_methane_demand*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.methane.total_produced*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.methane.total_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
@@ -913,7 +913,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen Electrolysis capacity factor</td>
-            <td>{{ o.electrolysis_capacity_factor | toFixed(1) }}%</span></td>
+            <td>{{ o.hydrogen.electrolysis_capacity_factor | toFixed(1) }}%</span></td>
             <td></td>
             <td></td>
         </tr>
@@ -937,28 +937,28 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Of which rotational grasses (e.g ryegrass)</td>
-            <td>{{ o.grass_biomass_for_biogas | toFixed(1) }}</td>
-            <td>{{ o.grass_landarea_for_biogas | toFixed(1) }} Mha</td>
-            <td>{{ o.grass_prc_landarea_for_biogas | toFixed(1) }}% of UK</td>
+            <td>{{ o.biomass.grass_for_biogas | toFixed(1) }}</td>
+            <td>{{ o.landarea.grass_for_biogas | toFixed(1) }} Mha</td>
+            <td>{{ o.landarea.grass_for_biogas_prc | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
-            <td>{{ o.total_synth_fuel_biomass_used*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.landarea_for_synth_fuel | toFixed(1) }} Mha</td>
-            <td>{{ o.prc_landarea_for_synth_fuel | toFixed(1) }}% of UK</td>
+            <td>{{ o.synth_fuel.total_biomass_used*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.landarea.for_synth_fuel | toFixed(1) }} Mha</td>
+            <td>{{ o.landarea.for_synth_fuel_prc | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
             <td>{{ o.total_other_biomass_used*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.landarea_for_other_biomass | toFixed(1) }} Mha</td>
-            <td>{{ o.prc_landarea_for_other_biomass | toFixed(1) }}% of UK</td>
+            <td>{{ o.landarea.for_other_biomass | toFixed(1) }} Mha</td>
+            <td>{{ o.landarea.for_other_biomass_prc | toFixed(1) }}% of UK</td>
             <td></td>
         </tr>
         <tr>
             <td>All input biomass energy</td>
             <td>{{ o.total_biomass_used*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.landarea_for_biomass | toFixed(1) }} Mha</td>
-            <td>{{ o.prc_landarea_for_biomass | toFixed(1) }}% of UK</td>
+            <td>{{ o.landarea.for_biomass | toFixed(1) }} Mha</td>
+            <td>{{ o.landarea.for_biomass_prc | toFixed(1) }}% of UK</td>
         </tr>
         <tr>
             <td></td>
@@ -968,20 +968,20 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Electricity from dispatchable (TWh)</td>
-            <td>{{ o.total_methane_turbine_output*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.total_methane_turbine_output*0.0001 | toFixed(1) }}</td>
             <td></td>
             <td></td>
         </tr>
         <tr>
             <td>Max Dispatchable Output (GW)</td>
-            <td>{{ o.max_dispatchable_capacity | toFixed(1) }} GW</td>
-            <td>{{ o.max_dispatchable_capacity_date }}</td>
+            <td>{{ o.electric_backup.max_methane_turbine_output | toFixed(1) }} GW</td>
+            <td>{{ o.electric_backup.max_methane_turbine_output_date }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Max Electricity Shortfall (GW)</td>
-            <td>{{ o.max_shortfall | toFixed(1) }} GW</td>
-            <td>{{ o.max_shortfall_date }}</td>
+            <td>{{ o.electric_backup.max_shortfall | toFixed(1) }} GW</td>
+            <td>{{ o.electric_backup.max_shortfall_date }}</td>
             <td></td>
         </tr>
         </table>
@@ -1046,7 +1046,7 @@ input[type='text'] {
 </div>
 
 <div class="box">
-    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>MANUFACTURING ENERGY<span style="float:right">{{ o.total_embodied_energy | toFixed(1) }} TWh/yr</span></b></div>
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>MANUFACTURING ENERGY<span style="float:right">{{ o.EE.total | toFixed(1) }} TWh/yr</span></b></div>
     <div class="inner">
         <div style="font-size:14px">Industrial energy use is dealt with above at a high level and a cautious approach is taken. It is part of the scenario that we would like to develop in more detail. The following makes a start on exploring the manufacturing energy required to build key elements of the renewable energy supply infrastructure: Offshore wind, Onshore wind and Solar PV. We can get an initial indication from this of the proportion of the total industrial energy demand modelled above that would relate to the manufacture of these technologies.<br><br>For more detail on the calculations below including sources see <a href="https://trystanlea.org.uk/zcb_industry">https://trystanlea.org.uk/zcb_industry</a></div><br>
         
@@ -1073,7 +1073,7 @@ input[type='text'] {
         <!--<tr><td>Lithium Ion Store</td><td>{{ o.EE_liion_store | toFixed(1) }} TWh/yr</span></td></tr>
         <tr><td>Electric Vehicle Battery</td><td>{{ o.EE_ecarbattery | toFixed(1) }} TWh/yr</span></td></tr>
         <tr><td>Electric Vehicle (rest)</td><td>{{ o.EE_ecar | toFixed(1) }} TWh/yr</span></td></tr>-->
-        <tr><td>Total Annual Demand</td><td>{{ o.total_embodied_energy | toFixed(1) }} TWh/yr</span> ({{ o.prc_of_industry_demand | toFixed(1) }}%</span> of industry demand)</td></tr>
+        <tr><td>Total Annual Demand</td><td>{{ o.EE.total | toFixed(1) }} TWh/yr</span> ({{ o.EE.prc_of_industry_demand | toFixed(1) }}%</span> of industry demand)</td></tr>
         </table>
         <div style="float:left; width:45%">
       

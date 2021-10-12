@@ -57,15 +57,14 @@ function fullzcb3_ui() {
           {"kwhd":o.space_heating.total_demand*scl,"name":"Space Heat","color":0},
           {"kwhd":o.water_heating.total_demand*scl,"name":"Water Heat","color":0},
           {"kwhd":(o.total_EV_demand+o.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
-          {"kwhd":o.total_hydrogen_for_hydrogen_vehicles*scl,"name":"Hydrogen Transport","color":0},
+          {"kwhd":o.hydrogen.total_vehicle_demand*scl,"name":"Hydrogen Transport","color":0},
           {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Biofuel Transport","color":0},
           {"kwhd":10000*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
           // Industry
-          {"kwhd":o.total_industrial_elec_demand*scl,"name":"Industry Electric","color":0},
-          {"kwhd":o.total_industrial_methane_demand*scl,"name":"Industry Methane","color":0},
-          {"kwhd":o.total_industrial_biomass_demand*scl,"name":"Industry Biomas","color":0},
-          {"kwhd":10000*i.industry.biofuel_TWhy*scl,"name":"Industry Biofuel","color":0},/*
-          {"kwhd":total_industry_solid/3650,"name":"Industry Biomass","color":0},
+          {"kwhd":o.industry.total_elec_demand*scl,"name":"Industry Electric","color":0},
+          {"kwhd":o.industry.total_methane_demand*scl,"name":"Industry Methane","color":0},
+          {"kwhd":o.industry.total_biomass_demand*scl,"name":"Industry Biomas","color":0},
+          {"kwhd":o.industry.total_synth_fuel_demand*scl,"name":"Industry Biofuel","color":0},/*
           // Backup, liquid and gas processes*/
           {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},
           {"kwhd":o.total_losses.electrolysis*scl,"name":"H2 losses","color":2},
