@@ -65,15 +65,7 @@
           <div class="menu-item"><a href="#scenario_variations">Scenario Variations</a></div>
           <div class="menu-item"><a href="#community_scenario">Creating a community scale ZeroCarbonBritain scenario</a></div>
           <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
-        </div>
-
-        <div class="menu-title" name="methodology"><b>Methodology Papers (PDF)</b></div>
-        <div class="menu-items" name="methodology" style="display:none">
-          <div class="menu-item"><a href="Methodology/Hourly Energy Model Methodology.pdf">1. Hourly Energy Model</a></div>
-          <div class="menu-item"><a href="Methodology/Renewable Energy Supply Methodology.pdf">2. Renewable Energy Supply</a></div>
-          <div class="menu-item"><a href="Methodology/Power Down Methodology 2 7 13.pdf">3. Power Down</a></div>
-          <div class="menu-item"><a href="Methodology/Food and diets methodology.pdf">4. Food and diets</a></div>
-          <div class="menu-item"><a href="Methodology/Land Use Methodology 30.6.13.pdf">5. Land Use</a></div>          
+          <div class="menu-item"><a href="ZCB-Methodology-Papers-2019.pdf">ZCB Methodology 2019 (PDF)</a></div>        
         </div>
         
       </div>
@@ -93,6 +85,9 @@
             <div id="model">
             <?php require "model.html"; ?>
             </div>
+            <div id="page" style="display:none">
+            
+            </div>
         </div>
         <div style="clear:both"></div>
       </div>
@@ -111,23 +106,16 @@
 
 <script>
 
-var scenario_name = "main";
 var sidenav_visible = true;
 var window_width = 0;
-var print_view = false;
-var run_zcb_test = false;
 var load_high_res = <?php echo $highres; ?>;
 var files_to_load = 2;
-if (run_zcb_test) files_to_load = 3;
 
 loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var d = {};
 var v = 43;
-var o = {transport:{}}
-    
 
 var view_mode = "electricity";
 
@@ -160,17 +148,6 @@ load_temperature_dataset("temperature.csv.zip",function(){
     if (datasets==files_to_load) load_page(page);
 });
 
-
-if (run_zcb_test) {
-    load_test_dataset("test.csv.zip",function(){
-        console.log("test dataset loaded");
-        datasets ++;
-        loading_prc(datasets*10,"test dataset");
-        
-        if (datasets==files_to_load) load_page(page);
-    });
-}
-
 $(window).on('hashchange', function() {
     timerStart = Date.now();
     scroll_to_hash();
@@ -193,13 +170,6 @@ function scroll_to_hash() {
 function load_page(page)
 {
     $(".loading").hide();
-    
-    //var out = "";
-    //for (var scenario_name in scenarios) {
-    //    out += "<option>"+scenario_name+"</option>"
-    //}
-    //$("#select_scenario").html(out);
-
 
     model.init();
     model.run();
@@ -306,41 +276,9 @@ $("#model").on("click",".box-title",function(){
    if (box.is(":visible")) box.hide(); else box.show();
 });
 
-/*
-$("#model").on("change","#select_scenario",function(){
-    scenario_name = $(this).val();
-
-    for (var z in scenarios.main) window[z] = scenarios.main[z]     
-    if (scenario_name!="main") {
-        for (var z in scenarios[scenario_name]) window[z] = scenarios[scenario_name][z]  
-    }
-
-    var timerStart = Date.now();
-    
-    model.run();
-    model_ui();
-    model_view();
-
-    var time_elapsed = (Date.now() - timerStart)
-    loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s"); 
-});*/
-
 function loading_prc(prc,msg) {
     $(".loading_prc").html(msg);
 }
-
-/*
-function save_scenario() {
-
-    var save = {};
-
-    for (var z in scenarios.main) {
-        if (window[z] != scenarios.main[z]) {
-            save[z] = window[z]
-        }
-    }
-    console.log(JSON.stringify(save))
-}*/
 
 // ------------------------------------------
 
@@ -355,12 +293,6 @@ function resize() {
         sidenav_visible = false;
     }
     draw_sidebar();
-    
-    if (print_view) {
-        $(".topnav").hide();
-        $(".sidenav").hide();
-        $(".published").hide();
-    }
       
     var width = $("#placeholder_bound").width();
     var height = $("#placeholder_bound").height();
