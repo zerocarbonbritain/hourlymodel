@@ -157,8 +157,15 @@ function scroll_to_hash() {
     var section = (window.location.hash).substring(1);
     
     if (section=="scenario_variations" || section=="community_scenario" || section=="dataset") {
-    
+        $.ajax({url: "pages/"+section+".html?v="+v, async: false, success: function(data){
+            $("#page").html(data);
+            $("#model").hide();
+            $("#page").show();
+        }});
     } else if (section!="") {
+        $("#model").show();
+        $("#page").hide();
+    
         $(".inner").hide();
         $(".inner[name='overview']").show();
         $(".inner[name='balance']").show();
