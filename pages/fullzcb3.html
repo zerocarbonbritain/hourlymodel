@@ -66,7 +66,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>ZERO CARBON BRITAIN HOURLY MODEL v3</b><div class="loading_prc" style="float:right">Loading...</div></div>
-    <div class="inner" style="display:block">
+    <div class="inner" style="display:block" name="overview">
 <div style="font-size:14px"><b>Note:</b> This hourly energy model is designed to be used in conjunction with the ZeroCarbonBritain matrix spreadsheet, which both provides background calculation for many of the inputs and makes use of the model outputs.</div><br>
     
         View:
@@ -96,7 +96,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SUPPLY</b></div>
-    <div class="inner">
+    <div class="inner" name="supply">
         <div style="font-size:14px">The following renewable supply mix is detailed in full on page 57-61 of the ZCB report. Capacities reflect proportions of available resource e.g: the Offshore Valuation Group report (2010) estimates that we could produce more than 1,500 TWh/year from floating offshore wind turbines, 400 TWh/year from fixed offshore wind turbines, 40 TWh/year from wave power and 116 TWh/year from tidal stream. The ZCB scenario suggests that only a proportion of this potential would need to be developed. 
         
         </div><br>
@@ -222,7 +222,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>LIGHTING, APPLIANCES & COOKING</b></div>
-    <div class="inner">
+    <div class="inner" name="lac">
         <div style="font-size:14px">Domestic Lighting & Appliance electricity demand in 2007 was 86 TWh, falling to 76 TWh in 2017, ZCB Scenario projects 55% reduction from 2007 as a result of LED lighting and more efficient appliances. Service sector Lighting & Appliance demand was 59 TWh in 2007 increasing to 71 TWh in 2017, ZCB scenario projects 30% reduction from 2007. Cooling demand was 9 TWh in 2007, increasing to 13 TWh in 2017, scenario projects falling cooling energy demand based on increasing cooling efficiency.<br><br>
         Projected scenario domestic cooking electricity consumption: 10.47 TWh, Catering electricity consumption: 16.85 TWh. In 2007 and 2017 these were: 15 TWh, 22 TWh and 14 TWh, 21 TWh respectively.
         </div>
@@ -270,7 +270,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>SPACE / WATER HEAT DEMAND</b></div>
-    <div class="inner">
+    <div class="inner" name="spacewaterheat">
         <p><b>1. Space Heating</b></p>
                 
         <p>Space heat base temperature: <input v-model.value="i.space_heating.base_temperature" type="text" @change="update" style="width:70px"  autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span></p>
@@ -342,7 +342,7 @@ input[type='text'] {
 </div>
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>HEATING SYSTEMS</b></div>
-    <div class="inner">
+    <div class="inner" name="heatingsystems">
         <table class="table" style="width:100%">  
             <tr>
                 <th></th>
@@ -379,7 +379,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>TRANSPORT</b></div>
-    <div class="inner">
+    <div class="inner" name="transport">
         
         <div style="font-size:14px">
         There is an extended discussion of the following transport model here: <a href="https://trystanlea.org.uk/transport_notes">Blog: transport notes</a>.<br><br>
@@ -560,7 +560,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>INDUSTRIAL (& cooking) FUEL INPUTS</b></div>
-    <div class="inner">
+    <div class="inner" name="industry">
         <div style="font-size:14px">
         Industrial energy demand is based on 2007 levels adjusted for 2030 population (1.15x) and a 25% reduction in energy intensity. E.g High temp heat was 57 TWh in 2007 x 1.15 x 0.75 = 49.16 TWh. Actual industrial energy demand in 2017 was 256 TWh consisting of: High temp: 41 TWh, Low temp: 82 TWh, Non heat + other: 133 TWh. 11% less than projected scenario demand for 2030.
         <br><br>
@@ -691,7 +691,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>STORAGE & BACKUP</b></div>
-    <div class="inner">
+    <div class="inner" name="backup">
         <div style="font-size:14px">
         Select dispatchable generation capacity to meet bulk of backup requirement. Tune electrolysis & methanation capacity and respective storage capacities to meet given hydrogen, synth fuel and synthetic methane demand. Select 'Stores' tab above to see store levels, ensure that the stores dont get depleted or over-fill. 50 GWh of generic storage is equivalent to a ~1.7 kWh battery store per household.<br><br>
         For background notes on the sabatier process see:<br> <a href="https://trystanlea.org.uk/zcb_sabatier_process">https://trystanlea.org.uk/zcb_sabatier_process</a>
@@ -786,7 +786,7 @@ input[type='text'] {
         <span style="float:right">{{ (100*o.balance.final_elec_balance_positive/i.hours) | toFixed(3) }}%</span>
         </b>
     </div>
-    <div class="inner" style="display:block">
+    <div class="inner" style="display:block" name="balance">
 
         <div id="stacks_bound" style="width:450; height:530; float:left;">
             <canvas id="stacks" width="450" height="530"></canvas>
@@ -998,7 +998,7 @@ input[type='text'] {
         <img class="icon-expand" src="img/expand.png"><b>SCALED TO VILLAGE, TOWN, CITY or COUNTRY
         </b>
     </div>
-    <div class="inner">
+    <div class="inner" name="scaled">
         
         <table><tr>
         <td>Number of households:</td>
@@ -1051,7 +1051,7 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>MANUFACTURING ENERGY<span style="float:right">{{ o.EE.total | toFixed(1) }} TWh/yr</span></b></div>
-    <div class="inner">
+    <div class="inner" name="manufacturing_energy">
         <div style="font-size:14px">Industrial energy use is dealt with above at a high level and a cautious approach is taken. It is part of the scenario that we would like to develop in more detail. The following makes a start on exploring the manufacturing energy required to build key elements of the renewable energy supply infrastructure: Offshore wind, Onshore wind and Solar PV. We can get an initial indication from this of the proportion of the total industrial energy demand modelled above that would relate to the manufacture of these technologies.<br><br>For more detail on the calculations below including sources see <a href="https://trystanlea.org.uk/zcb_industry">https://trystanlea.org.uk/zcb_industry</a></div><br>
         
         <table style="width:100%">

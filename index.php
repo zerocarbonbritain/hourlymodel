@@ -23,7 +23,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
     <script type="text/javascript" src="ui/stacks.js?v=1"></script>
-    <link rel="stylesheet" type="text/css" href="ui/style.css?v=1" />
+    <link rel="stylesheet" type="text/css" href="ui/style.css?v=2" />
   </head>
 
   <body>
@@ -45,16 +45,26 @@
         <div style="clear:both"></div>
         
         <br>
-        <div class="menu-title" name="fullmodel"><b>Full Model</b></div>
         <div class="menu-items" name="fullmodel">
-          <div class="menu-item"><a href="#fullzcb3">ZeroCarbonBritain v3</a></div>
-          <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
+          <div class="menu-item"><a href="#overview">Overview</a></div>      
+          <div class="menu-item"><a href="#supply">Supply</a></div>
+          <div class="menu-item"><a href="#lac">Lighting & Appliances</a></div>
+          <div class="menu-item"><a href="#spacewaterheat">Space & Water heat demand</a></div>   
+          <div class="menu-item"><a href="#heatingsystems">Heating systems</a></div>
+          <div class="menu-item"><a href="#transport">Transport</a></div>
+          <div class="menu-item"><a href="#industry">Industry</a></div>                    
+          <div class="menu-item"><a href="#elec_storage">Electricity Storage</a></div>                    
+          <div class="menu-item"><a href="#backup">Storage & Backup</a></div>     
+          <div class="menu-item"><a href="#balance">Final balance</a></div>
+          <div class="menu-item"><a href="#scaled">Scaled by</a></div>
+          <div class="menu-item"><a href="#manufacturing_energy">Manufacturing Energy</a></div>                                      
         </div>
         
         <div class="menu-title" name="guides"><b>Guides</b></div>
         <div class="menu-items" name="guides">
           <div class="menu-item"><a href="#scenario_variations">1. Scenario Variations</a></div>
           <div class="menu-item"><a href="#community_scenario">2. Creating a community scale ZeroCarbonBritain scenario</a></div>
+          <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
         </div>
 
         <div class="menu-title" name="methodology"><b>Methodology Papers (PDF)</b></div>
@@ -165,9 +175,19 @@ if (run_zcb_test) {
 
 $(window).on('hashchange', function() {
     timerStart = Date.now();
-    page = (window.location.hash).substring(1);
-    load_page(page);
+    scroll_to_hash();
 });
+
+function scroll_to_hash() {
+    var section = (window.location.hash).substring(1);
+    if (section!="") {
+        $(".inner").hide();
+        $(".inner[name='overview']").show();
+        $(".inner[name='balance']").show();
+        $(".inner[name='"+section+"']").show();
+        $(".inner[name='"+section+"']").parent().get(0).scrollIntoView();    
+    }
+}
 
 function load_page(page)
 {
@@ -272,7 +292,7 @@ function load_page(page)
 
     resize();
     fullzcb3_ui();
-        
+    scroll_to_hash();
 }
 
 $("#model").on("click",".viewmode",function(){

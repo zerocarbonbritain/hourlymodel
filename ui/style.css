@@ -45,14 +45,14 @@ h2 {
   width:42px;
   height:42px;
   float:left;
-  background: url(img/solarhouse.png);
+  background: url(../img/solarhouse.png);
   background-repeat: no-repeat;
   background-size: 100%;
   cursor:pointer;
 }
 
 .logo:hover {
-  background: url(img/solarhouse-blue.png);
+  background: url(../img/solarhouse-blue.png);
   background-repeat: no-repeat;
   background-size: 100%;
 }
