@@ -62,8 +62,8 @@
         
         <div class="menu-title" name="guides"><b>Guides</b></div>
         <div class="menu-items" name="guides">
-          <div class="menu-item"><a href="#scenario_variations">1. Scenario Variations</a></div>
-          <div class="menu-item"><a href="#community_scenario">2. Creating a community scale ZeroCarbonBritain scenario</a></div>
+          <div class="menu-item"><a href="#scenario_variations">Scenario Variations</a></div>
+          <div class="menu-item"><a href="#community_scenario">Creating a community scale ZeroCarbonBritain scenario</a></div>
           <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
         </div>
 
@@ -91,7 +91,7 @@
         
         <div id="model-bound">
             <div id="model">
-            <?php require "pages/fullzcb3.html"; ?>
+            <?php require "model.html"; ?>
             </div>
         </div>
         <div style="clear:both"></div>
@@ -107,7 +107,7 @@
 <script language="javascript" type="text/javascript" src="defaults.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="model.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=1"></script>
-<script language="javascript" type="text/javascript" src="ui/zcem.js?v=1"></script>
+<script language="javascript" type="text/javascript" src="ui/zcem.js?v=2"></script>
 
 <script>
 
@@ -135,7 +135,7 @@ view.start = 32*365.25*24*3600;
 view.end = view.start + 87648*3600;
 view.calc_interval();
 
-var page = "fullzcb3";
+var page = "model";
 
 var datasets = 0;
 var pageload = 0;
@@ -171,8 +171,6 @@ if (run_zcb_test) {
     });
 }
 
-// load_page(page);
-
 $(window).on('hashchange', function() {
     timerStart = Date.now();
     scroll_to_hash();
@@ -180,7 +178,10 @@ $(window).on('hashchange', function() {
 
 function scroll_to_hash() {
     var section = (window.location.hash).substring(1);
-    if (section!="") {
+    
+    if (section=="scenario_variations" || section=="community_scenario" || section=="dataset") {
+    
+    } else if (section!="") {
         $(".inner").hide();
         $(".inner[name='overview']").show();
         $(".inner[name='balance']").show();
@@ -215,33 +216,33 @@ function load_page(page)
         methods: {
           update: function () {
             model.run();
-            fullzcb3_view();
+            model_view();
           },
           pan_left: function () {
             view.pan_left();
-            fullzcb3_view();
+            model_view();
           },
           pan_right: function () {
             view.pan_right();
-            fullzcb3_view();          
+            model_view();          
           },
           zoom_in: function () {
             view.zoom_in();
-            fullzcb3_view(); 
+            model_view(); 
           },
           zoom_out: function () {
             view.zoom_out();
-            fullzcb3_view();      
+            model_view();      
           },
           reset: function () {
             view.start = 32*365.25*24*3600;
             view.end = view.start + 87648*3600;
             view.calc_interval();
-            fullzcb3_view();
+            model_view();
           },
           view_mode: function (_view_mode) {
             view_mode = _view_mode
-            fullzcb3_view();
+            model_view();
           },
           auto_scale: function(val,baseunit) {
 
@@ -291,13 +292,13 @@ function load_page(page)
     });
 
     resize();
-    fullzcb3_ui();
+    model_ui();
     scroll_to_hash();
 }
 
 $("#model").on("click",".viewmode",function(){
     view_mode = $(this).attr("view");
-    fullzcb3_view();
+    model_view();
 });
 
 $("#model").on("click",".box-title",function(){
@@ -317,8 +318,8 @@ $("#model").on("change","#select_scenario",function(){
     var timerStart = Date.now();
     
     model.run();
-    fullzcb3_ui();
-    fullzcb3_view();
+    model_ui();
+    model_view();
 
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Calculation time "+(time_elapsed*0.001).toFixed(1)+"s"); 
@@ -366,7 +367,7 @@ function resize() {
     $("#placeholder").width(width);
     $("#placeholder").height(width*0.52);
     
-    fullzcb3_view();
+    model_view();
 }
 
 

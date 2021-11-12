@@ -1,7 +1,7 @@
 previousPoint = false
 // ---------------------------------------------------------------------------    
 	
-function fullzcb3_ui() {
+function model_ui() {
     // Energy stacks visualisation definition
     var scl = 1.0/10000.0;
     var units = "TWh/yr";
@@ -103,7 +103,7 @@ function fullzcb3_ui() {
     v++;
 }	
 	
-function fullzcb3_view()
+function model_view()
 {
     if (view_mode=="electricity")
     {
@@ -195,7 +195,7 @@ $("body").bind("plotselected","#placeholder", function (event, ranges) {
     view.start = ranges.xaxis.from*0.001;
     view.end = ranges.xaxis.to*0.001;
     view.calc_interval();
-    fullzcb3_view();
+    model_view();
 });
 
 $("body").bind("plothover","#placeholder", function (event, pos, item) {
