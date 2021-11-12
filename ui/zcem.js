@@ -19,13 +19,13 @@ function fullzcb3_ui() {
     }
     
     var stacks = [
-      {"name":"Supply","height":(o.total_supply+o.total_unmet_demand)*scl,"saving":0,
+      {"name":"Supply","height":(o.balance.total_supply+o.total_unmet_demand)*scl,"saving":0,
         "stack":[
-          {"kwhd":o.total_supply*scl,"name":"Supply","color":1},
+          {"kwhd":o.balance.total_supply*scl,"name":"Supply","color":1},
           {"kwhd":o.total_unmet_demand*scl,"name":"Unmet","color":3}
         ]
       },
-      {"name":"Supply","height":(o.total_supply+o.total_unmet_demand)*scl,"saving":0,
+      {"name":"Supply","height":(o.balance.total_supply+o.total_unmet_demand)*scl,"saving":0,
         "stack":[
           {"kwhd":o.supply.total_offshore_wind*scl,"name":"Offshore Wind","color":1},
           {"kwhd":o.supply.total_onshore_wind*scl,"name":"Onshore Wind","color":1},
@@ -37,26 +37,26 @@ function fullzcb3_ui() {
           {"kwhd":o.supply.total_geothermal_elec*scl,"name":"Geo Thermal Elec","color":1},
           {"kwhd":o.supply.total_geothermal_heat*scl,"name":"Geo Thermal Heat","color":1},
           {"kwhd":o.supply.total_nuclear*scl,"name":"Nuclear","color":1},
-          {"kwhd":o.total_biomass_used*scl,"name":"Biomass","color":1},
-          {"kwhd":o.total_ambient_heat_supply*scl,"name":"Ambient","color":1},
+          {"kwhd":o.biomass.total_used*scl,"name":"Biomass","color":1},
+          {"kwhd":o.heat.total_ambient_supply*scl,"name":"Ambient","color":1},
           {"kwhd":o.total_unmet_demand*scl,"name":"Unmet","color":3}
         ]
       },
       
-      {"name":"Demand","height":(o.total_demand+o.total_losses_combined+o.total_exess)*scl,"saving":0,
+      {"name":"Demand","height":(o.balance.total_demand+o.balance.total_losses_combined+o.balance.total_exess)*scl,"saving":0,
         "stack":[
-          {"kwhd":o.total_demand*scl,"name":"Demand","color":0},
-          {"kwhd":o.total_losses_combined*scl,"name":"Losses","color":2},
-          {"kwhd":o.total_exess*scl,"name":"Exess","color":3}
+          {"kwhd":o.balance.total_demand*scl,"name":"Demand","color":0},
+          {"kwhd":o.balance.total_losses_combined*scl,"name":"Losses","color":2},
+          {"kwhd":o.balance.total_exess*scl,"name":"Exess","color":3}
         ]
       },
 
-      {"name":"Demand","height":(o.total_demand+o.total_losses_combined)*scl,"saving":0,
+      {"name":"Demand","height":(o.balance.total_demand+o.balance.total_losses_combined)*scl,"saving":0,
         "stack":[
-          {"kwhd":o.total_traditional_elec*scl,"name":"LAC","color":0},
+          {"kwhd":o.LAC.total*scl,"name":"LAC","color":0},
           {"kwhd":o.space_heating.total_demand*scl,"name":"Space Heat","color":0},
           {"kwhd":o.water_heating.total_demand*scl,"name":"Water Heat","color":0},
-          {"kwhd":(o.total_EV_demand+o.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
+          {"kwhd":(o.electric_transport.total_EV_demand+o.electric_transport.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
           {"kwhd":o.hydrogen.total_vehicle_demand*scl,"name":"Hydrogen Transport","color":0},
           {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Biofuel Transport","color":0},
           {"kwhd":10000*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
@@ -73,7 +73,7 @@ function fullzcb3_ui() {
           {"kwhd":(o.total_losses.sabatier+o.total_losses.power_to_X)*scl,"name":"Sabatier losses","color":2},
           {"kwhd":o.total_losses.anaerobic_digestion*scl,"name":"AD losses","color":2},
           {"kwhd":o.total_losses.heating_systems*scl,"name":"Boiler loss","color":2},
-          {"kwhd":o.total_spill*scl,"name":"Total spill","color":2},
+          {"kwhd":o.balance.total_spill*scl,"name":"Total spill","color":2},
 
           /*
           {"kwhd":total_direct_gas_losses/3650,"name":"Direct gas loss","color":2},
@@ -81,7 +81,7 @@ function fullzcb3_ui() {
 
           {"kwhd":total_liion_losses/3650,"name":"Liion losses","color":2},
           {"kwhd":total_losses*scl,"name":"Losses","color":2},*/
-          {"kwhd":o.total_exess*scl,"name":"Exess","color":3}
+          {"kwhd":o.balance.total_exess*scl,"name":"Exess","color":3}
         ]
       }
     ];
@@ -112,7 +112,7 @@ function fullzcb3_view()
 
             // {label: "Heatstore", data:timeseries(d.heatstore, color:"#cc3311"},
 
-            {stack:true, label: "Traditional", data:timeseries(d.lac_demand), color:"#0044aa"},
+            {stack:true, label: "Lighting & Appliances", data:timeseries(d.lac_demand), color:"#0044aa"},
             {stack:true, label: "Industry & Cooking", data:timeseries(d.industrial_elec_demand), color:"#1960d5"},
             {stack:true, label: "Electric Heat", data:timeseries(d.spacewater_elec), color:"#cc6622"},
             {stack:true, label: "Electric Transport", data:timeseries(d.EL_transport), color:"#aac15b"},

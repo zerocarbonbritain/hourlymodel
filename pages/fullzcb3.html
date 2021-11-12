@@ -234,13 +234,13 @@ input[type='text'] {
             <td>Domestic Lighting & Appliances</td>
             <td><input v-model.value="i.LAC.domestic.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>   
             <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/86)*100 | toFixed(0) }}%</td>
-            <td>{{ o.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
+            <td>{{ o.LAC.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
             <td><input v-model.value="i.LAC.domestic.cooking_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
             <td>{{ (1-i.LAC.domestic.cooking_TWhy/15)*100 | toFixed(0) }}%</td>
-            <td>{{ o.domestic_cooking_kwh | toFixed(0) }} kWh/household</td>
+            <td>{{ o.LAC.domestic_cooking_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services Lighting & Appliances</td>
@@ -779,7 +779,7 @@ input[type='text'] {
 <div class="box">
     <div class="box-title">
         <img class="icon-expand" src="img/expand.png"><b>FINAL SUPPLY DEMAND MATCHING
-        <span style="float:right">{{ (100*o.final_elec_balance_positive/i.hours) | toFixed(3) }}%</span>
+        <span style="float:right">{{ (100*o.balance.final_elec_balance_positive/i.hours) | toFixed(3) }}%</span>
         </b>
     </div>
     <div class="inner" style="display:block">
@@ -789,11 +789,11 @@ input[type='text'] {
         </div>
         
         <div style="float:left; width:35%;">
-            <p style="font-size:18px">Total supply: {{ o.total_supply*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:18px">Total demand: {{ o.total_demand*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:18px">Primary energy factor: {{ o.primary_energy_factor | toFixed(2) }}</p>
-            <p style="font-size:18px">Exess generation: {{ o.total_exess*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:18px">Unmet demand: {{ o.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
+            <p style="font-size:18px">Total supply: {{ o.balance.total_supply*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:18px">Total demand: {{ o.balance.total_demand*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:18px">Primary energy factor: {{ o.balance.primary_energy_factor | toFixed(2) }}</p>
+            <p style="font-size:18px">Exess generation: {{ o.balance.total_exess*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:18px">Unmet demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
         </div>
         
         <div style="clear:both"></div>
@@ -822,27 +822,27 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Initial el. balance positive</td>
-            <td>{{ o.initial_elec_balance_positive }}</td>
-            <td>{{ (100*o.initial_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.total_initial_elec_balance_positive*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.balance.initial_elec_balance_positive }}</td>
+            <td>{{ (100*o.balance.initial_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
+            <td>{{ o.balance.total_initial_elec_balance_positive*0.0001 | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Final el. balance negative</td>
-            <td>{{ o.final_elec_balance_negative }}</td>
-            <td>{{ (100*o.final_elec_balance_negative/i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.total_final_elec_balance_negative*0.0001 | toFixed(3) }}</td>
+            <td>{{ o.balance.final_elec_balance_negative }}</td>
+            <td>{{ (100*o.balance.final_elec_balance_negative/i.hours) | toFixed(1) }}%</td>
+            <td>{{ o.balance.total_final_elec_balance_negative*0.0001 | toFixed(3) }}</td>
         </tr>
         <tr>
             <td>Final el. balance positive</td>
-            <td>{{ o.final_elec_balance_positive }}</td>
-            <td>{{ (100*o.final_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.total_final_elec_balance_positive*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.balance.final_elec_balance_positive }}</td>
+            <td>{{ (100*o.balance.final_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
+            <td>{{ o.balance.total_final_elec_balance_positive*0.0001 | toFixed(1) }}</td>
         </tr>
         <tr>
             <td>Unmet heat demand</td>
             <td>{{ o.unmet_heat_demand_count }}</td>
-            <td>{{ (100*o.unmet_heat_demand_count / i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.total_unmet_heat_demand*0.0001 | toFixed(1) }}</td>
+            <td></td>
+            <td>{{ o.heat.total_unmet_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
@@ -919,7 +919,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Power-to-X capacity factor</td>
-            <td>{{ o.power_to_X_capacity_factor | toFixed(1) }}%</span></td>
+            <td>{{ o.power_to_X.capacity_factor | toFixed(1) }}%</span></td>
             <td></td>
             <td></td>
         </tr>
@@ -949,7 +949,7 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
-            <td>{{ o.total_other_biomass_used*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.biomass.total_direct_use*0.0001 | toFixed(1) }}</td>
             <td>{{ o.landarea.for_other_biomass | toFixed(1) }} Mha</td>
             <td>{{ o.landarea.for_other_biomass_prc | toFixed(1) }}% of UK</td>
             <td></td>

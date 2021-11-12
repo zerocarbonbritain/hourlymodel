@@ -36,11 +36,12 @@ var model = {
             cooking_profile = JSON.parse(JSON.stringify(flat_profile))
             hot_water_profile = JSON.parse(JSON.stringify(flat_profile))
             space_heat_profile = JSON.parse(JSON.stringify(flat_profile))  
-        }    
+        }
         
-        o.total_biomass_used = 0
+        o.biomass = {
+            total_used: 0
+        }
         
-        model.transport_model()
         model.supply();
         model.lac();
         model.space_water_heat_demand();
@@ -48,6 +49,7 @@ var model = {
         model.heating_systems();
         model.industry();
         // model.bivalent_backup();
+        model.transport_model()
         model.electric_transport();
         model.main_loop();
         model.final();
@@ -183,7 +185,9 @@ var model = {
         let trad_elec_demand = i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.cooling_TWhy 
         let daily_trad_elec_demand = trad_elec_demand * 1000.0 / 365.25
 
-        o.total_traditional_elec = 0
+        o.LAC = {}
+
+        o.LAC.total = 0
         
         d.lac_demand = []
             
@@ -199,11 +203,11 @@ var model = {
             traditional_elec_demand += cooking_elec
             
             d.lac_demand.push(traditional_elec_demand)
-            o.total_traditional_elec += traditional_elec_demand
+            o.LAC.total += traditional_elec_demand
         }
         
-        o.domestic_appliances_kwh = i.LAC.domestic.lighting_and_appliances_TWhy * 1000000000 / i.households_2030
-        o.domestic_cooking_kwh = i.LAC.domestic.cooking_TWhy * 1000000000 / i.households_2030
+        o.LAC.domestic_appliances_kwh = i.LAC.domestic.lighting_and_appliances_TWhy * 1000000000 / i.households_2030
+        o.LAC.domestic_cooking_kwh = i.LAC.domestic.cooking_TWhy * 1000000000 / i.households_2030
     },
 
     // ---------------------------------------------------------------------------------------------    
@@ -213,7 +217,8 @@ var model = {
 
         o.space_heating = {}
         o.water_heating = {}
-
+        o.heat = {}
+        
         o.space_heating.demand_GWK = i.space_heating.domestic_demand_GWK + i.space_heating.services_demand_GWK + i.space_heating.industry_demand_GWK
 
         o.water_heating.demand_TWhy = i.water_heating.domestic_TWhy + i.water_heating.services_TWhy
@@ -299,8 +304,8 @@ var model = {
         d.heatstore_discharge_GWth = []
         d.heatstore_SOC = []
         d.spacewater_heat = []
-
-        o.total_heat_spill = 0
+        
+        o.heat.total_spill = 0
         
         for (var hour = 0; hour < i.hours; hour++) {
 
@@ -338,7 +343,7 @@ var model = {
             d.heatstore_discharge_GWth.push(heatstore_discharge_GWth)        
             // ---------------------------------------------------------------------------------------------
             if (spacewater_balance<0.0) {
-                o.total_heat_spill += -spacewater_balance
+                o.heat.total_spill += -spacewater_balance
                 spacewater_balance = 0
             }
             
@@ -360,11 +365,10 @@ var model = {
 
         o.total_losses.heating_systems = 0
         
-        o.total_unmet_heat_demand = 0
-        o.unmet_heat_demand_count = 0
+        o.heat.total_unmet_demand = 0
         
-        o.max_heat_demand_elec = 0
-        o.total_ambient_heat_supply = 0
+        o.heat.max_elec_demand = 0
+        o.heat.total_ambient_supply = 0
         
         d.spacewater_elec = []
         
@@ -397,7 +401,7 @@ var model = {
                 heat_supplied += system_heat_demand[z]
                 
                 if (system_fuel_demand[z]<system_heat_demand[z]) {
-                    o.total_ambient_heat_supply += system_heat_demand[z] - system_fuel_demand[z]   
+                    o.heat.total_ambient_supply += system_heat_demand[z] - system_fuel_demand[z]   
                 } else {
                     o.total_losses.heating_systems += system_fuel_demand[z] - system_heat_demand[z]
                 }
@@ -406,16 +410,15 @@ var model = {
             // check for unmet heat
             let unmet_heat_demand = heat_demand - heat_supplied
             if (unmet_heat_demand.toFixed(3)>0) {
-                o.unmet_heat_demand_count++
-                o.total_unmet_heat_demand += unmet_heat_demand
+                o.heat.total_unmet_demand += unmet_heat_demand
             }
             
-            o.total_biomass_used += system_fuel_demand.biomass
+            o.biomass.total_used += system_fuel_demand.biomass
             d.methane_for_spacewaterheat.push(system_fuel_demand.methane)
             d.hydrogen_for_spacewaterheat.push(system_fuel_demand.hydrogen)
             
             let spacewater_elec_demand = system_fuel_demand.elres + system_fuel_demand.heatpump
-            if (spacewater_elec_demand>o.max_heat_demand_elec) o.max_heat_demand_elec = spacewater_elec_demand
+            if (spacewater_elec_demand>o.heat.max_elec_demand) o.heat.max_elec_demand = spacewater_elec_demand
             d.spacewater_elec.push(spacewater_elec_demand)       
         }
     },
@@ -500,8 +503,8 @@ var model = {
             o.industry.total_biomass_demand += non_heat_process_biomass
             o.industry.total_biomass_demand += heat_process_fixed_biomass
             
-            o.total_biomass_used += non_heat_process_biomass
-            o.total_biomass_used += heat_process_fixed_biomass
+            o.biomass.total_used += non_heat_process_biomass
+            o.biomass.total_used += heat_process_fixed_biomass
             
             // Balance calculation for BEV storage stage
             d.balance_before_BEV_storage.push(d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - d.industrial_elec_demand[hour])   
@@ -516,7 +519,7 @@ var model = {
 
         bivalent_backup = false
         if (bivalent_backup) {
-            o.total_ambient_heat_supply = 0
+            o.heat.total_ambient_supply = 0
             var spacewater_elec_demand = 0;
             var balance = 0;
             var unmet = 0;
@@ -555,7 +558,7 @@ var model = {
                 
                 heat_from_heatpumps = spacewater_elec_heatpumps * i.heatpump_COP
                 ambient_heat_used = heat_from_heatpumps * (1.0-1.0/i.heatpump_COP)
-                o.total_ambient_heat_supply += ambient_heat_used
+                o.heat.total_ambient_supply += ambient_heat_used
                 
                 // repopulate
                 d.spacewater_elec[hour] = spacewater_elec_demand
@@ -571,15 +574,16 @@ var model = {
 
         let daily_BEV_demand = o.transport.fuel_totals.BEV * 1000.0 / 365.25
         let daily_elec_trains_demand = o.transport.fuel_totals.DEV * 1000.0 / 365.25
-
-        o.BEV_Store_SOC_start = i.transport.electric_car_battery_capacity * 0.5
-        o.BEV_Store_SOC = o.BEV_Store_SOC_start
         
-        o.total_EV_charge = 0
-        o.total_EV_demand = 0
-        o.unmet_EV_demand = 0
+        o.electric_transport = {}
+        o.electric_transport.BEV_Store_SOC_start = i.transport.electric_car_battery_capacity * 0.5
+        o.electric_transport.BEV_Store_SOC = o.electric_transport.BEV_Store_SOC_start
+        
+        o.electric_transport.total_EV_charge = 0
+        o.electric_transport.total_EV_demand = 0
+        o.electric_transport.unmet_EV_demand = 0
 
-        o.total_elec_trains_demand = 0
+        o.electric_transport.total_elec_trains_demand = 0
         
         d.balance_before_elec_store = []
         
@@ -608,7 +612,7 @@ var model = {
             
             // Electric trains
             let elec_trains_demand = elec_trains_use_profile[hour%24] * daily_elec_trains_demand
-            o.total_elec_trains_demand += elec_trains_demand
+            o.electric_transport.total_elec_trains_demand += elec_trains_demand
             balance -= elec_trains_demand 
             
             // Standard EV charge
@@ -620,7 +624,7 @@ var model = {
             if (i.transport.smart_charging_enabled==1 && balance>EV_charge) {
                 if (i.transport.smart_charge_type=="average") {
                     if (deviation_from_mean_BEV>0.0) {
-                        EV_charge = (i.transport.electric_car_battery_capacity-o.BEV_Store_SOC)*deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
+                        EV_charge = (i.transport.electric_car_battery_capacity-o.electric_transport.BEV_Store_SOC)*deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
                         if (EV_charge>balance) EV_charge = balance
                     }
                 } else {
@@ -629,22 +633,22 @@ var model = {
             }
             // Charging rate & quantity limits
             if (EV_charge>max_charge_rate) EV_charge = max_charge_rate
-            if ((o.BEV_Store_SOC+EV_charge)>i.transport.electric_car_battery_capacity) EV_charge = i.transport.electric_car_battery_capacity - o.BEV_Store_SOC
+            if ((o.electric_transport.BEV_Store_SOC+EV_charge)>i.transport.electric_car_battery_capacity) EV_charge = i.transport.electric_car_battery_capacity - o.electric_transport.BEV_Store_SOC
             // Subtract EV charge from balance and add to SOC
             balance -= EV_charge
-            o.BEV_Store_SOC += EV_charge
-            o.total_EV_charge += EV_charge
+            o.electric_transport.BEV_Store_SOC += EV_charge
+            o.electric_transport.total_EV_charge += EV_charge
             d.EV_charge.push(EV_charge)
             
             // EV DEMAND -----------------------------------
             let EV_demand = BEV_use_profile[hour%24] * daily_BEV_demand
-            o.BEV_Store_SOC -= EV_demand
-            if (o.BEV_Store_SOC<0) {
-                o.unmet_EV_demand += -1 * o.BEV_Store_SOC;
-                o.BEV_Store_SOC = 0
+            o.electric_transport.BEV_Store_SOC -= EV_demand
+            if (o.electric_transport.BEV_Store_SOC<0) {
+                o.electric_transport.unmet_EV_demand += -1 * o.electric_transport.BEV_Store_SOC;
+                o.electric_transport.BEV_Store_SOC = 0
             }
             
-            o.total_EV_demand += EV_demand
+            o.electric_transport.total_EV_demand += EV_demand
             
             // SMART DISCHARGE -----------------------------
             let EV_smart_discharge = 0.0
@@ -652,7 +656,7 @@ var model = {
             if (i.transport.V2G_enabled==1 && balance<0.0) {
                 if (i.transport.V2G_discharge_type=="average") {
                     if (deviation_from_mean_BEV<0.0) {
-                        EV_smart_discharge = o.BEV_Store_SOC*-deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
+                        EV_smart_discharge = o.electric_transport.BEV_Store_SOC*-deviation_from_mean_BEV/(i.transport.electric_car_battery_capacity*0.5)
                         if (EV_smart_discharge>-balance) EV_smart_discharge = -balance
                     }
                 } else {
@@ -663,17 +667,17 @@ var model = {
             // Discharge rate & quantity limits
             if (EV_smart_discharge>max_charge_rate) EV_smart_discharge = max_charge_rate
             //EV_V2G_min_SOC = i.transport.electric_car_battery_capacity * 0.3
-            //if ((o.BEV_Store_SOC-EV_smart_discharge)<EV_V2G_min_SOC) EV_smart_discharge = o.BEV_Store_SOC-EV_V2G_min_SOC
-            if (EV_smart_discharge>o.BEV_Store_SOC) EV_smart_discharge = o.BEV_Store_SOC
+            //if ((o.electric_transport.BEV_Store_SOC-EV_smart_discharge)<EV_V2G_min_SOC) EV_smart_discharge = o.electric_transport.BEV_Store_SOC-EV_V2G_min_SOC
+            if (EV_smart_discharge>o.electric_transport.BEV_Store_SOC) EV_smart_discharge = o.electric_transport.BEV_Store_SOC
             if (EV_smart_discharge<0) EV_smart_discharge = 0
                    
             // Apply to SOC and balance
-            o.BEV_Store_SOC -= EV_smart_discharge
+            o.electric_transport.BEV_Store_SOC -= EV_smart_discharge
             balance += EV_smart_discharge
             
             // Timeseries
             d.EV_smart_discharge.push(EV_smart_discharge)
-            d.BEV_Store_SOC.push(o.BEV_Store_SOC)
+            d.BEV_Store_SOC.push(o.electric_transport.BEV_Store_SOC)
             d.EL_transport.push(elec_trains_demand + EV_charge)
             d.balance_before_elec_store.push(balance)        
         }    
@@ -728,17 +732,19 @@ var model = {
         o.synth_fuel.total_biomass_used = 0
                  
         // Power to X
-        o.total_electricity_for_power_to_X = 0
+        o.power_to_X = {}
+        o.power_to_X.total_electricity_demand = 0
         
         // --------------------------------------------- 
         // Final balance
         // ---------------------------------------------
-        o.initial_elec_balance_positive = 0
-        o.final_elec_balance_negative = 0
-        o.final_elec_balance_positive = 0
-        o.total_initial_elec_balance_positive = 0
-        o.total_final_elec_balance_negative = 0
-        o.total_final_elec_balance_positive = 0
+        o.balance = {}
+        o.balance.initial_elec_balance_positive = 0
+        o.balance.final_elec_balance_negative = 0
+        o.balance.final_elec_balance_positive = 0
+        o.balance.total_initial_elec_balance_positive = 0
+        o.balance.total_final_elec_balance_negative = 0
+        o.balance.total_final_elec_balance_positive = 0
 
         // Electric backup
         o.electric_backup = {}        
@@ -883,8 +889,8 @@ var model = {
             d.elec_store_discharge.push(elec_store_discharge)
             
             if (balance>=0.0) {
-                o.total_initial_elec_balance_positive += balance
-                o.initial_elec_balance_positive++
+                o.balance.total_initial_elec_balance_positive += balance
+                o.balance.initial_elec_balance_positive++
             }
 
             // ----------------------------------------------------------------------------
@@ -989,7 +995,7 @@ var model = {
             
             balance -= electricity_for_power_to_X
             
-            o.total_electricity_for_power_to_X += electricity_for_power_to_X
+            o.power_to_X.total_electricity_demand += electricity_for_power_to_X
             
             // Losses and electric consumption graph
             o.total_losses.power_to_X += electricity_for_power_to_X - (methane_from_IHTEM + synth_fuel_produced_PTL)
@@ -1032,12 +1038,12 @@ var model = {
             let unmet_elec = 0.0
             if (balance>=0.0) {
                 export_elec = balance
-                o.total_final_elec_balance_positive += export_elec
-                o.final_elec_balance_positive++
+                o.balance.total_final_elec_balance_positive += export_elec
+                o.balance.final_elec_balance_positive++
             } else {
                 unmet_elec = -balance
-                o.total_final_elec_balance_negative += unmet_elec
-                o.final_elec_balance_negative++
+                o.balance.total_final_elec_balance_negative += unmet_elec
+                o.balance.final_elec_balance_negative++
                 
                 if (unmet_elec>o.electric_backup.max_shortfall) {
                     o.electric_backup.max_shortfall = unmet_elec
@@ -1101,8 +1107,8 @@ var model = {
             if (o.synth_fuel.store_SOC<o.synth_fuel.store_min_SOC) o.synth_fuel.store_min_SOC = o.synth_fuel.store_SOC   
             // ------------------------------------------------------------------------------------
             // Biomass
-            o.total_biomass_used += biogas_supply / i.biogas.anaerobic_digestion_efficiency 
-            o.total_biomass_used += hourly_biomass_for_biofuel
+            o.biomass.total_used += biogas_supply / i.biogas.anaerobic_digestion_efficiency 
+            o.biomass.total_used += hourly_biomass_for_biofuel
             
             // Hydrogen SOC data
             d.hydrogen_SOC.push(o.hydrogen.SOC)
@@ -1118,22 +1124,22 @@ var model = {
         
         // -------------------------------------------------------------------------------
         
-        o.total_unmet_demand = o.total_final_elec_balance_negative
+        o.balance.total_unmet_demand = o.balance.total_final_elec_balance_negative
         
-        o.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.total_biomass_used + o.total_ambient_heat_supply 
+        o.balance.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply 
         
-        o.total_demand = 0
-        o.total_demand += o.total_traditional_elec 
-        o.total_demand += o.space_heating.total_demand
-        o.total_demand += o.water_heating.total_demand
-        o.total_demand += o.industry.total_elec_demand
-        o.total_demand += o.industry.total_methane_demand
-        o.total_demand += o.industry.total_biomass_demand
+        o.balance.total_demand = 0
+        o.balance.total_demand += o.LAC.total 
+        o.balance.total_demand += o.space_heating.total_demand
+        o.balance.total_demand += o.water_heating.total_demand
+        o.balance.total_demand += o.industry.total_elec_demand
+        o.balance.total_demand += o.industry.total_methane_demand
+        o.balance.total_demand += o.industry.total_biomass_demand
         
-        o.total_demand += o.total_EV_demand
-        o.total_demand += o.total_elec_trains_demand
-        o.total_demand += o.hydrogen.total_vehicle_demand
-        o.total_demand += o.synth_fuel.total_demand
+        o.balance.total_demand += o.electric_transport.total_EV_demand
+        o.balance.total_demand += o.electric_transport.total_elec_trains_demand
+        o.balance.total_demand += o.hydrogen.total_vehicle_demand
+        o.balance.total_demand += o.synth_fuel.total_demand
         
         // -------------------------------------------------------------------------------------------------
         let final_store_balance = 0
@@ -1142,7 +1148,7 @@ var model = {
         console.log("heatstore_additions: "+heatstore_additions)
         final_store_balance += heatstore_additions
 
-        let BEV_store_additions =  o.BEV_Store_SOC - o.BEV_Store_SOC_start
+        let BEV_store_additions =  o.electric_transport.BEV_Store_SOC - o.electric_transport.BEV_Store_SOC_start
         console.log("BEV_store_additions: "+BEV_store_additions)
         final_store_balance += BEV_store_additions
 
@@ -1164,43 +1170,43 @@ var model = {
 
         console.log("final_store_balance: "+final_store_balance)
         
-        console.log("total_heat_spill: "+o.total_heat_spill);
+        console.log("total_heat_spill: "+o.heat.total_spill);
         
-        console.log("unmet_EV_demand: "+o.unmet_EV_demand)
+        console.log("unmet_EV_demand: "+o.electric_transport.unmet_EV_demand)
         console.log("Unmet hydrogen demand: "+o.hydrogen.unmet_demand)
         console.log("Unmet synth fuel demand: "+o.synth_fuel.unmet_demand)
-        o.total_unmet_demand += o.unmet_EV_demand + o.hydrogen.unmet_demand + o.synth_fuel.unmet_demand
+        o.balance.total_unmet_demand += o.electric_transport.unmet_EV_demand + o.hydrogen.unmet_demand + o.synth_fuel.unmet_demand
         
-        o.total_spill = o.methane.store_excess + o.total_heat_spill
+        o.balance.total_spill = o.methane.store_excess + o.heat.total_spill
         
         // -------------------------------------------------------------------------------------------------
-        o.total_exess = o.total_final_elec_balance_positive + final_store_balance; //o.total_supply - o.total_demand
+        o.balance.total_exess = o.balance.total_final_elec_balance_positive + final_store_balance; //o.balance.total_supply - o.balance.total_demand
         
-        o.total_losses_combined = o.total_spill
+        o.balance.total_losses_combined = o.balance.total_spill
         for (var z in o.total_losses) {
-            o.total_losses_combined += o.total_losses[z];
+            o.balance.total_losses_combined += o.total_losses[z];
         }
 
-        console.log("total_supply: "+o.total_supply)
-        console.log("total_unmet_demand: "+o.total_unmet_demand)
-        console.log("total_demand: "+o.total_demand)    
-        console.log("total_losses_combined: "+o.total_losses_combined)
-        console.log("total_exess: "+o.total_exess)
+        console.log("total_supply: "+o.balance.total_supply)
+        console.log("total_unmet_demand: "+o.balance.total_unmet_demand)
+        console.log("total_demand: "+o.balance.total_demand)    
+        console.log("total_losses_combined: "+o.balance.total_losses_combined)
+        console.log("total_exess: "+o.balance.total_exess)
             
-        let unaccounted_balance = o.total_supply + o.total_unmet_demand - o.total_demand - o.total_losses_combined - o.total_exess
+        let unaccounted_balance = o.balance.total_supply + o.balance.total_unmet_demand - o.balance.total_demand - o.balance.total_losses_combined - o.balance.total_exess
         console.log("unaccounted_balance: "+unaccounted_balance.toFixed(6))
         // -------------------------------------------------------------------------------------------------
         
-        console.log("max heat elec demand: "+o.max_heat_demand_elec);
+        console.log("max heat elec demand: "+o.heat.max_elec_demand);
         
-        o.primary_energy_factor = o.total_supply / o.total_demand
+        o.balance.primary_energy_factor = o.balance.total_supply / o.balance.total_demand
         
         // -------------------------------------------------------------------------------
         
-        o.total_other_biomass_used = o.total_biomass_used - (i.biogas.biomass_for_biogas*10000) - o.synth_fuel.total_biomass_used
+        o.biomass.total_direct_use = o.biomass.total_used - (i.biogas.biomass_for_biogas*10000) - o.synth_fuel.total_biomass_used
         
         o.hydrogen.electrolysis_capacity_factor = 100*(o.hydrogen.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * 87600))
-        o.power_to_X_capacity_factor = 100*(o.total_electricity_for_power_to_X / (i.power_to_X.capacity * 87600))
+        o.power_to_X.capacity_factor = 100*(o.power_to_X.total_electricity_demand / (i.power_to_X.capacity * 87600))
         
         var out = "";
         var error = 0
@@ -1231,8 +1237,7 @@ var model = {
     // Land area factors
     // ----------------------------------------------------------------------------    
     land_area: function() {
-    
-        o.biomass = {}
+        
         o.landarea = {}
         
         // Biogas
@@ -1271,7 +1276,7 @@ var model = {
         // 41.5 TWh per 1.534 MHa = 27 TWh/Mha or 0.0370 Mha per TWh
           
         biomass_landarea_factor = 0.0370 // old: ((0.1/365.25)/0.024) / 0.975
-        o.landarea.for_other_biomass = o.total_other_biomass_used * 0.0001 * biomass_landarea_factor
+        o.landarea.for_other_biomass = o.biomass.total_direct_use * 0.0001 * biomass_landarea_factor
         o.landarea.for_other_biomass_prc = 100 * o.landarea.for_other_biomass / 24.2495
         
         o.landarea.for_biomass = o.landarea.grass_for_biogas + o.landarea.for_synth_fuel + o.landarea.for_other_biomass    
