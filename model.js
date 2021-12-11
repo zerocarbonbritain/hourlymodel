@@ -56,6 +56,7 @@ var model = {
         model.land_area();
         model.scaled_by();
         model.embodied_energy();
+        model.emissions_balance();
     },
 
     // ---------------------------------------------------------------------------------------------    
@@ -1281,6 +1282,69 @@ var model = {
         
         o.landarea.for_biomass = o.landarea.grass_for_biogas + o.landarea.for_synth_fuel + o.landarea.for_other_biomass    
         o.landarea.for_biomass_prc = 100 * o.landarea.for_biomass / 24.2495
+    },
+
+    // ----------------------------------------------------------------------------
+    // Emissions balance
+    // ----------------------------------------------------------------------------     
+    emissions_balance: function() {
+
+        // Temporarily set emission balance inputs here
+        i.emissions_balance = {
+            // Disused mines (figure for 2016 from NAEI)
+            disused_mines: 0.45,
+            // Gas leakage from NAEI [2] figures for 2016 reduced by ratio of 2016 gas use (approx. 900 TWh) to ZCB 2030 use (approx. 100 TWh).
+            gas_leakage: 0.06,
+            // Assume that only process emissions remain, energy emissions fully removed. This is in line with: AEA [3] states potential for abatement of 13.06 of 16.02 MtCO2e by 2030. This is maximum feasible abatement and appears to be achievable by several routes, therefore assume it represents full abatement of non-process emissions.
+            iron_and_steel: 2.52,
+            // ZCB targets reduction of 75%
+            refrigerants: 2.34,
+            foams: 0.10,
+            firefighting: 0.05,
+            solvents: 0.02,
+            electrical_insulation: 0.18,
+            
+            // Domestic
+            aerosols_and_inhalers: 0.71, 
+                        
+            // Industrial
+            cement: 3.67,
+            lime: 0.79,
+            soda_ash: 0.11,
+            glass: 0.28,
+            aluminium: 0.58,
+            nitric_acid: 0.05,
+            adipic_acid: 0.03,
+            other_chemical: 0.20,
+            halocarbon: 0.06,
+            magnesium_cover_gas: 0.04,
+
+            // Agirculture
+            agriculture_total: 19.65,
+            
+            // Land use
+            biomass_burning: 0.3,
+            reforestation: -25.31,
+            wetlands: -1.93,
+            harvested_wood: -14.72,
+            settlements: 2.44,
+            
+            landfill: 3.86,
+            waste_water_handling: 0.86,
+            waste_incineration: 0.38,
+            
+            international_aviation_bunkers: 7.43,
+            biochar_carbon_capture: -1.59,
+            landfill_carbon_capture: -4.27
+            
+        }
+        
+        o.emissions_balance = {}
+        o.emissions_balance.total = 0
+        
+        for (var z in i.emissions_balance) {
+            o.emissions_balance.total += i.emissions_balance[z]
+        }
     },
 
     // ----------------------------------------------------------------------------
