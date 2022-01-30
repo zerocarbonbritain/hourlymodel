@@ -99,7 +99,16 @@
   </body>
 </html>
 
-<script language="javascript" type="text/javascript" src="defaults.js?v=2"></script>
+<script>
+function normalise_profile(profile) {
+    var sum = 0
+    for (var z=0; z<24; z++) sum += profile[z]
+    for (var z=0; z<24; z++) profile[z] /= sum
+    return profile
+}
+</script>
+
+<script language="javascript" type="text/javascript" src="defaults.js?v=3"></script>
 <script language="javascript" type="text/javascript" src="model.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=1"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=2"></script>
@@ -352,13 +361,6 @@ $(".menu-title").click(function(){
     var name = $(this).attr("name");
     $(".menu-items[name="+name+"]").toggle();
 });
-
-function normalise_profile(profile) {
-    var sum = 0
-    for (var z=0; z<24; z++) sum += profile[z]
-    for (var z=0; z<24; z++) profile[z] /= sum
-    return profile
-}
     
 </script>
 

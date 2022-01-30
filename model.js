@@ -25,13 +25,9 @@ var model = {
 
         // Profiles
         if (!i.use_flat_profiles) {
-            cooking_profile = [0.00093739, 0.00093739, 0.00093739, 0.005002513, 0.015325386, 0.034557134, 0.075528659, 0.10242465, 0.112118681, 0.068802784, 0.046286663, 0.030023072, 0.019077393, 0.019077393, 0.021108649, 0.029555111, 0.069742295, 0.077562688, 0.071150746, 0.058327514, 0.044879681, 0.037216907, 0.032212599, 0.027207312]
-            hot_water_profile = [0.00093739, 0.00093739, 0.00093739, 0.005002513, 0.015325386, 0.034557134, 0.075528659, 0.10242465, 0.112118681, 0.068802784, 0.046286663, 0.030023072, 0.019077393, 0.019077393, 0.021108649, 0.029555111, 0.069742295, 0.077562688, 0.071150746, 0.058327514, 0.044879681, 0.037216907, 0.032212599, 0.027207312]
-            space_heat_profile = [0.008340899, 0.008340899, 0.008340899, 0.008340866, 0.016680908, 0.06511456, 0.076803719, 0.083470637, 0.0751301, 0.06009123, 0.04593692, 0.040060611, 0.0350685, 0.033362773, 0.033394683, 0.034247234, 0.036743141, 0.040881845, 0.05175043, 0.06264997, 0.064292437, 0.060849104, 0.04176657, 0.008341064]
-            //elec_trains_use_profile = flat_profile
-            //BEV_use_profile = flat_profile
-            //BEV_charge_profile = flat_profile
-            //BEV_plugged_in_profile = flat_profile
+            cooking_profile = JSON.parse(JSON.stringify(default_cooking_profile))
+            hot_water_profile = JSON.parse(JSON.stringify(default_hot_water_profile))
+            space_heat_profile = JSON.parse(JSON.stringify(default_space_heat_profile))
         } else {
             cooking_profile = JSON.parse(JSON.stringify(flat_profile))
             hot_water_profile = JSON.parse(JSON.stringify(flat_profile))
@@ -619,7 +615,7 @@ var model = {
             let EV_charge = BEV_charge_profile[hour%24] * daily_BEV_demand
             
             let max_charge_rate = BEV_plugged_in_profile[hour%24] * i.transport.electric_car_max_charge_rate
-            
+            // let max_charge_rate = i.transport.electric_car_max_charge_rate 
             // SMART CHARGE --------------------------------
             if (i.transport.smart_charging_enabled==1 && balance>EV_charge) {
                 if (i.transport.smart_charge_type=="average") {
@@ -668,7 +664,12 @@ var model = {
             if (EV_smart_discharge>max_charge_rate) EV_smart_discharge = max_charge_rate
             //EV_V2G_min_SOC = i.transport.electric_car_battery_capacity * 0.3
             //if ((o.electric_transport.BEV_Store_SOC-EV_smart_discharge)<EV_V2G_min_SOC) EV_smart_discharge = o.electric_transport.BEV_Store_SOC-EV_V2G_min_SOC
-            if (EV_smart_discharge>o.electric_transport.BEV_Store_SOC) EV_smart_discharge = o.electric_transport.BEV_Store_SOC
+            
+            
+            let available_SOC = o.electric_transport.BEV_Store_SOC - i.transport.electric_car_battery_capacity*0.2
+            if (available_SOC<0) available_SOC = 0;
+            
+            if (EV_smart_discharge>available_SOC) EV_smart_discharge = available_SOC;
             if (EV_smart_discharge<0) EV_smart_discharge = 0
                    
             // Apply to SOC and balance
