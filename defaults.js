@@ -232,6 +232,80 @@ var i = {
         hydrogen_turbine_capacity: 0.0,
         hydrogen_turbine_efficiency: 0.6
     },
+    
+    land_use: {
+        existing_natural_broadleaf_woodland:      139,
+        existing_natural_coniferous_woodland:     151,
+        existing_productive_broadleaf_woodland:  1247,
+        existing_productive_coniferous_woodland: 1357,
+        new_natural_broadleaf_woodland:          1000,
+        new_natural_coniferous_woodland:         1000,
+        new_productive_broadleaf_woodland:        700,
+        new_productive_coniferous_woodland:       700,
+        short_rotation_forestry:                 1660,
+        short_rotation_coppice:                  1300,
+        perrennial_grass_miscanthus:             1000,
+        rotational_grass_ryegrass:                820,
+        intensive_and_rough_grazing:             2833,
+        annual_grass_hemp:                        320,
+        food_crops:                              3408,
+        feed_crops_for_livestock:                1210,
+
+        mountain_heath_and_bog:                  3566,
+        semi_natural_grassland:                   155,
+        coastal_and_freshwater:                   692,
+
+        urban_areas:                             1459
+    },
+    
+    emissions_balance: {
+        // Disused mines (figure for 2016 from NAEI)
+        disused_mines: 0.448,
+        // Gas leakage from NAEI [2] figures for 2016 reduced by ratio of 2016 gas use (approx. 900 TWh) to ZCB 2030 use (approx. 100 TWh).
+        gas_leakage: 0.064,
+        // ZCB targets reduction of 75%
+        refrigerants: 2.34,
+        
+        // Includes: foams, firefighting, solvents, electrical_insulation, aerosols_and_inhalers
+        other_foams_solvents_aerosols: 1.05,
+        
+        // Industrial
+
+        // Assume that only process emissions remain, energy emissions fully removed. This is in line with: AEA [3] states potential for abatement of 13.06 of 16.02 MtCO2e by 2030. This is maximum feasible abatement and appears to be achievable by several routes, therefore assume it represents full abatement of non-process emissions.
+        iron_and_steel: 2.52,
+        // Clinker substitution with equivalent process CO2 emissions reduction (40%?)
+        cement: 3.67,
+        // Assume 25% reduction
+        lime: 0.789,
+        // Assume 25% reduction
+        soda_ash: 0.105,
+        // Assume 25% reduction
+        glass: 0.276,
+        // Remains the same, reduction in F-gases
+        aluminium: 0.583,
+        // nitric_acid, adipic_acid, other_chemical, halocarbon, magnesium_cover_gas
+        other: 0.382,
+
+        // Agirculture
+        agriculture_total: 19.646,
+        
+        // Land use
+        biomass_burning: 0.3,
+        
+        reforestation: 0,
+        harvested_wood: 0,
+
+        wetlands: -1.926,           
+        settlements: 2.44,
+        
+        landfill: 3.86,
+        waste_water_handling: 0.879,
+        waste_incineration: 0.377,
+        
+        international_aviation_bunkers: 0,
+        biochar_carbon_capture: 0,
+        landfill_carbon_capture: -4.267
+    },
 
     // Embodied Energy
     EE: {

@@ -53,7 +53,7 @@ var model = {
         model.electric_transport();
         model.main_loop();
         model.final();
-        model.land_area();
+        model.land_use();
         model.scaled_by();
         model.embodied_energy();
         model.emissions_balance();
@@ -1233,55 +1233,96 @@ var model = {
         if (h<10) h = "0"+h
         o.electric_backup.max_shortfall_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear(); 
     },
-
-    // ----------------------------------------------------------------------------
-    // Land area factors
-    // ----------------------------------------------------------------------------    
-    land_area: function() {
+    
+    land_use: function() {
+        o.land_use = {}
         
-        o.landarea = {}
-        
-        // Biogas
-        // 779 kha rotational grasses (ryegrass) produces 8.18 Modt product
-        // 4.72 TWh/Modt used in MATRIX spreadsheet (or should it be 9.08?)
-        // 8.18 Modt x 4.72 TWh/Modt = 38.61 TWh / 779 kha = 0.56 W/m2
-        // 38.61 TWh per 0.779 Mha = 49.6 TWh per Mha or 0.02 Mha per TWh
-        
-        // 34.15 (20.49/0.6, ZCB MATRIX) TWh of biomass for biogas equivalent from waste sources
-        // subtracted here so that land requirement shown is just for additional 
-        // rotational grasses.
-        
+        // Work backwards to land areas
         o.biomass.grass_for_biogas = i.biogas.biomass_for_biogas - 34.15
         if (o.biomass.grass_for_biogas<0.0) o.biomass.grass_for_biogas = 0.0
+
+        i.land_use.rotational_grass_ryegrass = o.biomass.grass_for_biogas / (10.5 * 0.001 * 0.95 * 4.72)
+        i.land_use.perrennial_grass_miscanthus = (o.synth_fuel.total_biomass_used * 0.0001) / (15.0 * 0.001 * 0.95 * 4.72)
+
+        // Work forwards to TWh
+        let short_rotation_forestry_harvestable_modtyr = ((i.land_use.short_rotation_forestry * 5.08 * 0.001)/(44/12))/0.5
+        let short_rotation_forestry_TWh = short_rotation_forestry_harvestable_modtyr * 0.65 * 4.72
         
-        let biomass_landarea_factor = 0.02 // old: ((0.1/365.25)/0.024) / 0.51
-        o.landarea.grass_for_biogas = o.biomass.grass_for_biogas * biomass_landarea_factor
-        o.landarea.grass_for_biogas_prc = 100 * o.landarea.grass_for_biogas / 24.2495
+        let biomass_demand_for_heat_TWh = o.biomass.total_direct_use * 0.0001
+        let short_rotation_coppice_TWh = biomass_demand_for_heat_TWh - short_rotation_forestry_TWh
         
-        // Synth fuel
-        // 24.2 Modt/yr made up of 14.25 Modt/yr Miscanthus (950 kha) & 9.95 Modt/yr SRC (780 kha) 
-        // 24.2 Modt/yr from 1730 kha total
-        // 4.72 TWh/Modt used in MATRIX spreadsheet (or should it be 3.07?) 
-        // 24.2 Modt/yr x 4.72 TWh/Modt = 114 TWh
-        // 114 TWh per 1.730 MHa = 66 TWh/Mha or 0.0152 Mha per TWh
+        // Work backwards to land area
+        i.land_use.short_rotation_coppice = short_rotation_coppice_TWh / (12.75 * 0.001 * 0.95 * 4.72)
         
-        biomass_landarea_factor = 0.0152 // old: ((0.1/365.25)/0.024) / 0.975
-        o.landarea.for_synth_fuel = o.synth_fuel.total_biomass_used * 0.0001 * biomass_landarea_factor
-        o.landarea.for_synth_fuel_prc = 100 * o.landarea.for_synth_fuel / 24.2495
         
-        // Biomass for heating and CHP
-        // 8.79 Modt/yr made up of 2.99 Modt/yr SRF (1079 kha) & 5.80 Modt/yr SRC (455 kha) 
-        // 8.79 Modt/yr from 1534 kha total
-        // 4.72 TWh/Modt used in MATRIX spreadsheet
-        // 8.79 Modt/yr x 4.72 TWh/Modt = 41.5 TWh
-        // 41.5 TWh per 1.534 MHa = 27 TWh/Mha or 0.0370 Mha per TWh
-          
-        biomass_landarea_factor = 0.0370 // old: ((0.1/365.25)/0.024) / 0.975
-        o.landarea.for_other_biomass = o.biomass.total_direct_use * 0.0001 * biomass_landarea_factor
-        o.landarea.for_other_biomass_prc = 100 * o.landarea.for_other_biomass / 24.2495
+        o.land_use.total = 0
+        for (var z in i.land_use) {
+            o.land_use.total += i.land_use[z]
+        }
         
-        o.landarea.for_biomass = o.landarea.grass_for_biogas + o.landarea.for_synth_fuel + o.landarea.for_other_biomass    
-        o.landarea.for_biomass_prc = 100 * o.landarea.for_biomass / 24.2495
+        o.land_use.available = 24728.0 - o.land_use.total
+        
+        o.land_use.total_prc = o.land_use.total / 24728.0
+        
+        // ---------------------
+        // Carbon sequestration        
+        // ---------------------
+        // See ZCB Matrix spreadsheet
+        // Todo: copy references over from ZCB Matrix spreadsheet and provide more explanation
+        
+        o.carbon_sequestration = {}
+        
+        // Carbon sequestration: Reforestation  
+        o.carbon_sequestration.reforestation = {
+            new_natural_broadleaf_woodland: i.land_use.new_natural_broadleaf_woodland * 8.80 * 0.001,
+            new_natural_coniferous_woodland: i.land_use.new_natural_coniferous_woodland * 9.11 * 0.001,
+            new_productive_broadleaf_woodland: i.land_use.new_productive_broadleaf_woodland * 2.49 * 0.001,
+            new_productive_coniferous_woodland: i.land_use.new_productive_coniferous_woodland * 4.25 * 0.001,
+            short_rotation_forestry: i.land_use.short_rotation_forestry * 3.26 * 0.001
+        }
+        var total = 0
+        for (var z in o.carbon_sequestration.reforestation) { 
+            total +=  o.carbon_sequestration.reforestation[z]
+        }
+        o.carbon_sequestration.reforestation.total = total
+        
+        // Carbon sequestration: Buildings etc
+        let existing_productive_broadleaf_woodland_harvestable_modtyr = ((i.land_use.existing_productive_broadleaf_woodland * 0.7 * 0.001)/(44/12))/0.5
+        let existing_productive_coniferous_woodland_harvestable_modtyr = ((i.land_use.existing_productive_coniferous_woodland * 1.47 * 0.001)/(44/12))/0.5
+        let new_productive_broadleaf_woodland_harvestable_modtyr = ((i.land_use.new_productive_broadleaf_woodland * 0.7 * 0.001)/(44/12))/0.5
+        let new_productive_coniferous_woodland_harvestable_modtyr = ((i.land_use.new_productive_coniferous_woodland * 1.47 * 0.001)/(44/12))/0.5
+        let annual_grass_hemp_harvestable_modtyr = i.land_use.annual_grass_hemp * 9.5 * 0.001
+         
+        o.carbon_sequestration.timber_products = {
+            existing_productive_broadleaf_woodland: existing_productive_broadleaf_woodland_harvestable_modtyr * 0.95 * 0.5*(44/12),
+            existing_productive_coniferous_woodland: existing_productive_coniferous_woodland_harvestable_modtyr * 0.95 * 0.5*(44/12),
+            new_productive_broadleaf_woodland: new_productive_broadleaf_woodland_harvestable_modtyr * 0.95 * 0.5*(44/12),
+            new_productive_coniferous_woodland: new_productive_coniferous_woodland_harvestable_modtyr * 0.95 * 0.5*(44/12),
+            short_rotation_forestry: short_rotation_forestry_harvestable_modtyr * 0.3 * 0.5*(44/12),
+            annual_grass_hemp: annual_grass_hemp_harvestable_modtyr * 0.95 * 0.5*(44/12)
+        }
+        var total = 0
+        for (var z in o.carbon_sequestration.timber_products) { 
+            total +=  o.carbon_sequestration.timber_products[z]
+        }
+        o.carbon_sequestration.timber_products.total = total
+        
+        // Carbon sequestration: Biochar
+        o.carbon_sequestration.biochar = {
+            existing_productive_broadleaf_woodland: existing_productive_broadleaf_woodland_harvestable_modtyr * 0.05 * 0.7,
+            existing_productive_coniferous_woodland: existing_productive_coniferous_woodland_harvestable_modtyr * 0.05 * 0.7,
+            new_productive_broadleaf_woodland: new_productive_broadleaf_woodland_harvestable_modtyr * 0.05 * 0.7,
+            new_productive_coniferous_woodland: new_productive_coniferous_woodland_harvestable_modtyr * 0.05 * 0.7,
+            short_rotation_forestry: short_rotation_forestry_harvestable_modtyr * 0.05 * 0.7,
+            landfill: 1.47 * 0.88
+        }
+        var total = 0
+        for (var z in o.carbon_sequestration.biochar) { 
+            total +=  o.carbon_sequestration.biochar[z]
+        }
+        o.carbon_sequestration.biochar.total = total
+        
+        o.carbon_sequestration.total = o.carbon_sequestration.reforestation.total + o.carbon_sequestration.timber_products.total + o.carbon_sequestration.biochar.total
     },
 
     // ----------------------------------------------------------------------------
@@ -1289,57 +1330,17 @@ var model = {
     // ----------------------------------------------------------------------------     
     emissions_balance: function() {
 
-        // Temporarily set emission balance inputs here
-        i.emissions_balance = {
-            // Disused mines (figure for 2016 from NAEI)
-            disused_mines: 0.45,
-            // Gas leakage from NAEI [2] figures for 2016 reduced by ratio of 2016 gas use (approx. 900 TWh) to ZCB 2030 use (approx. 100 TWh).
-            gas_leakage: 0.06,
-            // Assume that only process emissions remain, energy emissions fully removed. This is in line with: AEA [3] states potential for abatement of 13.06 of 16.02 MtCO2e by 2030. This is maximum feasible abatement and appears to be achievable by several routes, therefore assume it represents full abatement of non-process emissions.
-            iron_and_steel: 2.52,
-            // ZCB targets reduction of 75%
-            refrigerants: 2.34,
-            foams: 0.10,
-            firefighting: 0.05,
-            solvents: 0.02,
-            electrical_insulation: 0.18,
-            
-            // Domestic
-            aerosols_and_inhalers: 0.71, 
-                        
-            // Industrial
-            cement: 3.67,
-            lime: 0.79,
-            soda_ash: 0.11,
-            glass: 0.28,
-            aluminium: 0.58,
-            nitric_acid: 0.05,
-            adipic_acid: 0.03,
-            other_chemical: 0.20,
-            halocarbon: 0.06,
-            magnesium_cover_gas: 0.04,
-
-            // Agirculture
-            agriculture_total: 19.65,
-            
-            // Land use
-            biomass_burning: 0.3,
-            reforestation: -25.31,
-            wetlands: -1.93,
-            harvested_wood: -14.72,
-            settlements: 2.44,
-            
-            landfill: 3.86,
-            waste_water_handling: 0.86,
-            waste_incineration: 0.38,
-            
-            international_aviation_bunkers: 7.43,
-            biochar_carbon_capture: -1.59,
-            landfill_carbon_capture: -4.27
-            
-        }
-        
         o.emissions_balance = {}
+
+        // Aviation emissions uplift
+        let aviation_uplift = 1.6
+        o.emissions_balance.aviation_co2e = o.transport.modes.Aviation.IC.TWh * 0.30704 * (aviation_uplift-1)
+                
+        i.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total
+        i.emissions_balance.harvested_wood = -o.carbon_sequestration.timber_products.total     
+        i.emissions_balance.biochar_carbon_capture = -o.carbon_sequestration.biochar.total     
+        i.emissions_balance.international_aviation_bunkers = o.emissions_balance.aviation_co2e
+        
         o.emissions_balance.total = 0
         
         for (var z in i.emissions_balance) {
