@@ -781,6 +781,250 @@ input[type='text'] {
 </div>
 
 <div class="box">
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>LAND USE<span style="float:right">{{ o.land_use.total_prc*100 | toFixed(1) }} %</span></b></div>
+    <div class="inner" name="land_use">
+        <table class="table" style="width:100%">
+            <tr>
+                <th></th>
+                <th>Land area</th>
+                <th>Carbon<br>sequestration</th>
+            </tr>
+            <tr>
+                <td>Existing natural broadleaf woodland</td>
+                <td>{{ i.land_use.existing_natural_broadleaf_woodland }} kha</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Existing natural coniferous woodland</td>
+                <td>{{ i.land_use.existing_natural_coniferous_woodland }} kha</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Existing productive broadleaf woodland</td>
+                <td>{{ i.land_use.existing_productive_broadleaf_woodland }} kha</td>
+                <td>{{ o.carbon_sequestration.timber_products.existing_productive_broadleaf_woodland+o.carbon_sequestration.biochar.existing_productive_broadleaf_woodland | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td>Existing productive coniferous woodland</td>
+                <td>{{ i.land_use.existing_productive_coniferous_woodland }} kha</td>
+                <td>{{ o.carbon_sequestration.timber_products.existing_productive_coniferous_woodland+o.carbon_sequestration.biochar.existing_productive_coniferous_woodland | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>New natural broadleaf woodland</td>
+                <td><input v-model.number="i.land_use.new_natural_broadleaf_woodland" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+                <td>{{ o.carbon_sequestration.reforestation.new_natural_broadleaf_woodland | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td>New natural coniferous woodland</td>
+                <td><input v-model.number="i.land_use.new_natural_coniferous_woodland" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+                <td>{{ o.carbon_sequestration.reforestation.new_natural_coniferous_woodland | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td>New productive broadleaf woodland</td>
+                <td><input v-model.number="i.land_use.new_productive_broadleaf_woodland" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+                <td>{{ (o.carbon_sequestration.reforestation.new_productive_broadleaf_woodland+o.carbon_sequestration.timber_products.new_productive_broadleaf_woodland+o.carbon_sequestration.biochar.new_productive_broadleaf_woodland) | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td>New productive coniferous woodland</td>
+                <td><input v-model.number="i.land_use.new_productive_coniferous_woodland" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+                <td>{{ (o.carbon_sequestration.reforestation.new_productive_coniferous_woodland+o.carbon_sequestration.timber_products.new_productive_coniferous_woodland+o.carbon_sequestration.biochar.new_productive_coniferous_woodland) | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>        
+            <tr>
+                <td>Short rotation forestry <span style="font-size:12px">(30% wood products & 65% biomass heat)</span></span></td>
+                <td><input v-model.number="i.land_use.short_rotation_forestry" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+                <td>{{ (o.carbon_sequestration.reforestation.short_rotation_forestry+o.carbon_sequestration.timber_products.short_rotation_forestry+o.carbon_sequestration.biochar.short_rotation_forestry) | toFixed(1) }} MtCO2e/yr</td>
+            </tr>
+            <tr>
+                <td>Short rotation coppice <span style="font-size:12px">(biomass heat)</span></td>
+                <td>{{ i.land_use.short_rotation_coppice | toFixed(0) }} kha</td>
+            </tr>
+            <tr>
+                <td>Perrennial grass miscanthus <span style="font-size:12px">(liquid biofuels)</span></td>
+                <td>{{ i.land_use.perrennial_grass_miscanthus | toFixed(0) }} kha</td>
+            </tr>
+            <tr>
+                <td>Rotational grass ryegrass <span style="font-size:12px">(biogas)</span></td>
+                <td>{{ i.land_use.rotational_grass_ryegrass | toFixed(0) }} kha</td>
+            </tr>
+            <tr>
+                <td>Annual grass hemp <span style="font-size:12px">(insulation & other materials)</span></span></td>
+                <td><input v-model.number="i.land_use.annual_grass_hemp" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr>      
+            <tr>
+                <td></td><td></td>
+            </tr>        
+            <tr>
+                <td>Intensive and rough grazing <span style="font-size:12px">(Currently 11,522 kha)</span></td>
+                <td><input v-model.number="i.land_use.intensive_and_rough_grazing" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr>
+            <tr>
+                <td>Food crops <span style="font-size:12px">(Currently 2,557 kha)</span></td>
+                <td><input v-model.number="i.land_use.food_crops" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr> 
+            <tr>
+                <td>Feed crops for livestock <span style="font-size:12px">(Currently 2,557 kha)</span></td>
+                <td><input v-model.number="i.land_use.feed_crops_for_livestock" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr> 
+            <tr>
+                <td></td><td></td>
+            </tr>        
+            <tr>
+                <td>Mountain heath and bog</span></td>
+                <td><input v-model.number="i.land_use.mountain_heath_and_bog" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr>   
+            <tr>
+                <td>Semi natural grassland</span></td>
+                <td><input v-model.number="i.land_use.semi_natural_grassland" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr>  
+            <tr>
+                <td>Coastal and freshwater</span></td>
+                <td><input v-model.number="i.land_use.coastal_and_freshwater" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr>  
+            <tr>
+                <td>Urban areas</span></td>
+                <td><input v-model.number="i.land_use.urban_areas" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
+            </tr>
+            <tr>
+                <td></td><td></td>
+            </tr>        
+            <tr>
+                <th>Total land used in scenario</span></th>
+                <th>{{ o.land_use.total | toFixed(0) }} kha</th>
+            </tr>   
+            <tr>
+                <th>Remaining land available</span></th>
+                <th>{{ o.land_use.available | toFixed(0) }} kha</th>
+            </tr>  
+            <tr>
+                <td>Total UK land area</span></td>
+                <td>24728 kha</td>
+            </tr>
+            <tr>
+                <td>Percentage of UK land area used</span></td>
+                <td>{{ o.land_use.total_prc*100 | toFixed(1) }} %</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>EMISSIONS BALANCE<span style="float:right">{{ o.emissions_balance.total | toFixed(2) }} MtCO2e/yr</span></b></div>
+    <div class="inner" name="emissions_balance">
+        <table class="table" style="width:100%">
+            <tr>
+                <th></th>
+                <th>MtCO2e/yr</th>
+            <tr>
+                <td>Disused mines</td>
+                <td><input v-model.number="i.emissions_balance.disused_mines" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Gas leakage</td>
+                <td><input v-model.number="i.emissions_balance.gas_leakage" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Refrigerants</td>
+                <td><input v-model.number="i.emissions_balance.refrigerants" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Other foams, solvents & aerosols</td>
+                <td><input v-model.number="i.emissions_balance.other_foams_solvents_aerosols" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Iron and steel process emissions</td>
+                <td><input v-model.number="i.emissions_balance.iron_and_steel" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Cement process emissions</td>
+                <td><input v-model.number="i.emissions_balance.cement" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Lime process emissions</td>
+                <td><input v-model.number="i.emissions_balance.lime" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Soda ash process emissions</td>
+                <td><input v-model.number="i.emissions_balance.soda_ash" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Glass process emissions</td>
+                <td><input v-model.number="i.emissions_balance.glass" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Aluminium process emissions</td>
+                <td><input v-model.number="i.emissions_balance.aluminium" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Other process emissions</td>
+                <td><input v-model.number="i.emissions_balance.other" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>              
+            <tr>
+                <td>Agriculture total</td>
+                <td><input v-model.number="i.emissions_balance.agriculture_total" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Biomass burning</td>
+                <td><input v-model.number="i.emissions_balance.biomass_burning" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Reforestation</td>
+                <td>{{ i.emissions_balance.reforestation | toFixed(2) }} </td>
+            </tr>
+            <tr>
+                <td>Harvested wood</td>
+                <td>{{ i.emissions_balance.harvested_wood | toFixed(2) }} </td>
+            </tr>
+            <tr>
+                <td>Wetlands</td>
+                <td><input v-model.number="i.emissions_balance.wetlands" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Settlements</td>
+                <td><input v-model.number="i.emissions_balance.settlements" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Landfill</td>
+                <td><input v-model.number="i.emissions_balance.landfill" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Waste water handling</td>
+                <td><input v-model.number="i.emissions_balance.waste_water_handling" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Waste incineration</td>
+                <td><input v-model.number="i.emissions_balance.waste_incineration" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>International aviation bunkers</td>
+                <td>{{ i.emissions_balance.international_aviation_bunkers | toFixed(2) }} </td>
+            </tr>
+            <tr>
+                <td>Biochar carbon capture</td>
+                <td>{{ i.emissions_balance.biochar_carbon_capture | toFixed(2) }} </td>             
+            </tr>
+            <tr>
+                <td>Landfill carbon capture</td>
+                <td><input v-model.number="i.emissions_balance.landfill_carbon_capture" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <th>Total balance</th>
+                <th>{{ o.emissions_balance.total | toFixed(2) }} MtCO2e/yr</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="box">
     <div class="box-title">
         <img class="icon-expand" src="img/expand.png"><b>FINAL SUPPLY DEMAND MATCHING
         <span style="float:right">{{ (100*o.balance.final_elec_balance_positive/i.hours) | toFixed(3) }}%</span>
@@ -798,6 +1042,9 @@ input[type='text'] {
             <p style="font-size:18px">Primary energy factor: {{ o.balance.primary_energy_factor | toFixed(2) }}</p>
             <p style="font-size:18px">Exess generation: {{ o.balance.total_exess*0.0001 | toFixed(0) }} TWh</p>
             <p style="font-size:18px">Unmet demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
+            <p style="font-size:18px">Land use total: {{ o.land_use.total | toFixed(0) }} kha</p>
+            <p style="font-size:18px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>
+            <p style="font-size:18px">Emissions balance {{ o.emissions_balance.total | toFixed(2) }}</p>
         </div>
         
         <div style="clear:both"></div>
@@ -942,27 +1189,20 @@ input[type='text'] {
         <tr>
             <td>Of which rotational grasses (e.g ryegrass)</td>
             <td>{{ o.biomass.grass_for_biogas | toFixed(1) }}</td>
-            <td>{{ o.landarea.grass_for_biogas | toFixed(1) }} Mha</td>
-            <td>{{ o.landarea.grass_for_biogas_prc | toFixed(1) }}% of UK</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
             <td>{{ o.synth_fuel.total_biomass_used*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.landarea.for_synth_fuel | toFixed(1) }} Mha</td>
-            <td>{{ o.landarea.for_synth_fuel_prc | toFixed(1) }}% of UK</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
             <td>{{ o.biomass.total_direct_use*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.landarea.for_other_biomass | toFixed(1) }} Mha</td>
-            <td>{{ o.landarea.for_other_biomass_prc | toFixed(1) }}% of UK</td>
             <td></td>
-        </tr>
-        <tr>
-            <td>All input biomass energy</td>
-            <td>{{ o.total_biomass_used*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.landarea.for_biomass | toFixed(1) }} Mha</td>
-            <td>{{ o.landarea.for_biomass_prc | toFixed(1) }}% of UK</td>
+            <td></td>
         </tr>
         <tr>
             <td></td>
@@ -1020,7 +1260,6 @@ input[type='text'] {
             <tr>
                 <td>Solar PV</td><td v-html="auto_scale(i.supply.solarpv_capacity*o.scaleby,'kW')"></td>
                 <td>Methane storage</td><td v-html="auto_scale(i.methane.storage_capacity_GWh*o.scaleby,'kWh')"></td>
-                <td>Biomass land area</td><td v-html="auto_scale(10000*o.landarea_for_biomass*o.scaleby,'m2')"></td>
             </tr>
             <tr>
                 <td>Hydro</td><td v-html="auto_scale(i.supply.hydro_capacity*o.scaleby,'kW')"></td>
