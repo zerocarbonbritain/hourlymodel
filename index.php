@@ -62,7 +62,7 @@
         
         <div class="menu-title" name="guides"><b>Guides</b></div>
         <div class="menu-items" name="guides">
-          <div class="menu-item"><a href="#scenario_variations">Scenario Variations</a></div>
+          <!--<div class="menu-item"><a href="#scenario_variations">Scenario Variations</a></div>-->
           <div class="menu-item"><a href="#community_scenario">Creating a community scale ZeroCarbonBritain scenario</a></div>
           <div class="menu-item"><a href="#dataset">ZCB Dataset</a></div>
           <div class="menu-item"><a href="ZCB-Methodology-Papers-2019.pdf">ZCB Methodology 2019 (PDF)</a></div>        
@@ -108,8 +108,8 @@ function normalise_profile(profile) {
 }
 </script>
 
-<script language="javascript" type="text/javascript" src="defaults.js?v=3"></script>
-<script language="javascript" type="text/javascript" src="model.js?v=2"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=4"></script>
+<script language="javascript" type="text/javascript" src="model.js?v=3"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=1"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=2"></script>
 
