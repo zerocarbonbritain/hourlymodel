@@ -205,6 +205,7 @@ function load_page(page)
           update: function () {
             model.run();
             model_view();
+            model_ui();
           },
           pan_left: function () {
             view.pan_left();

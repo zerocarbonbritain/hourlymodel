@@ -1,4 +1,6 @@
 var i = {
+    units_mode: "TWhyr",
+
     hours: 87648,
     population_2030: 70499802,
     households_2030: 29941701,

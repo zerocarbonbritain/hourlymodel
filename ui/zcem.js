@@ -6,13 +6,13 @@ function model_ui() {
     var scl = 1.0/10000.0;
     var units = "TWh/yr";
     
-    if (units_mode=="kwhdperperson") {
+    if (i.units_mode=="kwhdperperson") {
         units = "kWh/d.p"
         // GWh converted to kWh x 1000 x 1000, per day divide by 365 & 10 years
         scl = (1000.0*1000.0) / (10*365.0*i.population_2030)
     }
     
-    if (units_mode=="kwhdperhousehold") {
+    if (i.units_mode=="kwhdperhousehold") {
         units = "kWh/d.h"
         // GWh converted to kWh x 1000 x 1000, per day divide by 365 & 10 years
         scl = (1000.0*1000.0) / (10*365.0*i.households_2030)
