@@ -55,6 +55,8 @@
           <div class="menu-item"><a href="#industry">Industry</a></div>                    
           <div class="menu-item"><a href="#elec_storage">Electricity Storage</a></div>                    
           <div class="menu-item"><a href="#backup">Storage & Backup</a></div>     
+          <div class="menu-item"><a href="#land_use">Land use</a></div>     
+          <div class="menu-item"><a href="#emissions_balance">Emissions balance</a></div>     
           <div class="menu-item"><a href="#balance">Final balance</a></div>
           <div class="menu-item"><a href="#scaled">Scaled by</a></div>
           <div class="menu-item"><a href="#manufacturing_energy">Manufacturing Energy</a></div>                                      

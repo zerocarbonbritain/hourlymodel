@@ -46,7 +46,7 @@ var i = {
 
     water_heating: {
         domestic_TWhy: 40.80,
-        services_TWhy: 15.99
+        services_TWhy: 15.90
     },
     
     heatstore: {
@@ -57,22 +57,27 @@ var i = {
         
     heating_systems: {
         heatpump: {
+            name: "Heat pumps",
             share: 90,
             efficiency:300
         },
         elres: {
+            name: "Direct electric",      
             share: 5,
             efficiency: 100
         },
         methane: {
+            name: "Methane gas boilers",      
             share: 0,
             efficiency: 90
         },
         hydrogen: {
+            name: "Hydrogen gas boilers",      
             share: 0,
             efficiency: 90
         },
         biomass: {
+            name: "Biomass boilers",      
             share: 5,
             efficiency: 90
         }

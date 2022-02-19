@@ -223,39 +223,36 @@ input[type='text'] {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>LIGHTING, APPLIANCES & COOKING</b></div>
     <div class="inner" name="lac">
-        <div style="font-size:14px">Domestic Lighting & Appliance electricity demand in 2007 was 86 TWh, falling to 76 TWh in 2017, ZCB Scenario projects 55% reduction from 2007 as a result of LED lighting and more efficient appliances. Service sector Lighting & Appliance demand was 59 TWh in 2007 increasing to 71 TWh in 2017, ZCB scenario projects 30% reduction from 2007. Cooling demand was 9 TWh in 2007, increasing to 13 TWh in 2017, scenario projects falling cooling energy demand based on increasing cooling efficiency.<br><br>
-        Projected scenario domestic cooking electricity consumption: 10.47 TWh, Catering electricity consumption: 16.85 TWh. In 2007 and 2017 these were: 15 TWh, 22 TWh and 14 TWh, 21 TWh respectively.
-        </div>
         
         <table class="table" style="width:100%">
         <tr>
             <th width="40%"></th>
             <th width="20%">Annual demand</th>
-            <th width="20%">% Reduction vs 2007</th>
+            <th width="20%">% Reduction vs 2018</th>
             <th width="20%"></th>
         </tr>
         <tr>
             <td>Domestic Lighting & Appliances</td>
             <td><input v-model.value="i.LAC.domestic.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>   
-            <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/86)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/76.6)*100 | toFixed(0) }}%</td>
             <td>{{ o.LAC.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
             <td><input v-model.value="i.LAC.domestic.cooking_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.domestic.cooking_TWhy/15)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.domestic.cooking_TWhy/13.2)*100 | toFixed(0) }}%</td>
             <td>{{ o.LAC.domestic_cooking_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services Lighting & Appliances</td>
             <td><input v-model.value="i.LAC.services.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.services.lighting_and_appliances_TWhy/59)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.services.lighting_and_appliances_TWhy/43.6)*100 | toFixed(0) }}%</td>
             <td></td> 
         </tr>
         <tr>
             <td>Services Catering</td>
             <td><input v-model.value="i.LAC.services.catering_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.services.catering_TWhy/22)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.services.catering_TWhy/25.3)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
@@ -280,35 +277,35 @@ input[type='text'] {
             <th width="20%"></th>
             <th width="20%"></th>
             <th width="20%">Annual demand</th>
-            <th width="20%">% Reduction vs 2007</th>
+            <th width="20%">% Reduction vs 2018</th>
             <th width="20%"></th>
         </tr>
         <tr>
             <td>Domestic</td>
             <td><input v-model.value="i.space_heating.domestic_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.space_heating.total_domestic_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_domestic_demand*0.0001) / 266.0))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_domestic_demand*0.0001) / 312.2))*100 | toFixed(0) }}%</td>
             <td>{{ o.space_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td><input v-model.value="i.space_heating.services_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.space_heating.total_services_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_services_demand*0.0001) / 83.0))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_services_demand*0.0001) / 112.5))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Industry</td>
             <td><input v-model.value="i.space_heating.industry_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.space_heating.total_industry_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_industry_demand*0.0001) / 28.0))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_industry_demand*0.0001) / 22.5))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Combined</td>
             <td>{{ o.space_heating.demand_GWK | toFixed(3) }} GW/K</td>
             <td>{{ o.space_heating.total_demand*0.0001 | toFixed(1) }} TWh/yr</td>     
-            <td>{{ (1.0-((o.space_heating.total_demand*0.0001)/(266.0+83.0+28.0)))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_demand*0.0001)/(312.2+112.5+22.5)))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -320,14 +317,14 @@ input[type='text'] {
             <td width="20%">Domestic</td>
             <td width="20%"></td>
             <td width="20%"><input v-model.value="i.water_heating.domestic_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td width="20%">{{ (1-i.water_heating.domestic_TWhy/71)*100 | toFixed(0) }}%</td>
+            <td width="20%">{{ (1-i.water_heating.domestic_TWhy/82.2)*100 | toFixed(0) }}%</td>
             <td width="20%">{{ o.water_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td></td>
             <td><input v-model.value="i.water_heating.services_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td>{{ (1-i.water_heating.services_TWhy/16)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.water_heating.services_TWhy/15.9)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
@@ -352,7 +349,7 @@ input[type='text'] {
                 <th>Fuel demand</th>
             </tr>
             <tr v-for="(system,index) in i.heating_systems">
-                <td>{{ index }}</td>
+                <td>{{ system.name }}</td>
                 <td><input v-model.value="system.share" type="text" @change="update" style="width:70px"  autocomplete="off" itype="%" /></td>
                 <td>{{ o.heating_systems[index].heat_demand | format_energy }} <span class="unit">TWh/yr</span></td>
                 <td><input v-model.value="system.efficiency" type="text" @change="update" style="width:70px"  autocomplete="off" itype="%" /></td>
