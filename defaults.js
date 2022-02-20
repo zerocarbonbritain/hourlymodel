@@ -8,7 +8,7 @@ var i = {
     use_flat_profiles: 0,
       
     supply: {
-        offshore_wind_capacity: 136.0,
+        offshore_wind_capacity: 140.0,
         offshore_wind_availability: 0.9,
         onshore_wind_capacity: 30.0,
         onshore_wind_availability: 0.9,
@@ -29,8 +29,8 @@ var i = {
     
     LAC: {
         domestic: {
-            lighting_and_appliances_TWhy: 32.92,
-            cooking_TWhy: 10.48
+            lighting_and_appliances_TWhy: 38.59,
+            cooking_TWhy: 10.47
         },
         services: {
             lighting_and_appliances_TWhy: 41.41,
@@ -47,10 +47,14 @@ var i = {
     },
 
     water_heating: {
-        domestic_TWhy: 40.80,
-        services_TWhy: 15.90
+        domestic_TWhy: 70.36,
+        services_TWhy: 12.01
     },
     
+    // Heat store option is currently hidden
+    // functionality is integrated in the space and water heat profiles
+    // provides more sensible heat demand profiles
+    // Perhaps to be reviewed and improved in future
     heatstore: {
         enabled: false,
         storage_capacity: 100.0,
@@ -143,10 +147,10 @@ var i = {
         electric_car_battery_capacity: 513.0,    // GWh
         electric_car_max_charge_rate: 73.3,      // GW
 
-        smart_charging_enabled: 1,
+        smart_charging_enabled: 0,
         smart_charge_type: "average",  // or flatout
         
-        V2G_enabled: 1,
+        V2G_enabled: 0,
         V2G_discharge_type: "average", // or flatout
 
         rail_freight_elec_demand: 2.0,
@@ -225,24 +229,24 @@ var i = {
     // Electricity Storage
     electric_storage: {
         type:"average",
-        capacity_GWh: 50.0,
-        charge_capacity_GW: 10.0,
-        discharge_capacity_GW: 10.0,
+        capacity_GWh: 200.0,
+        charge_capacity_GW: 50.0,
+        discharge_capacity_GW: 50.0,
         charge_efficiency: 0.95,
         discharge_efficiency: 0.95
     },
     
     // Hydrogen
     hydrogen: {
-        electrolysis_capacity_GW: 24.0,
+        electrolysis_capacity_GW: 27.0,
         electrolysis_efficiency: 0.8,
-        storage_capacity_GWh: 15000.0,
+        storage_capacity_GWh: 20000.0,
         minimum_store_level: 0.1
     },
     
     // biogas
     biogas: {
-        biomass_for_biogas: 72.0,
+        biomass_for_biogas: 85.0,
         anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
         co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))   // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     },
@@ -251,12 +255,12 @@ var i = {
     methane: {
         methanation_capacity: 5.15,
         SOC_start: 10000.0,
-        storage_capacity_GWh: 52000.0
+        storage_capacity_GWh: 60000.0
     },
 
     // Synth fuel production
     synth_fuel: {
-        capacity_GW: 8.8,
+        capacity_GW: 9.0,
         store_capacity_GWh: 50000,
         store_start_GWh: 5000.0,
         FT_process_biomass_req: 1.3,   // GWh/GWh fuel
@@ -282,10 +286,10 @@ var i = {
 
     // Dispatchable
     electric_backup: {
-        methane_turbine_capacity: 42.0,
-        methane_turbine_efficiency: 0.6,
+        methane_turbine_capacity: 70.0,
+        methane_turbine_efficiency: 0.5,
         hydrogen_turbine_capacity: 0.0,
-        hydrogen_turbine_efficiency: 0.6
+        hydrogen_turbine_efficiency: 0.5
     },
     
     land_use: {
@@ -388,7 +392,7 @@ default_space_heat_profile = normalise_profile([0.3,0.32,0.35,0.42,0.5,0.55,0.58
 elec_trains_use_profile = [0.004268293, 0.002439024, 0.001829268, 0.001219512, 0.003658536, 0.009756097, 0.025609755, 0.061585364, 0.054878047, 0.048780486, 0.058536584, 0.066463413, 0.07317073, 0.065853657, 0.07317073, 0.082317071, 0.077439022, 0.079268291, 0.067073169, 0.051219511, 0.038414633, 0.02804878, 0.015853658, 0.009146341];
 
 BEV_use_profile = normalise_profile([0.05,0.04,0.04,0.04,0.07,0.12,0.31,0.55,0.65,0.7,0.73,0.74,0.75,0.76,0.78,0.82,0.83,0.83,0.75,0.6,0.45,0.35,0.25,0.11]);
-BEV_charge_profile = normalise_profile([0.95,0.96,0.96,0.9,0.8,0.62,0.48,0.4,0.3,0.3,0.27,0.26,0.25,0.24,0.22,0.18,0.17,0.17,0.25,0.4,0.55,0.65,0.75,0.89]);
+default_BEV_charge_profile = normalise_profile([0.95,0.96,0.96,0.9,0.8,0.62,0.48,0.4,0.3,0.3,0.27,0.26,0.25,0.24,0.22,0.18,0.17,0.17,0.25,0.4,0.55,0.65,0.75,0.89]);
 BEV_plugged_in_profile = [0.95,0.96,0.96,0.96,0.93,0.88,0.69,0.45,0.35,0.3,0.27,0.26,0.25,0.24,0.22,0.18,0.17,0.17,0.25,0.4,0.55,0.65,0.75,0.89];
 
 high_temp_process_profile = JSON.parse(JSON.stringify(flat_profile))

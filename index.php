@@ -110,8 +110,8 @@ function normalise_profile(profile) {
 }
 </script>
 
-<script language="javascript" type="text/javascript" src="defaults.js?v=6"></script>
-<script language="javascript" type="text/javascript" src="model.js?v=5"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=7"></script>
+<script language="javascript" type="text/javascript" src="model.js?v=6"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=4"></script>
 

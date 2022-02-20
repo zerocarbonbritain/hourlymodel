@@ -28,10 +28,12 @@ var model = {
             cooking_profile = JSON.parse(JSON.stringify(default_cooking_profile))
             hot_water_profile = JSON.parse(JSON.stringify(default_hot_water_profile))
             space_heat_profile = JSON.parse(JSON.stringify(default_space_heat_profile))
+            BEV_charge_profile = JSON.parse(JSON.stringify(default_BEV_charge_profile))      
         } else {
             cooking_profile = JSON.parse(JSON.stringify(flat_profile))
             hot_water_profile = JSON.parse(JSON.stringify(flat_profile))
             space_heat_profile = JSON.parse(JSON.stringify(flat_profile))  
+            BEV_charge_profile = JSON.parse(JSON.stringify(flat_profile))  
         }
         
         o.biomass = {
