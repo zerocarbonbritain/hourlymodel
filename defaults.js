@@ -8,7 +8,7 @@ var i = {
     use_flat_profiles: 0,
       
     supply: {
-        offshore_wind_capacity: 134.0,
+        offshore_wind_capacity: 136.0,
         offshore_wind_availability: 0.9,
         onshore_wind_capacity: 30.0,
         onshore_wind_availability: 0.9,
@@ -156,22 +156,70 @@ var i = {
     },
     
     industry: {
-        high_temp_process_TWhy: 49.01,                 // 26.3% elec, 73.7% gas in original model
-        low_temp_dry_sep_TWhy: 117.78,                 // 66% elec, 11% gas, 22% biomass CHP in original model      
-        non_heat_process_elec_TWhy: 88.00,
-        non_heat_process_biogas_TWhy: 13.44,
-        non_heat_process_biomass_TWhy: 5.58,
-        biofuel_TWhy: 13.44,
+        // 2018 levels
+        /*high_temp_process_TWhy: 39.9,
+        low_temp_process_TWhy: 64.2,
+        dry_sep_TWhy: 20.4,
+        other_heat_TWhy: 24.7,
+        motors_TWhy: 31.8,
+        compressed_air_TWhy: 9.0,
+        lighting_TWhy: 2.7,
+        refrigeration_TWhy: 5.3,
+        other_non_heat_TWhy: 18.4,*/
 
-        high_temp_process_fixed_elec_prc: 0.125,
-        high_temp_process_fixed_gas_prc: 0.375,
-        high_temp_process_fixed_biomass_prc: 0.0,
-        high_temp_process_DSR_prc: 0.5,
+        // ZCB Originals
+        high_temp_process_TWhy: 53,
+        low_temp_process_TWhy: 85,
+        dry_sep_TWhy: 27.0,
+        other_heat_TWhy: 33,
+        motors_TWhy: 42.0,
+        compressed_air_TWhy: 12.0,
+        lighting_TWhy: 4.0,
+        refrigeration_TWhy: 7.0,
+        other_non_heat_TWhy: 25,
+        
+        // non_heat_process_elec_TWhy: 88.00,
+        // non_heat_process_biogas_TWhy: 13.44,
+        // non_heat_process_biomass_TWhy: 5.58,
+        // biofuel_TWhy: 13.44,
 
-        low_temp_process_fixed_elec_prc: 0.3,
-        low_temp_process_fixed_gas_prc: 0.1,
-        low_temp_process_fixed_biomass_prc: 0.2,
-        low_temp_process_DSR_prc: 0.4
+        high_temp_process_fixed_elec_prc: 12.5,
+        high_temp_process_fixed_CH4_prc: 32.5,
+        high_temp_process_fixed_H2_prc: 0,
+        high_temp_process_fixed_liquid_prc: 5.0,    
+        high_temp_process_fixed_biomass_prc: 10,
+        high_temp_process_DSR_CH4_prc: 40,
+        high_temp_process_DSR_H2_prc: 0,
+
+        low_temp_process_fixed_elec_prc: 33,
+        low_temp_process_fixed_CH4_prc: 12,
+        low_temp_process_fixed_H2_prc: 0,
+        low_temp_process_fixed_liquid_prc: 5,
+        low_temp_process_fixed_biomass_prc: 10,
+        low_temp_process_DSR_CH4_prc: 40,
+        low_temp_process_DSR_H2_prc: 0,
+
+        dry_sep_fixed_elec_prc: 30,
+        dry_sep_fixed_CH4_prc: 16,
+        dry_sep_fixed_H2_prc: 0,
+        dry_sep_fixed_liquid_prc: 4.0,
+        dry_sep_fixed_biomass_prc: 10,
+        dry_sep_DSR_CH4_prc: 40,
+        dry_sep_DSR_H2_prc: 0,
+        
+        other_heat_fixed_elec_prc: 30,
+        other_heat_fixed_CH4_prc: 10,
+        other_heat_fixed_H2_prc: 0,
+        other_heat_fixed_liquid_prc: 0, 
+        other_heat_fixed_biomass_prc: 20,
+        other_heat_DSR_CH4_prc: 40,
+        other_heat_DSR_H2_prc: 0,
+
+        other_non_heat_fixed_elec_prc: 48,
+        other_non_heat_fixed_CH4_prc: 37,
+        other_non_heat_fixed_H2_prc: 0,
+        other_non_heat_fixed_liquid_prc: 5,
+        other_non_heat_fixed_biomass_prc: 10
     },
         
     // Electricity Storage
@@ -186,7 +234,7 @@ var i = {
     
     // Hydrogen
     hydrogen: {
-        electrolysis_capacity_GW: 25.0,
+        electrolysis_capacity_GW: 24.0,
         electrolysis_efficiency: 0.8,
         storage_capacity_GWh: 15000.0,
         minimum_store_level: 0.1
@@ -194,7 +242,7 @@ var i = {
     
     // biogas
     biogas: {
-        biomass_for_biogas: 70.0,
+        biomass_for_biogas: 72.0,
         anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
         co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))   // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     },
@@ -208,7 +256,7 @@ var i = {
 
     // Synth fuel production
     synth_fuel: {
-        capacity_GW: 9.4,
+        capacity_GW: 8.8,
         store_capacity_GWh: 50000,
         store_start_GWh: 5000.0,
         FT_process_biomass_req: 1.3,   // GWh/GWh fuel

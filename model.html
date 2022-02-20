@@ -559,7 +559,7 @@ input[type='text'] {
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>INDUSTRIAL (& cooking) FUEL INPUTS</b></div>
     <div class="inner" name="industry">
         <div style="font-size:14px">
-        Industrial energy demand is based on 2007 levels adjusted for 2030 population (1.15x) and a 25% reduction in energy intensity. E.g High temp heat was 57 TWh in 2007 x 1.15 x 0.75 = 49.16 TWh. Actual industrial energy demand in 2017 was 256 TWh consisting of: High temp: 41 TWh, Low temp: 82 TWh, Non heat + other: 133 TWh. 11% less than projected scenario demand for 2030.
+        The original ZCB scenario bases industrial energy demand on 2007 levels adjusted for 2030 population and a 25% reduction in energy intensity, this gives a total industrial energy demand of 331 TWh × 1.16 × 0.75 = 288 TWh. Industrial energy demand in 2018 was actually 25% below this at 216 TWh.
         <br><br>
         Industrial energy use is dealt with in the scenario at a high level and a cautious approach is taken. Industry energy demand is an area highlighted for further research within the ZeroCarbonBritain scenario.
         
@@ -568,55 +568,128 @@ input[type='text'] {
         <table class="table" style="width:100%">
         <tr>
           <th></th>
-          <th>Process Energy</th>
-          <th>Fixed Elec</th>
-          <th>Fixed Gas</th>
-          <th>Fixed Biomass</th>
-          <th>DSR</th>
+          <th>Energy Demand</th>
+          <th>Elec</th>
+          <th>CH4</th>
+          <th>H2</th>
+          <th>Synth<br>Fuel</th>
+          <th>Biomass</th>
+          <th>DSR<br>EL>CH4</th>
+          <th>DSR<br>EL>H2</th> 
         </tr>
         <tr>
             <td>High temp process</td>
             <td><input v-model.number="i.industry.high_temp_process_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.number="i.industry.high_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.number="i.industry.high_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.number="i.industry.high_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.number="i.industry.high_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.high_temp_process_fixed_elec_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.high_temp_process_fixed_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.high_temp_process_fixed_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.high_temp_process_fixed_liquid_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.high_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.high_temp_process_DSR_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>          
+            <td><input v-model.number="i.industry.high_temp_process_DSR_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>          
         </tr>
         <tr>
-            <td>Low temp drying & separation</td>
-            <td><input v-model.number="i.industry.low_temp_dry_sep_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.number="i.industry.low_temp_process_fixed_elec_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.number="i.industry.low_temp_process_fixed_gas_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.number="i.industry.low_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
-            <td><input v-model.number="i.industry.low_temp_process_DSR_prc" type="text" @change="update" style="width:70px"  autocomplete="off" /> %</td>
+            <td>Low temp process</td>
+            <td><input v-model.number="i.industry.low_temp_process_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.number="i.industry.low_temp_process_fixed_elec_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.low_temp_process_fixed_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.low_temp_process_fixed_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.low_temp_process_fixed_liquid_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.low_temp_process_fixed_biomass_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.low_temp_process_DSR_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>          
+            <td><input v-model.number="i.industry.low_temp_process_DSR_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>  
         </tr>
         <tr>
-          <th></th>
-          <th>Elec</th>
-          <th>Gas</th>
-          <th>Biomass</th>
-          <th>Biofuel</th>
-          <th></th>
+            <td>Drying and seperation</td>
+            <td><input v-model.number="i.industry.dry_sep_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.number="i.industry.dry_sep_fixed_elec_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.dry_sep_fixed_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.dry_sep_fixed_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.dry_sep_fixed_liquid_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.dry_sep_fixed_biomass_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.dry_sep_DSR_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>          
+            <td><input v-model.number="i.industry.dry_sep_DSR_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>  
         </tr>
         <tr>
-            <td>Non heat process</td>
-            <td><input v-model.number="i.industry.non_heat_process_elec_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.number="i.industry.non_heat_process_biogas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.number="i.industry.non_heat_process_biomass_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td><input v-model.number="i.industry.biofuel_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td>Other heat</td>
+            <td><input v-model.number="i.industry.other_heat_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.number="i.industry.other_heat_fixed_elec_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_heat_fixed_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_heat_fixed_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_heat_fixed_liquid_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_heat_fixed_biomass_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_heat_DSR_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>          
+            <td><input v-model.number="i.industry.other_heat_DSR_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>  
+        </tr>
+        <tr>
+            <td>Motors</td>
+            <td><input v-model.number="i.industry.motors_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td>100%</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
         </tr>
-        <tr><td></td><td></td><td></td><td></td><td></td></tr>
         <tr>
-            <td>Total demand by fuel</td>
-            <td>{{ o.industry.total_elec_demand*0.0001 | toFixed(0) }} TWh</td>
-            <td>{{ o.industry.total_methane_demand*0.0001 | toFixed(0) }} TWh</td>
-            <td>{{ o.industry.total_biomass_demand*0.0001 | toFixed(0) }} TWh</td>
-            <td>{{ o.industry.total_synth_fuel_demand*0.0001 | toFixed(0) }} TWh</td>
+            <td>Compressed air</td>
+            <td><input v-model.number="i.industry.compressed_air_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td>100%</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>          
+        </tr>
+        <tr>
+            <td>Lighting</td>
+            <td><input v-model.number="i.industry.lighting_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td>100%</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Refrigeration</td>
+            <td><input v-model.number="i.industry.refrigeration_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td>100%</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Other non heat</td>
+            <td><input v-model.number="i.industry.other_non_heat_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td><input v-model.number="i.industry.other_non_heat_fixed_elec_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_non_heat_fixed_CH4_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_non_heat_fixed_H2_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_non_heat_fixed_liquid_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td><input v-model.number="i.industry.other_non_heat_fixed_biomass_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
+            <td></td>
             <td></td>
         </tr>
         </table>
-        <div style="font-size:14px"><i>High and low temp DSR implements a substitutable heat source, direct electricity is used when excess renewable energy is available, synthetic gas is used when direct electricity supply is not sufficient. Breakdown of demand by fuel type is detailed in the ZCB matrix spreadsheet.</i></div>
+
+        <div style="font-size:14px"><i>DSR options implement a substitutable heat source, direct electricity is used when excess renewable energy is available, methane or hydrogen is used when direct electricity supply is not sufficient.</i></div>
+        
+        <p><b>Total demand by fuel:</b></p>
+        
+        <table class="table" style="width:100%">
+            <tr><td>Electricity</td><td>{{ o.industry.total_elec_demand*0.0001 | toFixed(1) }} TWh</td></tr>
+            <tr><td>Methane</td><td>{{ o.industry.total_methane_demand*0.0001 | toFixed(1) }} TWh</td></tr>
+            <tr><td>Hydrogen</td><td>{{ o.industry.total_hydrogen_demand*0.0001 | toFixed(1) }} TWh</td></tr>
+            <tr><td>Liquid synth fuel</td><td>{{ o.industry.total_synth_fuel_demand*0.0001 | toFixed(1) }} TWh</td></tr>       
+            <tr><td>Solid biomass</td><td>{{ o.industry.total_biomass_demand*0.0001 | toFixed(1) }} TWh</td></tr>
+            <tr><th>Total demand</th><th>{{ o.industry.total_demand | toFixed(1) }} TWh</th></tr>
+        </table>
     </div>
 </div>
 
