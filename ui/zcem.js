@@ -58,6 +58,7 @@ function model_ui() {
           {"kwhd":o.water_heating.total_demand*scl,"name":"Water Heat","color":0},
           {"kwhd":(o.electric_transport.total_EV_demand+o.electric_transport.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
           {"kwhd":o.hydrogen.total_vehicle_demand*scl,"name":"Hydrogen Transport","color":0},
+          {"kwhd":o.hydrogen.total_industry_demand*scl,"name":"Hydrogen for Industry","color":0},
           {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Biofuel Transport","color":0},
           {"kwhd":10000*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
           // Industry

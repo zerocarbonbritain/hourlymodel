@@ -556,7 +556,7 @@ input[type='text'] {
 </div>
 
 <div class="box">
-    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>INDUSTRIAL (& cooking) FUEL INPUTS</b></div>
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>INDUSTRY</b></div>
     <div class="inner" name="industry">
         <div style="font-size:14px">
         The original ZCB scenario bases industrial energy demand on 2007 levels adjusted for 2030 population and a 25% reduction in energy intensity, this gives a total industrial energy demand of 331 TWh × 1.16 × 0.75 = 288 TWh. Industrial energy demand in 2018 was actually 25% below this at 216 TWh.
@@ -688,7 +688,8 @@ input[type='text'] {
             <tr><td>Hydrogen</td><td>{{ o.industry.total_hydrogen_demand*0.0001 | toFixed(1) }} TWh</td></tr>
             <tr><td>Liquid synth fuel</td><td>{{ o.industry.total_synth_fuel_demand*0.0001 | toFixed(1) }} TWh</td></tr>       
             <tr><td>Solid biomass</td><td>{{ o.industry.total_biomass_demand*0.0001 | toFixed(1) }} TWh</td></tr>
-            <tr><th>Total demand</th><th>{{ o.industry.total_demand | toFixed(1) }} TWh</th></tr>
+            <tr><th>Total demand (in)</th><th>{{ o.industry.total_demand | toFixed(1) }} TWh</th></tr>
+            <tr><th>Total demand (out)</th><th>{{ o.industry.total_demand_check*0.0001 | toFixed(1) }} TWh</th></tr>
         </table>
     </div>
 </div>

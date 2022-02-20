@@ -554,6 +554,13 @@ var model = {
             // Balance calculation for BEV storage stage
             d.balance_before_BEV_storage.push(d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - d.industrial_elec_demand[hour])   
         }
+        
+        o.industry.total_demand_check = 0;
+        o.industry.total_demand_check += o.industry.total_elec_demand
+        o.industry.total_demand_check += o.industry.total_methane_demand
+        o.industry.total_demand_check += o.industry.total_hydrogen_demand
+        o.industry.total_demand_check += o.industry.total_synth_fuel_demand
+        o.industry.total_demand_check += o.industry.total_biomass_demand
     },
 
     // -------------------------------------------------------------------------------------
@@ -755,6 +762,7 @@ var model = {
         o.hydrogen.total_electricity_for_electrolysis = 0
         o.hydrogen.total_demand = 0
         o.hydrogen.total_vehicle_demand = 0
+        o.hydrogen.total_industry_demand = 0
         o.hydrogen.unmet_demand = 0
         o.hydrogen.store_empty_count = 0
         o.hydrogen.store_full_count = 0
@@ -984,6 +992,11 @@ var model = {
             let hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
             o.hydrogen.total_vehicle_demand += hydrogen_for_hydrogen_vehicles
             hydrogen_balance -= hydrogen_for_hydrogen_vehicles
+            
+            // Hydrogen for industry
+            let hydrogen_for_industry = d.hydrogen_for_industry[hour]
+            o.hydrogen.total_industry_demand += hydrogen_for_industry
+            hydrogen_balance -= hydrogen_for_industry
             
             // 3. Hydrogen to synthetic liquid fuels
             let hourly_biomass_for_biofuel = 0.0
