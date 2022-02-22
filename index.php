@@ -111,11 +111,14 @@ function normalise_profile(profile) {
 </script>
 
 <script language="javascript" type="text/javascript" src="defaults.js?v=7"></script>
+<script language="javascript" type="text/javascript" src="scenarios.js?v=7"></script>
 <script language="javascript" type="text/javascript" src="model.js?v=6"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=4"></script>
 
 <script>
+
+var default_scenario = JSON.parse(JSON.stringify(i));
 
 var sidenav_visible = true;
 var window_width = 0;
@@ -199,7 +202,9 @@ function load_page(page)
         el: '#app',
         data: {
             i: i,
-            o: o
+            o: o,
+            selected_scenario: "default",
+            scenario_list: Object.keys(scenarios)
         },
         methods: {
           update: function () {
@@ -261,6 +266,9 @@ function load_page(page)
             
             return "<span>"+(1*val*scale).toFixed(dp)+"</span><span style='font-size:90%'>"+units+"</span>"
 
+          },
+          change_scenario: function() {
+              load_scenario(app.selected_scenario)
           }       
         },
         filters: {
@@ -364,6 +372,24 @@ $(".menu-title").click(function(){
     var name = $(this).attr("name");
     $(".menu-items[name="+name+"]").toggle();
 });
+
+function save_scenario() {
+    console.log(JSON.parse(JSON.stringify(i)))
+}
+
+function load_scenario(name) {
+
+    if (name=='default') {
+
+        i = Object.assign(i,JSON.parse(JSON.stringify(default_scenario)))       
+    } else {
+        i = Object.assign(i,JSON.parse(JSON.stringify(scenarios[name])))
+        
+    }
+    model.run();
+    model_view();
+    model_ui();
+}
     
 </script>
 

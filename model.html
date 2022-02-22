@@ -84,13 +84,14 @@ input[type='text'] {
         <div id="placeholder_bound" style="width:100%">
             <div id="placeholder"></div>
         </div>
-        <!--
         <br>
         
         Select scenario: 
-        <select id="select_scenario">
+        <select id="select_scenario" @change="change_scenario" v-model="selected_scenario">
+            <option value='default'>ZeroCarbonBritain (Default)</option>
+            <option v-for="(name,index) in scenario_list">{{ name }}</option>
         </select>
-        -->     
+        
     </div>
 </div>
 
