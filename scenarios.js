@@ -336,5 +336,343 @@ var scenarios = {
       "offshorewind_lifespan": 25,
       "solarpv_lifespan": 30
     }
+  },
+  "2018 Energy Demand (More H2 rather than synth fuel demand, plus power-to-x technology)": {
+    "units_mode": "TWhyr",
+    "hours": 87648,
+    "population_2030": 70499802,
+    "households_2030": 29941701,
+    "number_of_households": 29941701,
+    "use_flat_profiles": 0,
+    "supply": {
+      "offshore_wind_capacity": 260,
+      "offshore_wind_availability": 0.9,
+      "onshore_wind_capacity": 30,
+      "onshore_wind_availability": 0.9,
+      "wave_capacity": 10,
+      "tidal_capacity": 20,
+      "solarpv_capacity": 90,
+      "solarthermal_capacity": 30,
+      "hydro_capacity": 3,
+      "hydro_capacity_factor": 0.3,
+      "geothermal_elec_capacity": 3,
+      "geothermal_elec_capacity_factor": 0.9,
+      "geothermal_heat_capacity": 2,
+      "geothermal_heat_capacity_factor": 0.9,
+      "nuclear_capacity": 0,
+      "nuclear_capacity_factor": 0.9,
+      "grid_loss_prc": 0.07
+    },
+    "LAC": {
+      "domestic": {
+        "lighting_and_appliances_TWhy": 76.6,
+        "cooking_TWhy": 13.2
+      },
+      "services": {
+        "lighting_and_appliances_TWhy": 43.6,
+        "catering_TWhy": 25.3,
+        "cooling_TWhy": 9
+      }
+    },
+    "space_heating": {
+      "domestic_demand_GWK": 9.3,
+      "services_demand_GWK": 3.35,
+      "industry_demand_GWK": 0.67,
+      "base_temperature": 13.07
+    },
+    "water_heating": {
+      "domestic_TWhy": 82.2,
+      "services_TWhy": 15.9
+    },
+    "heatstore": {
+      "enabled": false,
+      "storage_capacity": 100,
+      "charge_capacity": 50
+    },
+    "heating_systems": {
+      "heatpump": {
+        "name": "Heat pumps",
+        "share": 92,
+        "efficiency": 300
+      },
+      "elres": {
+        "name": "Direct electric",
+        "share": 5,
+        "efficiency": 100
+      },
+      "methane": {
+        "name": "Methane gas boilers",
+        "share": 0,
+        "efficiency": 90
+      },
+      "hydrogen": {
+        "name": "Hydrogen gas boilers",
+        "share": 0,
+        "efficiency": 90
+      },
+      "biomass": {
+        "name": "Biomass boilers",
+        "share": 3,
+        "efficiency": 90
+      }
+    },
+    "transport": {
+      "km_per_mile": 1.609344,
+      "modes": {
+        "Walking": {
+          "miles_pp": 198,
+          "km_pp": 318.65011200000004
+        },
+        "Cycling": {
+          "miles_pp": 48,
+          "km_pp": 77.248512
+        },
+        "Ebikes": {
+          "miles_pp": 0,
+          "mechanical_kwhppkm_full": 0.0081,
+          "load_factor": 1,
+          "prc": {
+            "EV": 1
+          },
+          "efficiency": {
+            "EV": 0.8
+          },
+          "km_pp": 0
+        },
+        "Rail": {
+          "miles_pp": 754,
+          "mechanical_kwhppkm_full": 0.027,
+          "load_factor": 0.324,
+          "prc": {
+            "EV": 0.9,
+            "H2": 0.04,
+            "IC": 0.06
+          },
+          "efficiency": {
+            "EV": 0.9,
+            "H2": 0.3564,
+            "IC": 0.3
+          },
+          "km_pp": 1213.4453760000001
+        },
+        "Bus": {
+          "miles_pp": 325,
+          "mechanical_kwhppkm_full": 0.016,
+          "load_factor": 0.1432,
+          "prc": {
+            "EV": 0.9,
+            "H2": 0.04,
+            "IC": 0.06
+          },
+          "efficiency": {
+            "EV": 0.8,
+            "H2": 0.3564,
+            "IC": 0.3
+          },
+          "km_pp": 523.0368000000001
+        },
+        "Motorbike": {
+          "miles_pp": 46,
+          "mechanical_kwhppkm_full": 0.054,
+          "load_factor": 1.071,
+          "prc": {
+            "EV": 0.9,
+            "H2": 0,
+            "IC": 0.1
+          },
+          "efficiency": {
+            "EV": 0.8,
+            "H2": 0.3564,
+            "IC": 0.3
+          },
+          "km_pp": 74.029824
+        },
+        "Cars & Vans": {
+          "miles_pp": 6299,
+          "mechanical_kwhppkm_full": 0.031,
+          "load_factor": 0.3288,
+          "prc": {
+            "EV": 0.9,
+            "H2": 0.04,
+            "IC": 0.06
+          },
+          "efficiency": {
+            "EV": 0.8,
+            "H2": 0.3564,
+            "IC": 0.3
+          },
+          "km_pp": 10137.257856
+        },
+        "Aviation": {
+          "miles_pp": 3438,
+          "mechanical_kwhppkm_full": 0.07,
+          "load_factor": 0.85,
+          "prc": {
+            "EV": 0.2,
+            "H2": 0,
+            "IC": 0.8
+          },
+          "efficiency": {
+            "EV": 0.8,
+            "H2": 0.2574,
+            "IC": 0.2
+          },
+          "km_pp": 5532.924672
+        }
+      },
+      "electric_car_battery_capacity": 513,
+      "electric_car_max_charge_rate": 73.3,
+      "smart_charging_enabled": 0,
+      "smart_charge_type": "average",
+      "V2G_enabled": 0,
+      "V2G_discharge_type": "average",
+      "rail_freight_elec_demand": 1,
+      "freight_BEV_demand": 31,
+      "freight_H2_demand": 8,
+      "freight_IC_demand": 10
+    },
+    "industry": {
+      "high_temp_process_TWhy": 39.9,
+      "low_temp_process_TWhy": 64.2,
+      "dry_sep_TWhy": 20.4,
+      "other_heat_TWhy": 24.7,
+      "motors_TWhy": 31.8,
+      "compressed_air_TWhy": 9,
+      "lighting_TWhy": 2.7,
+      "refrigeration_TWhy": 5.3,
+      "other_non_heat_TWhy": 18.4,
+      "high_temp_process_fixed_elec_prc": 20,
+      "high_temp_process_fixed_CH4_prc": 15,
+      "high_temp_process_fixed_H2_prc": 20,
+      "high_temp_process_fixed_liquid_prc": 0,
+      "high_temp_process_fixed_biomass_prc": 0,
+      "high_temp_process_DSR_CH4_prc": 45,
+      "high_temp_process_DSR_H2_prc": 0,
+      "low_temp_process_fixed_elec_prc": 35,
+      "low_temp_process_fixed_CH4_prc": 6,
+      "low_temp_process_fixed_H2_prc": 14,
+      "low_temp_process_fixed_liquid_prc": 0,
+      "low_temp_process_fixed_biomass_prc": 0,
+      "low_temp_process_DSR_CH4_prc": 45,
+      "low_temp_process_DSR_H2_prc": 0,
+      "dry_sep_fixed_elec_prc": 35,
+      "dry_sep_fixed_CH4_prc": 6,
+      "dry_sep_fixed_H2_prc": 14,
+      "dry_sep_fixed_liquid_prc": 0,
+      "dry_sep_fixed_biomass_prc": 0,
+      "dry_sep_DSR_CH4_prc": 45,
+      "dry_sep_DSR_H2_prc": 0,
+      "other_heat_fixed_elec_prc": 35,
+      "other_heat_fixed_CH4_prc": 5,
+      "other_heat_fixed_H2_prc": 15,
+      "other_heat_fixed_liquid_prc": 0,
+      "other_heat_fixed_biomass_prc": 0,
+      "other_heat_DSR_CH4_prc": 45,
+      "other_heat_DSR_H2_prc": 0,
+      "other_non_heat_fixed_elec_prc": 55,
+      "other_non_heat_fixed_CH4_prc": 20,
+      "other_non_heat_fixed_H2_prc": 10,
+      "other_non_heat_fixed_liquid_prc": 5,
+      "other_non_heat_fixed_biomass_prc": 10
+    },
+    "electric_storage": {
+      "type": "average",
+      "capacity_GWh": 200,
+      "charge_capacity_GW": 50,
+      "discharge_capacity_GW": 50,
+      "charge_efficiency": 0.95,
+      "discharge_efficiency": 0.95
+    },
+    "hydrogen": {
+      "electrolysis_capacity_GW": 23.5,
+      "electrolysis_efficiency": 0.8,
+      "storage_capacity_GWh": 30000,
+      "minimum_store_level": 0.1
+    },
+    "biogas": {
+      "biomass_for_biogas": 31,
+      "anaerobic_digestion_efficiency": 0.6,
+      "co2_tons_per_gwh_methane": 118.7565226835914
+    },
+    "methane": {
+      "methanation_capacity": 20,
+      "SOC_start": 20000,
+      "storage_capacity_GWh": 120000
+    },
+    "synth_fuel": {
+      "capacity_GW": 9.1,
+      "store_capacity_GWh": 50000,
+      "store_start_GWh": 5000,
+      "FT_process_biomass_req": 1.3,
+      "FT_process_hydrogen_req": 0.61
+    },
+    "power_to_X": {
+      "capacity": 34,
+      "prc_gas": 0.45,
+      "gas_efficiency": 0.75,
+      "prc_liquid": 0.55,
+      "liquid_efficiency": 0.75
+    },
+    "electric_backup": {
+      "methane_turbine_capacity": 120,
+      "methane_turbine_efficiency": 0.5,
+      "hydrogen_turbine_capacity": 0,
+      "hydrogen_turbine_efficiency": 0.5
+    },
+    "land_use": {
+      "existing_natural_broadleaf_woodland": 139,
+      "existing_natural_coniferous_woodland": 151,
+      "existing_productive_broadleaf_woodland": 1247,
+      "existing_productive_coniferous_woodland": 1357,
+      "new_natural_broadleaf_woodland": 1000,
+      "new_natural_coniferous_woodland": 2350,
+      "new_productive_broadleaf_woodland": 700,
+      "new_productive_coniferous_woodland": 700,
+      "short_rotation_forestry": 1550,
+      "short_rotation_coppice": 96.28259612325955,
+      "perrennial_grass_miscanthus": 1764.300816075194,
+      "rotational_grass_ryegrass": 0,
+      "intensive_and_rough_grazing": 2833,
+      "annual_grass_hemp": 320,
+      "food_crops": 3408,
+      "feed_crops_for_livestock": 1210,
+      "mountain_heath_and_bog": 3566,
+      "semi_natural_grassland": 155,
+      "coastal_and_freshwater": 692,
+      "urban_areas": 1459
+    },
+    "emissions_balance": {
+      "disused_mines": 0.448,
+      "gas_leakage": 0.064,
+      "refrigerants": 2.34,
+      "other_foams_solvents_aerosols": 1.05,
+      "iron_and_steel": 1,
+      "cement": 1.85,
+      "lime": 0.35,
+      "soda_ash": 0.05,
+      "glass": 0.276,
+      "aluminium": 0.583,
+      "other": 0.382,
+      "agriculture_total": 19.646,
+      "biomass_burning": 0.3,
+      "reforestation": -39.9795,
+      "harvested_wood": -11.824222166666665,
+      "wetlands": -1.926,
+      "settlements": 2.44,
+      "landfill": 3.86,
+      "waste_water_handling": 0.879,
+      "waste_incineration": 0.15,
+      "international_aviation_bunkers": 23.67161933152349,
+      "biochar_carbon_capture": -1.5276677181818183,
+      "landfill_carbon_capture": -4.267
+    },
+    "EE": {
+      "onshorewind_GWh_per_GW": 1435,
+      "offshorewind_GWh_per_GW": 2700,
+      "solarpv_GWh_per_GW": 1680,
+      "onshorewind_lifespan": 25,
+      "offshorewind_lifespan": 25,
+      "solarpv_lifespan": 30
+    }
   }
 }
