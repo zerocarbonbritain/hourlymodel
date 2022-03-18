@@ -117,6 +117,7 @@ function draw_block(ctx,x,mov,kwh,text,c,scale,unit,width,textscale)
     if (c==5) { fill = "#ffeebc"; border = "#ffd44f"; }				// yellow
     if (c==6) { fill = "#ede8c2"; border = "#bdb570"; }				// red
     if (c==7) { fill = "rgb(245,245,245)"; border = "rgb(220,220,220)"; }
+    if (c==8) { fill = "#ddd"; border = "#888"; }				// gray
  
     ctx.fillStyle = fill; ctx.strokeStyle = border;
 

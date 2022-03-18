@@ -1127,6 +1127,9 @@ input[type='text'] {
             <p style="font-size:18px">Land use total: {{ o.land_use.total | toFixed(0) }} kha</p>
             <p style="font-size:18px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>
             <p style="font-size:18px">Emissions balance {{ o.emissions_balance.total | toFixed(2) }}</p>
+            <p style="font-size:18px">Grid CO2 intensity {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
+            
+            
         </div>
         
         <div style="clear:both"></div>

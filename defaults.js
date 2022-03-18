@@ -292,6 +292,10 @@ var i = {
         hydrogen_turbine_efficiency: 0.5
     },
     
+    fossil_fuels: {
+        allow_use_for_backup: false
+    },
+    
     land_use: {
         existing_natural_broadleaf_woodland:      139,
         existing_natural_coniferous_woodland:     151,
