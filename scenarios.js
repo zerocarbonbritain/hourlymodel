@@ -751,7 +751,7 @@ var scenarios = {
       "methane": {
         "name": "Methane gas boilers",
         "share": 74.2,
-        "efficiency": 80
+        "efficiency": 70
       },
       "hydrogen": {
         "name": "Hydrogen gas boilers",
