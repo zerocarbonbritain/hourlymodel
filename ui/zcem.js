@@ -21,7 +21,7 @@ function model_ui() {
     var stacks = [
       {"name":"Supply","height":(o.balance.total_supply+o.total_unmet_demand)*scl,"saving":0,
         "stack":[
-          {"kwhd":o.balance.total_supply*scl,"name":"Supply","color":1},
+          {"kwhd":(o.balance.total_supply-o.fossil_fuels.total)*scl,"name":"Supply","color":1}, // Zero carbon supply
           {"kwhd":o.fossil_fuels.total*scl,"name":"Fossil fuels","color":8},      
           {"kwhd":o.balance.total_unmet_demand*scl,"name":"Unmet","color":3}
         ]
@@ -62,13 +62,13 @@ function model_ui() {
           {"kwhd":(o.electric_transport.total_EV_demand+o.electric_transport.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
           {"kwhd":o.hydrogen.total_vehicle_demand*scl,"name":"Hydrogen Transport","color":0},
           {"kwhd":o.hydrogen.total_industry_demand*scl,"name":"Hydrogen for Industry","color":0},
-          {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Biofuel Transport","color":0},
+          {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Liquids for Transport","color":0},
           {"kwhd":10000*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
           // Industry
           {"kwhd":o.industry.total_elec_demand*scl,"name":"Industry Electric","color":0},
           {"kwhd":o.industry.total_methane_demand*scl,"name":"Industry Methane","color":0},
           {"kwhd":o.industry.total_biomass_demand*scl,"name":"Industry Biomas","color":0},
-          {"kwhd":o.industry.total_synth_fuel_demand*scl,"name":"Industry Biofuel","color":0},/*
+          {"kwhd":o.industry.total_synth_fuel_demand*scl,"name":"Industry Fuel","color":0},/*
           // Backup, liquid and gas processes*/
           {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},
           {"kwhd":o.total_losses.electrolysis*scl,"name":"H2 losses","color":2},

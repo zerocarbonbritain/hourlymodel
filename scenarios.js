@@ -72,6 +72,11 @@ var scenarios = {
         "share": 0,
         "efficiency": 90
       },
+      "synthfuel": {
+        "name": "Oil boilers",      
+        "share": 0,
+        "efficiency": 90
+      },
       "biomass": {
         "name": "Biomass boilers",
         "share": 5,
@@ -407,6 +412,11 @@ var scenarios = {
       },
       "hydrogen": {
         "name": "Hydrogen gas boilers",
+        "share": 0,
+        "efficiency": 90
+      },
+      "synthfuel": {
+        "name": "Oil boilers",      
         "share": 0,
         "efficiency": 90
       },
@@ -748,6 +758,11 @@ var scenarios = {
         "share": 0,
         "efficiency": 80
       },
+      "synthfuel": {
+        "name": "Oil boilers",      
+        "share": 0,
+        "efficiency": 90
+      },
       "biomass": {
         "name": "Biomass boilers",
         "share": 5,
@@ -782,9 +797,9 @@ var scenarios = {
           "mechanical_kwhppkm_full": 0.027,
           "load_factor": 0.324,
           "prc": {
-            "EV": 0.3,
+            "EV": 0.5,
             "H2": 0,
-            "IC": 0.7
+            "IC": 0.5
           },
           "efficiency": {
             "EV": 0.9,
@@ -795,7 +810,7 @@ var scenarios = {
         },
         "Bus": {
           "miles_pp": 325,
-          "mechanical_kwhppkm_full": 0.016,
+          "mechanical_kwhppkm_full": 0.018,
           "load_factor": 0.1432,
           "prc": {
             "EV": 0.0125,
@@ -827,7 +842,7 @@ var scenarios = {
         },
         "Cars & Vans": {
           "miles_pp": 6299,
-          "mechanical_kwhppkm_full": 0.031,
+          "mechanical_kwhppkm_full": 0.041,
           "load_factor": 0.3288,
           "prc": {
             "EV": 0.0125,
@@ -867,7 +882,7 @@ var scenarios = {
       "rail_freight_elec_demand": 1,
       "freight_BEV_demand": 0,
       "freight_H2_demand": 0,
-      "freight_IC_demand": 95
+      "freight_IC_demand": 181.2
     },
     "industry": {
       "high_temp_process_TWhy": 39.9,
@@ -1088,6 +1103,11 @@ var scenarios = {
       },
       "hydrogen": {
         "name": "Hydrogen gas boilers",
+        "share": 0,
+        "efficiency": 90
+      },
+      "synthfuel": {
+        "name": "Oil boilers",      
         "share": 0,
         "efficiency": 90
       },
@@ -1429,6 +1449,11 @@ var scenarios = {
         "share": 0,
         "efficiency": 90
       },
+      "synthfuel": {
+        "name": "Oil boilers",      
+        "share": 0,
+        "efficiency": 90
+      },    
       "biomass": {
         "name": "Biomass boilers",
         "share": 5,
@@ -1764,6 +1789,11 @@ var scenarios = {
     },
     "hydrogen": {
       "name": "Hydrogen gas boilers",
+      "share": 0,
+      "efficiency": 90
+    },
+    "synthfuel": {
+      "name": "Oil boilers",      
       "share": 0,
       "efficiency": 90
     },

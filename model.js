@@ -362,7 +362,8 @@ var model = {
     heating_systems: function() {
         d.methane_for_spacewaterheat = []
         d.hydrogen_for_spacewaterheat = []
-
+        d.synthfuel_for_spacewaterheat = []
+        
         o.total_losses.heating_systems = 0
         
         o.heat.total_unmet_demand = 0
@@ -416,6 +417,7 @@ var model = {
             o.biomass.total_used += system_fuel_demand.biomass
             d.methane_for_spacewaterheat.push(system_fuel_demand.methane)
             d.hydrogen_for_spacewaterheat.push(system_fuel_demand.hydrogen)
+            d.synthfuel_for_spacewaterheat.push(system_fuel_demand.synthfuel)
             
             let spacewater_elec_demand = system_fuel_demand.elres + system_fuel_demand.heatpump
             if (spacewater_elec_demand>o.heat.max_elec_demand) o.heat.max_elec_demand = spacewater_elec_demand
@@ -1173,7 +1175,7 @@ var model = {
             
             o.total_losses.FT += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req)
             
-            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel
+            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel + d.synthfuel_for_spacewaterheat[hour]
             
             o.synth_fuel.store_SOC -= synth_fuel_demand
 
@@ -1182,7 +1184,7 @@ var model = {
                 o.synth_fuel.store_SOC = 0.0
             }
             
-            o.synth_fuel.total_demand += synth_fuel_demand
+            o.synth_fuel.total_demand += (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel
 
             d.synth_fuel_store_SOC.push(o.synth_fuel.store_SOC)   
             
@@ -1234,7 +1236,7 @@ var model = {
         
         o.balance.total_unmet_demand = o.balance.total_final_elec_balance_negative
         
-        o.balance.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply 
+        o.balance.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply + o.fossil_fuels.total
         
         o.balance.total_demand = 0
         o.balance.total_demand += o.LAC.total 

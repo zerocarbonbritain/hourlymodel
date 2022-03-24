@@ -82,6 +82,11 @@ var i = {
             share: 0,
             efficiency: 90
         },
+        synthfuel: {
+            name: "Oil boilers",      
+            share: 0,
+            efficiency: 90
+        },
         biomass: {
             name: "Biomass boilers",      
             share: 5,

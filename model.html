@@ -358,9 +358,9 @@ input[type='text'] {
             </tr>
             <tr v-for="(system,index) in i.heating_systems">
                 <td>{{ system.name }}</td>
-                <td><input v-model.number="system.share" type="text" @change="update" style="width:70px"  autocomplete="off" itype="%" /></td>
+                <td><input v-model.number="system.share" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
                 <td>{{ o.heating_systems[index].heat_demand | format_energy }} <span class="unit">TWh/yr</span></td>
-                <td><input v-model.number="system.efficiency" type="text" @change="update" style="width:70px"  autocomplete="off" itype="%" /></td>
+                <td><input v-model.number="system.efficiency" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
                 <td>{{ o.heating_systems[index].fuel_demand | format_energy }} <span class="unit">TWh/yr</span></td>
             </tr>
         </table>
@@ -409,7 +409,7 @@ input[type='text'] {
         <tr>
           <td>Mechanical</td>
           <td><span class="unit">kWh/p.km full</span></td>
-          <td v-for="(mode,key) in i.transport.modes" v-if="mode.mechanical_kwhppkm_full!=undefined">{{ mode.mechanical_kwhppkm_full | toFixed(3) }}</td>
+          <td v-for="(mode,key) in i.transport.modes" v-if="mode.mechanical_kwhppkm_full!=undefined"><input v-model.number="mode.mechanical_kwhppkm_full" type="text" @change="update" /></td>
         </tr>
         <tr>
           <td>Electric</td>
@@ -1006,6 +1006,19 @@ input[type='text'] {
             <tr>
                 <th></th>
                 <th>MtCO2e/yr</th>
+            </tr>
+            <tr>
+                <td>Fossil fuels: Gas</td>
+                <td>{{ i.emissions_balance.fossil_fuel_gas | toFixed(2) }} </td>
+            </tr>
+            <tr>
+                <td>Fossil fuels: Oil</td>
+                <td>{{ i.emissions_balance.fossil_fuel_oil | toFixed(2) }} </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
             <tr>
                 <td>Disused mines</td>
                 <td><input v-model.number="i.emissions_balance.disused_mines" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
