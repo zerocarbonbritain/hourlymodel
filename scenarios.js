@@ -740,7 +740,7 @@ var scenarios = {
     "heating_systems": {
       "heatpump": {
         "name": "Heat pumps",
-        "share": 3,
+        "share": 2.5,
         "efficiency": 300
       },
       "elres": {
@@ -750,7 +750,7 @@ var scenarios = {
       },
       "methane": {
         "name": "Methane gas boilers",
-        "share": 87,
+        "share": 74.2,
         "efficiency": 80
       },
       "hydrogen": {
@@ -760,12 +760,12 @@ var scenarios = {
       },
       "synthfuel": {
         "name": "Oil boilers",      
-        "share": 0,
+        "share": 9.7,
         "efficiency": 90
       },
       "biomass": {
         "name": "Biomass boilers",
-        "share": 5,
+        "share": 8.6,
         "efficiency": 80
       }
     },
