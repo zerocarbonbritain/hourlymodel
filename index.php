@@ -22,8 +22,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
-    <script type="text/javascript" src="ui/stacks.js?v=1"></script>
-    <link rel="stylesheet" type="text/css" href="ui/style.css?v=2" />
+    <script type="text/javascript" src="ui/stacks.js?v=2"></script>
+    <link rel="stylesheet" type="text/css" href="ui/style.css?v=3" />
   </head>
 
   <body>
