@@ -326,53 +326,54 @@ var i = {
         urban_areas:                             1459
     },
     
-    emissions_balance: {
-        // Disused mines (figure for 2016 from NAEI)
-        disused_mines: 0.448,
-        // Gas leakage from NAEI [2] figures for 2016 reduced by ratio of 2016 gas use (approx. 900 TWh) to ZCB 2030 use (approx. 100 TWh).
-        gas_leakage: 0.064,
-        // ZCB targets reduction of 75%
-        refrigerants: 2.34,
-        
-        // Includes: foams, firefighting, solvents, electrical_insulation, aerosols_and_inhalers
-        other_foams_solvents_aerosols: 1.05,
-        
-        // Industrial
-
-        // Assume that only process emissions remain, energy emissions fully removed. This is in line with: AEA [3] states potential for abatement of 13.06 of 16.02 MtCO2e by 2030. This is maximum feasible abatement and appears to be achievable by several routes, therefore assume it represents full abatement of non-process emissions.
-        iron_and_steel: 2.52,
-        // Clinker substitution with equivalent process CO2 emissions reduction (40%?)
-        cement: 3.67,
-        // Assume 25% reduction
-        lime: 0.789,
-        // Assume 25% reduction
-        soda_ash: 0.105,
-        // Assume 25% reduction
-        glass: 0.276,
-        // Remains the same, reduction in F-gases
-        aluminium: 0.583,
-        // nitric_acid, adipic_acid, other_chemical, halocarbon, magnesium_cover_gas
-        other: 0.382,
-
-        // Agirculture
-        agriculture_total: 19.646,
-        
-        // Land use
-        biomass_burning: 0.3,
-        
-        reforestation: 0,
-        harvested_wood: 0,
-
-        wetlands: -1.926,           
-        settlements: 2.44,
-        
-        landfill: 3.86,
-        waste_water_handling: 0.879,
-        waste_incineration: 0.377,
-        
-        international_aviation_bunkers: 0,
-        biochar_carbon_capture: 0,
-        landfill_carbon_capture: -4.267
+    "emissions_balance": {
+      // Energy Supply
+      "power_station":0.0,
+      "manufacture_solid_fuels": 0.0,
+      // Disused mines (figure for 2016 from NAEI)
+      "coal_mining_handling": 0.448,
+      // Gas leakage from NAEI [2] figures for 2016 reduced by ratio of 2016 gas use (approx. 900 TWh) to ZCB 2030 use (approx. 100 TWh).
+      "upstream_ch4_leakage": 0.064,
+      "oil_and_gas_flaring_venting": 0.0,
+      // Business
+      // ZCB targets reduction of 75%
+      "refrigerants": 2.34,
+      // Includes: foams, firefighting, solvents, electrical_insulation, aerosols_and_inhalers
+      "other_foams_solvents_aerosols": 1.05,
+      // Transport
+      "transport_ch4_and_n2o": 0.0,
+      // Domestic
+      "domestic_combustion_ch4_and_n20": 0.0,
+      "domestic_aerosols": 0.0,
+      // Process emissions
+      // Clinker substitution with equivalent process CO2 emissions reduction (40%?)   
+      "cement": 3.67,
+      // Assume that only process emissions remain, energy emissions fully removed. This is in line with: AEA [3] states potential for abatement of 13.06 of 16.02 MtCO2e by 2030. This is maximum feasible abatement and appears to be achievable by several routes, therefore assume it represents full abatement of non-process emissions.
+      "iron_steel_and_sinter": 2.52,
+      // Assume 25% reduction
+      "lime": 0.789,
+      "ammonia": 0.0,
+      // Assume 25% reduction
+      "glass": 0.276,
+      "bricks": 0.0,
+      "other_process_emissions": 1.07,
+      // Agriculture & land use
+      "agriculture_total": 19.646,
+      "biomass_burning": 0.3,
+      "land_remaining_and_converted_to_grassland": 0,
+      "land_remaining_and_converted_to_cropland": 0,
+      "land_remaining_and_converted_to_settlements": 2.44, 
+      "land_remaining_and_converted_to_wetlands": -1.926,
+      "land_use_n2o": 0.0,
+      // Waste
+      "landfill": 3.86,
+      "waste_water_handling": 0.879,
+      "waste_incineration": 0.377,
+      "composting": 0.0,
+      "anaerobic_digestion": 0.0,
+      "mechanical_biological_treatment": 0.0,
+      // Carbon capture
+      "landfill_carbon_capture": -4.267,
     },
 
     // Embodied Energy

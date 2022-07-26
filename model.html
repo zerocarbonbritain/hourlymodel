@@ -1020,12 +1020,34 @@ input[type='text'] {
                 <td></td>
             </tr>
             <tr>
-                <td>Disused mines</td>
-                <td><input v-model.number="i.emissions_balance.disused_mines" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+                <td>Other non direct fuel emissions</td>
+                <td></td>
             </tr>
             <tr>
-                <td>Gas leakage</td>
-                <td><input v-model.number="i.emissions_balance.gas_leakage" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+              <th>Energy Supply</th><th></th>
+            </tr>
+            <tr>
+                <td>Methane leaks and N2O emissions at power stations</td>
+                <td><input v-model.number="i.emissions_balance.power_station" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Manufacture of solid fuels (CH4 leaks & N2O emissions)</td>
+                <td><input v-model.number="i.emissions_balance.manufacture_solid_fuels" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Coal mining and handling (CH4 leaks from disused mines)</td>
+                <td><input v-model.number="i.emissions_balance.coal_mining_handling" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Methane leaks from exploration, production & transport of oil and gas</td>
+                <td><input v-model.number="i.emissions_balance.upstream_ch4_leakage" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Oil and gas flaring & venting (CO2, CH4 & N2O)</td>
+                <td><input v-model.number="i.emissions_balance.oil_and_gas_flaring_venting" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+              <th>Business</th><th></th>
             </tr>
             <tr>
                 <td>Refrigerants</td>
@@ -1036,40 +1058,81 @@ input[type='text'] {
                 <td><input v-model.number="i.emissions_balance.other_foams_solvents_aerosols" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
-                <td>Iron and steel process emissions</td>
-                <td><input v-model.number="i.emissions_balance.iron_and_steel" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+              <th>Transport</th>
+              <th><input v-model.number="i.emissions_balance.transport_ch4_and_n2o" type="text" @change="update" style="width:70px"  autocomplete="off"/></th>
+            </tr>
+            <tr>
+                <td>International aviation bunkers</td>
+                <td>{{ i.emissions_balance.international_aviation_bunkers | toFixed(2) }} </td>
+            </tr>
+            <tr>
+              <th>Residential</th><th></th>
+            </tr>
+            <tr>
+                <td>Combustion methane leaks and N2O emissions</td>
+                <td><input v-model.number="i.emissions_balance.domestic_combustion_ch4_and_n20" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Aerosols</td>
+                <td><input v-model.number="i.emissions_balance.domestic_aerosols" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+              <th>Industrial processes</th><th></th>
             </tr>
             <tr>
                 <td>Cement process emissions</td>
                 <td><input v-model.number="i.emissions_balance.cement" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
+                <td>Iron, steel and sinter process emissions</td>
+                <td><input v-model.number="i.emissions_balance.iron_steel_and_sinter" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
                 <td>Lime process emissions</td>
                 <td><input v-model.number="i.emissions_balance.lime" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
-                <td>Soda ash process emissions</td>
-                <td><input v-model.number="i.emissions_balance.soda_ash" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+                <td>Ammonia process emissions</td>
+                <td><input v-model.number="i.emissions_balance.ammonia" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
                 <td>Glass process emissions</td>
                 <td><input v-model.number="i.emissions_balance.glass" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
-                <td>Aluminium process emissions</td>
-                <td><input v-model.number="i.emissions_balance.aluminium" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+                <td>Other process emissions</td>
+                <td><input v-model.number="i.emissions_balance.other_process_emissions" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
-                <td>Other process emissions</td>
-                <td><input v-model.number="i.emissions_balance.other" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            </tr>              
+              <th>Agriculture & land use</th><th></th>
+            </tr>           
             <tr>
-                <td>Agriculture total</td>
-                <td><input v-model.number="i.emissions_balance.agriculture_total" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+                <th>Agriculture total</th>
+                <th><input v-model.number="i.emissions_balance.agriculture_total" type="text" @change="update" style="width:70px"  autocomplete="off"/></th>
             </tr>
             <tr>
                 <td>Biomass burning</td>
                 <td><input v-model.number="i.emissions_balance.biomass_burning" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Indirect & direct N2O emissions</td>
+                <td><input v-model.number="i.emissions_balance.land_use_n2o" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Land remaining or converted to grassland</td>
+                <td><input v-model.number="i.emissions_balance.land_remaining_and_converted_to_grassland" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Land remaining or converted to cropland</td>
+                <td><input v-model.number="i.emissions_balance.land_remaining_and_converted_to_cropland" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>      
+            <tr>
+                <td>Land remaining or converted to settlements</td>
+                <td><input v-model.number="i.emissions_balance.land_remaining_and_converted_to_settlements" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>    
+            <tr>
+                <td>Land remaining or converted to wetlands</td>
+                <td><input v-model.number="i.emissions_balance.land_remaining_and_converted_to_wetlands" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
                 <td>Reforestation</td>
@@ -1080,13 +1143,8 @@ input[type='text'] {
                 <td>{{ i.emissions_balance.harvested_wood | toFixed(2) }} </td>
             </tr>
             <tr>
-                <td>Wetlands</td>
-                <td><input v-model.number="i.emissions_balance.wetlands" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            </tr>
-            <tr>
-                <td>Settlements</td>
-                <td><input v-model.number="i.emissions_balance.settlements" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            </tr>
+              <th>Waste management</th><th></th>
+            </tr> 
             <tr>
                 <td>Landfill</td>
                 <td><input v-model.number="i.emissions_balance.landfill" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
@@ -1100,9 +1158,20 @@ input[type='text'] {
                 <td><input v-model.number="i.emissions_balance.waste_incineration" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
             <tr>
-                <td>International aviation bunkers</td>
-                <td>{{ i.emissions_balance.international_aviation_bunkers | toFixed(2) }} </td>
+                <td>Composting</td>
+                <td><input v-model.number="i.emissions_balance.composting" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             </tr>
+            <tr>
+                <td>Anaerobic digestion</td>
+                <td><input v-model.number="i.emissions_balance.anaerobic_digestion" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Mechanical biological treatment</td>
+                <td><input v-model.number="i.emissions_balance.mechanical_biological_treatment" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+              <th>Carbon capture</th><th></th>
+            </tr> 
             <tr>
                 <td>Biochar carbon capture</td>
                 <td>{{ i.emissions_balance.biochar_carbon_capture | toFixed(2) }} </td>             

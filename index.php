@@ -110,7 +110,7 @@ function normalise_profile(profile) {
 }
 </script>
 
-<script language="javascript" type="text/javascript" src="defaults.js?v=8"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=9"></script>
 <script language="javascript" type="text/javascript" src="model.js?v=9"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=2"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=5"></script>
@@ -391,6 +391,6 @@ function load_scenario(name) {
 }
     
 </script>
-<script language="javascript" type="text/javascript" src="scenarios.js?v=12"></script>
+<script language="javascript" type="text/javascript" src="scenarios.js?v=18"></script>
 
 
