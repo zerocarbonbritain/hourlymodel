@@ -47,11 +47,11 @@ function model_ui() {
         ]
       },
       
-      {"name":"Demand","height":(o.balance.total_demand+o.balance.total_losses_combined+o.balance.total_exess)*scl,"saving":0,
+      {"name":"Demand","height":(o.balance.total_demand+o.balance.total_losses_combined+o.balance.total_excess)*scl,"saving":0,
         "stack":[
           {"kwhd":o.balance.total_demand*scl,"name":"Demand","color":0},
           {"kwhd":o.balance.total_losses_combined*scl,"name":"Losses","color":2},
-          {"kwhd":o.balance.total_exess*scl,"name":"Exess","color":3}
+          {"kwhd":o.balance.total_excess*scl,"name":"Excess","color":3}
         ]
       },
 
@@ -89,7 +89,7 @@ function model_ui() {
 
           {"kwhd":total_liion_losses/3650,"name":"Liion losses","color":2},
           {"kwhd":total_losses*scl,"name":"Losses","color":2},*/
-          {"kwhd":o.balance.total_exess*scl,"name":"Exess","color":3}
+          {"kwhd":o.balance.total_excess*scl,"name":"Excess","color":3}
         ]
       }
     ];
@@ -127,7 +127,7 @@ function model_view()
             {stack:true, label: "Elec Store Charge", data:timeseries(d.elec_store_charge), color:"#006a80"},
             {stack:true, label: "Electrolysis", data:timeseries(d.electricity_for_electrolysis), color:"#00aacc"},
             {stack:true, label: "PowerToX", data:timeseries(d.electricity_for_power_to_X), color:"#00bbdd"},
-            {stack:true, label: "Exess", data:timeseries(d.export_elec), color:"#33ccff", lines: {lineWidth:0, fill: 0.4 }},            
+            {stack:true, label: "Excess", data:timeseries(d.excess_elec), color:"#33ccff", lines: {lineWidth:0, fill: 0.4 }},            
             {stack:false, label: "Supply", data:timeseries(d.elec_supply_hourly), color:"#000000", lines: {lineWidth:0.2, fill: false }}
 
             ], {

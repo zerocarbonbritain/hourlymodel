@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 25;
+    $v = 29;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -395,6 +395,6 @@ function load_scenario(name) {
 }
     
 </script>
-<script language="javascript" type="text/javascript" src="scenarios.js?v=23"></script>
+<script language="javascript" type="text/javascript" src="scenarios.js?v=<?php echo $v; ?>"></script>
 
 

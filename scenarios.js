@@ -22,8 +22,7 @@ var scenarios = {
       "geothermal_heat_capacity": 0,
       "geothermal_heat_capacity_factor": 0.9,
       "nuclear_capacity": 11.64,
-      "nuclear_capacity_factor": 0.835,
-      "grid_loss_prc": 0.0884+0.05113
+      "nuclear_capacity_factor": 0.835
     },
     "LAC": {
       "domestic": {
@@ -297,8 +296,13 @@ var scenarios = {
         prc_coal: 9.81,
         coal_efficiency: 34.4
     },
+    energy_industry_use: {
+        electricity_grid_loss_prc: 8.84,
+        electricity_own_use_prc: 5.11
+    },
     "fossil_fuels": {
-      "allow_use_for_backup": 1
+      "allow_use_for_backup": 1,
+      "refinery_electric_use": 0
     },
     "land_use": {
       "existing_natural_broadleaf_woodland": 139,

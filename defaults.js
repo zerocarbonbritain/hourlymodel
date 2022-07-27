@@ -23,8 +23,7 @@ var i = {
         geothermal_heat_capacity: 2.0,
         geothermal_heat_capacity_factor: 0.9,
         nuclear_capacity: 0.0,
-        nuclear_capacity_factor: 0.9,
-        grid_loss_prc: 0.07
+        nuclear_capacity_factor: 0.9
     },
     
     LAC: {
@@ -256,7 +255,7 @@ var i = {
     
     // biogas
     biogas: {
-        biomass_for_biogas: 85.0,
+        biomass_for_biogas: 88.0,
         anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
         co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))   // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     },
@@ -308,8 +307,14 @@ var i = {
         coal_efficiency: 34
     },
     
+    energy_industry_use: {
+        electricity_grid_loss_prc: 7.0,
+        electricity_own_use_prc: 0.0
+    },
+    
     fossil_fuels: {
-        allow_use_for_backup: 0
+        allow_use_for_backup: 0,
+        refinery_electric_use: 0
     },
     
     land_use: {
@@ -319,7 +324,7 @@ var i = {
         existing_productive_coniferous_woodland: 1357,
         new_natural_broadleaf_woodland:          1000,
         new_natural_coniferous_woodland:         1000,
-        new_productive_broadleaf_woodland:        700,
+        new_productive_broadleaf_woodland:        600,
         new_productive_coniferous_woodland:       700,
         short_rotation_forestry:                 1660,
         short_rotation_coppice:                  1300,

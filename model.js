@@ -120,13 +120,16 @@ var model = {
             total_geothermal_elec: 0,
             total_geothermal_heat: 0,
             total_nuclear: 0,
-            total_electricity: 0,
+            total_fixed_electricity: 0,
             total_fixed_heat: 0
+
         }
         
         o.total_losses = {
             grid: 0
         }
+        
+        let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
         
         d.balance_hourly = []
         d.elec_supply_hourly = []
@@ -162,9 +165,9 @@ var model = {
             
             // Electricity supply
             let electricity_supply_before_grid_loss = onshore_wind + offshore_wind + wave + tidal + solarpv + hydro + geothermal_elec + nuclear
-            o.supply.total_electricity += electricity_supply_before_grid_loss
+            o.supply.total_fixed_electricity += electricity_supply_before_grid_loss
                         
-            let electricity_supply = electricity_supply_before_grid_loss * (1.0-i.supply.grid_loss_prc)
+            let electricity_supply = electricity_supply_before_grid_loss * grid_loss_prc
             o.total_losses.grid += electricity_supply_before_grid_loss - electricity_supply
             d.elec_supply_hourly.push(electricity_supply)
             d.balance_hourly.push(electricity_supply)
@@ -808,12 +811,8 @@ var model = {
         // Final balance
         // ---------------------------------------------
         o.balance = {}
-        o.balance.initial_elec_balance_positive = 0
-        o.balance.final_elec_balance_negative = 0
-        o.balance.final_elec_balance_positive = 0
-        o.balance.total_initial_elec_balance_positive = 0
-        o.balance.total_final_elec_balance_negative = 0
-        o.balance.total_final_elec_balance_positive = 0
+        o.balance.total_excess_elec = 0
+        o.balance.total_unmet_elec = 0
 
         // Electric backup
         o.electric_backup = {}        
@@ -827,6 +826,7 @@ var model = {
         o.electric_backup.total_synth_fuel_turbine_output = 0
         o.electric_backup.total_biomass_turbine_output = 0
         o.electric_backup.total_coal_turbine_output = 0
+        o.electric_backup.total_before_grid_loss = 0
     
         // demand totals
         o.total_losses.electrolysis = 0
@@ -850,10 +850,12 @@ var model = {
         d.electricity_for_power_to_X = []
 
         d.electricity_from_dispatchable = []
-        d.export_elec = []
+        d.excess_elec = []
         d.unmet_elec = []
         d.methane_SOC = []
         d.synth_fuel_store_SOC = []
+        
+        let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
 
         for (var hour = 0; hour < i.hours; hour++)
         {
@@ -962,11 +964,6 @@ var model = {
             d.elec_store_charge.push(elec_store_charge)
             d.elec_store_discharge.push(elec_store_discharge)
             
-            if (balance>=0.0) {
-                o.balance.total_initial_elec_balance_positive += balance
-                o.balance.initial_elec_balance_positive++
-            }
-
             // ----------------------------------------------------------------------------
             // Biogas
             // ----------------------------------------------------------------------------
@@ -1105,7 +1102,7 @@ var model = {
             if (balance<0.0) {
                 let backup_requirement = (-1 * balance);
                 
-                let backup_requirement_before_grid_loss = backup_requirement / (1.0-i.supply.grid_loss_prc)
+                let backup_requirement_before_grid_loss = backup_requirement / grid_loss_prc
                 
                 // Allocate to different technologies
                 hydrogen_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_hydrogen * 0.01)
@@ -1145,7 +1142,8 @@ var model = {
                 }
                 
                 electricity_from_dispatchable_before_grid_loss = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output
-                electricity_from_dispatchable = electricity_from_dispatchable_before_grid_loss * (1.0-i.supply.grid_loss_prc)
+                o.electric_backup.total_before_grid_loss += electricity_from_dispatchable_before_grid_loss
+                electricity_from_dispatchable = electricity_from_dispatchable_before_grid_loss * grid_loss_prc
                 o.total_losses.grid += electricity_from_dispatchable_before_grid_loss - electricity_from_dispatchable
             }
             d.electricity_from_dispatchable.push(electricity_from_dispatchable)
@@ -1153,29 +1151,22 @@ var model = {
             // Final electricity balance
             balance += electricity_from_dispatchable
 
-            let export_elec = 0.0
+            let excess_elec = 0.0
             let unmet_elec = 0.0
             if (balance>=0.0) {
-                export_elec = balance
-                o.balance.total_final_elec_balance_positive += export_elec
-                o.balance.final_elec_balance_positive++
+                excess_elec = balance
+                o.balance.total_excess_elec += excess_elec
             } else {
                 unmet_elec = -balance
-                o.balance.total_final_elec_balance_negative += unmet_elec
-                o.balance.final_elec_balance_negative++
+                o.balance.total_unmet_elec += unmet_elec
                 
                 if (unmet_elec>o.electric_backup.max_shortfall) {
                     o.electric_backup.max_shortfall = unmet_elec
                     o.electric_backup.max_shortfall_hour = hour
                 }
             }
-            d.export_elec.push(export_elec)
+            d.excess_elec.push(excess_elec)
             d.unmet_elec.push(unmet_elec)
-            
-            if (o.balance.total_final_elec_balance_negative<0.0000001) {
-                o.balance.total_final_elec_balance_negative = 0;
-                o.balance.final_elec_balance_positive = i.hours;
-            }
             
             // ----------------------------------------------------------------------------
             // Methane
@@ -1311,11 +1302,19 @@ var model = {
         o.electric_storage.cycles_per_year = (o.electric_storage.total_discharge / i.electric_storage.capacity_GWh)*0.1
         
         // -------------------------------------------------------------------------------
+        // o.supply.total_fixed_electricity
+        // o.total_losses.grid
+        // o.electric_backup.total_before_grid_loss
+        
+        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity + o.electric_backup.total_before_grid_loss
+        o.balance.total_electricity_demand = o.supply.total_electricity_before_grid_loss - o.total_losses.grid - o.balance.total_excess_elec + o.balance.total_unmet_elec
+
+        
         o.biomass.total_used += o.industry.total_biomass_demand
         
-        o.balance.total_unmet_demand = o.balance.total_final_elec_balance_negative
+        o.balance.total_unmet_demand = o.balance.total_unmet_elec
         
-        o.balance.total_supply = o.supply.total_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply + o.fossil_fuels.total
+        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply + o.fossil_fuels.total
         
         o.balance.total_demand = 0
         o.balance.total_demand += o.LAC.total 
@@ -1374,7 +1373,7 @@ var model = {
         o.balance.total_spill = o.methane.store_excess + o.heat.total_spill
         
         // -------------------------------------------------------------------------------------------------
-        o.balance.total_exess = o.balance.total_final_elec_balance_positive + final_store_balance; //o.balance.total_supply - o.balance.total_demand
+        o.balance.total_excess = o.balance.total_excess_elec + final_store_balance
         
         o.balance.total_losses_combined = o.balance.total_spill
         for (var z in o.total_losses) {
@@ -1385,9 +1384,9 @@ var model = {
         console.log("total_unmet_demand: "+o.balance.total_unmet_demand)
         console.log("total_demand: "+o.balance.total_demand)    
         console.log("total_losses_combined: "+o.balance.total_losses_combined)
-        console.log("total_exess: "+o.balance.total_exess)
+        console.log("total_excess: "+o.balance.total_excess)
             
-        let unaccounted_balance = o.balance.total_supply + o.balance.total_unmet_demand - o.balance.total_demand - o.balance.total_losses_combined - o.balance.total_exess
+        let unaccounted_balance = o.balance.total_supply + o.balance.total_unmet_demand - o.balance.total_demand - o.balance.total_losses_combined - o.balance.total_excess
         console.log("unaccounted_balance: "+unaccounted_balance.toFixed(6))
         // -------------------------------------------------------------------------------------------------
         
@@ -1399,8 +1398,17 @@ var model = {
         
         o.biomass.total_direct_use = o.biomass.total_used - (i.biogas.biomass_for_biogas*10000) - o.synth_fuel.total_biomass_used
         
-        o.hydrogen.electrolysis_capacity_factor = 100*(o.hydrogen.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * 87600))
-        o.power_to_X.capacity_factor = 100*(o.power_to_X.total_electricity_demand / (i.power_to_X.capacity * 87600))
+        if (i.hydrogen.electrolysis_capacity_GW>0) {
+            o.hydrogen.electrolysis_capacity_factor = 100*(o.hydrogen.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * 87600))
+        } else {
+            o.hydrogen.electrolysis_capacity_factor = 0
+        }
+        
+        if (i.power_to_X.capacity>0) {
+            o.power_to_X.capacity_factor = 100*(o.power_to_X.total_electricity_demand / (i.power_to_X.capacity * 87600))
+        } else {
+            o.power_to_X.capacity_factor = 0
+        }
         
         var out = "";
         var error = 0
@@ -1408,7 +1416,7 @@ var model = {
             
             let supply = d.elec_supply_hourly[hour]
             let demand = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour] + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
-            let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.export_elec[hour]
+            let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.excess_elec[hour]
             error += Math.abs(balance)
         } 
         
@@ -1538,23 +1546,12 @@ var model = {
         i.emissions_balance.fossil_fuel_coal = o.fossil_fuels.coal*0.1*0.0003166
         i.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
         i.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
-        
-        // Work out grid co2 intensity
-        let total_electricity = o.supply.total_electricity
-        
-        total_electricity += o.electric_backup.total_hydrogen_turbine_output
-        total_electricity += o.electric_backup.total_methane_turbine_output
-        total_electricity += o.electric_backup.total_synth_fuel_turbine_output
-        total_electricity += o.electric_backup.total_biomass_turbine_output
-        total_electricity += o.electric_backup.total_coal_turbine_output
-        
-        console.log("Total electric generation: "+(total_electricity*0.0001))
-                
+                        
         let grid_co2_emissions = 0;
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
         grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*0.0003166
         
-        o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / total_electricity)   // MtC02 / GWh
+        o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
         
         i.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total
         i.emissions_balance.harvested_wood = -o.carbon_sequestration.timber_products.total     

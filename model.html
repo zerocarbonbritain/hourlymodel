@@ -188,20 +188,6 @@ input[type='text'] {
             <td></td>
         </tr>
         <tr>
-            <td>Grid loss</td>
-            <td><input v-model.number="i.supply.grid_loss_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
             <td>Biomass for biogas</td>
             <td><input v-model.number="i.biogas.biomass_for_biogas" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td>AD efficiency</td>
@@ -716,37 +702,66 @@ input[type='text'] {
 <div class="box">
     <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>ENERGY INDUSTRY USE</b></div>
     <div class="inner" name="energy_industry_use">
-        <div style="font-size:14px">
-        The energy industry itself can use a significant quantity of energy.
-        </div><br>
         
         <table class="table" style="width:100%">
         <tr>
-            <th width="40%"></th>
+            <th width="60%"></th>
+            <th width="20%"></th>  
             <th width="20%">Annual demand</th>
         </tr>
         <tr>
-            <td>Refinery gas consumption</td>
+            <td>Electricity transmission and distribution grid losses</td>
+            <td><input v-model.number="i.energy_industry_use.electricity_grid_loss_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
+            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_grid_loss_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
+        </tr>     
+        <tr>
+            <td>Electricity industry own use</td>
+            <td><input v-model.number="i.energy_industry_use.electricity_own_use_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
+            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_own_use_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
+        </tr>  
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Oil refinery gas consumption</td>
+            <td></td>
             <td>{{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         <tr>
-            <td>Refinery oil consumption</td>
+            <td>Oil refinery oil consumption</td>
+            <td></td>
             <td>{{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         <tr>
+            <td>Oil refinery electricity consumption</td>
+            <td></td>
+            <td><input v-model.number="i.fossil_fuels.refinery_electric_use" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
             <td>Oil and gas extraction gas consumption</td>
+            <td></td>
             <td>{{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         <tr>
             <td>Oil and gas extraction oil consumption</td>
+            <td></td>
             <td>{{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         <tr>
             <td>Other gas use</td>
+            <td></td>
             <td>{{ o.fossil_fuels.other_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         <tr>
             <td>Gas losses</td>
+            <td></td>
             <td>{{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         </table>
@@ -1300,7 +1315,7 @@ input[type='text'] {
 <div class="box">
     <div class="box-title">
         <img class="icon-expand" src="img/expand.png"><b>FINAL SUPPLY DEMAND MATCHING
-        <span style="float:right">{{ (100*o.balance.final_elec_balance_positive/i.hours) | toFixed(3) }}%</span>
+        <span style="float:right">{{ 100*(1.0-(o.balance.total_unmet_elec/o.balance.total_electricity_demand)) | toFixed(3) }}%</span>
         </b>
     </div>
     <div class="inner" style="display:block" name="balance">
@@ -1310,17 +1325,21 @@ input[type='text'] {
         </div>
         
         <div style="float:left; width:35%;">
-            <p style="font-size:18px">Total supply: {{ o.balance.total_supply*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:18px">Total demand: {{ o.balance.total_demand*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:18px">Primary energy factor: {{ o.balance.primary_energy_factor | toFixed(2) }}</p>
-            <p style="font-size:18px">Exess generation: {{ o.balance.total_exess*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:18px">Unmet demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
-            <p style="font-size:18px">Land use total: {{ o.land_use.total | toFixed(0) }} kha</p>
-            <p style="font-size:18px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>
-            <p style="font-size:18px">Emissions balance {{ o.emissions_balance.total | toFixed(2) }}</p>
-            <p style="font-size:18px">Grid CO2 intensity {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
-            
-            
+            <p style="font-size:16px"><b>Energy</b></p>
+            <p style="font-size:16px">Total energy supply: {{ o.balance.total_supply*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Total energy demand: {{ o.balance.total_demand*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Primary energy factor: {{ o.balance.primary_energy_factor | toFixed(2) }}</p>
+            <p style="font-size:16px">Exess energy supply: {{ o.balance.total_excess*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Unmet energy demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
+            <p style="font-size:16px"><b>Electricity</b></p>
+            <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*0.0001 | toFixed(0) }} TWh</p>    
+            <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*0.0001 | toFixed(3) }} TWh</p>
+            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Grid CO2 intensity: {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
+            <p style="font-size:16px"><b>Land & Emissions</b></p>
+            <p style="font-size:16px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>
+            <p style="font-size:16px">Emissions balance {{ o.emissions_balance.total | toFixed(2) }} MtC02e</p>
         </div>
         
         <div style="clear:both"></div>
@@ -1331,53 +1350,8 @@ input[type='text'] {
             <option value="kwhdperhousehold">kWh/d per household</option>
             <option value="kwhdperperson">kWh/d per person</option>
         </select> 
-
-        <p><b>Comparison table for direct reference with original spreadsheet</b></p>
         
         <table class="table" style="width:100%">
-        <tr>
-            <th></th>
-            <th>hours</th>
-            <th>percent</th>
-            <th>TWh/yr</th>
-        </tr>
-        <tr>
-            <td>Total hours of simulation</td>
-            <td>{{ i.hours }}</td>
-            <td>100%</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Initial el. balance positive</td>
-            <td>{{ o.balance.initial_elec_balance_positive }}</td>
-            <td>{{ (100*o.balance.initial_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.balance.total_initial_elec_balance_positive*0.0001 | toFixed(1) }}</td>
-        </tr>
-        <tr>
-            <td>Final el. balance negative</td>
-            <td>{{ o.balance.final_elec_balance_negative }}</td>
-            <td>{{ (100*o.balance.final_elec_balance_negative/i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.balance.total_final_elec_balance_negative*0.0001 | toFixed(3) }}</td>
-        </tr>
-        <tr>
-            <td>Final el. balance positive</td>
-            <td>{{ o.balance.final_elec_balance_positive }}</td>
-            <td>{{ (100*o.balance.final_elec_balance_positive/i.hours) | toFixed(1) }}%</td>
-            <td>{{ o.balance.total_final_elec_balance_positive*0.0001 | toFixed(1) }}</td>
-        </tr>
-        <tr>
-            <td>Unmet heat demand</td>
-            <td>{{ o.unmet_heat_demand_count }}</td>
-            <td></td>
-            <td>{{ o.heat.total_unmet_demand*0.0001 | toFixed(1) }}</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
         <tr>
             <th></th>
             <th>Min</th>
