@@ -91,6 +91,11 @@ var i = {
             name: "Biomass boilers",      
             share: 5,
             efficiency: 90
+        },
+        solid_fuel: {
+            name: "Solid fuel",
+            share: 0,
+            efficiency: 70
         }
     },
 

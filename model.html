@@ -238,19 +238,19 @@ input[type='text'] {
         <tr>
             <td>Domestic Lighting & Appliances</td>
             <td><input v-model.number="i.LAC.domestic.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>   
-            <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/76.6)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/76.63)*100 | toFixed(0) }}%</td>
             <td>{{ o.LAC.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
             <td><input v-model.number="i.LAC.domestic.cooking_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.domestic.cooking_TWhy/13.2)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.domestic.cooking_TWhy/13.17)*100 | toFixed(0) }}%</td>
             <td>{{ o.LAC.domestic_cooking_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services Lighting & Appliances</td>
             <td><input v-model.number="i.LAC.services.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.services.lighting_and_appliances_TWhy/43.6)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.services.lighting_and_appliances_TWhy/70.9)*100 | toFixed(0) }}%</td>
             <td></td> 
         </tr>
         <tr>
@@ -262,7 +262,7 @@ input[type='text'] {
         <tr>
             <td>Services Cooling</td>
             <td><input v-model.number="i.LAC.services.cooling_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.services.cooling_TWhy/9)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.LAC.services.cooling_TWhy/12.9)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -292,28 +292,28 @@ input[type='text'] {
             <td>Domestic</td>
             <td><input v-model.number="i.space_heating.domestic_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.space_heating.total_domestic_demand*0.0001 | toFixed(2) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_domestic_demand*0.0001) / 312.2))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_domestic_demand*0.0001) / 257.93))*100 | toFixed(0) }}%</td>
             <td>{{ o.space_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td><input v-model.number="i.space_heating.services_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.space_heating.total_services_demand*0.0001 | toFixed(2) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_services_demand*0.0001) / 112.5))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_services_demand*0.0001) / 96.225))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Industry</td>
             <td><input v-model.number="i.space_heating.industry_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
             <td>{{ o.space_heating.total_industry_demand*0.0001 | toFixed(2) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_industry_demand*0.0001) / 22.5))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_industry_demand*0.0001) / 19.733))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Combined</td>
             <td>{{ o.space_heating.demand_GWK | toFixed(3) }} GW/K</td>
             <td>{{ o.space_heating.total_demand*0.0001 | toFixed(1) }} TWh/yr</td>     
-            <td>{{ (1.0-((o.space_heating.total_demand*0.0001)/(312.2+112.5+22.5)))*100 | toFixed(0) }}%</td>
+            <td>{{ (1.0-((o.space_heating.total_demand*0.0001)/373.9))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -325,14 +325,14 @@ input[type='text'] {
             <td width="20%">Domestic</td>
             <td width="20%"></td>
             <td width="20%"><input v-model.number="i.water_heating.domestic_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td width="20%">{{ (1-i.water_heating.domestic_TWhy/82.2)*100 | toFixed(0) }}%</td>
+            <td width="20%">{{ (1-i.water_heating.domestic_TWhy/68.538)*100 | toFixed(0) }}%</td>
             <td width="20%">{{ o.water_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td></td>
             <td><input v-model.number="i.water_heating.services_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
-            <td>{{ (1-i.water_heating.services_TWhy/15.9)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-i.water_heating.services_TWhy/13.701)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>

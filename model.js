@@ -1221,6 +1221,14 @@ var model = {
              o.methane.unmet = 0
          }
          
+         o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * 0.049;
+         o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.03746;
+         o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.00547;
+         
+         o.fossil_fuels.oil += o.fossil_fuels.refineries_oil_use
+         o.fossil_fuels.oil += o.fossil_fuels.oil_gas_extraction_oil_use
+         o.fossil_fuels.gas += o.fossil_fuels.oil_gas_extraction_gas_use
+         
          o.fossil_fuels.total = o.fossil_fuels.oil + o.fossil_fuels.gas
                   
     },
@@ -1451,8 +1459,8 @@ var model = {
         // multiply by 0.1 to give over 1 year
         // - oil co2 factor is 0.245 kgCO2 per kWh = 0.000245 MtCO2 per GWh
         // - gas co2 factor is 0.185 kgCO2 per kWh = 0.000185 MtCO2 per GWh     
-        i.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.000245
-        i.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.000185
+        i.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
+        i.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
         
         // Work out grid co2 intensity
         let total_electricity = o.supply.total_electricity + o.electric_backup.total_methane_turbine_output
