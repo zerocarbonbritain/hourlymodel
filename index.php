@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 29;
+    $v = 31;
 ?>
 <!DOCTYPE html>
 <html lang="en">

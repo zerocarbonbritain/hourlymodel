@@ -27,11 +27,14 @@ var scenarios = {
     "LAC": {
       "domestic": {
         "lighting_and_appliances_TWhy": 76.63,
-        "cooking_TWhy": 13.17
+        "cooking_TWhy": 5.71,
+        "cooking_gas_TWhy": 7.46
       },
       "services": {
-        "lighting_and_appliances_TWhy": 70.9,
-        "catering_TWhy": 25.3,
+        "lighting_and_appliances_TWhy": 60.3,
+        "lighting_and_appliances_gas_TWhy": 10.6,      
+        "catering_TWhy": 8.8,
+        "catering_gas_TWhy": 16.4,
         "cooling_TWhy": 12.9
       }
     },

@@ -57,7 +57,7 @@ function model_ui() {
 
       {"name":"Demand","height":(o.balance.total_demand+o.balance.total_losses_combined)*scl,"saving":0,
         "stack":[
-          {"kwhd":o.LAC.total*scl,"name":"LAC","color":0},
+          {"kwhd":(o.LAC.total+o.LAC.total_gas)*scl,"name":"LAC","color":0},
           {"kwhd":o.space_heating.total_demand*scl,"name":"Space Heat","color":0},
           {"kwhd":o.water_heating.total_demand*scl,"name":"Water Heat","color":0},
           {"kwhd":(o.electric_transport.total_EV_demand+o.electric_transport.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},

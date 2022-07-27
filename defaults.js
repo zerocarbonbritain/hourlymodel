@@ -29,11 +29,14 @@ var i = {
     LAC: {
         domestic: {
             lighting_and_appliances_TWhy: 38.59,
-            cooking_TWhy: 10.47
+            cooking_TWhy: 10.47,
+            cooking_gas_TWhy: 0.0
         },
         services: {
             lighting_and_appliances_TWhy: 41.41,
+            lighting_and_appliances_gas_TWhy: 0.0,
             catering_TWhy: 16.85,
+            catering_gas_TWhy: 0.0,
             cooling_TWhy: 4.55
         }   
     },

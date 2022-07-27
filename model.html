@@ -224,38 +224,44 @@ input[type='text'] {
         
         <table class="table" style="width:100%">
         <tr>
-            <th width="40%"></th>
-            <th width="20%">Annual demand</th>
-            <th width="20%">% Reduction vs 2018</th>
-            <th width="20%"></th>
+            <th width="30%"></th>
+            <th width="20%">Electric</th>
+            <th width="20%">Gas</th>
+            <th width="15%">% Reduction<br>vs 2018</th>
+            <th width="15%"></th>
         </tr>
         <tr>
             <td>Domestic Lighting & Appliances</td>
-            <td><input v-model.number="i.LAC.domestic.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>   
+            <td><input v-model.number="i.LAC.domestic.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td></td>   
             <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/76.63)*100 | toFixed(0) }}%</td>
-            <td>{{ o.LAC.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
+            <td>{{ o.LAC.domestic_appliances_kwh | toFixed(0) }} kWh/hh</td>
         </tr>
         <tr>
             <td>Domestic Cooking</td>
             <td><input v-model.number="i.LAC.domestic.cooking_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.domestic.cooking_TWhy/13.17)*100 | toFixed(0) }}%</td>
-            <td>{{ o.LAC.domestic_cooking_kwh | toFixed(0) }} kWh/household</td>
+            <td><input v-model.number="i.LAC.domestic.cooking_gas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td>{{ (1-(i.LAC.domestic.cooking_TWhy+i.LAC.domestic.cooking_gas_TWhy)/13.17)*100 | toFixed(0) }}%</td>
+            <td>{{ o.LAC.domestic_cooking_kwh | toFixed(0) }} kWh/hh</td>
         </tr>
         <tr>
             <td>Services Lighting & Appliances</td>
             <td><input v-model.number="i.LAC.services.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.services.lighting_and_appliances_TWhy/70.9)*100 | toFixed(0) }}%</td>
+            <td><input v-model.number="i.LAC.services.lighting_and_appliances_gas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td>{{ (1-(i.LAC.services.lighting_and_appliances_TWhy+i.LAC.services.lighting_and_appliances_gas_TWhy)/70.9)*100 | toFixed(0) }}%</td>
             <td></td> 
         </tr>
         <tr>
             <td>Services Catering</td>
             <td><input v-model.number="i.LAC.services.catering_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-i.LAC.services.catering_TWhy/25.3)*100 | toFixed(0) }}%</td>
+            <td><input v-model.number="i.LAC.services.catering_gas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td>{{ (1-(i.LAC.services.catering_TWhy+i.LAC.services.catering_gas_TWhy)/25.3)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Services Cooling</td>
             <td><input v-model.number="i.LAC.services.cooling_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td></td>              
             <td>{{ (1-i.LAC.services.cooling_TWhy/12.9)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
@@ -1339,7 +1345,7 @@ input[type='text'] {
             <p style="font-size:16px">Grid CO2 intensity: {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
             <p style="font-size:16px"><b>Land & Emissions</b></p>
             <p style="font-size:16px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>
-            <p style="font-size:16px">Emissions balance {{ o.emissions_balance.total | toFixed(2) }} MtC02e</p>
+            <p style="font-size:16px">Emissions balance {{ o.emissions_balance.total | toFixed(1) }} MtC02e</p>
         </div>
         
         <div style="clear:both"></div>

@@ -190,36 +190,49 @@ var model = {
     // Lighting, cooking and appliances
     // --------------------------------------------------------------------------------------------- 
     lac: function() {
-    
+        // Electric
         let annual_cooking_elec = i.LAC.domestic.cooking_TWhy + i.LAC.services.catering_TWhy
         let daily_cooking_elec = annual_cooking_elec * 1000.0 / 365.25
-        
-        let trad_elec_demand = i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.cooling_TWhy 
-        let daily_trad_elec_demand = trad_elec_demand * 1000.0 / 365.25
+        let LA_elec_demand = i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.cooling_TWhy 
+        let daily_LA_elec_demand = LA_elec_demand * 1000.0 / 365.25
+
+        // Gas
+        let annual_cooking_gas = i.LAC.domestic.cooking_gas_TWhy + i.LAC.services.catering_gas_TWhy
+        let daily_cooking_gas = annual_cooking_gas * 1000.0 / 365.25
+        let LA_gas_demand = i.LAC.services.lighting_and_appliances_gas_TWhy
+        let daily_LA_gas_demand = LA_gas_demand * 1000.0 / 365.25
 
         o.LAC = {}
-
         o.LAC.total = 0
-        
+        o.LAC.total_gas = 0
         d.lac_demand = []
+        d.lac_demand_gas = []
             
         for (var hour = 0; hour < i.hours; hour++) {
             let capacityfactors = capacityfactors_all[hour]
 
             let cooking_elec = cooking_profile[hour%24] * daily_cooking_elec
+            let cooking_gas = cooking_profile[hour%24] * daily_cooking_gas
             
             let normalised_trad_elec = capacityfactors[5]/331.033
-            let traditional_elec_demand = normalised_trad_elec * trad_elec_demand
+            let hourly_LAC_elec_demand = normalised_trad_elec * LA_elec_demand
+            let hourly_LAC_gas_demand = normalised_trad_elec * LA_gas_demand
             
-            if (i.use_flat_profiles) traditional_elec_demand = daily_trad_elec_demand / 24.0
-            traditional_elec_demand += cooking_elec
+            if (i.use_flat_profiles) hourly_LAC_elec_demand = daily_LA_elec_demand / 24.0
+            if (i.use_flat_profiles) hourly_LAC_gas_demand = daily_LA_gas_demand / 24.0
             
-            d.lac_demand.push(traditional_elec_demand)
-            o.LAC.total += traditional_elec_demand
+            hourly_LAC_elec_demand += cooking_elec
+            hourly_LAC_gas_demand += cooking_gas         
+            
+            d.lac_demand.push(hourly_LAC_elec_demand)
+            d.lac_demand_gas.push(hourly_LAC_gas_demand)      
+               
+            o.LAC.total += hourly_LAC_elec_demand
+            o.LAC.total_gas += hourly_LAC_gas_demand
         }
         
-        o.LAC.domestic_appliances_kwh = i.LAC.domestic.lighting_and_appliances_TWhy * 1000000000 / i.households_2030
-        o.LAC.domestic_cooking_kwh = i.LAC.domestic.cooking_TWhy * 1000000000 / i.households_2030
+        o.LAC.domestic_appliances_kwh = (i.LAC.domestic.lighting_and_appliances_TWhy) * 1000000000 / i.households_2030
+        o.LAC.domestic_cooking_kwh = (i.LAC.domestic.cooking_TWhy+i.LAC.domestic.cooking_gas_TWhy) * 1000000000 / i.households_2030
     },
 
     // ---------------------------------------------------------------------------------------------    
@@ -572,6 +585,13 @@ var model = {
             // Balance calculation for BEV storage stage
             d.balance_before_BEV_storage.push(d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - d.industrial_elec_demand[hour])   
         }
+        
+        o.industry.total_demand_check = 0;
+        o.industry.total_demand_check += o.industry.total_elec_demand
+        o.industry.total_demand_check += o.industry.total_methane_demand
+        o.industry.total_demand_check += o.industry.total_hydrogen_demand
+        o.industry.total_demand_check += o.industry.total_synth_fuel_demand
+        o.industry.total_demand_check += o.industry.total_biomass_demand
     },
 
     // -------------------------------------------------------------------------------------
@@ -1183,7 +1203,7 @@ var model = {
                 }
             }
             
-            let methane_demand = methane_to_dispatchable + d.methane_for_spacewaterheat[hour] + d.methane_for_industry[hour]
+            let methane_demand = methane_to_dispatchable + d.methane_for_spacewaterheat[hour] + d.methane_for_industry[hour] + d.lac_demand_gas[hour]
             o.methane.total_demand += methane_demand
             
             let methane_balance = methane_production - methane_demand
@@ -1318,6 +1338,7 @@ var model = {
         
         o.balance.total_demand = 0
         o.balance.total_demand += o.LAC.total 
+        o.balance.total_demand += o.LAC.total_gas
         o.balance.total_demand += o.space_heating.total_demand
         o.balance.total_demand += o.water_heating.total_demand
         o.balance.total_demand += o.industry.total_elec_demand
