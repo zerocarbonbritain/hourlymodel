@@ -107,27 +107,27 @@ var i = {
         
         modes: {
             'Walking': {
-                miles_pp: 186
+                miles_pp: 250
             },
             'Cycling': {
-                miles_pp: 168
+                miles_pp: 400
             },
             'Ebikes': {
-                miles_pp: 155,
+                miles_pp: 200,
                 mechanical_kwhppkm_full: 0.0081,
                 load_factor: 1.0,
                 prc: {EV:1},
                 efficiency: {EV: 0.8}
             },
             'Rail': {
-                miles_pp: 808,
+                miles_pp: 1250,
                 mechanical_kwhppkm_full: 0.027,
                 load_factor: 0.42,
                 prc: {EV:0.9, H2:0.04, IC:0.06},
                 efficiency: {EV: 0.9, H2: 0.3564, IC: 0.3}
             },
             'Bus': {
-                miles_pp: 1150,
+                miles_pp: 1035,
                 mechanical_kwhppkm_full: 0.016,
                 load_factor: 0.42,
                 prc: {EV:0.9, H2:0.04, IC:0.06},
@@ -258,7 +258,7 @@ var i = {
     
     // biogas
     biogas: {
-        biomass_for_biogas: 88.0,
+        biomass_for_biogas: 89.0,
         anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
         co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))   // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     },
@@ -267,12 +267,12 @@ var i = {
     methane: {
         methanation_capacity: 5.15,
         SOC_start: 10000.0,
-        storage_capacity_GWh: 60000.0
+        storage_capacity_GWh: 65000.0
     },
 
     // Synth fuel production
     synth_fuel: {
-        capacity_GW: 9.0,
+        capacity_GW: 9.15,
         store_capacity_GWh: 50000,
         store_start_GWh: 5000.0,
         FT_process_biomass_req: 1.3,   // GWh/GWh fuel
