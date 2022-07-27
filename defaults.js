@@ -296,14 +296,20 @@ var i = {
 
     // Dispatchable
     electric_backup: {
-        methane_turbine_capacity: 70.0,
-        methane_turbine_efficiency: 0.5,
-        hydrogen_turbine_capacity: 0.0,
-        hydrogen_turbine_efficiency: 0.5
+        prc_hydrogen: 0,
+        hydrogen_efficiency: 50,
+        prc_methane: 100,
+        methane_efficiency:50,
+        prc_biomass: 0,
+        biomass_efficiency:32,
+        prc_synth_fuel: 0,
+        synth_fuel_efficiency:21,
+        prc_coal: 0,
+        coal_efficiency: 34
     },
     
     fossil_fuels: {
-        allow_use_for_backup: false
+        allow_use_for_backup: 0
     },
     
     land_use: {

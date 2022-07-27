@@ -134,7 +134,7 @@ function draw_block(ctx,x,mov,kwh,text,c,scale,unit,width,textscale)
     ctx.textAlign    = "center";
 
     // Draw text if block height is more than 30 pixels
-    if (seg>30.0)
+    if (seg>28.0)
     {
       ctx.font = "bold "+textscale+"px arial";
       var textwidth = text.length*4.0;
@@ -147,6 +147,18 @@ function draw_block(ctx,x,mov,kwh,text,c,scale,unit,width,textscale)
       } else {
          ctx.fillText((kwh).toFixed(dp), x+(width/2),mov+(seg/2)+8+2);   
       }
+    } else if (seg>12.0) {
+      ctx.font = "bold "+textscale+"px arial";
+      var textwidth = text.length*4.0;
+      if (textwidth<width) ctx.fillText(text, x+(width/2),mov+(seg/2)+2);
+
+      /*ctx.font = "normal "+textscale+"px arial"; 
+      var textwidth = (""+(kwh).toFixed(dp)+unit).length*6.0;
+      if (textwidth<width) {
+        ctx.fillText((kwh).toFixed(dp)+unit, x+(width/2),mov+(seg/2)+8+2);   
+      } else {
+         ctx.fillText((kwh).toFixed(dp), x+(width/2),mov+(seg/2)+8+2);   
+      } */ 
     }
   }
 

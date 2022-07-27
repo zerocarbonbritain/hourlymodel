@@ -1,6 +1,8 @@
 <?php
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
+    
+    $v = 23;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,8 +24,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
-    <script type="text/javascript" src="ui/stacks.js?v=2"></script>
-    <link rel="stylesheet" type="text/css" href="ui/style.css?v=3" />
+    <script type="text/javascript" src="ui/stacks.js?v=<?php echo $v; ?>"></script>
+    <link rel="stylesheet" type="text/css" href="ui/style.css?v=<?php echo $v; ?>" />
   </head>
 
   <body>
@@ -53,8 +55,10 @@
           <div class="menu-item"><a href="#heatingsystems">Heating systems</a></div>
           <div class="menu-item"><a href="#transport">Transport</a></div>
           <div class="menu-item"><a href="#industry">Industry</a></div>                    
-          <div class="menu-item"><a href="#elec_storage">Electricity Storage</a></div>                    
-          <div class="menu-item"><a href="#backup">Storage & Backup</a></div>     
+          <div class="menu-item"><a href="#energy_industry_use">Energy industry use</a></div>                    
+          <div class="menu-item"><a href="#elec_storage">Electricity storage</a></div>  
+          <div class="menu-item"><a href="#elec_backup">Electricity backup</a></div>                  
+          <div class="menu-item"><a href="#synthfuels">Synthetic Fuels</a></div>     
           <div class="menu-item"><a href="#land_use">Land use</a></div>     
           <div class="menu-item"><a href="#emissions_balance">Emissions balance</a></div>     
           <div class="menu-item"><a href="#balance">Final balance</a></div>
@@ -110,10 +114,10 @@ function normalise_profile(profile) {
 }
 </script>
 
-<script language="javascript" type="text/javascript" src="defaults.js?v=11"></script>
-<script language="javascript" type="text/javascript" src="model.js?v=10"></script>
-<script language="javascript" type="text/javascript" src="ui/vishelper.js?v=2"></script>
-<script language="javascript" type="text/javascript" src="ui/zcem.js?v=5"></script>
+<script language="javascript" type="text/javascript" src="defaults.js?v=<?php echo $v; ?>"></script>
+<script language="javascript" type="text/javascript" src="model.js?v=<?php echo $v; ?>"></script>
+<script language="javascript" type="text/javascript" src="ui/vishelper.js?v=<?php echo $v; ?>"></script>
+<script language="javascript" type="text/javascript" src="ui/zcem.js?v=<?php echo $v; ?>"></script>
 
 <script>
 
@@ -391,6 +395,6 @@ function load_scenario(name) {
 }
     
 </script>
-<script language="javascript" type="text/javascript" src="scenarios.js?v=20"></script>
+<script language="javascript" type="text/javascript" src="scenarios.js?v=23"></script>
 
 

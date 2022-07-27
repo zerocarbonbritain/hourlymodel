@@ -40,6 +40,15 @@ var model = {
             total_used: 0
         }
         
+        o.fossil_fuels = {
+          oil:0,
+          gas:0,
+          coal:0,
+          total:0,
+          coal_for_dispatchable: 0,
+          coal_for_heating_systems: 0
+        }
+        
         model.supply();
         model.lac();
         model.space_water_heat_demand();
@@ -415,6 +424,7 @@ var model = {
             }
             
             o.biomass.total_used += system_fuel_demand.biomass
+            o.fossil_fuels.coal_for_heating_systems += system_fuel_demand.solid_fuel
             d.methane_for_spacewaterheat.push(system_fuel_demand.methane)
             d.hydrogen_for_spacewaterheat.push(system_fuel_demand.hydrogen)
             d.synthfuel_for_spacewaterheat.push(system_fuel_demand.synthfuel)
@@ -559,13 +569,6 @@ var model = {
             // Balance calculation for BEV storage stage
             d.balance_before_BEV_storage.push(d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - d.industrial_elec_demand[hour])   
         }
-        
-        o.industry.total_demand_check = 0;
-        o.industry.total_demand_check += o.industry.total_elec_demand
-        o.industry.total_demand_check += o.industry.total_methane_demand
-        o.industry.total_demand_check += o.industry.total_hydrogen_demand
-        o.industry.total_demand_check += o.industry.total_synth_fuel_demand
-        o.industry.total_demand_check += o.industry.total_biomass_demand
     },
 
     // -------------------------------------------------------------------------------------
@@ -795,7 +798,8 @@ var model = {
         o.synth_fuel.unmet_demand = 0
         o.synth_fuel.total_produced = 0
         o.synth_fuel.total_biomass_used = 0
-                 
+        o.synth_fuel.total_transport_demand = 0
+        o.synth_fuel.total_industrial_demand = 0
         // Power to X
         o.power_to_X = {}
         o.power_to_X.total_electricity_demand = 0
@@ -813,15 +817,20 @@ var model = {
 
         // Electric backup
         o.electric_backup = {}        
-        o.electric_backup.max_methane_turbine_output = 0
-        o.electric_backup.max_methane_turbine_output_hour = 0
+        o.electric_backup.max_capacity_requirement = 0
+        o.electric_backup.max_capacity_requirement_hour = 0
         o.electric_backup.max_shortfall = 0
         o.electric_backup.max_shortfall_hour = 0
-        o.electric_backup.total_methane_turbine_output = 0
         
+        o.electric_backup.total_hydrogen_turbine_output = 0
+        o.electric_backup.total_methane_turbine_output = 0
+        o.electric_backup.total_synth_fuel_turbine_output = 0
+        o.electric_backup.total_biomass_turbine_output = 0
+        o.electric_backup.total_coal_turbine_output = 0
+    
         // demand totals
         o.total_losses.electrolysis = 0
-        o.total_losses.methane_turbine = 0
+        o.total_losses.elec_backup = 0
         o.total_losses.sabatier = 0
         o.total_losses.anaerobic_digestion = 0
         o.total_losses.FT = 0
@@ -1015,6 +1024,13 @@ var model = {
                 hydrogen_balance -= hydrogen_to_synth_fuel
             }
             
+            // Production of synth fuel and losses
+            let synth_fuel_produced_FT = hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req
+            o.synth_fuel.total_produced += synth_fuel_produced_FT
+            o.synth_fuel.total_biomass_used += hourly_biomass_for_biofuel
+            o.synth_fuel.store_SOC += synth_fuel_produced_FT
+            o.total_losses.FT += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req)         
+            
             // 4. Hydrogen to Methanation
             let co2_for_sabatier = co2_from_biogas
             let hydrogen_for_sabatier = co2_for_sabatier * (8.064/44.009) * 39.4 * 0.001                     // 1000 tCO2, requires 7.2 GWh of H2 (HHV)
@@ -1078,35 +1094,59 @@ var model = {
             // ----------------------------------------------------------------------------
             // Dispatchable (backup power via CCGT gas turbines)
             // ---------------------------------------------------------------------------- 
+            let hydrogen_turbine_output = 0
             let methane_turbine_output = 0
+            let synth_fuel_turbine_output = 0
+            let biomass_turbine_output = 0
+            let coal_turbine_output = 0
+            let electricity_from_dispatchable = 0
+            
             if (balance<0.0) {
-                methane_turbine_output = -1 * balance
+                let backup_requirement = (-1 * balance);
                 
-                // Limit by methane availability
+                // Allocate to different technologies
+                hydrogen_turbine_output = backup_requirement * (i.electric_backup.prc_hydrogen * 0.01)
+                methane_turbine_output = backup_requirement * (i.electric_backup.prc_methane * 0.01)
+                synth_fuel_turbine_output = backup_requirement * (i.electric_backup.prc_synth_fuel * 0.01)
+                biomass_turbine_output = backup_requirement * (i.electric_backup.prc_biomass * 0.01)
+                coal_turbine_output = backup_requirement * (i.electric_backup.prc_coal * 0.01)
+
+                // Limit by hydrogen availability (only available from H2 store)
+                if (hydrogen_turbine_output>(o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01)) {
+                    hydrogen_turbine_output = o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01
+                }
+                
+                // If methane and synth fuels are from stores only, limit by availability
                 if (!i.fossil_fuels.allow_use_for_backup) {
-                    if (methane_turbine_output>(o.methane.SOC*i.electric_backup.methane_turbine_efficiency)) {
-                        methane_turbine_output = o.methane.SOC*i.electric_backup.methane_turbine_efficiency
+                    // Limit by methane availability
+                    if (methane_turbine_output>(o.methane.SOC*i.electric_backup.methane_efficiency*0.01)) {
+                        methane_turbine_output = o.methane.SOC*i.electric_backup.methane_efficiency*0.01
+                    }
+                    // Limit by synth fuel availability
+                    if (synth_fuel_turbine_output>(o.synth_fuel.store_SOC*i.electric_backup.synth_fuel_efficiency*0.01)) {
+                        synth_fuel_turbine_output = o.synth_fuel.store_SOC*i.electric_backup.synth_fuel_efficiency*0.01
                     }
                 }
-                // Limit by CCGT capacity
-                if (methane_turbine_output > i.electric_backup.methane_turbine_capacity) {
-                    methane_turbine_output = i.electric_backup.methane_turbine_capacity
-                }
-                // Totals, losses and max capacity utilisation
-                o.total_losses.methane_turbine += ((1.0/i.electric_backup.methane_turbine_efficiency)-1.0) * methane_turbine_output
+                
+                // Totals
+                o.electric_backup.total_hydrogen_turbine_output += hydrogen_turbine_output
                 o.electric_backup.total_methane_turbine_output += methane_turbine_output
-                
-                if (methane_turbine_output>o.electric_backup.max_methane_turbine_output) {
-                    o.electric_backup.max_methane_turbine_output = methane_turbine_output
-                    o.electric_backup.max_methane_turbine_output_hour = hour
+                o.electric_backup.total_synth_fuel_turbine_output += synth_fuel_turbine_output 
+                o.electric_backup.total_biomass_turbine_output += biomass_turbine_output
+                o.electric_backup.total_coal_turbine_output += coal_turbine_output 
+                                
+                // Log maximum dispatchable capacity requirement and time
+                if (backup_requirement>o.electric_backup.max_capacity_requirement) {
+                    o.electric_backup.max_capacity_requirement = backup_requirement
+                    o.electric_backup.max_capacity_requirement_hour = hour
                 }
                 
-                
+                electricity_from_dispatchable = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output
             }
-            d.electricity_from_dispatchable.push(methane_turbine_output)
+            d.electricity_from_dispatchable.push(electricity_from_dispatchable)
             
             // Final electricity balance
-            balance += methane_turbine_output
+            balance += electricity_from_dispatchable
 
             let export_elec = 0.0
             let unmet_elec = 0.0
@@ -1127,13 +1167,19 @@ var model = {
             d.export_elec.push(export_elec)
             d.unmet_elec.push(unmet_elec)
             
+            if (o.balance.total_final_elec_balance_negative<0.0000001) {
+                o.balance.total_final_elec_balance_negative = 0;
+                o.balance.final_elec_balance_positive = i.hours;
+            }
+            
             // ----------------------------------------------------------------------------
             // Methane
             // ---------------------------------------------------------------------------- 
             // Total methane production
             let methane_production = methane_from_sabatier + methane_from_biogas + methane_from_IHTEM
             o.methane.total_produced += methane_production
-            let methane_to_dispatchable = methane_turbine_output / i.electric_backup.methane_turbine_efficiency
+            
+            let methane_to_dispatchable = methane_turbine_output / (i.electric_backup.methane_efficiency*0.01)
             
             if (i.fossil_fuels.allow_use_for_backup) {
                 if (methane_to_dispatchable>o.methane.SOC) {
@@ -1155,7 +1201,7 @@ var model = {
             if (o.methane.SOC<0) {
                 o.methane.unmet += -1*o.methane.SOC
                 o.methane.SOC = 0
-            } 
+            }
             
             
             d.methane_SOC.push(o.methane.SOC)
@@ -1164,42 +1210,49 @@ var model = {
             
             if (o.methane.SOC>o.methane.max_SOC) o.methane.max_SOC = o.methane.SOC
             if (o.methane.SOC<o.methane.min_SOC) o.methane.min_SOC = o.methane.SOC
-            // ------------------------------------------------------------------------------------
-            // Synth fuel FT
-            let synth_fuel_produced_FT = hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req
             
-            o.synth_fuel.total_produced += synth_fuel_produced_FT
-            o.synth_fuel.total_biomass_used += hourly_biomass_for_biofuel
-            
-            o.synth_fuel.store_SOC += synth_fuel_produced_FT
-            
-            o.total_losses.FT += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req)
-            
-            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel + d.synthfuel_for_spacewaterheat[hour]
-            
+            // ----------------------------------------------------------------------------
+            // Liquid Synth fuel
+            // ---------------------------------------------------------------------------- 
+            // Synth fuel demand
+            let synth_fuel_for_dispatchable = synth_fuel_turbine_output / (i.electric_backup.synth_fuel_efficiency*0.01)
+            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel + d.synthfuel_for_spacewaterheat[hour] + synth_fuel_for_dispatchable
+            o.synth_fuel.total_demand += synth_fuel_demand
             o.synth_fuel.store_SOC -= synth_fuel_demand
-
+            
+            o.synth_fuel.total_transport_demand += (daily_transport_liquid_demand/24.0)
+            o.synth_fuel.total_industrial_demand += hourly_industrial_biofuel
+            
+            // Record unmet synth fuel demand
             if (o.synth_fuel.store_SOC<0.0) {
                 o.synth_fuel.unmet_demand += -1*o.synth_fuel.store_SOC
                 o.synth_fuel.store_SOC = 0.0
             }
+            d.synth_fuel_store_SOC.push(o.synth_fuel.store_SOC)
             
-            o.synth_fuel.total_demand += (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel
-
-            d.synth_fuel_store_SOC.push(o.synth_fuel.store_SOC)   
-            
-            if (o.synth_fuel.store_SOC>o.synth_fuel.store_max_SOC) o.synth_fuel.store_max_SOC = o.synth_fuel.store_SOC
-            if (o.synth_fuel.store_SOC<o.synth_fuel.store_min_SOC) o.synth_fuel.store_min_SOC = o.synth_fuel.store_SOC   
-            // ------------------------------------------------------------------------------------
             // Biomass
             o.biomass.total_used += biogas_supply / i.biogas.anaerobic_digestion_efficiency 
             o.biomass.total_used += hourly_biomass_for_biofuel
             
             // Hydrogen SOC data
+            let hydrogen_for_dispatchable = hydrogen_turbine_output / (i.electric_backup.hydrogen_efficiency*0.01)     
+            o.hydrogen.SOC -= hydrogen_for_dispatchable
+            
             d.hydrogen_SOC.push(o.hydrogen.SOC)
             if ((o.hydrogen.SOC/i.hydrogen.storage_capacity_GWh)<0.01) o.hydrogen.store_empty_count ++
             if ((o.hydrogen.SOC/i.hydrogen.storage_capacity_GWh)>0.99) o.hydrogen.store_full_count ++
         }
+        
+        // Electricity backup losses
+        o.total_losses.elec_backup = 0
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.hydrogen_efficiency*0.01))-1.0) * o.electric_backup.total_hydrogen_turbine_output
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.methane_efficiency*0.01))-1.0) * o.electric_backup.total_methane_turbine_output
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.synth_fuel_efficiency*0.01))-1.0) * o.electric_backup.total_synth_fuel_turbine_output
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.biomass_efficiency*0.01))-1.0) * o.electric_backup.total_biomass_turbine_output
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.coal_efficiency*0.01))-1.0) * o.electric_backup.total_coal_turbine_output
+        
+        let biomass_for_dispatchable = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
+        o.biomass.total_used += biomass_for_dispatchable
     },
     
     // -------------------------------------------------------------------------------------------------
@@ -1207,10 +1260,9 @@ var model = {
     // or to simulate interim scenarios on the way to zero carbon.
     // -------------------------------------------------------------------------------------------------   
     fossil_fuels: function() {
-         o.fossil_fuels = {
-             oil:0,
-             gas:0,
-             total:0
+         
+         o.energy_industry_use = {
+             total: 0
          }
          
          if (i.fossil_fuels.allow_use_for_backup) {
@@ -1219,28 +1271,33 @@ var model = {
              
              o.fossil_fuels.gas = o.methane.unmet
              o.methane.unmet = 0
+             
+             o.fossil_fuels.coal_for_dispatchable = o.electric_backup.total_coal_turbine_output / (i.electric_backup.coal_efficiency*0.01)
+             o.fossil_fuels.coal = o.fossil_fuels.coal_for_heating_systems + o.fossil_fuels.coal_for_dispatchable
          }
          
          o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * 0.049;
          o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.03746;
          o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.00547;
          
+         o.energy_industry_use.total += o.fossil_fuels.refineries_oil_use
+         o.energy_industry_use.total += o.fossil_fuels.oil_gas_extraction_gas_use
+         o.energy_industry_use.total += o.fossil_fuels.oil_gas_extraction_oil_use
+         
          o.fossil_fuels.oil += o.fossil_fuels.refineries_oil_use
          o.fossil_fuels.oil += o.fossil_fuels.oil_gas_extraction_oil_use
          o.fossil_fuels.gas += o.fossil_fuels.oil_gas_extraction_gas_use
          
-         o.fossil_fuels.total = o.fossil_fuels.oil + o.fossil_fuels.gas
+         o.fossil_fuels.total = o.fossil_fuels.oil + o.fossil_fuels.gas + o.fossil_fuels.coal
                   
     },
     
     final: function() {
-
         o.electric_storage.kwh_per_household = (i.electric_storage.capacity_GWh * 1000 * 1000) / i.households_2030;
         o.electric_storage.cycles_per_year = (o.electric_storage.total_discharge / i.electric_storage.capacity_GWh)*0.1
         
         // -------------------------------------------------------------------------------
         o.biomass.total_used += o.industry.total_biomass_demand
-        
         
         o.balance.total_unmet_demand = o.balance.total_final_elec_balance_negative
         
@@ -1258,7 +1315,11 @@ var model = {
         o.balance.total_demand += o.electric_transport.total_EV_demand
         o.balance.total_demand += o.electric_transport.total_elec_trains_demand
         o.balance.total_demand += o.hydrogen.total_vehicle_demand
-        o.balance.total_demand += o.synth_fuel.total_demand
+        
+        o.balance.total_demand += o.synth_fuel.total_transport_demand
+        o.balance.total_demand += o.synth_fuel.total_industrial_demand
+        
+        o.balance.total_demand += o.energy_industry_use.total
         
         // -------------------------------------------------------------------------------------------------
         let final_store_balance = 0
@@ -1341,10 +1402,10 @@ var model = {
         
         var datastarttime = 32*365.25*24*3600*1000;
 
-        var date = new Date(datastarttime + (o.electric_backup.max_methane_turbine_output_hour * 3600 * 1000));
+        var date = new Date(datastarttime + (o.electric_backup.max_capacity_requirement_hour * 3600 * 1000));
         var h = date.getHours();
         if (h<10) h = "0"+h
-        o.electric_backup.max_methane_turbine_output_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
+        o.electric_backup.max_capacity_requirement_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
 
         date = new Date(datastarttime + (o.electric_backup.max_shortfall_hour * 3600 * 1000));
         h = date.getHours();
@@ -1457,14 +1518,26 @@ var model = {
         // Fossil fuels
         // energy quantities are in GWh over 10 years
         // multiply by 0.1 to give over 1 year
-        // - oil co2 factor is 0.245 kgCO2 per kWh = 0.000245 MtCO2 per GWh
-        // - gas co2 factor is 0.185 kgCO2 per kWh = 0.000185 MtCO2 per GWh     
+        // - coal co2 factor is 0.3166 kgCO2 per kWh = 0.0003166 MtCO2 per GWh
+        // - oil co2 factor is 0.2678 kgCO2 per kWh = 0.0002678 MtCO2 per GWh
+        // - gas co2 factor is 0.1839 kgCO2 per kWh = 0.0001839 MtCO2 per GWh
+        i.emissions_balance.fossil_fuel_coal = o.fossil_fuels.coal*0.1*0.0003166
         i.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
         i.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
         
         // Work out grid co2 intensity
-        let total_electricity = o.supply.total_electricity + o.electric_backup.total_methane_turbine_output
-        let grid_co2_emissions = o.methane.ccgt_methane_from_fossil_gas*0.000185      // in MtC02
+        let total_electricity = o.supply.total_electricity
+        
+        total_electricity += o.electric_backup.total_hydrogen_turbine_output
+        total_electricity += o.electric_backup.total_methane_turbine_output
+        total_electricity += o.electric_backup.total_synth_fuel_turbine_output
+        total_electricity += o.electric_backup.total_biomass_turbine_output
+        total_electricity += o.electric_backup.total_coal_turbine_output
+                
+        let grid_co2_emissions = 0;
+        grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
+        grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*0.0003166
+        
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / total_electricity)   // MtC02 / GWh
         
         i.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total

@@ -40,6 +40,7 @@ function model_ui() {
           {"kwhd":o.supply.total_nuclear*scl,"name":"Nuclear","color":1},
           {"kwhd":o.biomass.total_used*scl,"name":"Biomass","color":1},
           {"kwhd":o.heat.total_ambient_supply*scl,"name":"Ambient","color":1},
+          {"kwhd":o.fossil_fuels.coal*scl,"name":"Coal","color":8},        
           {"kwhd":o.fossil_fuels.oil*scl,"name":"Oil","color":8},
           {"kwhd":o.fossil_fuels.gas*scl,"name":"Gas","color":8},      
           {"kwhd":o.balance.total_unmet_demand*scl,"name":"Unmet","color":3}
@@ -68,11 +69,14 @@ function model_ui() {
           {"kwhd":o.industry.total_elec_demand*scl,"name":"Industry Electric","color":0},
           {"kwhd":o.industry.total_methane_demand*scl,"name":"Industry Methane","color":0},
           {"kwhd":o.industry.total_biomass_demand*scl,"name":"Industry Biomas","color":0},
-          {"kwhd":o.industry.total_synth_fuel_demand*scl,"name":"Industry Fuel","color":0},/*
+          {"kwhd":o.industry.total_synth_fuel_demand*scl,"name":"Industry Fuel","color":0},
+          {"kwhd":o.energy_industry_use.total*scl,"name":"Energy Industry Use","color":0}, 
+          
+          /*
           // Backup, liquid and gas processes*/
           {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},
           {"kwhd":o.total_losses.electrolysis*scl,"name":"H2 losses","color":2},
-          {"kwhd":o.total_losses.methane_turbine*scl,"name":"CCGT losses","color":2},
+          {"kwhd":(o.total_losses.elec_backup)*scl,"name":"Power station losses","color":2},
           {"kwhd":o.total_losses.FT*scl,"name":"FT losses","color":2},
           {"kwhd":(o.total_losses.sabatier+o.total_losses.power_to_X)*scl,"name":"Sabatier losses","color":2},
           {"kwhd":o.total_losses.anaerobic_digestion*scl,"name":"AD losses","color":2},

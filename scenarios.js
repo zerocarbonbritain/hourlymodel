@@ -286,13 +286,19 @@ var scenarios = {
       "liquid_efficiency": 0.6
     },
     "electric_backup": {
-      "methane_turbine_capacity": 60,
-      "methane_turbine_efficiency": 0.478,
-      "hydrogen_turbine_capacity": 0,
-      "hydrogen_turbine_efficiency": 0.478
+        prc_hydrogen: 0,
+        hydrogen_efficiency: 47.8,
+        prc_methane: 69.24,
+        methane_efficiency:47.8,
+        prc_biomass: 20.39,
+        biomass_efficiency:32.2,
+        prc_synth_fuel: 0.56,
+        synth_fuel_efficiency:21,
+        prc_coal: 9.81,
+        coal_efficiency: 34.4
     },
     "fossil_fuels": {
-      "allow_use_for_backup": true
+      "allow_use_for_backup": 1
     },
     "land_use": {
       "existing_natural_broadleaf_woodland": 139,
