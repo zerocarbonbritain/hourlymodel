@@ -724,14 +724,30 @@ input[type='text'] {
         <tr>
             <th width="40%"></th>
             <th width="20%">Annual demand</th>
-            <th width="20%">% Reduction vs 2018</th>
-            <th width="20%"></th>
         </tr>
         <tr>
-            <td>Domestic Lighting & Appliances</td>
-            <td><input v-model.number="i.LAC.domestic.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>   
-            <td>{{ (1-i.LAC.domestic.lighting_and_appliances_TWhy/76.63)*100 | toFixed(0) }}%</td>
-            <td>{{ o.LAC.domestic_appliances_kwh | toFixed(0) }} kWh/household</td>
+            <td>Refinery gas consumption</td>
+            <td>{{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Refinery oil consumption</td>
+            <td>{{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Oil and gas extraction gas consumption</td>
+            <td>{{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Oil and gas extraction oil consumption</td>
+            <td>{{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Other gas use</td>
+            <td>{{ o.fossil_fuels.other_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+        </tr>
+        <tr>
+            <td>Gas losses</td>
+            <td>{{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
         </tr>
         </table>
     </div>

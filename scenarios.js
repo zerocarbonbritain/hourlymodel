@@ -21,7 +21,7 @@ var scenarios = {
       "geothermal_elec_capacity_factor": 0.9,
       "geothermal_heat_capacity": 0,
       "geothermal_heat_capacity_factor": 0.9,
-      "nuclear_capacity": 8.9,
+      "nuclear_capacity": 11.64,
       "nuclear_capacity_factor": 0.835,
       "grid_loss_prc": 0.0884+0.05113
     },

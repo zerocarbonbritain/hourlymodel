@@ -1100,16 +1100,19 @@ var model = {
             let biomass_turbine_output = 0
             let coal_turbine_output = 0
             let electricity_from_dispatchable = 0
+            let electricity_from_dispatchable_before_grid_loss = 0
             
             if (balance<0.0) {
                 let backup_requirement = (-1 * balance);
                 
+                let backup_requirement_before_grid_loss = backup_requirement / (1.0-i.supply.grid_loss_prc)
+                
                 // Allocate to different technologies
-                hydrogen_turbine_output = backup_requirement * (i.electric_backup.prc_hydrogen * 0.01)
-                methane_turbine_output = backup_requirement * (i.electric_backup.prc_methane * 0.01)
-                synth_fuel_turbine_output = backup_requirement * (i.electric_backup.prc_synth_fuel * 0.01)
-                biomass_turbine_output = backup_requirement * (i.electric_backup.prc_biomass * 0.01)
-                coal_turbine_output = backup_requirement * (i.electric_backup.prc_coal * 0.01)
+                hydrogen_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_hydrogen * 0.01)
+                methane_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_methane * 0.01)
+                synth_fuel_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_synth_fuel * 0.01)
+                biomass_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_biomass * 0.01)
+                coal_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_coal * 0.01)
 
                 // Limit by hydrogen availability (only available from H2 store)
                 if (hydrogen_turbine_output>(o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01)) {
@@ -1141,7 +1144,9 @@ var model = {
                     o.electric_backup.max_capacity_requirement_hour = hour
                 }
                 
-                electricity_from_dispatchable = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output
+                electricity_from_dispatchable_before_grid_loss = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output
+                electricity_from_dispatchable = electricity_from_dispatchable_before_grid_loss * (1.0-i.supply.grid_loss_prc)
+                o.total_losses.grid += electricity_from_dispatchable_before_grid_loss - electricity_from_dispatchable
             }
             d.electricity_from_dispatchable.push(electricity_from_dispatchable)
             
@@ -1276,17 +1281,26 @@ var model = {
              o.fossil_fuels.coal = o.fossil_fuels.coal_for_heating_systems + o.fossil_fuels.coal_for_dispatchable
          }
          
+         o.fossil_fuels.refineries_gas_use = (o.fossil_fuels.oil) * 0.0025;
          o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * 0.049;
          o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.03746;
          o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.00547;
+         o.fossil_fuels.other_gas_use = (o.fossil_fuels.gas) * 0.01;
+         o.fossil_fuels.gas_losses = (o.fossil_fuels.gas) * 0.011;
          
+         o.energy_industry_use.total += o.fossil_fuels.refineries_gas_use
          o.energy_industry_use.total += o.fossil_fuels.refineries_oil_use
          o.energy_industry_use.total += o.fossil_fuels.oil_gas_extraction_gas_use
          o.energy_industry_use.total += o.fossil_fuels.oil_gas_extraction_oil_use
+         o.energy_industry_use.total += o.fossil_fuels.other_gas_use
+         o.energy_industry_use.total += o.fossil_fuels.gas_losses
          
+         o.fossil_fuels.gas += o.fossil_fuels.refineries_gas_use
          o.fossil_fuels.oil += o.fossil_fuels.refineries_oil_use
+         o.fossil_fuels.gas += o.fossil_fuels.oil_gas_extraction_gas_use       
          o.fossil_fuels.oil += o.fossil_fuels.oil_gas_extraction_oil_use
-         o.fossil_fuels.gas += o.fossil_fuels.oil_gas_extraction_gas_use
+         o.fossil_fuels.gas += o.fossil_fuels.other_gas_use
+         o.fossil_fuels.gas += o.fossil_fuels.gas_losses
          
          o.fossil_fuels.total = o.fossil_fuels.oil + o.fossil_fuels.gas + o.fossil_fuels.coal
                   
@@ -1533,6 +1547,8 @@ var model = {
         total_electricity += o.electric_backup.total_synth_fuel_turbine_output
         total_electricity += o.electric_backup.total_biomass_turbine_output
         total_electricity += o.electric_backup.total_coal_turbine_output
+        
+        console.log("Total electric generation: "+(total_electricity*0.0001))
                 
         let grid_co2_emissions = 0;
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
