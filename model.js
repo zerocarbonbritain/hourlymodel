@@ -478,6 +478,7 @@ var model = {
         o.industry.total_methane_demand = 0
         o.industry.total_hydrogen_demand = 0 
         o.industry.total_synth_fuel_demand = 0  
+        o.industry.total_coal_demand = 0
         o.industry.total_biomass_demand = 0
         
         var conv_hourly = 1000 / (365.25*24)
@@ -513,6 +514,13 @@ var model = {
         o.industry.total_synth_fuel_demand += i.industry.other_heat_TWhy * i.industry.other_heat_fixed_liquid_prc * 0.01  
         o.industry.total_synth_fuel_demand += i.industry.other_non_heat_TWhy * i.industry.other_non_heat_fixed_liquid_prc * 0.01  
         o.industry.total_synth_fuel_demand *= 10000
+
+        o.industry.total_coal_demand += i.industry.high_temp_process_TWhy * i.industry.high_temp_process_fixed_coal_prc * 0.01
+        o.industry.total_coal_demand += i.industry.low_temp_process_TWhy * i.industry.low_temp_process_fixed_coal_prc * 0.01
+        o.industry.total_coal_demand += i.industry.dry_sep_TWhy * i.industry.dry_sep_fixed_coal_prc * 0.01            
+        o.industry.total_coal_demand += i.industry.other_heat_TWhy * i.industry.other_heat_fixed_coal_prc * 0.01  
+        o.industry.total_coal_demand += i.industry.other_non_heat_TWhy * i.industry.other_non_heat_fixed_coal_prc * 0.01     
+        o.industry.total_coal_demand *= 10000 
         
         o.industry.total_biomass_demand += i.industry.high_temp_process_TWhy * i.industry.high_temp_process_fixed_biomass_prc * 0.01
         o.industry.total_biomass_demand += i.industry.low_temp_process_TWhy * i.industry.low_temp_process_fixed_biomass_prc * 0.01
@@ -592,6 +600,7 @@ var model = {
         o.industry.total_demand_check += o.industry.total_hydrogen_demand
         o.industry.total_demand_check += o.industry.total_synth_fuel_demand
         o.industry.total_demand_check += o.industry.total_biomass_demand
+        o.industry.total_demand_check += o.industry.total_coal_demand
     },
 
     // -------------------------------------------------------------------------------------
@@ -1292,7 +1301,7 @@ var model = {
              o.methane.unmet = 0
              
              o.fossil_fuels.coal_for_dispatchable = o.electric_backup.total_coal_turbine_output / (i.electric_backup.coal_efficiency*0.01)
-             o.fossil_fuels.coal = o.fossil_fuels.coal_for_heating_systems + o.fossil_fuels.coal_for_dispatchable
+             o.fossil_fuels.coal = o.fossil_fuels.coal_for_heating_systems + o.fossil_fuels.coal_for_dispatchable + o.industry.total_coal_demand
          }
          
          o.fossil_fuels.refineries_gas_use = (o.fossil_fuels.oil) * 0.0025;
@@ -1347,6 +1356,7 @@ var model = {
         o.balance.total_demand += o.industry.total_elec_demand
         o.balance.total_demand += o.industry.total_methane_demand
         o.balance.total_demand += o.industry.total_hydrogen_demand
+        o.balance.total_demand += o.industry.total_coal_demand
         o.balance.total_demand += o.industry.total_biomass_demand
         
         o.balance.total_demand += o.electric_transport.total_EV_demand

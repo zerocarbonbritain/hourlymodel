@@ -68,6 +68,7 @@ function model_ui() {
           // Industry
           {"kwhd":o.industry.total_elec_demand*scl,"name":"Industry Electric","color":0},
           {"kwhd":o.industry.total_methane_demand*scl,"name":"Industry Methane","color":0},
+          {"kwhd":o.industry.total_coal_demand*scl,"name":"Industry Coal","color":0},
           {"kwhd":o.industry.total_biomass_demand*scl,"name":"Industry Biomas","color":0},
           {"kwhd":o.industry.total_synth_fuel_demand*scl,"name":"Industry Fuel","color":0},
           {"kwhd":o.energy_industry_use.total*scl,"name":"Energy Industry Use","color":0}, 
