@@ -260,7 +260,7 @@ var scenarios = {
     "hydrogen": {
       "electrolysis_capacity_GW": 0,
       "electrolysis_efficiency": 0.8,
-      "storage_capacity_GWh": 0,
+      "storage_capacity_GWh": 0.1,
       "minimum_store_level": 0.1
     },
     "biogas": {

@@ -1401,13 +1401,13 @@ input[type='text'] {
             <td></td>
         </tr>
         <tr>
-            <td>Liquid fuel</td>
+            <td>Liquid fuel (not including industry use and losses)</td>
             <td>{{ o.synth_fuel.total_produced*0.0001 | toFixed(1) }}</td>
             <td>{{ o.synth_fuel.total_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
-            <td>Methane</td>
+            <td>Methane (not including industry use and losses)</td>
             <td>{{ o.methane.total_produced*0.0001 | toFixed(1) }}</td>
             <td>{{ o.methane.total_demand*0.0001 | toFixed(1) }}</td>
             <td></td>
@@ -1445,19 +1445,19 @@ input[type='text'] {
         <tr>
             <td>Of which rotational grasses (e.g ryegrass)</td>
             <td>{{ o.biomass.grass_for_biogas | toFixed(1) }}</td>
-            <td></td>
+            <td>{{ i.land_use.rotational_grass_ryegrass | toFixed(0) }} kha</td>
             <td></td>
         </tr>
         <tr>
             <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
             <td>{{ o.synth_fuel.total_biomass_used*0.0001 | toFixed(1) }}</td>
-            <td></td>
+            <td>{{ i.land_use.perrennial_grass_miscanthus | toFixed(0) }} kha</td>
             <td></td>
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
             <td>{{ o.biomass.total_direct_use*0.0001 | toFixed(1) }}</td>
-            <td></td>
+            <td>{{ (i.land_use.short_rotation_coppice+(i.land_use.short_rotation_forestry*0.65)) | toFixed(0) }} kha</td>
             <td></td>
         </tr>
         <tr>

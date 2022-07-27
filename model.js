@@ -1246,6 +1246,9 @@ var model = {
             }
             d.synth_fuel_store_SOC.push(o.synth_fuel.store_SOC)
             
+            if (o.synth_fuel.store_min_SOC>o.synth_fuel.store_SOC) o.synth_fuel.store_min_SOC = o.synth_fuel.store_SOC
+            if (o.synth_fuel.store_max_SOC<o.synth_fuel.store_SOC) o.synth_fuel.store_max_SOC = o.synth_fuel.store_SOC
+            
             // Biomass
             o.biomass.total_used += biogas_supply / i.biogas.anaerobic_digestion_efficiency 
             o.biomass.total_used += hourly_biomass_for_biofuel
