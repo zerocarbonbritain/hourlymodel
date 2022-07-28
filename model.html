@@ -202,6 +202,27 @@ input[type='text'] {
             <td></td>
         </tr>
         <tr>
+            <td>Electricity transmission and distribution grid losses</td>
+            <td><input v-model.number="i.energy_industry_use.electricity_grid_loss_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
+            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_grid_loss_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
+            <td></td>
+            <td></td>
+        </tr>     
+        <tr>
+            <td>Electricity industry own use</td>
+            <td><input v-model.number="i.energy_industry_use.electricity_own_use_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
+            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_own_use_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
+            <td></td>
+            <td></td>
+        </tr>  
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>     
+        <tr>
             <th>Enable fossil fuel backup</th>
             <td><select v-model.number="i.fossil_fuels.allow_use_for_backup" autocomplete="off" @change="update"><option value=1>Enabled</option><option value=0>Disabled</option></select>
             </td>
@@ -248,7 +269,7 @@ input[type='text'] {
             <td>Services Lighting & Appliances</td>
             <td><input v-model.number="i.LAC.services.lighting_and_appliances_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
             <td><input v-model.number="i.LAC.services.lighting_and_appliances_gas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-            <td>{{ (1-(i.LAC.services.lighting_and_appliances_TWhy+i.LAC.services.lighting_and_appliances_gas_TWhy)/70.9)*100 | toFixed(0) }}%</td>
+            <td>{{ (1-(i.LAC.services.lighting_and_appliances_TWhy+i.LAC.services.lighting_and_appliances_gas_TWhy)/70.95)*100 | toFixed(0) }}%</td>
             <td></td> 
         </tr>
         <tr>
@@ -261,8 +282,15 @@ input[type='text'] {
         <tr>
             <td>Services Cooling</td>
             <td><input v-model.number="i.LAC.services.cooling_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td><input v-model.number="i.LAC.services.cooling_gas_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
+            <td>{{ (1-(i.LAC.services.cooling_TWhy+i.LAC.services.cooling_gas_TWhy)/12.91)*100 | toFixed(0) }}%</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Totals</td>
+            <td>{{ i.LAC.domestic.lighting_and_appliances_TWhy+i.LAC.domestic.cooking_TWhy+i.LAC.services.lighting_and_appliances_TWhy+i.LAC.services.catering_TWhy+i.LAC.services.cooling_TWhy | toFixed(1) }} TWh/yr</td>
+            <td>{{ i.LAC.domestic.cooking_gas_TWhy+i.LAC.services.lighting_and_appliances_gas_TWhy+i.LAC.services.catering_gas_TWhy+i.LAC.services.cooling_gas_TWhy | toFixed(1) }} TWh/yr</td>
             <td></td>              
-            <td>{{ (1-i.LAC.services.cooling_TWhy/12.9)*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -686,6 +714,18 @@ input[type='text'] {
             <td></td>
         </tr>
         <tr>
+            <td>Refineries*</td>
+            <td><input v-model.number="i.industry.refinery_electric_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
+            <td>100%</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
             <td>Other non heat</td>
             <td><input v-model.number="i.industry.other_non_heat_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh</td>
             <td><input v-model.number="i.industry.other_non_heat_fixed_elec_prc" type="text" @change="update" style="width:30px"  autocomplete="off" /> %</td>
@@ -700,6 +740,8 @@ input[type='text'] {
         </table>
 
         <div style="font-size:14px"><i>DSR options implement a substitutable heat source, direct electricity is used when excess renewable energy is available, methane or hydrogen is used when direct electricity supply is not sufficient.</i></div>
+        <br>
+        <div style="font-size:14px"><i>* Refineries includes electric for oil and gas exploration, refineries, solid fuel manufacture and unallocated electricity use.</i></div>
         
         <p><b>Total demand by fuel:</b></p>
         
@@ -712,75 +754,6 @@ input[type='text'] {
             <tr><td>Solid biomass</td><td>{{ o.industry.total_biomass_demand*0.0001 | toFixed(1) }} TWh</td></tr>
             <tr><th>Total demand (in)</th><th>{{ o.industry.total_demand | toFixed(1) }} TWh</th></tr>
             <tr><th>Total demand (out)</th><th>{{ o.industry.total_demand_check*0.0001 | toFixed(1) }} TWh</th></tr>
-        </table>
-    </div>
-</div>
-
-<div class="box">
-    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>ENERGY INDUSTRY USE</b></div>
-    <div class="inner" name="energy_industry_use">
-        
-        <table class="table" style="width:100%">
-        <tr>
-            <th width="60%"></th>
-            <th width="20%"></th>  
-            <th width="20%">Annual demand</th>
-        </tr>
-        <tr>
-            <td>Electricity transmission and distribution grid losses</td>
-            <td><input v-model.number="i.energy_industry_use.electricity_grid_loss_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
-            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_grid_loss_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
-        </tr>     
-        <tr>
-            <td>Electricity industry own use</td>
-            <td><input v-model.number="i.energy_industry_use.electricity_own_use_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
-            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_own_use_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
-        </tr>  
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Oil refinery gas consumption</td>
-            <td></td>
-            <td>{{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Oil refinery oil consumption</td>
-            <td></td>
-            <td>{{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Oil refinery electricity consumption</td>
-            <td></td>
-            <td><input v-model.number="i.fossil_fuels.refinery_electric_use" type="text" @change="update" style="width:70px"  autocomplete="off" /> TWh/yr</td>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Oil and gas extraction gas consumption</td>
-            <td></td>
-            <td>{{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Oil and gas extraction oil consumption</td>
-            <td></td>
-            <td>{{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Other gas use</td>
-            <td></td>
-            <td>{{ o.fossil_fuels.other_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-        </tr>
-        <tr>
-            <td>Gas losses</td>
-            <td></td>
-            <td>{{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
-        </tr>
         </table>
     </div>
 </div>
@@ -996,6 +969,67 @@ input[type='text'] {
             <td></td>
         </tr>
         </table>
+    </div>
+</div>
+
+
+
+<div class="box">
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>FOSSIL FUELS</b></div>
+    <div class="inner" name="fossil_fuels">
+    
+        <table class="table" style="width:100%">
+        <tr>
+          <th></th>
+          <th>Gas</th>
+          <th>Oil</th>
+          <th>Coal</th>
+        </tr>
+        <tr>
+          <td>End use total</td>
+          <td>{{ o.fossil_fuels.gas_final_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.oil_final_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.coal_final_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+        </tr>
+        <tr>
+          <td>Refineries</td>
+          <td>{{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Oil and gas extraction</td>
+          <td>{{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Losses</td>
+          <td>{{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Correction*</td>
+          <td><input v-model.number="i.fossil_fuels.other_gas_use" type="text" @change="update" style="width:50px"  autocomplete="off" /> TWh/yr</td>
+          <td><input v-model.number="i.fossil_fuels.other_oil_use" type="text" @change="update" style="width:50px"  autocomplete="off" /> TWh/yr</td>
+          <td><input v-model.number="i.fossil_fuels.other_coal_use" type="text" @change="update" style="width:50px"  autocomplete="off" /> TWh/yr</td>
+        </tr>
+        <tr>
+          <td>Final total</td>
+          <td>{{ o.fossil_fuels.gas*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.oil*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.coal*0.0001 | toFixed(1) }} TWh/yr</td>
+        </tr>
+        <tr>
+          <td>GHG Emissions</td>
+          <td>{{ i.emissions_balance.fossil_fuel_gas | toFixed(2) }} MtC02e</td>
+          <td>{{ i.emissions_balance.fossil_fuel_oil | toFixed(2) }} MtC02e</td>
+          <td>{{ i.emissions_balance.fossil_fuel_coal | toFixed(2) }} MtC02e</td>
+        </tr>       
+        </table>
+        <p>Total fuels GHG Emissions: {{ i.emissions_balance.fossil_fuel_gas+i.emissions_balance.fossil_fuel_oil+i.emissions_balance.fossil_fuel_coal | toFixed(2) }} MtC02e</p>
+        <div style="font-size:14px"><i>* Correction for mismatch in original end use vs primary energy statistics.</i></div>
     </div>
 </div>
 

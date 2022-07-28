@@ -37,7 +37,8 @@ var i = {
             lighting_and_appliances_gas_TWhy: 0.0,
             catering_TWhy: 16.85,
             catering_gas_TWhy: 0.0,
-            cooling_TWhy: 4.55
+            cooling_TWhy: 4.55,
+            cooling_gas_TWhy: 0
         }   
     },
 
@@ -192,6 +193,7 @@ var i = {
         compressed_air_TWhy: 12.0,
         lighting_TWhy: 4.0,
         refrigeration_TWhy: 7.0,
+        refinery_electric_TWhy: 0,
         other_non_heat_TWhy: 25,
         
         // non_heat_process_elec_TWhy: 88.00,
@@ -322,7 +324,9 @@ var i = {
     
     fossil_fuels: {
         allow_use_for_backup: 0,
-        refinery_electric_use: 0
+        other_gas_use: 0,
+        other_oil_use: 0,
+        other_coal_use: 0
     },
     
     land_use: {

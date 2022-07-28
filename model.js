@@ -199,7 +199,7 @@ var model = {
         // Gas
         let annual_cooking_gas = i.LAC.domestic.cooking_gas_TWhy + i.LAC.services.catering_gas_TWhy
         let daily_cooking_gas = annual_cooking_gas * 1000.0 / 365.25
-        let LA_gas_demand = i.LAC.services.lighting_and_appliances_gas_TWhy
+        let LA_gas_demand = i.LAC.services.lighting_and_appliances_gas_TWhy + i.LAC.services.cooling_gas_TWhy 
         let daily_LA_gas_demand = LA_gas_demand * 1000.0 / 365.25
 
         o.LAC = {}
@@ -467,6 +467,7 @@ var model = {
         o.industry.total_demand += i.industry.compressed_air_TWhy
         o.industry.total_demand += i.industry.lighting_TWhy
         o.industry.total_demand += i.industry.refrigeration_TWhy
+        o.industry.total_demand += i.industry.refinery_electric_TWhy
         o.industry.total_demand += i.industry.other_non_heat_TWhy
   
         d.industrial_elec_demand = []
@@ -492,6 +493,7 @@ var model = {
         hourly_fixed_elec_demand += i.industry.compressed_air_TWhy * conv_hourly
         hourly_fixed_elec_demand += i.industry.lighting_TWhy * conv_hourly
         hourly_fixed_elec_demand += i.industry.refrigeration_TWhy * conv_hourly
+        hourly_fixed_elec_demand += i.industry.refinery_electric_TWhy * conv_hourly
         hourly_fixed_elec_demand += i.industry.other_non_heat_TWhy * conv_hourly * i.industry.other_non_heat_fixed_elec_prc * 0.01  
 
         var hourly_fixed_CH4_demand = 0;
@@ -1299,30 +1301,45 @@ var model = {
              
              o.fossil_fuels.gas = o.methane.unmet
              o.methane.unmet = 0
-             
-             o.fossil_fuels.coal_for_dispatchable = o.electric_backup.total_coal_turbine_output / (i.electric_backup.coal_efficiency*0.01)
-             o.fossil_fuels.coal = o.fossil_fuels.coal_for_heating_systems + o.fossil_fuels.coal_for_dispatchable + o.industry.total_coal_demand
          }
+         o.fossil_fuels.coal_for_dispatchable = o.electric_backup.total_coal_turbine_output / (i.electric_backup.coal_efficiency*0.01)
+         o.fossil_fuels.coal = o.fossil_fuels.coal_for_heating_systems + o.fossil_fuels.coal_for_dispatchable + o.industry.total_coal_demand
+     
+         // Record final gas, oil and coal demand before energy industry use additions
+         o.fossil_fuels.gas_final_demand = o.fossil_fuels.gas
+         o.fossil_fuels.oil_final_demand = o.fossil_fuels.oil
+         o.fossil_fuels.coal_final_demand = o.fossil_fuels.coal
          
-         o.fossil_fuels.refineries_gas_use = (o.fossil_fuels.oil) * 0.0025;
-         o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * 0.049;
-         o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.03746;
-         o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.00547;
-         o.fossil_fuels.other_gas_use = (o.fossil_fuels.gas) * 0.01;
-         o.fossil_fuels.gas_losses = (o.fossil_fuels.gas) * 0.011;
+         o.fossil_fuels.refineries_gas_use = (o.fossil_fuels.oil) * 0.00293;
+         o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * 0.0576;
+         o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.0334;
+         o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.00486;
+         o.fossil_fuels.gas_losses = (o.fossil_fuels.gas) * 0.0069;
          
          o.energy_industry_use.total += o.fossil_fuels.refineries_gas_use
          o.energy_industry_use.total += o.fossil_fuels.refineries_oil_use
+         
          o.energy_industry_use.total += o.fossil_fuels.oil_gas_extraction_gas_use
          o.energy_industry_use.total += o.fossil_fuels.oil_gas_extraction_oil_use
-         o.energy_industry_use.total += o.fossil_fuels.other_gas_use
+         
          o.energy_industry_use.total += o.fossil_fuels.gas_losses
          
          o.fossil_fuels.gas += o.fossil_fuels.refineries_gas_use
          o.fossil_fuels.oil += o.fossil_fuels.refineries_oil_use
+         
          o.fossil_fuels.gas += o.fossil_fuels.oil_gas_extraction_gas_use       
          o.fossil_fuels.oil += o.fossil_fuels.oil_gas_extraction_oil_use
-         o.fossil_fuels.gas += o.fossil_fuels.other_gas_use
+         
+         // When creating baselines, some of the datasets dont precisely match
+         // these can be used for final adjustments
+         o.fossil_fuels.gas += i.fossil_fuels.other_gas_use * 10000
+         o.fossil_fuels.oil += i.fossil_fuels.other_oil_use * 10000
+         o.fossil_fuels.coal += i.fossil_fuels.other_coal_use * 10000
+         // Add to energy_industry_use total
+         o.energy_industry_use.total += i.fossil_fuels.other_gas_use * 10000
+         o.energy_industry_use.total += i.fossil_fuels.other_oil_use * 10000
+         o.energy_industry_use.total += i.fossil_fuels.other_coal_use * 10000
+           
          o.fossil_fuels.gas += o.fossil_fuels.gas_losses
          
          o.fossil_fuels.total = o.fossil_fuels.oil + o.fossil_fuels.gas + o.fossil_fuels.coal

@@ -32,10 +32,11 @@ var scenarios = {
       },
       "services": {
         "lighting_and_appliances_TWhy": 60.3,
-        "lighting_and_appliances_gas_TWhy": 10.6,      
+        "lighting_and_appliances_gas_TWhy": 10.65,      
         "catering_TWhy": 8.8,
-        "catering_gas_TWhy": 16.4,
-        "cooling_TWhy": 12.9
+        "catering_gas_TWhy": 16.42,
+        "cooling_TWhy": 12.4,
+        "cooling_gas_TWhy": 0.51
       }
     },
     "space_heating": {
@@ -118,9 +119,9 @@ var scenarios = {
           "mechanical_kwhppkm_full": 0.027,
           "load_factor": 0.324,
           "prc": {
-            "EV": 0.5,
+            "EV": 0.66,
             "H2": 0,
-            "IC": 0.5
+            "IC": 0.34
           },
           "efficiency": {
             "EV": 0.9,
@@ -131,7 +132,7 @@ var scenarios = {
         },
         "Bus": {
           "miles_pp": 325,
-          "mechanical_kwhppkm_full": 0.018,
+          "mechanical_kwhppkm_full": 0.0163,
           "load_factor": 0.1432,
           "prc": {
             "EV": 0.0125,
@@ -157,13 +158,13 @@ var scenarios = {
           "efficiency": {
             "EV": 0.8,
             "H2": 0.3564,
-            "IC": 0.3
+            "IC": 0.115
           },
           "km_pp": 74.029824
         },
         "Cars & Vans": {
           "miles_pp": 6299,
-          "mechanical_kwhppkm_full": 0.041,
+          "mechanical_kwhppkm_full": 0.031,
           "load_factor": 0.3288,
           "prc": {
             "EV": 0.0125,
@@ -173,12 +174,12 @@ var scenarios = {
           "efficiency": {
             "EV": 0.8,
             "H2": 0.3564,
-            "IC": 0.3
+            "IC": 0.2191
           },
           "km_pp": 10137.257856
         },
         "Aviation": {
-          "miles_pp": 3438,
+          "miles_pp": 3580,
           "mechanical_kwhppkm_full": 0.07,
           "load_factor": 0.85,
           "prc": {
@@ -200,10 +201,10 @@ var scenarios = {
       "smart_charge_type": "average",
       "V2G_enabled": 0,
       "V2G_discharge_type": "average",
-      "rail_freight_elec_demand": 1,
+      "rail_freight_elec_demand": 0,
       "freight_BEV_demand": 0,
       "freight_H2_demand": 0,
-      "freight_IC_demand": 181.2
+      "freight_IC_demand": 188.1
     },
     "industry": {
       "high_temp_process_TWhy": 39.9,
@@ -214,6 +215,7 @@ var scenarios = {
       "compressed_air_TWhy": 9,
       "lighting_TWhy": 2.7,
       "refrigeration_TWhy": 5.3,
+      "refinery_electric_TWhy": 12.6,
       "other_non_heat_TWhy": 18.3,
       "high_temp_process_fixed_elec_prc": 23.4,
       "high_temp_process_fixed_CH4_prc": 53.9,
@@ -305,12 +307,14 @@ var scenarios = {
         coal_efficiency: 34.4
     },
     energy_industry_use: {
-        electricity_grid_loss_prc: 8.84,
-        electricity_own_use_prc: 5.11
+        electricity_grid_loss_prc: 7.64,
+        electricity_own_use_prc: 4.40
     },
     "fossil_fuels": {
       "allow_use_for_backup": 1,
-      "refinery_electric_use": 0
+      "other_gas_use": 14.8,
+      "other_oil_use": 31.8,
+      "other_coal_use": 7.0
     },
     "land_use": {
       "existing_natural_broadleaf_woodland": 139,

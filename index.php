@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 35;
+    $v = 45;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,10 +55,10 @@
           <div class="menu-item"><a href="#heatingsystems">Heating systems</a></div>
           <div class="menu-item"><a href="#transport">Transport</a></div>
           <div class="menu-item"><a href="#industry">Industry</a></div>                    
-          <div class="menu-item"><a href="#energy_industry_use">Energy industry use</a></div>                    
           <div class="menu-item"><a href="#elec_storage">Electricity storage</a></div>  
           <div class="menu-item"><a href="#elec_backup">Electricity backup</a></div>                  
           <div class="menu-item"><a href="#synthfuels">Synthetic Fuels</a></div>     
+          <div class="menu-item"><a href="#fossil_fuels">Fossil Fuels</a></div>                          
           <div class="menu-item"><a href="#land_use">Land use</a></div>     
           <div class="menu-item"><a href="#emissions_balance">Emissions balance</a></div>     
           <div class="menu-item"><a href="#balance">Final balance</a></div>
