@@ -4,7 +4,7 @@ var scenarios = {
     "hours": 87648,
     "population_2030": 66460000,
     "households_2030": 27600000,
-    "number_of_households": 27600000,
+    "number_of_households": 1000,
     "use_flat_profiles": 0,
     "supply": {
       "offshore_wind_capacity": 8.2,

@@ -4,7 +4,7 @@ var i = {
     hours: 87648,
     population_2030: 70499802,
     households_2030: 29941701,
-    number_of_households: 29941701,
+    number_of_households: 1000,
     use_flat_profiles: 0,
       
     supply: {

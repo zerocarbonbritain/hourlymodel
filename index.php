@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 45;
+    $v = 46;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -249,8 +249,8 @@ function load_page(page)
 
             if (baseunit=="kW") {
                 scale = 1; units = " kW"; dp = 0;
-                if (val>=10000) {scale=0.001; units=" MW"; dp=0;}
-                if (val>=10000000) {scale=0.000001; units=" GW"; dp=0;}
+                if (val>=1000) {scale=0.001; units=" MW"; dp=1;}
+                if (val>=10000000) {scale=0.000001; units=" GW"; dp=1;}
             }
             
             if (baseunit=="kWh") {

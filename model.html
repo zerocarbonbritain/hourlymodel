@@ -1525,43 +1525,41 @@ input[type='text'] {
         <table><tr>
         <td>Number of households:</td>
         <td><input v-model.number="i.number_of_households" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
+        <td><i>(1000 households (population ~2400) is about the size of a large village)</i></td>
         </tr></table>
         <br>
         <table>
             <tr><th>Supply</th><th width="100px"></th><th>Storage, Gas & Liquids</th><th width="100px"></th></tr>
             <tr>
                 <td>Onshore Wind</td><td v-html="auto_scale(i.supply.onshore_wind_capacity*o.scaleby,'kW')"></td>
-                <td>Electrolysis capacity</td><td v-html="auto_scale(i.hydrogen.electrolysis_capacity_GW*o.scaleby,'kW')"></td>
-                <td>Hydrogen storage</td><td v-html="auto_scale(i.hydrogen.storage_capacity_GWh*o.scaleby,'kWh')"></td>
+                <td>Elec storage cap</td><td v-html="auto_scale(i.electric_storage.capacity_GWh*o.scaleby,'kWh')"></td>            
+                <td>Methanation capacity</td><td v-html="auto_scale(i.methane.methanation_capacity*o.scaleby,'kW')"></td>    
             </tr>
             <tr>
                 <td>Offshore Wind</td><td v-html="auto_scale(i.supply.offshore_wind_capacity*o.scaleby,'kW')"></td>
-                <td>Methanation capacity</td><td v-html="auto_scale(i.methane.methanation_capacity*o.scaleby,'kW')"></td>
-                <td>IHTEM capacity</td><td v-html="auto_scale(i.power_to_X.capacity*o.scaleby,'kW')"></td>
+                <td>Electrolysis capacity</td><td v-html="auto_scale(i.hydrogen.electrolysis_capacity_GW*o.scaleby,'kW')"></td>
+                <td>Power-to-X capacity</td><td v-html="auto_scale(i.power_to_X.capacity*o.scaleby,'kW')"></td>
             </tr>
             <tr>
                 <td>Solar PV</td><td v-html="auto_scale(i.supply.solarpv_capacity*o.scaleby,'kW')"></td>
-                <td>Methane storage</td><td v-html="auto_scale(i.methane.storage_capacity_GWh*o.scaleby,'kWh')"></td>
+                <td>Hydrogen storage</td><td v-html="auto_scale(i.hydrogen.storage_capacity_GWh*o.scaleby,'kWh')"></td>
+                <td>Synth fuel prod capacity</td><td v-html="auto_scale(i.synth_fuel.capacity_GW*o.scaleby,'kW')"></td>     
             </tr>
             <tr>
                 <td>Hydro</td><td v-html="auto_scale(i.supply.hydro_capacity*o.scaleby,'kW')"></td>
-                <td>Synth fuel prod capacity</td><td v-html="auto_scale(i.synth_fuel.capacity_GW*o.scaleby,'kW')"></td>
+                <td>Hydrogen turbine</td><td v-html="auto_scale(o.electric_backup.max_capacity_requirement*i.electric_backup.prc_hydrogen*0.01*o.scaleby,'kW')"></td>
             </tr>
-            
             <tr>
                 <td>Wave</td><td v-html="auto_scale(i.supply.wave_capacity*o.scaleby,'kW')"></td>
-                <td>Elec storage cap</td><td v-html="auto_scale(i.electric_storage.capacity_GWh*o.scaleby,'kWh')"></td>
+                <td>Methane storage</td><td v-html="auto_scale(i.methane.storage_capacity_GWh*o.scaleby,'kWh')"></td>             
             </tr>
             <tr>
                 <td>Tidal</td><td v-html="auto_scale(i.supply.tidal_capacity*o.scaleby,'kW')"></td>
-                <td>BEV storage cap</td><td v-html="auto_scale(i.electric_car_battery_capacity*o.scaleby,'kWh')"></td>
+                <td>Methane turbine</td><td v-html="auto_scale(o.electric_backup.max_capacity_requirement*i.electric_backup.prc_methane*0.01*o.scaleby,'kW')"></td>
+                <!--<td>BEV storage cap</td><td v-html="auto_scale(i.electric_car_battery_capacity*o.scaleby,'kWh')"></td>-->
             </tr>
             <tr>
                 <td>Nuclear</td><td v-html="auto_scale(i.supply.nuclear_capacity*o.scaleby,'kW')"></td>
-
-            </tr>
-            <tr>
-                <td>Methane turbine</td><td v-html="auto_scale(i.electric_backup.methane_turbine_capacity*o.scaleby,'kW')"></td>
 
             </tr>
         </table>
