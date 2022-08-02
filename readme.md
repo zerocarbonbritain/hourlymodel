@@ -22,8 +22,8 @@ The default scenario presented in the tool is the main ZeroCarbonBritain scenari
 - Domestic and service sector lighting, appliances and cooking demands
 - Domestic, service and industry sectors space and water heating demand
 - Heating system technologies: Heat pumps, direct electric, boilers (H2, CH4, Biomass, Oil) 
-- Transport model
-- Industry model
+- Transport model based on passenger miles travelled, occupancy rates, vehicle efficiencies and drive train types. 
+- Simple industry model
  
 **Storage and Synthetic fuels**
 
