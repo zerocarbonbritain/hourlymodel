@@ -1,15 +1,38 @@
 # ZeroCarbonBritain hourly energy model
 
-The ZeroCarbonBritain hourly energy model is designed to be used in conjunction with the ZeroCarbonBritain matrix spreadsheet, which both provides background calculation for many of the inputs and makes use of the model outputs.
+**A 10-year hourly cross sectoral UK energy model. Build and explore your own zero carbon scenarios.**
 
-The hourly model is a 10-year hourly energy model shows how energy demand for transport, heat, industry, services and traditional electricity can be met from a variable renewable supply and biomass based backup system.
-
-At the heart of the model is a 10 year hourly offshore wind, onshore wind, solar, wave & tidal dataset, this dataset is derived from hourly weather data mapped to relevant offshore and onshore regions. These datasets are normalised and can be multiplied by an installed capacity in order to provide an expected output for a given installed capacity.
-
-On the demand side the model builds up a detailed picture covering everything from lighting, appliances, cooking, water heating, space heating, electric, hydrogen, biofuel vehicles to industrial demand. A multitude of different short term storage technologies are included from heat and battery stores to pump-storage. Longer term backup is provided with gas turbines run on sabatier enhanced biogas combining hydrogen from excess renewable electricity with the CO2 present in biogas to produce larger quantities of methane.
-
-Energy is provided in the form of electricity, hydrogen, liquid biofuel and methane gas to meet the variety of demand types.
+The default scenario presented in the tool is the main ZeroCarbonBritain scenario as presented in the reports. The other scenario currently available is a baseline scenario reflecting current energy use and carbon emissions. Both scenarios can be used as starting points from which to explore different variants, either in terms of zero carbon end points or interim steps along the way.
 
 ### [Launch online tool: http://openenergymonitor.org/zcem](http://openenergymonitor.org/zcem)
+
+**Zero carbon supply options**
+
+- Variable renewables: Offshore wind, Onshore wind, solar PV & thermal, Wave and Tidal energy. 
+- Fixed renewables: Hydro, Geothermal electricity and geothermal heat.
+- Nuclear electricity (currently simple flat output)
+- Biomass for heat and biomass for synthetic fuels (methane and liquid fuels).
+- Backup electricity generation (options include hydrogen, synthetic methane & biomass)
+
+**Demand model**
+
+- Explore: electrification and cross sector integration.
+- Domestic and service sector lighting, appliances and cooking demands
+- Domestic, service and industry sectors space and water heating demand
+- Heating system technologies: Heat pumps, direct electric, boilers (H2, CH4, Biomass, Oil) 
+- Transport model
+- Industry model
+ 
+**Storage and Synthetic fuels**
+
+- Electricity storage (e.g battery storage or pump hydro)
+- Hydrogen production via electrolysis 
+- Hydrogen storage (e.g large scale salt caverns)
+- Synthetic methane production and storage
+- Synthetic liquid fuels production and storage
+
+**Variable renewable dataset**
+
+At the heart of the model is a 10 year hourly offshore wind, onshore wind, solar, wave & tidal dataset, this dataset is derived from hourly weather data mapped to relevant offshore and onshore regions. These datasets are normalised and can be multiplied by an installed capacity in order to provide an expected output for a given installed capacity.
 
 ![zerocarbonbritain.png](img/zerocarbonbritain.png)
