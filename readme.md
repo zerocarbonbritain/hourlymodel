@@ -6,6 +6,8 @@ The default scenario presented in the tool is the main ZeroCarbonBritain scenari
 
 ### [Launch online tool: http://openenergymonitor.org/zcem](http://openenergymonitor.org/zcem)
 
+![zcem.png](img/zcem.png)
+
 **Zero carbon supply options**
 
 - Variable renewables: Offshore wind, Onshore wind, solar PV & thermal, Wave and Tidal energy. 
@@ -35,4 +37,4 @@ The default scenario presented in the tool is the main ZeroCarbonBritain scenari
 
 At the heart of the model is a 10 year hourly offshore wind, onshore wind, solar, wave & tidal dataset, this dataset is derived from hourly weather data mapped to relevant offshore and onshore regions. These datasets are normalised and can be multiplied by an installed capacity in order to provide an expected output for a given installed capacity.
 
-![zerocarbonbritain.png](img/zerocarbonbritain.png)
+
