@@ -47,7 +47,7 @@ All models have limitations, here are a few limitations with this model to bear 
 
 - Electricity and heat storage algorithms could be improved to allow better utilisation for backup fuel displacement and peak-shaving. Current implementation is limited to a simple 'flat-out' charge when surplus is available, discharge when not available, or a charge/discharge rate based on a +-12h average of energy surplus and deficit. 
 
-- There are currently no limitations on backup methane or hydrogen gas turbine ramp rates and the model suggests a need for these resources to ramp up from zero to high outputs over relatively short timescales. 
+- There are currently no limitations on backup methane or hydrogen gas turbine ramp rates and the model suggests a need for these resources to ramp up from zero to high outputs over relatively short timescales. A more sophisticated implementation could make use of electricity storage to provide the fast response component allowing backup turbines to ramp up and down more slowly. Alternatively other long duration storage technologies not yet included may be used.
 
 - Cost model: there is currently no integrated cost model in the javascript implementation.
 
