@@ -33,6 +33,10 @@ The default scenario presented in the tool is the main ZeroCarbonBritain scenari
 - Synthetic methane production and storage
 - Synthetic liquid fuels production and storage
 
+**Land use and GHG Emissions balance**
+
+The tool also includes a simple model of UK land use and GHG emissions. Land use implications of reforestation for carbon sequestration and bio-energy can be explored. 
+
 **Variable renewable dataset**
 
 At the heart of the model is a 10 year hourly offshore wind, onshore wind, solar, wave & tidal dataset, this dataset is derived from hourly weather data mapped to relevant offshore and onshore regions. These datasets are normalised and can be multiplied by an installed capacity in order to provide an expected output for a given installed capacity.
