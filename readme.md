@@ -37,6 +37,12 @@ The default scenario presented in the tool is the main ZeroCarbonBritain scenari
 
 At the heart of the model is a 10 year hourly offshore wind, onshore wind, solar, wave & tidal dataset, this dataset is derived from hourly weather data mapped to relevant offshore and onshore regions. These datasets are normalised and can be multiplied by an installed capacity in order to provide an expected output for a given installed capacity.
 
+**David JC MacKay Energy Stacks**
+
+Inspired by David JC MacKay's Sustainable energy without the hot air, the tool includes the energy stack graphics used in the book:
+
+![stacks.png](img/stacks.png)
+
 **Limitations & improvement wish list**
 
 All models have limitations, here are a few limitations with this model to bear in mind. These could be improved in future.
