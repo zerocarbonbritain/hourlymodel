@@ -1,6 +1,6 @@
 # ZeroCarbonBritain hourly energy model
 
-**An open-source javascript implementation of the 10-year hourly cross sectoral UK energy model behind the ZeroCarbonBritain scenario. This model can be used to explore a wide variety of scenarios, try creating your own scenario that gets to zero carbon!** 
+**An open-source javascript implementation of the 10-year hourly cross sectoral UK energy model behind the ZeroCarbonBritain scenario. This model can be used to explore a wide variety of scenarios. Try creating your own scenario that gets to zero carbon!** 
 
 The default scenario presented in the tool is the main ZeroCarbonBritain scenario as presented in the reports. The other scenario currently available is a baseline scenario reflecting current energy use and carbon emissions. Both scenarios can be used as starting points from which to explore different variants, either in terms of zero carbon end points or interim steps along the way.
 
