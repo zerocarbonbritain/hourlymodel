@@ -51,6 +51,6 @@ All models have limitations, here are a few limitations with this model to bear 
 
 - Cost model: there is currently no integrated cost model in the javascript implementation.
 
-- Carbon capture and storage technology options not yet implemented, either using fossil fuels or bio-energy.
+- Carbon capture, storage or utilisation technology options not yet implemented, either using fossil fuels, bio-energy, or process emissions. 
 
 
