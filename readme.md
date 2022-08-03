@@ -41,7 +41,7 @@ At the heart of the model is a 10 year hourly offshore wind, onshore wind, solar
 
 All models have limitations, here are a few limitations with this model to bear in mind. These could be improved in future.
 
-- Flat plate grid model: There is no detailed spatial model of the grid that might explore related constraints and costs with increasing transmission and distribution capacities. The model does provide insight into the maximum amount of end use electricity demand, maximum generation and curtailment estimates. These give a rough idea of the extent to which grid capacity would need to be increased but not specifically were that should happen.
+- Flat plate grid model: There is no detailed spatial model of the grid that might explore related constraints and costs with increasing transmission and distribution capacities. The model does provide insight into the maximum amount of end use electricity demand, maximum generation and curtailment estimates. These give a rough idea of the extent to which grid capacity would need to be increased but not specifically where that should happen.
 
 - No European or wider grid integration: Already a reality and likely to play a more significant role over time but would require substantial increase in complexity and scope of the model to include energy demand and supply in all countries in order to establish the extent of energy flow between countries. Other studies have shown that wider grid integration may provide in the order of a 9% reduction in cost (e.g Michael Child et al. (2019)). 
 
