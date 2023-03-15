@@ -85,11 +85,18 @@ input[type='text'] {
         </div>
         <br>
         
+        <div style="float:right">
+          <label>Live edit</label>
+          <input type="checkbox" v-model="live_edit">
+          <button v-if="!live_edit" @click="simulate">Simulate</button>
+        </div>
+        
         Select scenario: 
         <select id="select_scenario" @change="change_scenario" v-model="selected_scenario">
             <option value='default'>ZeroCarbonBritain (Default)</option>
             <option v-for="(name,index) in scenario_list">{{ name }}</option>
         </select>
+        
         
     </div>
 </div>

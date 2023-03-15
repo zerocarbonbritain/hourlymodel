@@ -207,10 +207,18 @@ function load_page(page)
             i: i,
             o: o,
             selected_scenario: "default",
-            scenario_list: Object.keys(scenarios)
+            scenario_list: Object.keys(scenarios),
+            live_edit: true
         },
         methods: {
           update: function () {
+            if (app.live_edit) {
+              model.run();
+              model_view();
+              model_ui();
+            }
+          },
+          simulate: function () {
             model.run();
             model_view();
             model_ui();
