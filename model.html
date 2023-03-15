@@ -907,6 +907,12 @@ input[type='text'] {
             <td><input v-model.number="i.hydrogen.electrolysis_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/> (HHV)</td>
         </tr>
         <tr>
+            <td>Hydrogen from imports</td>
+            <td><input v-model.number="i.hydrogen.hydrogen_from_imports" type="text" @change="update" style="width:70px"  autocomplete="off"/> TWh/yr</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
             <td>Hydrogen storage<br><span style="font-size:12px"><i>GWh chemical energy HHV</i></span></td>
             <td><input v-model.number="i.hydrogen.storage_capacity_GWh" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
             <td style="text-align:right">Lower limit</td>
@@ -1528,7 +1534,7 @@ input[type='text'] {
         </tr></table>
         <br>
         <table>
-            <tr><th>Supply</th><th width="100px"></th><th>Storage, Gas & Liquids</th><th width="100px"></th></tr>
+            <tr><th>Supply</th><th width="80px"></th><th>Storage, Gas & Liquids</th><th width="80px"></th></tr>
             <tr>
                 <td>Onshore Wind</td><td v-html="auto_scale(i.supply.onshore_wind_capacity*o.scaleby,'kW')"></td>
                 <td>Elec storage cap</td><td v-html="auto_scale(i.electric_storage.capacity_GWh*o.scaleby,'kWh')"></td>            
@@ -1547,15 +1553,17 @@ input[type='text'] {
             <tr>
                 <td>Hydro</td><td v-html="auto_scale(i.supply.hydro_capacity*o.scaleby,'kW')"></td>
                 <td>Hydrogen turbine</td><td v-html="auto_scale(o.electric_backup.max_capacity_requirement*i.electric_backup.prc_hydrogen*0.01*o.scaleby,'kW')"></td>
+                <td>Rotational grasses</td><td v-html="auto_scale(o.biomass.grass_for_biogas*1000*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
                 <td>Wave</td><td v-html="auto_scale(i.supply.wave_capacity*o.scaleby,'kW')"></td>
                 <td>Methane storage</td><td v-html="auto_scale(i.methane.storage_capacity_GWh*o.scaleby,'kWh')"></td>             
+                <td>Miscanthus / SRC</td><td v-html="auto_scale(o.synth_fuel.total_biomass_used*0.1*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
                 <td>Tidal</td><td v-html="auto_scale(i.supply.tidal_capacity*o.scaleby,'kW')"></td>
                 <td>Methane turbine</td><td v-html="auto_scale(o.electric_backup.max_capacity_requirement*i.electric_backup.prc_methane*0.01*o.scaleby,'kW')"></td>
-                <!--<td>BEV storage cap</td><td v-html="auto_scale(i.electric_car_battery_capacity*o.scaleby,'kWh')"></td>-->
+                <td>Biomass direct heat</td><td v-html="auto_scale(o.biomass.total_direct_use*0.1*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
                 <td>Nuclear</td><td v-html="auto_scale(i.supply.nuclear_capacity*o.scaleby,'kW')"></td>

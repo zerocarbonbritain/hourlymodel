@@ -260,7 +260,8 @@ var i = {
         electrolysis_capacity_GW: 27.0,
         electrolysis_efficiency: 0.8,
         storage_capacity_GWh: 20000.0,
-        minimum_store_level: 0.1
+        minimum_store_level: 0.1,
+        hydrogen_from_imports: 0 // Twh
     },
     
     // biogas

@@ -801,6 +801,7 @@ var model = {
         o.hydrogen.max_SOC = 0
         o.hydrogen.min_SOC = i.hydrogen.storage_capacity_GWh
         o.hydrogen.total_produced = 0
+        o.hydrogen.total_from_imports = 0
         o.hydrogen.total_electricity_for_electrolysis = 0
         o.hydrogen.total_demand = 0
         o.hydrogen.total_vehicle_demand = 0
@@ -873,6 +874,8 @@ var model = {
         let daily_biomass_for_biogas = i.biogas.biomass_for_biogas * 1000.0 / 365.25
         let hourly_biomass_for_biogas = daily_biomass_for_biogas / 24.0
         let hourly_industrial_biofuel = (o.industry.total_synth_fuel_demand / 10) / (365.25*24.0)
+        
+        let hourly_hydrogen_from_imports = i.hydrogen.hydrogen_from_imports * 1000.0 / (365.25*24.0)
         
         d.elecstore_SOC = []
         d.elec_store_charge = []
@@ -1026,8 +1029,9 @@ var model = {
             
             o.hydrogen.total_electricity_for_electrolysis += electricity_for_electrolysis
             
-            let hydrogen_balance = hydrogen_from_electrolysis
-            o.hydrogen.total_produced += hydrogen_from_electrolysis
+            let hydrogen_balance = hydrogen_from_electrolysis + hourly_hydrogen_from_imports
+            o.hydrogen.total_produced += hydrogen_from_electrolysis + hourly_hydrogen_from_imports
+            o.hydrogen.total_from_imports += hourly_hydrogen_from_imports
             
             // hydrogen heating demand
             hydrogen_balance -= d.hydrogen_for_spacewaterheat[hour]
@@ -1363,7 +1367,7 @@ var model = {
         
         o.balance.total_unmet_demand = o.balance.total_unmet_elec
         
-        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply + o.fossil_fuels.total
+        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply + o.fossil_fuels.total + o.hydrogen.total_from_imports
         
         o.balance.total_demand = 0
         o.balance.total_demand += o.LAC.total 

@@ -40,6 +40,7 @@ function model_ui() {
           {"kwhd":o.supply.total_nuclear*scl,"name":"Nuclear","color":1},
           {"kwhd":o.biomass.total_used*scl,"name":"Biomass","color":1},
           {"kwhd":o.heat.total_ambient_supply*scl,"name":"Ambient","color":1},
+          {"kwhd":o.hydrogen.total_from_imports*scl,"name":"H2 import","color":1},
           {"kwhd":o.fossil_fuels.coal*scl,"name":"Coal","color":8},        
           {"kwhd":o.fossil_fuels.oil*scl,"name":"Oil","color":8},
           {"kwhd":o.fossil_fuels.gas*scl,"name":"Gas","color":8},      
