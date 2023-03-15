@@ -8,11 +8,15 @@ function load_capacityfactor_dataset(filename,callback){
         throw err; // or handle err
         }
 
-        var zip = new JSZip(data);
-        capacityfactorfile = zip.file(filename.replace(".zip","")).asText();
-        tenyearsdatalines = capacityfactorfile.split(/\r\n|\n/);
-        hours = 87648;
-        callback();
+        JSZip.loadAsync(data).then(function (zip) {
+            zip.file(filename.replace(".zip","")).async("string")
+            .then(function (capacityfactorfile) {
+                tenyearsdatalines = capacityfactorfile.split(/\r\n|\n/);
+                hours = 87648;
+                callback(tenyearsdatalines);
+            });
+        });
+        
     });
 }
 
@@ -25,12 +29,15 @@ function load_temperature_dataset(filename,callback){
         if(err) {
         throw err; // or handle err
         }
-
-        var zip = new JSZip(data);
-        temperaturefile = zip.file(filename.replace(".zip","")).asText();
-        temperaturelines = temperaturefile.split(/\r\n|\n/);
-        days = temperaturelines.length;
-        callback();
+        
+        JSZip.loadAsync(data).then(function (zip) {
+            zip.file(filename.replace(".zip","")).async("string")
+            .then(function (temperaturefile) {
+                temperaturelines = temperaturefile.split(/\r\n|\n/);
+                days = temperaturelines.length;
+                callback();
+            });
+        });
     });
 }
 
@@ -43,10 +50,13 @@ function load_test_dataset(filename,callback){
         throw err; // or handle err
         }
 
-        var zip = new JSZip(data);
-        testfile = zip.file(filename.replace(".zip","")).asText();
-        testlines = testfile.split(/\r\n|\n/);
-        callback();
+        JSZip.loadAsync(data).then(function (zip) {
+            zip.file(filename.replace(".zip","")).async("string")
+            .then(function (testfile) {
+                testlines = testfile.split(/\r\n|\n/);
+                callback();
+            });
+        });
     });
 }
 
