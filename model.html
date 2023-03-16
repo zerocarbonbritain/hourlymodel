@@ -1396,9 +1396,10 @@ input[type='text'] {
             <p style="font-size:16px">Unmet energy demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
             <p style="font-size:16px"><b>Electricity</b></p>
             <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(0) }} TWh</p>       
+            <p style="font-size:16px">Over-supply factor: {{ (o.supply.total_electricity_before_grid_loss / o.balance.total_electricity_demand) | toFixed(2) }}</p>       
             <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*0.0001 | toFixed(0) }} TWh</p>    
             <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*0.0001 | toFixed(3) }} TWh</p>
-            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(0) }} TWh</p>
             <p style="font-size:16px">Grid CO2 intensity: {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
             <p style="font-size:16px"><b>Land & Emissions</b></p>
             <p style="font-size:16px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>
@@ -1407,12 +1408,19 @@ input[type='text'] {
         
         <div style="clear:both"></div>
         
-        Energy stack units: 
-        <select v-model="i.units_mode" autocomplete="off" @change="update">
-            <option value="TWhyr">National TWh/yr</option>
-            <option value="kwhdperhousehold">kWh/d per household</option>
-            <option value="kwhdperperson">kWh/d per person</option>
-        </select> 
+        <div style="padding-top:10px">
+          Energy stack units: 
+          <select v-model="i.units_mode" autocomplete="off" @change="update">
+              <option value="TWhyr">National TWh/yr</option>
+              <option value="kwhdperhousehold">kWh/d per household</option>
+              <option value="kwhdperperson">kWh/d per person</option>
+          </select>
+        </div>
+        
+        <div style="padding-top:10px; padding-bottom:10px">
+          Show heat pump ambient heat sourced from air:
+          <input type="checkbox" v-model="i.include_ambient_heat" @change="update">
+        </div>
         
         <table class="table" style="width:100%">
         <tr>

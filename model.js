@@ -1367,13 +1367,17 @@ var model = {
         
         o.balance.total_unmet_demand = o.balance.total_unmet_elec
         
-        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.heat.total_ambient_supply + o.fossil_fuels.total + o.hydrogen.total_from_imports
+        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.fossil_fuels.total + o.hydrogen.total_from_imports
+        if (i.include_ambient_heat) o.balance.total_supply += o.heat.total_ambient_supply
         
         o.balance.total_demand = 0
         o.balance.total_demand += o.LAC.total 
         o.balance.total_demand += o.LAC.total_gas
         o.balance.total_demand += o.space_heating.total_demand
         o.balance.total_demand += o.water_heating.total_demand
+        if (!i.include_ambient_heat) {
+            o.balance.total_demand -= o.heat.total_ambient_supply  
+        }
         o.balance.total_demand += o.industry.total_elec_demand
         o.balance.total_demand += o.industry.total_methane_demand
         o.balance.total_demand += o.industry.total_hydrogen_demand

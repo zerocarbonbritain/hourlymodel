@@ -6,6 +6,7 @@ var i = {
     households_2030: 29941701,
     number_of_households: 1000,
     use_flat_profiles: 0,
+    include_ambient_heat: 1,
       
     supply: {
         offshore_wind_capacity: 140.0,

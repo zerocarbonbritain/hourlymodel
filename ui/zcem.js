@@ -18,6 +18,11 @@ function model_ui() {
         scl = (1000.0*1000.0) / (10*365.0*i.households_2030)
     }
     
+    var ambient = 0;
+    if (i.include_ambient_heat) {
+        ambient = o.heat.total_ambient_supply;
+    }
+    
     var stacks = [
       {"name":"Supply","height":(o.balance.total_supply+o.total_unmet_demand)*scl,"saving":0,
         "stack":[
@@ -39,7 +44,7 @@ function model_ui() {
           {"kwhd":o.supply.total_geothermal_heat*scl,"name":"Geo Thermal Heat","color":1},
           {"kwhd":o.supply.total_nuclear*scl,"name":"Nuclear","color":1},
           {"kwhd":o.biomass.total_used*scl,"name":"Biomass","color":1},
-          {"kwhd":o.heat.total_ambient_supply*scl,"name":"Ambient","color":1},
+          {"kwhd":ambient*scl,"name":"Ambient","color":1},
           {"kwhd":o.hydrogen.total_from_imports*scl,"name":"H2 import","color":1},
           {"kwhd":o.fossil_fuels.coal*scl,"name":"Coal","color":8},        
           {"kwhd":o.fossil_fuels.oil*scl,"name":"Oil","color":8},
@@ -95,6 +100,13 @@ function model_ui() {
         ]
       }
     ];
+    
+    if (!i.include_ambient_heat) {
+        stacks[3]["stack"][1]["kwhd"] = (o.space_heating.total_demand+o.water_heating.total_demand-o.heat.total_ambient_supply)*scl;
+        stacks[3]["stack"][1]["name"] = "Space & Water heat"
+        stacks[3]["stack"][2]["kwhd"] = 0;
+    }
+    
     draw_stacks(stacks,"stacks",1000,600,units)
     
     /*
