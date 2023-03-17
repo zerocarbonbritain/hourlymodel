@@ -59,37 +59,51 @@ var scenarios = {
       "heatpump": {
         "name": "Heat pumps",
         "share": 3.58,
-        "efficiency": 280
+        "efficiency_hot_water": 240,
+        "efficiency_0C": 250,
+        "efficiency_10C": 320
       },
       "elres": {
         "name": "Direct electric",
         "share": 7.67,
-        "efficiency": 100
+        "efficiency_hot_water": 100,
+        "efficiency_0C": 100,
+        "efficiency_10C": 100
       },
       "methane": {
         "name": "Methane gas boilers",
         "share": 73.60,
-        "efficiency": 82.5
+        "efficiency_hot_water": 82.5,
+        "efficiency_0C": 82.5,
+        "efficiency_10C": 82.5
       },
       "hydrogen": {
         "name": "Hydrogen gas boilers",
         "share": 0,
-        "efficiency": 82.5
+        "efficiency_hot_water": 82.5,
+        "efficiency_0C": 82.5,
+        "efficiency_10C": 82.5
       },
       "synthfuel": {
         "name": "Oil boilers",      
         "share": 9.60,
-        "efficiency": 82.5
+        "efficiency_hot_water": 82.5,
+        "efficiency_0C": 82.5,
+        "efficiency_10C": 82.5
       },
       "biomass": {
         "name": "Biomass boilers",
         "share": 4.32,
-        "efficiency": 70
+        "efficiency_hot_water": 70,
+        "efficiency_0C": 70,
+        "efficiency_10C": 70
       },
       "solid_fuel": {
         "name": "Solid fuel",
         "share": 1.23,
-        "efficiency": 75
+        "efficiency_hot_water": 75,
+        "efficiency_0C": 75,
+        "efficiency_10C": 75
       }
     },
     "transport": {
@@ -450,37 +464,51 @@ var scenarios = {
     "heatpump": {
       "name": "Heat pumps",
       "share": 74,
-      "efficiency": 250
+      "efficiency_hot_water": 200,
+      "efficiency_0C": 240,
+      "efficiency_10C": 300
     },
     "elres": {
       "name": "Direct electric",
       "share": 5,
-      "efficiency": 100
+      "efficiency_hot_water": 100,
+      "efficiency_0C": 100,
+      "efficiency_10C": 100
     },
     "methane": {
       "name": "Methane gas boilers",
       "share": 0,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "hydrogen": {
       "name": "Hydrogen gas boilers",
       "share": 15,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "synthfuel": {
       "name": "Oil boilers",
       "share": 0,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "biomass": {
       "name": "Biomass boilers",
       "share": 6,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "solid_fuel": {
       "name": "Solid fuel",
       "share": 0,
-      "efficiency": 70
+      "efficiency_hot_water": 70,
+      "efficiency_0C": 70,
+      "efficiency_10C": 70
     }
   },
   "transport": {
@@ -840,37 +868,51 @@ var scenarios = {
     "heatpump": {
       "name": "Heat pumps",
       "share": 100,
-      "efficiency": 300
+      "efficiency_hot_water": 280,
+      "efficiency_0C": 280,
+      "efficiency_10C": 340
     },
     "elres": {
       "name": "Direct electric",
       "share": 0,
-      "efficiency": 100
+      "efficiency_hot_water": 100,
+      "efficiency_0C": 100,
+      "efficiency_10C": 100
     },
     "methane": {
       "name": "Methane gas boilers",
       "share": 0,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "hydrogen": {
       "name": "Hydrogen gas boilers",
       "share": 0,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "synthfuel": {
       "name": "Oil boilers",
       "share": 0,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "biomass": {
       "name": "Biomass boilers",
       "share": 0,
-      "efficiency": 90
+      "efficiency_hot_water": 90,
+      "efficiency_0C": 90,
+      "efficiency_10C": 90
     },
     "solid_fuel": {
       "name": "Solid fuel",
       "share": 0,
-      "efficiency": 70
+      "efficiency_hot_water": 70,
+      "efficiency_0C": 70,
+      "efficiency_10C": 70
     }
   },
   "transport": {
@@ -1094,7 +1136,7 @@ var scenarios = {
     "electricity_own_use_prc": 0
   },
   "fossil_fuels": {
-    "allow_use_for_backup": 0,
+    "allow_use_for_backup": 1,
     "other_gas_use": 0,
     "other_oil_use": 0,
     "other_coal_use": 0

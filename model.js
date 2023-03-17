@@ -52,7 +52,7 @@ var model = {
         model.supply();
         model.lac();
         model.space_water_heat_demand();
-        model.heatstore();
+        // model.heatstore();
         model.heating_systems();
         model.industry();
         // model.bivalent_backup();
@@ -243,6 +243,7 @@ var model = {
         o.space_heating = {}
         o.water_heating = {}
         o.heat = {}
+        o.heat.total_spill = 0
         
         o.space_heating.demand_GWK = i.space_heating.domestic_demand_GWK + i.space_heating.services_demand_GWK + i.space_heating.industry_demand_GWK
 
@@ -256,7 +257,9 @@ var model = {
         o.space_heating.total_demand = 0
         o.water_heating.total_demand = 0
                 
-        d.spacewater_demand_before_heatstore = []
+        // d.spacewater_demand_before_heatstore = []
+        d.space_heat_demand = []
+        d.water_heat_demand = []
         
         for (var hour = 0; hour < i.hours; hour++) {
             var day = parseInt(Math.floor(hour / 24))
@@ -279,11 +282,39 @@ var model = {
             o.space_heating.total_demand += space_heat_demand
             
             // water heat
-            let hot_water_demand = hot_water_profile[hour%24] * water_heating_daily_demand
-            o.water_heating.total_demand += hot_water_demand 
+            let water_heat_demand = hot_water_profile[hour%24] * water_heating_daily_demand
+            o.water_heating.total_demand += water_heat_demand 
             
-            let spacewater_demand_before_heatstore = space_heat_demand + hot_water_demand - d.heat_supply_hourly[hour]
-            d.spacewater_demand_before_heatstore.push(spacewater_demand_before_heatstore)
+            // let spacewater_demand_before_heatstore = space_heat_demand + water_heat_demand - d.heat_supply_hourly[hour]
+            // d.spacewater_demand_before_heatstore.push(spacewater_demand_before_heatstore)
+            
+            let fixed_heat_supply = d.heat_supply_hourly[hour];
+            let combined_heat_demand = space_heat_demand + water_heat_demand
+            
+            let fixed_heat_for_space = 0
+            if (space_heat_demand>0) {
+                fixed_heat_for_space = fixed_heat_supply * (space_heat_demand / combined_heat_demand)
+            }
+            
+            let fixed_heat_for_water = 0
+            if (combined_heat_demand) {
+                fixed_heat_for_water = fixed_heat_supply * (water_heat_demand / combined_heat_demand)
+            }
+            
+            let space_heat_balance = space_heat_demand - fixed_heat_for_space
+            if (space_heat_balance<0) {
+                o.heat.total_spill += -1*space_heat_balance
+                space_heat_balance = 0;
+            }
+            d.space_heat_demand.push(space_heat_balance)
+            
+            let water_heat_balance = water_heat_demand - fixed_heat_for_water
+            if (water_heat_balance<0) {
+                o.heat.total_spill += -1*water_heat_balance
+                water_heat_balance = 0;
+            }
+            d.water_heat_demand.push(water_heat_balance)
+            
         }
 
         o.space_heating.domestic_kwh = o.space_heating.total_domestic_demand*0.1*1000000 / i.households_2030
@@ -295,8 +326,13 @@ var model = {
     },
 
     // --------------------------------------------------------------------------------------------------------------
-    // Stage 2: Heatstore
-    // --------------------------------------------------------------------------------------------------------------    
+    // Stage 2: Heatstore 
+    // - needs to be reworked to provide the equivalent service as hot water tanks
+    // - or/and district heating large scale inter seasonal heat storage
+    // - was only really working as peak shaving (whilst placing all hot water demand in the peak.. )
+    // --------------------------------------------------------------------------------------------------------------
+    
+    /*
     heatstore: function () {
 
         o.heatstore = {}
@@ -380,6 +416,7 @@ var model = {
             d.spacewater_demand_after_heatstore.push(spacewater_demand_after_heatstore)
         }
     },
+    */
 
     // --------------------------------------------------------------------------------------------------------------
     // Heating systems
@@ -389,52 +426,57 @@ var model = {
         d.hydrogen_for_spacewaterheat = []
         d.synthfuel_for_spacewaterheat = []
         
-        o.total_losses.heating_systems = 0
+
         
         o.heat.total_unmet_demand = 0
         
         o.heat.max_elec_demand = 0
-        o.heat.total_ambient_supply = 0
         
         d.spacewater_elec = []
         
         o.heating_systems = {}
         for (var z in i.heating_systems) {
+            var slope  = (i.heating_systems[z].efficiency_10C - i.heating_systems[z].efficiency_0C) / (10 - 0);
+            var intercept = i.heating_systems[z].efficiency_10C - (slope*10);
+        
             o.heating_systems[z] = {
                 heat_demand: 0,
-                fuel_demand: 0
+                fuel_demand: 0,
+                efficiency_slope: slope,
+                efficiency_intercept: intercept
             }
         }
         
         for (var hour = 0; hour < i.hours; hour++) {
-            let heat_demand = d.spacewater_demand_after_heatstore[hour]
+            var day = parseInt(Math.floor(hour / 24))
+            var outside_temperature = parseFloat(temperaturelines[day].split(",")[1]); 
             
+            let space_heat_demand = d.space_heat_demand[hour]
+            let water_heat_demand = d.water_heat_demand[hour]            
             let heat_supplied = 0
-            let system_heat_demand = {}
+            
             let system_fuel_demand = {}
             
             for (var z in i.heating_systems) {
-                 
-                // heatpumps
-                // i.heatpump_COP = 1.8+(temperature+15.0)*0.05
-                // if (temperature<-15.0) i.heatpump_COP = 1.8
-            
-                system_heat_demand[z] = heat_demand * (i.heating_systems[z].share * 0.01)
-                system_fuel_demand[z] = system_heat_demand[z] / (i.heating_systems[z].efficiency*0.01)
-
-                o.heating_systems[z].heat_demand += system_heat_demand[z]
-                o.heating_systems[z].fuel_demand += system_fuel_demand[z]
-                heat_supplied += system_heat_demand[z]
                 
-                if (system_fuel_demand[z]<system_heat_demand[z]) {
-                    o.heat.total_ambient_supply += system_heat_demand[z] - system_fuel_demand[z]   
-                } else {
-                    o.total_losses.heating_systems += system_fuel_demand[z] - system_heat_demand[z]
-                }
+                var space_heat_efficiency = (o.heating_systems[z].efficiency_slope * outside_temperature) + o.heating_systems[z].efficiency_intercept
+                var water_heat_efficiency = i.heating_systems[z].efficiency_hot_water
+            
+                let system_space_heat_demand = space_heat_demand * (i.heating_systems[z].share * 0.01)
+                let system_space_fuel_demand = system_space_heat_demand / (space_heat_efficiency*0.01)
+                
+                let system_water_heat_demand = water_heat_demand * (i.heating_systems[z].share * 0.01)
+                let system_water_fuel_demand = system_water_heat_demand / (water_heat_efficiency*0.01)
+                
+                system_fuel_demand[z] = system_space_fuel_demand + system_water_fuel_demand
+                
+                o.heating_systems[z].heat_demand += system_space_heat_demand + system_water_heat_demand
+                o.heating_systems[z].fuel_demand += system_space_fuel_demand + system_water_fuel_demand
+                heat_supplied += system_space_heat_demand + system_water_heat_demand
             }
             
             // check for unmet heat
-            let unmet_heat_demand = heat_demand - heat_supplied
+            let unmet_heat_demand = (space_heat_demand + water_heat_demand) - heat_supplied
             if (unmet_heat_demand.toFixed(3)>0) {
                 o.heat.total_unmet_demand += unmet_heat_demand
             }
@@ -449,6 +491,19 @@ var model = {
             if (spacewater_elec_demand>o.heat.max_elec_demand) o.heat.max_elec_demand = spacewater_elec_demand
             d.spacewater_elec.push(spacewater_elec_demand)       
         }
+        
+        o.heat.total_ambient_supply = 0
+        o.total_losses.heating_systems = 0
+        
+        for (var z in i.heating_systems) {
+            if (o.heating_systems[z].fuel_demand<o.heating_systems[z].heat_demand) {
+                o.heat.total_ambient_supply += o.heating_systems[z].heat_demand - o.heating_systems[z].fuel_demand  
+            } else {
+                o.total_losses.heating_systems += o.heating_systems[z].fuel_demand - o.heating_systems[z].heat_demand
+            }
+            
+            o.heating_systems[z].efficiency = (100 * o.heating_systems[z].heat_demand / o.heating_systems[z].fuel_demand).toFixed(0)
+        } 
     },
 
     // ---------------------------------------------------------------------------
@@ -1396,9 +1451,9 @@ var model = {
         // -------------------------------------------------------------------------------------------------
         let final_store_balance = 0
         
-        let heatstore_additions =  o.heatstore.SOC - o.heatstore.SOC_start
-        console.log("heatstore_additions: "+heatstore_additions)
-        final_store_balance += heatstore_additions
+        //let heatstore_additions =  o.heatstore.SOC - o.heatstore.SOC_start
+        //console.log("heatstore_additions: "+heatstore_additions)
+        //final_store_balance += heatstore_additions
 
         let BEV_store_additions =  o.electric_transport.BEV_Store_SOC - o.electric_transport.BEV_Store_SOC_start
         console.log("BEV_store_additions: "+BEV_store_additions)

@@ -69,37 +69,51 @@ var i = {
         heatpump: {
             name: "Heat pumps",
             share: 90,
-            efficiency:300
+            efficiency_hot_water: 280,
+            efficiency_0C: 280,
+            efficiency_10C: 340
         },
         elres: {
             name: "Direct electric",      
             share: 5,
-            efficiency: 100
+            efficiency_hot_water: 100,
+            efficiency_0C: 100,
+            efficiency_10C: 100
         },
         methane: {
             name: "Methane gas boilers",      
             share: 0,
-            efficiency: 90
+            efficiency_hot_water: 90,
+            efficiency_0C: 90,
+            efficiency_10C: 90
         },
         hydrogen: {
             name: "Hydrogen gas boilers",      
             share: 0,
-            efficiency: 90
+            efficiency_hot_water: 90,
+            efficiency_0C: 90,
+            efficiency_10C: 90
         },
         synthfuel: {
             name: "Oil boilers",      
             share: 0,
-            efficiency: 90
+            efficiency_hot_water: 90,
+            efficiency_0C: 90,
+            efficiency_10C: 90
         },
         biomass: {
             name: "Biomass boilers",      
             share: 5,
-            efficiency: 90
+            efficiency_hot_water: 80,
+            efficiency_0C: 85,
+            efficiency_10C: 90
         },
         solid_fuel: {
             name: "Solid fuel",
             share: 0,
-            efficiency: 70
+            efficiency_hot_water: 70,
+            efficiency_0C: 70,
+            efficiency_10C: 70
         }
     },
 
@@ -267,7 +281,7 @@ var i = {
     
     // biogas
     biogas: {
-        biomass_for_biogas: 89.0,
+        biomass_for_biogas: 92.0,
         anaerobic_digestion_efficiency: 0.6,                                     // HHV, originally 0.5747
         co2_tons_per_gwh_methane: (1000.0/15.4)*((0.40*44.009)/(0.60*16.0425))   // 15.4 kWh/kg, MWh/ton HHV, proportion by molar mass
     },
@@ -344,7 +358,7 @@ var i = {
         short_rotation_coppice:                  1300,
         perrennial_grass_miscanthus:             1000,
         rotational_grass_ryegrass:                820,
-        intensive_and_rough_grazing:             2833,
+        intensive_and_rough_grazing:             2800,
         annual_grass_hemp:                        320,
         food_crops:                              3408,
         feed_crops_for_livestock:                1210,

@@ -387,14 +387,20 @@ input[type='text'] {
                 <th></th>
                 <th>Share</th>
                 <th>Heat demand</th>         
-                <th>Efficiency</th>
+                <th>Efficiency<br>Water</th>
+                <th>Efficiency<br>@0C</th>
+                <th>Efficiency<br>@10C</th>
+                <th>Efficiency<br>Result</th>
                 <th>Fuel demand</th>
             </tr>
             <tr v-for="(system,index) in i.heating_systems">
                 <td>{{ system.name }}</td>
                 <td><input v-model.number="system.share" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
                 <td>{{ o.heating_systems[index].heat_demand | format_energy }} <span class="unit">TWh/yr</span></td>
-                <td><input v-model.number="system.efficiency" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
+                <td><input v-model.number="system.efficiency_hot_water" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
+                <td><input v-model.number="system.efficiency_0C" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
+                <td><input v-model.number="system.efficiency_10C" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
+                <td><span v-if="!isNaN(o.heating_systems[index].efficiency)">{{ o.heating_systems[index].efficiency }} <span class="unit">%</span></span> </td>     
                 <td>{{ o.heating_systems[index].fuel_demand | format_energy }} <span class="unit">TWh/yr</span></td>
             </tr>
         </table>

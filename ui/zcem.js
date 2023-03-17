@@ -158,7 +158,7 @@ function model_view()
     {
         $.plot("#placeholder", [
                 {stack:true, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:3, color:"#1960d5", lines: {lineWidth:0, fill: 0.8 }},
-                {stack:true, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:3, color:"#cc3311", lines: {lineWidth:0, fill: 0.8 }},
+                // {stack:true, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:3, color:"#cc3311", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:3, color:"#aac15b", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "Hydrogen Store", data:timeseries(d.hydrogen_SOC), yaxis:3, color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "Synth Fuel Store", data:timeseries(d.synth_fuel_store_SOC), yaxis:3, color:"#cb9950", lines: {lineWidth:0, fill: 0.8 }},
@@ -178,7 +178,7 @@ function model_view()
                 {stack:true, label: "CCGT output", data:timeseries(d.electricity_from_dispatchable), yaxis:1, color:"#ccaa00", lines: {lineWidth:0, fill: 1.0 }},
                 {stack:true, label: "Elec Store discharge", data:timeseries(d.elec_store_discharge), yaxis:1, color:"#1960d5", lines: {lineWidth:0, fill: 1.0 }},
                 {stack:true, label: "EV Smart discharge", data:timeseries(d.EV_smart_discharge), yaxis:1, color:"#aac15b", lines: {lineWidth:0, fill: 1.0 }},
-                {stack:false, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
+                // {stack:false, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:2, color:"#1960d5", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:2, color:"#aac15b", lines: {lineWidth:1, fill: false }},       
             ], {
@@ -194,8 +194,8 @@ function model_view()
     {
         $.plot("#placeholder", [
                 {stack:true, label: "Direct heat", data:timeseries(d.spacewater_heat), color:"#cc6622", lines: {lineWidth:0, fill: 1.0 }},
-                {stack:true, label: "Heatstore discharge", data:timeseries(d.heatstore_discharge_GWth), color:"#a3511b", lines: {lineWidth:0, fill: 1.0 }} ,
-                {stack:false, label: "Heatstore SOC", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
+                // {stack:true, label: "Heatstore discharge", data:timeseries(d.heatstore_discharge_GWth), color:"#a3511b", lines: {lineWidth:0, fill: 1.0 }} ,
+                // {stack:false, label: "Heatstore SOC", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "Electric for heat", data:timeseries(d.spacewater_elec), color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:false, label: "Heat Demand", data:timeseries(d.spacewater_balance), yaxis:1, color:"#000", lines: {lineWidth:1, fill: false }}
             ], {
