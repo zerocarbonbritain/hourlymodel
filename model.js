@@ -846,7 +846,7 @@ var model = {
             max_charge: 0,
             max_discharge: 0
         }     
-        o.electric_storage.SOC_start = i.electric_storage.capacity_GWh * 1.0
+        o.electric_storage.SOC_start = i.electric_storage.capacity_GWh * 0.3
         o.electric_storage.SOC = o.electric_storage.SOC_start
           
         // Hydrogen
@@ -1414,8 +1414,8 @@ var model = {
         // o.total_losses.grid
         // o.electric_backup.total_before_grid_loss
         
-        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity + o.electric_backup.total_before_grid_loss
-        o.balance.total_electricity_demand = o.supply.total_electricity_before_grid_loss - o.total_losses.grid - o.balance.total_excess_elec + o.balance.total_unmet_elec
+        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity // + o.electric_backup.total_before_grid_loss
+        o.balance.total_electricity_demand = o.supply.total_electricity_before_grid_loss - o.balance.total_excess_elec + o.balance.total_unmet_elec // - o.total_losses.grid
 
         
         o.biomass.total_used += o.industry.total_biomass_demand

@@ -1393,7 +1393,7 @@ input[type='text'] {
             <canvas id="stacks" width="450" height="530"></canvas>
         </div>
         
-        <div style="float:left; width:35%;">
+        <div style="float:left; width:40%;">
             <p style="font-size:16px"><b>Energy</b></p>
             <p style="font-size:16px">Total energy supply: {{ o.balance.total_supply*0.0001 | toFixed(0) }} TWh</p>
             <p style="font-size:16px">Total energy demand: {{ o.balance.total_demand*0.0001 | toFixed(0) }} TWh</p>
@@ -1401,11 +1401,12 @@ input[type='text'] {
             <p style="font-size:16px">Exess energy supply: {{ o.balance.total_excess*0.0001 | toFixed(0) }} TWh</p>
             <p style="font-size:16px">Unmet energy demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
             <p style="font-size:16px"><b>Electricity</b></p>
-            <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(0) }} TWh</p>       
-            <p style="font-size:16px">Over-supply factor: {{ (o.supply.total_electricity_before_grid_loss / o.balance.total_electricity_demand) | toFixed(2) }}</p>       
-            <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*0.0001 | toFixed(0) }} TWh</p>    
-            <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*0.0001 | toFixed(3) }} TWh</p>
+            <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*0.0001 | toFixed(1) }} TWh</p>
+            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(1) }} TWh</p>       
+            <p style="font-size:16px">Over-supply factor: {{ o.supply.total_electricity_before_grid_loss / o.balance.total_electricity_demand | toFixed(2) }}</p>       
+            <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*0.0001 | toFixed(1) }} TWh ({{ (100*o.balance.total_excess_elec/o.supply.total_electricity_before_grid_loss) | toFixed(0) }}%)</p>    
+            <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*0.0001 | toFixed(1) }} TWh  ({{ (100*o.balance.total_unmet_elec/o.balance.total_electricity_demand) | toFixed(0) }}%)</p>
+
             <p style="font-size:16px">Grid CO2 intensity: {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
             <p style="font-size:16px"><b>Land & Emissions</b></p>
             <p style="font-size:16px">Land available: {{ o.land_use.available | toFixed(0) }} kha</p>

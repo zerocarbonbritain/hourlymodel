@@ -82,6 +82,7 @@ function model_ui() {
           /*
           // Backup, liquid and gas processes*/
           {"kwhd":o.total_losses.grid*scl,"name":"Grid losses","color":2},
+          {"kwhd":o.total_losses.electric_storage*scl,"name":"Store losses","color":2},
           {"kwhd":o.total_losses.electrolysis*scl,"name":"H2 losses","color":2},
           {"kwhd":(o.total_losses.elec_backup)*scl,"name":"Power station losses","color":2},
           {"kwhd":o.total_losses.FT*scl,"name":"FT losses","color":2},
