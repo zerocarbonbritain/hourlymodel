@@ -744,19 +744,22 @@ var model = {
         for (var hour = 0; hour < i.hours; hour++)
         {
             let balance = d.balance_before_BEV_storage[hour]
-            
-            // ---------------------------------------------
-            // +- 12 h average of balance before BEV Storage
-            var sum = 0; var n = 0;
-            for (var z=-24; z<24; z++) {
-                var index = hour + z
-                if (index>=i.hours) index-=i.hours
-                if (index<0) index += i.hours
-                sum += d.balance_before_BEV_storage[index]
-                n++;
+  
+            let deviation_from_mean_BEV = 0;
+            if (i.transport.V2G_discharge_type=="average") {            
+                // ---------------------------------------------
+                // +- 12 h average of balance before BEV Storage
+                var sum = 0; var n = 0;
+                for (var z=-24; z<24; z++) {
+                    var index = hour + z
+                    if (index>=i.hours) index-=i.hours
+                    if (index<0) index += i.hours
+                    sum += d.balance_before_BEV_storage[index]
+                    n++;
+                }
+                let average_12h_balance_before_BEV_storage = sum / n;
+                deviation_from_mean_BEV = balance - average_12h_balance_before_BEV_storage
             }
-            let average_12h_balance_before_BEV_storage = sum / n;
-            let deviation_from_mean_BEV = balance - average_12h_balance_before_BEV_storage   
             // ---------------------------------------------
             
             // Electric trains
@@ -956,21 +959,7 @@ var model = {
                
             let elec_store_charge = 0
             let elec_store_discharge = 0        
-            // ---------------------------------------------------------------------------
-            // 12 h average store implementation
-            // ---------------------------------------------------------------------------
-            // +- 12 h average of balance
-            var sum = 0; var n = 0;
-            for (var z=-12; z<12; z++) {
-                var index = hour + z
-                if (index>=i.hours) index-=i.hours
-                if (index<0) index += i.hours
-                sum += d.balance_before_elec_store[index]
-                n++;
-            }
-            let average_12h_balance_before_elec_storage = sum / n;
-            let deviation_from_mean_elec = balance - average_12h_balance_before_elec_storage
-            
+
             if (i.electric_storage.type=="basic") {
                 if (balance>0) {
                     elec_store_charge = balance                                                                                                        // Charge by extend of available oversupply
@@ -1003,6 +992,22 @@ var model = {
             }
             
             else if (i.electric_storage.type=="average") {
+                // ---------------------------------------------------------------------------
+                // 12 h average store implementation
+                // ---------------------------------------------------------------------------
+                // +- 12 h average of balance
+                var sum = 0; var n = 0;
+                for (var z=-12; z<12; z++) {
+                    var index = hour + z
+                    if (index>=i.hours) index-=i.hours
+                    if (index<0) index += i.hours
+                    sum += d.balance_before_elec_store[index]
+                    n++;
+                }
+                let average_12h_balance_before_elec_storage = sum / n;
+                let deviation_from_mean_elec = balance - average_12h_balance_before_elec_storage
+                
+            
                 if (balance>=0.0) {
                     if (deviation_from_mean_elec>=0.0) {
                         // charge
