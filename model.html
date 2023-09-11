@@ -1421,6 +1421,7 @@ input[type='text'] {
               <option value="TWhyr">National TWh/yr</option>
               <option value="kwhdperhousehold">kWh/d per household</option>
               <option value="kwhdperperson">kWh/d per person</option>
+              <option value="scaleby">Scaled by</option>
           </select>
         </div>
         
@@ -1590,6 +1591,14 @@ input[type='text'] {
             <tr>
                 <td>Nuclear</td><td v-html="auto_scale(i.supply.nuclear_capacity*o.scaleby,'kW')"></td>
 
+            </tr>
+            <tr>
+                <td>Total supply</td>
+                <td v-html="auto_scale(o.balance.total_supply*o.scaleby*0.1,'kWh')"></td>
+                <td>Final demand</td>
+                <td v-html="auto_scale(o.balance.total_demand*o.scaleby*0.1,'kWh')"></td>
+                <td></td>
+                <td></td>                
             </tr>
         </table>
         

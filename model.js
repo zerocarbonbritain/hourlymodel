@@ -126,7 +126,8 @@ var model = {
         }
         
         o.total_losses = {
-            grid: 0
+            grid: 0,
+            grid2:0
         }
         
         let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)

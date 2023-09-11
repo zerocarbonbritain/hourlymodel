@@ -18,6 +18,11 @@ function model_ui() {
         scl = (1000.0*1000.0) / (10*365.0*i.households_2030)
     }
     
+    if (i.units_mode=="scaleby") {
+        units = "GWh/yr"
+        scl =  o.scaleby * 0.1 * 0.001 * 0.001;
+    }
+    
     var ambient = 0;
     if (i.include_ambient_heat) {
         ambient = o.heat.total_ambient_supply;
