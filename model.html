@@ -1383,6 +1383,61 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title">
+        <img class="icon-expand" src="img/expand.png"><b>COST MODEL</b>
+    </div>
+    <div class="inner" style="display:block" name="cost_model">
+    
+        <p>Total return on investment (financing costs + profit): 
+        <input v-model.number="i.interest_rate" type="text" @change="update_non_hourly" style="width:20px"  autocomplete="off"/> %</p>
+    
+        <table class="table" style="width:100%">
+            <tr>
+                <th>Component</th>
+                <th>Capacity</th>
+                <th>Capex</th>
+                <th>Opex</th>
+                <th>Fuel</th>
+                <th>Build</th>
+                <th>Lifetime</th>
+                <th>Annual cost</th>
+            </tr>
+            <tr v-for="(row,key) in i.costs">
+                <td>{{ key }}</td>
+                <td>{{ row.capacity | toFixed(1) }} GW</td>
+                <td><input v-model.number="row.capex" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> £/kW</td>
+                <td><input v-model.number="row.opex" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> £/kW.y</td>
+                <td><i>n/a</i></td>
+                <td><input v-model.number="row.buildmonths" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> months</td>
+                <td><input v-model.number="row.lifespan" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> years</td>
+                <td>£{{ o.costs[key].annual | toFixed(1) }} bn/year</td>
+            </tr>
+        </table>
+        
+        <table class="table" style="width:100%">
+            <tr>
+                <td>Total annual cost</td>
+                <td>£{{ o.total_annual_cost | toFixed(1) }} bn/year</td>
+            </tr>
+            <tr>
+                <td>LCOE (Electricity)</td>
+                <td>£{{ o.LCOE | toFixed(1) }}/MWh</td>
+            </tr>
+            <tr>
+                <td>Network costs</td>
+                <td>~£50/MWh *</td>      
+            </tr>
+            <tr>
+                <td>LCOE (Electricity) + Network costs</td>
+                <td>£{{ (o.LCOE+50) | toFixed(1) }}/MWh</td>      
+            </tr>
+        </table>
+        <p><i>* Detailed modelling by BEIS 'Appendix I: Electricity Networks Modelling' August 2022 suggests that while significant network investments are required for net zero scenarios the network costs are likely to stay relatively flat on a per unit basis at around £50/MWh due to higher electricity volumes.</i></p>
+        
+    </div>
+</div>
+
+<div class="box">
+    <div class="box-title">
         <img class="icon-expand" src="img/expand.png"><b>FINAL SUPPLY DEMAND MATCHING
         <span style="float:right">{{ 100*(1.0-(o.balance.total_unmet_elec/o.balance.total_electricity_demand)) | toFixed(3) }}%</span>
         </b>
@@ -1417,7 +1472,7 @@ input[type='text'] {
         
         <div style="padding-top:10px">
           Energy stack units: 
-          <select v-model="i.units_mode" autocomplete="off" @change="update">
+          <select v-model="i.units_mode" autocomplete="off" @change="update_non_hourly">
               <option value="TWhyr">National TWh/yr</option>
               <option value="kwhdperhousehold">kWh/d per household</option>
               <option value="kwhdperperson">kWh/d per person</option>
@@ -1552,7 +1607,7 @@ input[type='text'] {
         
         <table><tr>
         <td>Number of households:</td>
-        <td><input v-model.number="i.number_of_households" type="text" @change="update" style="width:100px"  autocomplete="off"/></td>
+        <td><input v-model.number="i.number_of_households" type="text" @change="update_non_hourly" style="width:100px"  autocomplete="off"/></td>
         <td><i>(1000 households (population ~2400) is about the size of a large village)</i></td>
         </tr></table>
         <br>

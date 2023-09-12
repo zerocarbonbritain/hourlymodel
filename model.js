@@ -65,6 +65,12 @@ var model = {
         model.scaled_by();
         model.embodied_energy();
         model.emissions_balance();
+        model.cost_model();
+    },
+
+    update_non_hourly: function() {
+        model.scaled_by();
+        model.cost_model();
     },
 
     // ---------------------------------------------------------------------------------------------    
@@ -1738,5 +1744,50 @@ var model = {
         // if (carsvans_miles_per_car>0) EE_ecar = 20000.0 * number_of_cars * 0.000000001 / carvans_lifetime
         
         o.EE.prc_of_industry_demand = 100 * o.EE.total / o.industry.total_demand
+    },
+    cost_model: function() {
+
+        i.costs['Onshore wind'].capacity = i.supply.onshore_wind_capacity
+        i.costs['Offshore wind'].capacity = i.supply.offshore_wind_capacity
+        i.costs['Solar PV'].capacity = i.supply.solarpv_capacity
+        i.costs['Tidal'].capacity = i.supply.tidal_capacity
+        i.costs['Wave'].capacity = i.supply.wave_capacity
+        i.costs['Geothermal Electric'].capacity = i.supply.geothermal_elec_capacity
+        i.costs['Nuclear'].capacity = i.supply.nuclear_capacity
+        i.costs['H2 Electrolysis'].capacity = i.hydrogen.electrolysis_capacity_GW
+        i.costs['Methanation'].capacity = i.methane.methanation_capacity
+        i.costs['Gas turbines'].capacity = o.electric_backup.max_capacity_requirement
+
+        o.costs = {}
+        o.total_annual_cost = 0;
+
+        for (var z in i.costs) {
+            o.costs[z] = {
+                annual: i.costs[z].capacity * 0.001 * annual_cost(
+                    i.costs[z].capex,
+                    i.costs[z].opex,
+                    0,
+                    i.costs[z].buildmonths,
+                    i.costs[z].lifespan,
+                    i.interest_rate*0.01)
+            }
+            o.total_annual_cost += o.costs[z].annual
+        }
+        
+        o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
+        
+        
     }
+}
+
+function annual_cost(capex,opex,fuel,months_to_build,lifespan,interest_rate) {
+
+    principal_at_commisioning = capex * Math.pow((1 + interest_rate), months_to_build/12)
+
+    lifespan_months = lifespan*12
+
+    monthly_payment = (interest_rate/12) * (1/(1-(1+interest_rate/12)**(-lifespan_months)))*principal_at_commisioning
+    annual_payment = monthly_payment * 12
+
+    return annual_payment + opex
 }

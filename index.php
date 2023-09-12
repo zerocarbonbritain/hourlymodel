@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 71;
+    $v = 77;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -217,6 +217,11 @@ function load_page(page)
               model_view();
               model_ui();
             }
+          },
+          update_non_hourly: function () {
+            model.update_non_hourly();
+            model_view();
+            model_ui();
           },
           simulate: function () {
             model.run();

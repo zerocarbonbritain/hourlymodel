@@ -1,3 +1,4 @@
+
 var i = {
     units_mode: "TWhyr",
 
@@ -428,6 +429,84 @@ var i = {
         onshorewind_lifespan: 25.0,
         offshorewind_lifespan: 25.0,
         solarpv_lifespan: 30.0,
+    },
+    
+    // Cost model
+
+    interest_rate : 5, // % (return on investment)
+
+    costs: {
+        
+        'Onshore wind': {
+            capex: 965*0.86,
+            opex: 19*0.86,
+            fuel: 0, 
+            buildmonths: 6,
+            lifespan: 30
+        },
+        'Offshore wind': {
+            capex: 2216*0.86,
+            opex: 64*0.86,
+            fuel: 0,
+            buildmonths: 12,
+            lifespan: 25
+        },
+        'Solar PV': {
+            capex: 393*0.86,
+            opex: 6*0.86,
+            fuel: 0,
+            buildmonths: 6,
+            lifespan: 35
+        },
+        'Tidal': {
+            capex: 2000*0.86,
+            opex: 40*0.86,
+            fuel: 0,
+            buildmonths: 12,
+            lifespan: 30
+        },
+        'Wave': {
+            capex: 2300*0.86,
+            opex: 58*0.86,
+            fuel: 0,
+            buildmonths: 12,
+            lifespan: 25
+        },
+        'Geothermal Electric': {
+            capex: 4245*0.86,
+            opex: 80*0.86,
+            fuel: 0,
+            buildmonths: 24,
+            lifespan: 40
+        },
+        'Nuclear': {
+            capex: 9170*0.86,
+            opex: 159.5*0.86,
+            fuel: 0.0,
+            buildmonths: 70,
+            lifespan: 40
+        },
+        'H2 Electrolysis': {
+            capex: 381*0.86,
+            opex: 13.3*0.86,
+            fuel: 0.0014*0.86,
+            buildmonths: 6,
+            lifespan: 30
+        },
+        'Methanation': {
+            capex: 274*0.86,
+            opex: 12.6*0.86,
+            fuel: 0.0,
+            buildmonths: 6,
+            lifespan: 30
+        },
+        'Gas turbines': {
+            capex: 475*0.86,
+            opex: 14.25*0.86,
+            fuel: 0.0,
+            buildmonths: 6,
+            lifespan: 35
+        }
     }
 }
 
