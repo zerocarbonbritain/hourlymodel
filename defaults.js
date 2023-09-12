@@ -433,7 +433,7 @@ var i = {
     
     // Cost model
 
-    interest_rate : 5, // % (return on investment)
+    wacc : 7, // % Weighted Average Cost of Capital
 
     costs: {
         

@@ -1769,7 +1769,7 @@ var model = {
                     0,
                     i.costs[z].buildmonths,
                     i.costs[z].lifespan,
-                    i.interest_rate*0.01)
+                    i.wacc*0.01)
             }
             o.total_annual_cost += o.costs[z].annual
         }
