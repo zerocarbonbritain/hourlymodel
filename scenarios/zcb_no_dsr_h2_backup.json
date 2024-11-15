@@ -1,0 +1,44 @@
+{
+    "supply": {
+        "offshore_wind_capacity": 146
+    },
+    "heating_systems": {
+        "heatpump": {
+            "efficiency_10C": 340
+        }
+    },
+    "industry": {
+        "high_temp_process_fixed_elec_prc": 45,
+        "high_temp_process_fixed_CH4_prc": 40,
+        "high_temp_process_DSR_CH4_prc": 0,
+        "low_temp_process_fixed_elec_prc": 65,
+        "low_temp_process_fixed_CH4_prc": 20,
+        "low_temp_process_DSR_CH4_prc": 0,
+        "dry_sep_fixed_elec_prc": 70,
+        "dry_sep_DSR_CH4_prc": 0,
+        "other_heat_fixed_elec_prc": 65,
+        "other_heat_fixed_CH4_prc": 15,
+        "other_heat_DSR_CH4_prc": 0
+    },
+    "hydrogen": {
+        "electrolysis_capacity_GW": 45,
+        "storage_capacity_GWh": 60000
+    },
+    "biogas": {
+        "biomass_for_biogas": 57
+    },
+    "methane": {
+        "methanation_capacity": 7,
+        "storage_capacity_GWh": 10000
+    },
+    "synth_fuel": {
+        "capacity_GW": 8.9
+    },
+    "electric_backup": {
+        "prc_hydrogen": 100,
+        "prc_methane": 0
+    },
+    "land_use": {
+        "intensive_and_rough_grazing": 2500
+    }
+}

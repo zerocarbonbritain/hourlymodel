@@ -1,0 +1,23 @@
+{
+    "zcb_no_dsr": {
+        "name": "ZCB no industrial DSR"
+    },
+    "zcb_no_dsr_h2_backup": {
+        "name": "ZCB no industrial DSR with H2 backup"
+    },
+    "baseline_2018": {
+        "name": "2018 baseline"
+    },
+    "wind_solar_2018": {
+        "name": "2018 wind and solar"
+    },
+    "wws_2018": {
+        "name": "2018 100% RE"
+    },
+    "fes_2022": {
+        "name": "2022 FES Leading the Way"
+    },
+    "zero_supply_demand": {
+        "name": "Zero supply demand"
+    }
+}

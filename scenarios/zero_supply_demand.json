@@ -1,0 +1,122 @@
+{
+    "supply": {
+        "offshore_wind_capacity": 0,
+        "onshore_wind_capacity": 0,
+        "wave_capacity": 0,
+        "tidal_capacity": 0,
+        "solarpv_capacity": 0,
+        "solarthermal_capacity": 0,
+        "hydro_capacity": 0,
+        "geothermal_elec_capacity": 0,
+        "geothermal_heat_capacity": 0
+    },
+    "LAC": {
+        "domestic": {
+            "lighting_and_appliances_TWhy": 0,
+            "cooking_TWhy": 0
+        },
+        "services": {
+            "lighting_and_appliances_TWhy": 0,
+            "catering_TWhy": 0,
+            "cooling_TWhy": 0
+        }
+    },
+    "space_heating": {
+        "domestic_demand_GWK": 0,
+        "services_demand_GWK": 0,
+        "industry_demand_GWK": 0
+    },
+    "water_heating": {
+        "domestic_TWhy": 0,
+        "services_TWhy": 0
+    },
+    "heatstore": {
+        "storage_capacity": 0.1,
+        "charge_capacity": 0.1
+    },
+    "heating_systems": {
+        "heatpump": {
+            "share": 100,
+            "efficiency_10C": 340
+        },
+        "elres": {
+            "share": 0
+        },
+        "biomass": {
+            "share": 0,
+            "efficiency_hot_water": 90,
+            "efficiency_0C": 90
+        }
+    },
+    "transport": {
+        "modes": {
+            "Walking": {
+                "miles_pp": 0
+            },
+            "Cycling": {
+                "miles_pp": 0
+            },
+            "Ebikes": {
+                "miles_pp": 0
+            },
+            "Rail": {
+                "miles_pp": 0
+            },
+            "Bus": {
+                "miles_pp": 0
+            },
+            "Motorbike": {
+                "miles_pp": 0
+            },
+            "Cars & Vans": {
+                "miles_pp": 0
+            },
+            "Aviation": {
+                "miles_pp": 0
+            }
+        },
+        "electric_car_battery_capacity": 0,
+        "rail_freight_elec_demand": 0,
+        "freight_BEV_demand": 0,
+        "freight_H2_demand": 0,
+        "freight_IC_demand": 0
+    },
+    "industry": {
+        "high_temp_process_TWhy": 0,
+        "low_temp_process_TWhy": 0,
+        "dry_sep_TWhy": 0,
+        "other_heat_TWhy": 0,
+        "motors_TWhy": 0,
+        "compressed_air_TWhy": 0,
+        "lighting_TWhy": 0,
+        "refrigeration_TWhy": 0,
+        "other_non_heat_TWhy": 0
+    },
+    "electric_storage": {
+        "capacity_GWh": 0.1,
+        "charge_capacity_GW": 0,
+        "discharge_capacity_GW": 0
+    },
+    "hydrogen": {
+        "electrolysis_capacity_GW": 0,
+        "storage_capacity_GWh": 0
+    },
+    "biogas": {
+        "biomass_for_biogas": 0
+    },
+    "methane": {
+        "methanation_capacity": 0,
+        "SOC_start": 0,
+        "storage_capacity_GWh": 0
+    },
+    "synth_fuel": {
+        "capacity_GW": 0,
+        "store_start_GWh": 0
+    },
+    "electric_backup": {
+        "prc_methane": 0
+    },
+    "fossil_fuels": {
+        "allow_use_for_backup": 1
+    }
+}

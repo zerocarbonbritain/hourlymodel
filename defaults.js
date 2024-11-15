@@ -1,5 +1,5 @@
 
-var i = {
+var default_scenario = {
     units_mode: "TWhyr",
 
     hours: 87648,
@@ -356,9 +356,9 @@ var i = {
         new_productive_broadleaf_woodland:        600,
         new_productive_coniferous_woodland:       700,
         short_rotation_forestry:                 1660,
-        short_rotation_coppice:                  1300,
-        perrennial_grass_miscanthus:             1000,
-        rotational_grass_ryegrass:                820,
+        // short_rotation_coppice:                  1300,
+        // perrennial_grass_miscanthus:             1000,
+        // rotational_grass_ryegrass:                820,
         intensive_and_rough_grazing:             2800,
         annual_grass_hemp:                        320,
         food_crops:                              3408,
@@ -509,6 +509,8 @@ var i = {
         }
     }
 }
+
+var i = JSON.parse(JSON.stringify(default_scenario));
 
 
 units_mode = "TWhyr"

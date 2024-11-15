@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 81;
+    $v = 89;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -207,7 +207,7 @@ function load_page(page)
             i: i,
             o: o,
             selected_scenario: "default",
-            scenario_list: Object.keys(scenarios),
+            scenario_list: [],
             live_edit: true
         },
         methods: {
@@ -284,7 +284,7 @@ function load_page(page)
 
           },
           change_scenario: function() {
-              load_scenario(app.selected_scenario)
+              load_scenario(app.selected_scenario);
           }       
         },
         filters: {
@@ -307,6 +307,14 @@ function load_page(page)
     resize();
     model_ui();
     scroll_to_hash();
+
+    // Load scenarios
+    var scenarios = {};
+
+    // Load available scenarios
+    $.ajax({url: "scenarios/available.json?v="+v, async: false, success: function(data){
+      app.scenario_list = data;
+    }});
 }
 
 $("#model").on("click",".viewmode",function(){
@@ -390,24 +398,72 @@ $(".menu-title").click(function(){
 });
 
 function save_scenario() {
-    console.log(JSON.parse(JSON.stringify(i)))
+    function getDifferences(obj, defaultObj) {
+        let differences = {};
+
+        for (let key in obj) {
+            if (typeof obj[key] === "object" && obj[key] !== null && !Array.isArray(obj[key])) {
+                // Recurse into the nested object
+                const nestedDiff = getDifferences(obj[key], defaultObj[key]);
+                if (Object.keys(nestedDiff).length > 0) {
+                    differences[key] = nestedDiff;
+                }
+            } else if (obj[key] !== defaultObj[key]) {
+                differences[key] = obj[key];
+            }
+        }
+
+        return differences;
+    }
+
+    // Compute the differences
+    const diff = getDifferences(i, default_scenario);
+
+    if (Object.keys(diff).length === 0) {
+        console.log("No changes from default scenario");
+    } else {
+        console.log(diff);
+    }
+
+
 }
+
 
 function load_scenario(name) {
 
-    if (name=='default') {
+  console.log("Scenario changed to: " + name);
 
-        i = Object.assign(i,JSON.parse(JSON.stringify(default_scenario)))       
-    } else {
-        i = Object.assign(i,JSON.parse(JSON.stringify(scenarios[name])))
-        
-    }
-    model.run();
-    model_view();
-    model_ui();
+  // Load scenario data
+  if (name=='default') {
+      i = Object.assign(i,JSON.parse(JSON.stringify(default_scenario)))       
+  } else {
+    $.ajax({url: "scenarios/"+name+".json?v="+v, async: false, success: function(data){
+
+      i = JSON.parse(JSON.stringify(default_scenario));
+
+      // Update the scenario with changes from nested objects
+      function updateScenario(obj, changes) {
+        for (let key in changes) {
+          if (typeof changes[key] === "object" && changes[key] !== null && !Array.isArray(changes[key])) {
+            updateScenario(obj[key], changes[key]);
+          } else {
+            obj[key] = changes[key];
+          }
+        }
+      }
+
+      updateScenario(i, data);
+
+    }});        
+  }
+  model.run();
+  model_view();
+  model_ui();
 }
+
+
+
     
 </script>
-<script language="javascript" type="text/javascript" src="scenarios.js?v=<?php echo $v; ?>"></script>
 
 

@@ -79,6 +79,7 @@ var model = {
     transport_model: function() {
 
         o.transport = {
+            km_pp: {},
             modes: { },
             fuel_totals: { EV:0, H2:0, IC:0 }
         }
@@ -88,14 +89,14 @@ var model = {
         for (var z in i.transport.modes) {
             let mode = i.transport.modes[z]
 
-            mode.km_pp = mode.miles_pp * i.transport.km_per_mile;
+            o.transport.km_pp[z] = mode.miles_pp * i.transport.km_per_mile;
             
             for (var fuel in mode.prc) {
                 if (o.transport.modes[z]==undefined) o.transport.modes[z] = {}
                 if (o.transport.modes[z][fuel]==undefined) o.transport.modes[z][fuel] = {}
                 o.transport.modes[z][fuel].kwhppkm_full = mode.mechanical_kwhppkm_full / mode.efficiency[fuel]
                 o.transport.modes[z][fuel].kwhppkm = o.transport.modes[z][fuel].kwhppkm_full / mode.load_factor
-                o.transport.modes[z][fuel].kwhpp = o.transport.modes[z][fuel].kwhppkm * mode.prc[fuel] * mode.km_pp
+                o.transport.modes[z][fuel].kwhpp = o.transport.modes[z][fuel].kwhppkm * mode.prc[fuel] * o.transport.km_pp[z]
                 o.transport.modes[z][fuel].TWh = o.transport.modes[z][fuel].kwhpp * kwpp_to_TWh
                 
                 o.transport.fuel_totals[fuel] += o.transport.modes[z][fuel].TWh
@@ -438,6 +439,7 @@ var model = {
         o.heat.total_unmet_demand = 0
         
         o.heat.max_elec_demand = 0
+        o.heat.max_elec_demand_time = 0
         
         d.spacewater_elec = []
         
@@ -495,7 +497,10 @@ var model = {
             d.synthfuel_for_spacewaterheat.push(system_fuel_demand.synthfuel)
             
             let spacewater_elec_demand = system_fuel_demand.elres + system_fuel_demand.heatpump
-            if (spacewater_elec_demand>o.heat.max_elec_demand) o.heat.max_elec_demand = spacewater_elec_demand
+            if (spacewater_elec_demand>o.heat.max_elec_demand) {
+                o.heat.max_elec_demand = spacewater_elec_demand
+                o.heat.max_elec_demand_time = hour
+            }
             d.spacewater_elec.push(spacewater_elec_demand)       
         }
         
@@ -510,7 +515,13 @@ var model = {
             }
             
             o.heating_systems[z].efficiency = (100 * o.heating_systems[z].heat_demand / o.heating_systems[z].fuel_demand).toFixed(0)
-        } 
+        }
+        var datastarttime = 32*365.25*24*3600*1000;
+        var date = new Date(datastarttime + (o.heat.max_elec_demand_time * 3600 * 1000));
+        h = date.getHours();
+        if (h<10) h = "0"+h
+        
+        o.heat.max_elec_demand_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear(); 
     },
 
     // ---------------------------------------------------------------------------
@@ -1568,8 +1579,8 @@ var model = {
         o.biomass.grass_for_biogas = i.biogas.biomass_for_biogas - 34.15
         if (o.biomass.grass_for_biogas<0.0) o.biomass.grass_for_biogas = 0.0
 
-        i.land_use.rotational_grass_ryegrass = o.biomass.grass_for_biogas / (10.5 * 0.001 * 0.95 * 4.72)
-        i.land_use.perrennial_grass_miscanthus = (o.synth_fuel.total_biomass_used * 0.0001) / (15.0 * 0.001 * 0.95 * 4.72)
+        o.land_use.rotational_grass_ryegrass = o.biomass.grass_for_biogas / (10.5 * 0.001 * 0.95 * 4.72)
+        o.land_use.perrennial_grass_miscanthus = (o.synth_fuel.total_biomass_used * 0.0001) / (15.0 * 0.001 * 0.95 * 4.72)
 
         // Work forwards to TWh
         let short_rotation_forestry_harvestable_modtyr = ((i.land_use.short_rotation_forestry * 5.08 * 0.001)/(44/12))/0.5
@@ -1579,13 +1590,16 @@ var model = {
         let short_rotation_coppice_TWh = biomass_demand_for_heat_TWh - short_rotation_forestry_TWh
         
         // Work backwards to land area
-        i.land_use.short_rotation_coppice = short_rotation_coppice_TWh / (12.75 * 0.001 * 0.95 * 4.72)
+        o.land_use.short_rotation_coppice = short_rotation_coppice_TWh / (12.75 * 0.001 * 0.95 * 4.72)
         
         
         o.land_use.total = 0
         for (var z in i.land_use) {
             o.land_use.total += i.land_use[z]
         }
+        o.land_use.total += o.land_use.rotational_grass_ryegrass
+        o.land_use.total += o.land_use.perrennial_grass_miscanthus
+        o.land_use.total += o.land_use.short_rotation_coppice
         
         o.land_use.available = 24728.0 - o.land_use.total
         
@@ -1669,9 +1683,9 @@ var model = {
         // - coal co2 factor is 0.3166 kgCO2 per kWh = 0.0003166 MtCO2 per GWh
         // - oil co2 factor is 0.2678 kgCO2 per kWh = 0.0002678 MtCO2 per GWh
         // - gas co2 factor is 0.1839 kgCO2 per kWh = 0.0001839 MtCO2 per GWh
-        i.emissions_balance.fossil_fuel_coal = o.fossil_fuels.coal*0.1*0.0003166
-        i.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
-        i.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
+        o.emissions_balance.fossil_fuel_coal = o.fossil_fuels.coal*0.1*0.0003166
+        o.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
+        o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
                         
         let grid_co2_emissions = 0;
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
@@ -1679,16 +1693,25 @@ var model = {
         
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
         
-        i.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total
-        i.emissions_balance.harvested_wood = -o.carbon_sequestration.timber_products.total     
-        i.emissions_balance.biochar_carbon_capture = -o.carbon_sequestration.biochar.total     
-        i.emissions_balance.international_aviation_bunkers = o.emissions_balance.aviation_co2e
+        o.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total
+        o.emissions_balance.harvested_wood = -o.carbon_sequestration.timber_products.total     
+        o.emissions_balance.biochar_carbon_capture = -o.carbon_sequestration.biochar.total     
+        o.emissions_balance.international_aviation_bunkers = o.emissions_balance.aviation_co2e
         
         o.emissions_balance.total = 0
         
         for (var z in i.emissions_balance) {
             o.emissions_balance.total += i.emissions_balance[z]
         }
+
+        o.emissions_balance.total += o.emissions_balance.fossil_fuel_coal
+        o.emissions_balance.total += o.emissions_balance.fossil_fuel_oil
+        o.emissions_balance.total += o.emissions_balance.fossil_fuel_gas
+
+        o.emissions_balance.total += o.emissions_balance.reforestation
+        o.emissions_balance.total += o.emissions_balance.harvested_wood
+        o.emissions_balance.total += o.emissions_balance.biochar_carbon_capture
+        o.emissions_balance.total += o.emissions_balance.international_aviation_bunkers
     },
 
     // ----------------------------------------------------------------------------
@@ -1747,23 +1770,24 @@ var model = {
     },
     cost_model: function() {
 
-        i.costs['Onshore wind'].capacity = i.supply.onshore_wind_capacity
-        i.costs['Offshore wind'].capacity = i.supply.offshore_wind_capacity
-        i.costs['Solar PV'].capacity = i.supply.solarpv_capacity
-        i.costs['Tidal'].capacity = i.supply.tidal_capacity
-        i.costs['Wave'].capacity = i.supply.wave_capacity
-        i.costs['Geothermal Electric'].capacity = i.supply.geothermal_elec_capacity
-        i.costs['Nuclear'].capacity = i.supply.nuclear_capacity
-        i.costs['H2 Electrolysis'].capacity = i.hydrogen.electrolysis_capacity_GW
-        i.costs['Methanation'].capacity = i.methane.methanation_capacity
-        i.costs['Gas turbines'].capacity = o.electric_backup.max_capacity_requirement
-
         o.costs = {}
+
+        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity }
+        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity }
+        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity }
+        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity }
+        o.costs['Wave'] = { capacity: i.supply.wave_capacity }
+        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity }
+        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity }
+        o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW }
+        o.costs['Methanation'] = { capacity: i.methane.methanation_capacity }
+        o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement }
+
         o.total_annual_cost = 0;
 
         for (var z in i.costs) {
             o.costs[z] = {
-                annual: i.costs[z].capacity * 0.001 * annual_cost(
+                annual: o.costs[z].capacity * 0.001 * annual_cost(
                     i.costs[z].capex,
                     i.costs[z].opex,
                     0,
