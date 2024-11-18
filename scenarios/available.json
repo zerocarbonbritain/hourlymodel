@@ -8,11 +8,14 @@
     "baseline_2018": {
         "name": "2018 baseline"
     },
-    "wind_solar_2018": {
-        "name": "2018 wind and solar"
+    "2018_re_high_e": {
+        "name": "2018 100% RE, High Industrial Electrification"
     },
     "wws_2018": {
-        "name": "2018 100% RE"
+        "name": "2018 100% RE, Low Industrial Electrification"
+    },
+    "2018_nuclear_high_e": {
+        "name": "2018 100% Nuclear, High Industrial Electrification"
     },
     "fes_2022": {
         "name": "2022 FES Leading the Way"

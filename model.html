@@ -841,7 +841,8 @@ input[type='text'] {
     <div class="inner" name="elec_backup">
         <div style="font-size:14px">
         Select from different types of dispatchable electricity supply.
-        </div><br>
+        </div>
+        <p>Dispatchable capacity limit <input v-model.number="i.electric_backup.capacity_limit" style="width:60px" @change="update"> GW</p>
         
         <table class="table" style="width:100%">        
         <tr>

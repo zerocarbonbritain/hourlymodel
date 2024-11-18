@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 89;
+    $v = 94;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -132,7 +132,7 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 43;
+var v = 95;
 
 var view_mode = "electricity";
 
@@ -439,7 +439,7 @@ function load_scenario(name) {
   } else {
     $.ajax({url: "scenarios/"+name+".json?v="+v, async: false, success: function(data){
 
-      i = JSON.parse(JSON.stringify(default_scenario));
+      var modified_scenario = JSON.parse(JSON.stringify(default_scenario));
 
       // Update the scenario with changes from nested objects
       function updateScenario(obj, changes) {
@@ -452,7 +452,9 @@ function load_scenario(name) {
         }
       }
 
-      updateScenario(i, data);
+      updateScenario(modified_scenario, data);
+
+      i = Object.assign(i,JSON.parse(JSON.stringify(modified_scenario)))       
 
     }});        
   }

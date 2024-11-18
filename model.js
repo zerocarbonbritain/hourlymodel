@@ -52,10 +52,8 @@ var model = {
         model.supply();
         model.lac();
         model.space_water_heat_demand();
-        // model.heatstore();
         model.heating_systems();
         model.industry();
-        // model.bivalent_backup();
         model.transport_model()
         model.electric_transport();
         model.main_loop();
@@ -442,6 +440,7 @@ var model = {
         o.heat.max_elec_demand_time = 0
         
         d.spacewater_elec = []
+        d.spacewater_heat = []
         
         o.heating_systems = {}
         for (var z in i.heating_systems) {
@@ -461,10 +460,11 @@ var model = {
             var outside_temperature = parseFloat(temperaturelines[day].split(",")[1]); 
             
             let space_heat_demand = d.space_heat_demand[hour]
-            let water_heat_demand = d.water_heat_demand[hour]            
+            let water_heat_demand = d.water_heat_demand[hour]
             let heat_supplied = 0
             
             let system_fuel_demand = {}
+            let system_heat_demand = {}
             
             for (var z in i.heating_systems) {
                 
@@ -478,6 +478,7 @@ var model = {
                 let system_water_fuel_demand = system_water_heat_demand / (water_heat_efficiency*0.01)
                 
                 system_fuel_demand[z] = system_space_fuel_demand + system_water_fuel_demand
+                system_heat_demand[z] = system_space_heat_demand + system_water_heat_demand
                 
                 o.heating_systems[z].heat_demand += system_space_heat_demand + system_water_heat_demand
                 o.heating_systems[z].fuel_demand += system_space_fuel_demand + system_water_fuel_demand
@@ -497,11 +498,14 @@ var model = {
             d.synthfuel_for_spacewaterheat.push(system_fuel_demand.synthfuel)
             
             let spacewater_elec_demand = system_fuel_demand.elres + system_fuel_demand.heatpump
+            let spacewater_heat_demand = system_heat_demand.elres + system_heat_demand.heatpump
+
             if (spacewater_elec_demand>o.heat.max_elec_demand) {
                 o.heat.max_elec_demand = spacewater_elec_demand
                 o.heat.max_elec_demand_time = hour
             }
-            d.spacewater_elec.push(spacewater_elec_demand)       
+            d.spacewater_elec.push(spacewater_elec_demand)
+            d.spacewater_heat.push(spacewater_heat_demand)
         }
         
         o.heat.total_ambient_supply = 0
@@ -944,6 +948,8 @@ var model = {
         o.total_losses.FT = 0
         o.total_losses.power_to_X = 0
         o.total_losses.electric_storage = 0
+
+        let total_heat_from_boiler = 0;
         
         let daily_transport_H2_demand = o.transport.fuel_totals.H2 * 1000.0 / 365.25
         let daily_transport_liquid_demand = o.transport.fuel_totals.IC * 1000.0 / 365.25
@@ -1211,10 +1217,21 @@ var model = {
             let coal_turbine_output = 0
             let electricity_from_dispatchable = 0
             let electricity_from_dispatchable_before_grid_loss = 0
+            var shortfall = 0;
             
             if (balance<0.0) {
                 let backup_requirement = (-1 * balance);
                 
+                // Limit to maximum allowed backup capacity
+                if (backup_requirement>i.electric_backup.capacity_limit) {
+
+                    // shortfall
+                    shortfall = backup_requirement - i.electric_backup.capacity_limit;
+
+                    backup_requirement = i.electric_backup.capacity_limit;
+
+                }
+
                 let backup_requirement_before_grid_loss = backup_requirement / grid_loss_prc
                 
                 // Allocate to different technologies
@@ -1240,7 +1257,7 @@ var model = {
                         synth_fuel_turbine_output = o.synth_fuel.store_SOC*i.electric_backup.synth_fuel_efficiency*0.01
                     }
                 }
-                
+
                 // Totals
                 o.electric_backup.total_hydrogen_turbine_output += hydrogen_turbine_output
                 o.electric_backup.total_methane_turbine_output += methane_turbine_output
@@ -1260,6 +1277,38 @@ var model = {
                 o.total_losses.grid += electricity_from_dispatchable_before_grid_loss - electricity_from_dispatchable
             }
             d.electricity_from_dispatchable.push(electricity_from_dispatchable)
+
+            // Can we reduce the shortfall with DSR
+            /*
+            if (shortfall>0) {
+                // Try reducing electric heat
+
+                let spacewater_elec = d.spacewater_elec[hour]
+                let spacewater_heat = d.spacewater_heat[hour]
+                let COP = spacewater_heat / spacewater_elec;
+
+                let heat_from_hybrid_boiler = 0
+
+                let remainder = 0
+
+                if (shortfall>=spacewater_elec) {
+                    shortfall = shortfall - spacewater_elec
+                    
+                    heat_from_hybrid_boiler = spacewater_heat
+                    spacewater_elec = 0
+                } else {
+                 
+                    spacewater_elec = spacewater_elec - shortfall
+                    spacewater_heat = spacewater_elec * COP
+
+                    heat_from_hybrid_boiler += shortfall * COP
+
+                    shortfall = 0
+                }
+                d.spacewater_elec[hour] = spacewater_elec;
+
+                total_heat_from_boiler += heat_from_hybrid_boiler;
+            }*/
             
             // Final electricity balance
             balance += electricity_from_dispatchable
@@ -1365,6 +1414,8 @@ var model = {
         
         let biomass_for_dispatchable = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
         o.biomass.total_used += biomass_for_dispatchable
+
+        console.log("Total heat from boiler: "+(total_heat_from_boiler/10000))
     },
     
     // -------------------------------------------------------------------------------------------------
@@ -1561,15 +1612,17 @@ var model = {
         
         var datastarttime = 32*365.25*24*3600*1000;
 
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
         var date = new Date(datastarttime + (o.electric_backup.max_capacity_requirement_hour * 3600 * 1000));
         var h = date.getHours();
         if (h<10) h = "0"+h
-        o.electric_backup.max_capacity_requirement_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear();
+        o.electric_backup.max_capacity_requirement_date = h+":00 "+(date.getDate())+" "+months[date.getMonth()]+" "+date.getFullYear();
 
         date = new Date(datastarttime + (o.electric_backup.max_shortfall_hour * 3600 * 1000));
         h = date.getHours();
         if (h<10) h = "0"+h
-        o.electric_backup.max_shortfall_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear(); 
+        o.electric_backup.max_shortfall_date = h+":00 "+(date.getDate())+" "+months[date.getMonth()]+" "+date.getFullYear();
     },
     
     land_use: function() {

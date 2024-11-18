@@ -322,6 +322,7 @@ var default_scenario = {
 
     // Dispatchable
     electric_backup: {
+        capacity_limit: 100,
         prc_hydrogen: 0,
         hydrogen_efficiency: 50,
         prc_methane: 100,
