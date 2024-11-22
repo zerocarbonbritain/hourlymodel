@@ -57,6 +57,9 @@ var model = {
         model.transport_model()
         model.electric_transport();
         model.main_loop();
+
+        model.heating_systems_post_loop();
+
         model.fossil_fuels();
         model.final();
         model.land_use();
@@ -326,9 +329,6 @@ var model = {
         o.space_heating.domestic_kwh = o.space_heating.total_domestic_demand*0.1*1000000 / i.households_2030
         o.water_heating.domestic_kwh = i.water_heating.domestic_TWhy*1000000000 / i.households_2030
         
-        // move to hourly model if needed
-        // i.heatpump_COP_hourly = i.heatpump_COP
-        // GWth_GWe = (i.heatpump_COP_hourly * i.spacewater_share_heatpumps) + (i.elres_efficiency * i.spacewater_share_elres) + (i.methane_boiler_efficiency * i.spacewater_share_methane)
     },
 
     // --------------------------------------------------------------------------------------------------------------
@@ -428,21 +428,15 @@ var model = {
     // Heating systems
     // --------------------------------------------------------------------------------------------------------------     
     heating_systems: function() {
-        d.methane_for_spacewaterheat = []
-        d.hydrogen_for_spacewaterheat = []
-        d.synthfuel_for_spacewaterheat = []
-        
 
-        
-        o.heat.total_unmet_demand = 0
-        
-        o.heat.max_elec_demand = 0
-        o.heat.max_elec_demand_time = 0
-        
+        d.heating_systems = {}
         d.spacewater_elec = []
-        d.spacewater_heat = []
+        
+        o.heat.total_demand = 0
         
         o.heating_systems = {}
+
+        // Calculate heating system efficiency slopes and intercepts
         for (var z in i.heating_systems) {
             var slope  = (i.heating_systems[z].efficiency_10C - i.heating_systems[z].efficiency_0C) / (10 - 0);
             var intercept = i.heating_systems[z].efficiency_10C - (slope*10);
@@ -453,6 +447,11 @@ var model = {
                 efficiency_slope: slope,
                 efficiency_intercept: intercept
             }
+
+            d.heating_systems[z] = {
+                heat_demand: [],
+                fuel_demand: []
+            }
         }
         
         for (var hour = 0; hour < i.hours; hour++) {
@@ -461,10 +460,9 @@ var model = {
             
             let space_heat_demand = d.space_heat_demand[hour]
             let water_heat_demand = d.water_heat_demand[hour]
+            o.heat.total_demand += space_heat_demand + water_heat_demand
+
             let heat_supplied = 0
-            
-            let system_fuel_demand = {}
-            let system_heat_demand = {}
             
             for (var z in i.heating_systems) {
                 
@@ -476,37 +474,44 @@ var model = {
                 
                 let system_water_heat_demand = water_heat_demand * (i.heating_systems[z].share * 0.01)
                 let system_water_fuel_demand = system_water_heat_demand / (water_heat_efficiency*0.01)
-                
-                system_fuel_demand[z] = system_space_fuel_demand + system_water_fuel_demand
-                system_heat_demand[z] = system_space_heat_demand + system_water_heat_demand
-                
-                o.heating_systems[z].heat_demand += system_space_heat_demand + system_water_heat_demand
-                o.heating_systems[z].fuel_demand += system_space_fuel_demand + system_water_fuel_demand
-                heat_supplied += system_space_heat_demand + system_water_heat_demand
+
+                d.heating_systems[z].heat_demand.push(system_space_heat_demand + system_water_heat_demand)
+                d.heating_systems[z].fuel_demand.push(system_space_fuel_demand + system_water_fuel_demand)
             }
             
-            // check for unmet heat
-            let unmet_heat_demand = (space_heat_demand + water_heat_demand) - heat_supplied
-            if (unmet_heat_demand.toFixed(3)>0) {
-                o.heat.total_unmet_demand += unmet_heat_demand
-            }
-            
-            o.biomass.total_used += system_fuel_demand.biomass
-            o.fossil_fuels.coal_for_heating_systems += system_fuel_demand.solid_fuel
-            d.methane_for_spacewaterheat.push(system_fuel_demand.methane)
-            d.hydrogen_for_spacewaterheat.push(system_fuel_demand.hydrogen)
-            d.synthfuel_for_spacewaterheat.push(system_fuel_demand.synthfuel)
-            
-            let spacewater_elec_demand = system_fuel_demand.elres + system_fuel_demand.heatpump
-            let spacewater_heat_demand = system_heat_demand.elres + system_heat_demand.heatpump
+            let spacewater_elec_demand = d.heating_systems.elres.fuel_demand[hour] + d.heating_systems.heatpump.fuel_demand[hour]
+            d.spacewater_elec.push(spacewater_elec_demand)
+        }
+    },
+
+    heating_systems_post_loop: function() {
+
+        o.heat.max_elec_demand = 0
+        o.heat.max_elec_demand_time = 0
+
+        o.heat.total_supplied_heat = 0
+
+        for (var hour = 0; hour < i.hours; hour++) {
+
+            let spacewater_elec_demand = d.spacewater_elec[hour]
 
             if (spacewater_elec_demand>o.heat.max_elec_demand) {
                 o.heat.max_elec_demand = spacewater_elec_demand
                 o.heat.max_elec_demand_time = hour
             }
-            d.spacewater_elec.push(spacewater_elec_demand)
-            d.spacewater_heat.push(spacewater_heat_demand)
+
+            for (var z in i.heating_systems) {
+                o.heating_systems[z].heat_demand += d.heating_systems[z].heat_demand[hour]
+                o.heating_systems[z].fuel_demand += d.heating_systems[z].fuel_demand[hour]
+
+                o.heat.total_supplied_heat += d.heating_systems[z].heat_demand[hour]
+            }
+
+            o.biomass.total_used += d.heating_systems.biomass.fuel_demand[hour]
+            o.fossil_fuels.coal_for_heating_systems += d.heating_systems.solid_fuel.fuel_demand[hour]
         }
+
+        o.heat.total_unmet_demand = o.heat.total_demand - o.heat.total_supplied_heat
         
         o.heat.total_ambient_supply = 0
         o.total_losses.heating_systems = 0
@@ -526,6 +531,7 @@ var model = {
         if (h<10) h = "0"+h
         
         o.heat.max_elec_demand_date = h+":00 "+(date.getDay()+1)+"/"+date.getMonth()+"/"+date.getFullYear(); 
+
     },
 
     // ---------------------------------------------------------------------------
@@ -681,62 +687,6 @@ var model = {
         o.industry.total_demand_check += o.industry.total_biomass_demand
         o.industry.total_demand_check += o.industry.total_coal_demand
     },
-
-    // -------------------------------------------------------------------------------------
-    // Bivalent heat substitution
-    // -------------------------------------------------------------------------------------  
-    /*  
-    bivalent_backup: function() {
-
-        bivalent_backup = false
-        if (bivalent_backup) {
-            o.heat.total_ambient_supply = 0
-            var spacewater_elec_demand = 0;
-            var balance = 0;
-            var unmet = 0;
-            var spacewater_bivalent = 0;
-
-            for (var hour = 0; hour < i.hours; hour++)
-            {
-                
-                spacewater_elec_demand = d.spacewater_elec[hour]
-                balance = d.elec_supply_hourly[hour] - d.lac_demand[hour] - spacewater_elec_demand - d.industrial_elec_demand[hour]
-                
-                unmet = 0
-                if (balance<0) unmet = -1*balance
-                if (unmet<=spacewater_elec_demand) {
-                    spacewater_elec_demand -= unmet
-                    spacewater_bivalent = unmet
-                } else {
-                    spacewater_bivalent = spacewater_elec_demand
-                    spacewater_elec_demand = 0
-                }
-                
-                elres_elec_demand = (spacewater_elec_demand/(i.spacewater_share_elres+(i.spacewater_share_heatpumps/i.heatpump_COP)))*i.spacewater_share_elres
-                spacewater_elec_heatpumps = spacewater_elec_demand - elres_elec_demand
-                heat_from_heatpumps = spacewater_elec_heatpumps * i.heatpump_COP
-
-                elres_component = (spacewater_bivalent/(i.spacewater_share_elres+(i.spacewater_share_heatpumps/i.heatpump_COP)))*i.spacewater_share_elres
-                heatpump_component = (spacewater_bivalent - elres_component) * i.heatpump_COP
-
-                // methane/gas boiler heat
-                var spacewater_heat_bivalent = elres_component + heatpump_component
-                methane_for_spacewaterheat = spacewater_heat_bivalent / i.methane_boiler_efficiency
-                d.methane_for_spacewaterheat[hour] += methane_for_spacewaterheat
-                total_methane_for_spacewaterheat_loss += methane_for_spacewaterheat - spacewater_heat_bivalent 
-                
-                
-                
-                heat_from_heatpumps = spacewater_elec_heatpumps * i.heatpump_COP
-                ambient_heat_used = heat_from_heatpumps * (1.0-1.0/i.heatpump_COP)
-                o.heat.total_ambient_supply += ambient_heat_used
-                
-                // repopulate
-                d.spacewater_elec[hour] = spacewater_elec_demand
-                d.balance_before_BEV_storage[hour] = d.elec_supply_hourly[hour] - d.lac_demand[hour] - spacewater_elec_demand - d.industrial_elec_demand[hour]
-            }
-        }
-    },*/
 
     // -------------------------------------------------------------------------------------
     // Elec transport
@@ -1118,7 +1068,7 @@ var model = {
             o.hydrogen.total_from_imports += hourly_hydrogen_from_imports
             
             // hydrogen heating demand
-            hydrogen_balance -= d.hydrogen_for_spacewaterheat[hour]
+            hydrogen_balance -= d.heating_systems.hydrogen.fuel_demand[hour]
                     
             // 2. Hydrogen vehicle demand
             let hydrogen_for_hydrogen_vehicles = daily_transport_H2_demand / 24.0
@@ -1242,7 +1192,8 @@ var model = {
                 coal_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_coal * 0.01)
 
                 // Limit by hydrogen availability (only available from H2 store)
-                if (hydrogen_turbine_output>(o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01)) {
+          
+              if (hydrogen_turbine_output>(o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01)) {
                     hydrogen_turbine_output = o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01
                 }
                 
@@ -1278,40 +1229,56 @@ var model = {
             }
             d.electricity_from_dispatchable.push(electricity_from_dispatchable)
 
-            // Can we reduce the shortfall with DSR
-            /*
-            if (shortfall>0) {
-                // Try reducing electric heat
-
-                let spacewater_elec = d.spacewater_elec[hour]
-                let spacewater_heat = d.spacewater_heat[hour]
-                let COP = spacewater_heat / spacewater_elec;
-
-                let heat_from_hybrid_boiler = 0
-
-                let remainder = 0
-
-                if (shortfall>=spacewater_elec) {
-                    shortfall = shortfall - spacewater_elec
-                    
-                    heat_from_hybrid_boiler = spacewater_heat
-                    spacewater_elec = 0
-                } else {
-                 
-                    spacewater_elec = spacewater_elec - shortfall
-                    spacewater_heat = spacewater_elec * COP
-
-                    heat_from_hybrid_boiler += shortfall * COP
-
-                    shortfall = 0
-                }
-                d.spacewater_elec[hour] = spacewater_elec;
-
-                total_heat_from_boiler += heat_from_hybrid_boiler;
-            }*/
-            
             // Final electricity balance
             balance += electricity_from_dispatchable
+
+            // Can we reduce the shortfall with DSR
+            
+            if (balance<0) {
+                shortfall = -1*balance;
+                // Try reducing electric heat
+
+                let spacewater_elec = d.heating_systems.elres.fuel_demand[hour] + d.heating_systems.heatpump.fuel_demand[hour];
+                let prc_elres_elec = d.heating_systems.elres.fuel_demand[hour] / spacewater_elec;
+                let prc_heatpump_elec = d.heating_systems.heatpump.fuel_demand[hour] / spacewater_elec;
+                let spacewater_heat = d.heating_systems.elres.heat_demand[hour] + d.heating_systems.heatpump.heat_demand[hour];
+                let prc_elres_heat = d.heating_systems.elres.heat_demand[hour] / spacewater_heat;
+                let prc_heatpump_heat = d.heating_systems.heatpump.heat_demand[hour] / spacewater_heat;
+
+                if (spacewater_elec>0) {
+                    let COP = spacewater_heat / spacewater_elec;
+
+                    let available_hybrid_heat_GW = 1000;
+
+                    let elec_displaced_by_hybrid = shortfall; 
+                    if (elec_displaced_by_hybrid>spacewater_elec) elec_displaced_by_hybrid = spacewater_elec;
+
+                    let heat_from_hybrid_boiler = elec_displaced_by_hybrid * COP;
+                    if (heat_from_hybrid_boiler>available_hybrid_heat_GW) heat_from_hybrid_boiler = available_hybrid_heat_GW;
+                    elec_displaced_by_hybrid = heat_from_hybrid_boiler / COP;
+
+                    shortfall -= elec_displaced_by_hybrid;
+                    spacewater_elec -= elec_displaced_by_hybrid;
+                    spacewater_heat -= heat_from_hybrid_boiler;
+                    balance += elec_displaced_by_hybrid;
+
+                    d.spacewater_elec[hour] = spacewater_elec;
+
+                    d.heating_systems.elres.fuel_demand[hour] = spacewater_elec * prc_elres_elec;
+                    d.heating_systems.elres.heat_demand[hour] = spacewater_heat * prc_elres_heat;
+                    d.heating_systems.heatpump.fuel_demand[hour] = spacewater_elec * prc_heatpump_elec;
+                    d.heating_systems.heatpump.heat_demand[hour] = spacewater_heat * prc_heatpump_heat;
+
+
+                    total_heat_from_boiler += heat_from_hybrid_boiler;
+
+                    // add to methane demand
+                    d.heating_systems.methane.fuel_demand[hour] += heat_from_hybrid_boiler / 0.85;
+                    d.heating_systems.methane.heat_demand[hour] += heat_from_hybrid_boiler;
+                }
+            }
+            
+
 
             let excess_elec = 0.0
             let unmet_elec = 0.0
@@ -1345,7 +1312,7 @@ var model = {
                 }
             }
             
-            let methane_demand = methane_to_dispatchable + d.methane_for_spacewaterheat[hour] + d.methane_for_industry[hour] + d.lac_demand_gas[hour]
+            let methane_demand = methane_to_dispatchable + d.heating_systems.methane.fuel_demand[hour] + d.methane_for_industry[hour] + d.lac_demand_gas[hour]
             o.methane.total_demand += methane_demand
             
             let methane_balance = methane_production - methane_demand
@@ -1374,7 +1341,7 @@ var model = {
             // ---------------------------------------------------------------------------- 
             // Synth fuel demand
             let synth_fuel_for_dispatchable = synth_fuel_turbine_output / (i.electric_backup.synth_fuel_efficiency*0.01)
-            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel + d.synthfuel_for_spacewaterheat[hour] + synth_fuel_for_dispatchable
+            let synth_fuel_demand = (daily_transport_liquid_demand/24.0) + hourly_industrial_biofuel + d.heating_systems.synthfuel.fuel_demand[hour] + synth_fuel_for_dispatchable
             o.synth_fuel.total_demand += synth_fuel_demand
             o.synth_fuel.store_SOC -= synth_fuel_demand
             
