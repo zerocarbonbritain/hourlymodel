@@ -93,7 +93,6 @@ input[type='text'] {
         
         Select scenario: 
         <select id="select_scenario" @change="change_scenario" v-model="selected_scenario">
-            <option value='default'>ZeroCarbonBritain (Default)</option>
             <option v-for="(scenario,key) in scenario_list" :value="key">{{ scenario.name }}</option>
         </select>
     </div>

@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 97;
+    $v = 100;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -120,7 +120,10 @@ function normalise_profile(profile) {
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=<?php echo $v; ?>"></script>
 
 <script>
+var v = <?php echo $v; ?>;
 
+// Load default scenario
+$.ajax({url: "scenarios/zerocarbonbritain.json?v="+v, async: false, success: function(data){ i = data }});
 var default_scenario = JSON.parse(JSON.stringify(i));
 
 var sidenav_visible = true;
@@ -132,7 +135,6 @@ loading_prc("0","")
 var timerStart = Date.now();
 var view_html = {};
 var view_desc = {};
-var v = 95;
 
 var view_mode = "electricity";
 
@@ -206,7 +208,7 @@ function load_page(page)
         data: {
             i: i,
             o: o,
-            selected_scenario: "default",
+            selected_scenario: "zerocarbonbritain",
             scenario_list: [],
             live_edit: true
         },
@@ -398,6 +400,7 @@ $(".menu-title").click(function(){
 });
 
 function save_scenario() {
+
     function getDifferences(obj, defaultObj) {
         let differences = {};
 
@@ -434,7 +437,7 @@ function load_scenario(name) {
   console.log("Scenario changed to: " + name);
 
   // Load scenario data
-  if (name=='default') {
+  if (name=='zerocarbonbritain') {
       i = Object.assign(i,JSON.parse(JSON.stringify(default_scenario)))       
   } else {
     $.ajax({url: "scenarios/"+name+".json?v="+v, async: false, success: function(data){
