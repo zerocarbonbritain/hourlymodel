@@ -2,7 +2,7 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 94;
+    $v = 97;
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -507,6 +507,20 @@ var default_scenario = {
             fuel: 0.0,
             buildmonths: 6,
             lifespan: 35
+        },
+        'Power to X': {
+            capex: 1000*0.86,
+            opex: 30*0.86,
+            fuel: 0.0,
+            buildmonths: 6,
+            lifespan: 30
+        },
+        'Electric Storage': {
+            capex: 100,
+            opex: 5*0.86,
+            fuel: 0.0,
+            buildmonths: 6,
+            lifespan: 20
         }
     }
 }

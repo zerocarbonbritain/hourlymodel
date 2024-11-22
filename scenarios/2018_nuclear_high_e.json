@@ -175,9 +175,9 @@
     },
     "electric_storage": {
       "type": "basic",
-      "capacity_GWh": 500,
-      "charge_capacity_GW": 300,
-      "discharge_capacity_GW": 300,
+      "capacity_GWh": 100,
+      "charge_capacity_GW": 100,
+      "discharge_capacity_GW": 100,
       "charge_efficiency": 0.9,
       "discharge_efficiency": 0.9
     },
@@ -259,7 +259,7 @@
     },
     "costs": {
       "Nuclear": {
-        "capex": 4000,
+        "capex": 4400,
         "buildmonths": 48,
         "lifespan": 50
       }

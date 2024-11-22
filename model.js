@@ -1835,19 +1835,19 @@ var model = {
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity }
         o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement }
+        o.costs['Power to X'] = { capacity: i.power_to_X.capacity }
+        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh }
 
         o.total_annual_cost = 0;
 
         for (var z in i.costs) {
-            o.costs[z] = {
-                annual: o.costs[z].capacity * 0.001 * annual_cost(
+            o.costs[z].annual = o.costs[z].capacity * 0.001 * annual_cost(
                     i.costs[z].capex,
                     i.costs[z].opex,
                     0,
                     i.costs[z].buildmonths,
                     i.costs[z].lifespan,
                     i.wacc*0.01)
-            }
             o.total_annual_cost += o.costs[z].annual
         }
         
