@@ -899,7 +899,9 @@ var model = {
         o.total_losses.power_to_X = 0
         o.total_losses.electric_storage = 0
 
-        let total_heat_from_boiler = 0;
+        o.heat.max_heat_from_hybrid_boiler = 0
+        o.heat.max_elec_avoided_by_hybrid_boiler = 0
+        o.heat.total_heat_from_hybrid_boiler = 0
         
         let daily_transport_H2_demand = o.transport.fuel_totals.H2 * 1000.0 / 365.25
         let daily_transport_liquid_demand = o.transport.fuel_totals.IC * 1000.0 / 365.25
@@ -1270,7 +1272,11 @@ var model = {
                     d.heating_systems.heatpump.heat_demand[hour] = spacewater_heat * prc_heatpump_heat;
 
 
-                    total_heat_from_boiler += heat_from_hybrid_boiler;
+                    o.heat.total_heat_from_hybrid_boiler += heat_from_hybrid_boiler;
+                    if (heat_from_hybrid_boiler>o.heat.max_heat_from_hybrid_boiler) {
+                        o.heat.max_heat_from_hybrid_boiler = heat_from_hybrid_boiler;
+                        o.heat.max_elec_avoided_by_hybrid_boiler = elec_displaced_by_hybrid;
+                    }
 
                     // add to methane demand
                     d.heating_systems.methane.fuel_demand[hour] += heat_from_hybrid_boiler / 0.85;
@@ -1382,7 +1388,6 @@ var model = {
         let biomass_for_dispatchable = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
         o.biomass.total_used += biomass_for_dispatchable
 
-        console.log("Total heat from boiler: "+(total_heat_from_boiler/10000))
     },
     
     // -------------------------------------------------------------------------------------------------

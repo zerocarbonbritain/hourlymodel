@@ -403,6 +403,7 @@ input[type='text'] {
         </table>
 
         <p>Peak electricity demand for heat: {{o.heat.max_elec_demand | toFixed(1) }} GW ({{o.heat.max_elec_demand_date}})</p>
+        <p>Max heat from hybrid boilers: {{ o.heat.max_heat_from_hybrid_boiler  | toFixed(1) }} GW ({{ o.heat.max_elec_avoided_by_hybrid_boiler  | toFixed(1) }} GW elec avoided)</p>
     
         <!--
         <table class="table" style="width:100%">
