@@ -12,10 +12,10 @@ Items found while building baselines that need further attention. Remove an item
 
 - **DUKES 6.1 commercial ambient heat** (12.0 TWh) includes reversible air conditioning, which inflates the heat pump share.
 - **Boiler and heat pump efficiencies** are carried from the 2018 baseline.
-- **Assumed per unit values:** EV battery 60 kWh and charger 7 kW per car, battery storage duration 1.3 hours, pumped hydro energy 24 GWh.
+- **Assumed per unit values:** EV battery 60 kWh and charger 7 kW per car, car EV miles at 1.32 times the battery electric stock share, battery storage duration 1.3 hours, pumped hydro energy 24 GWh.
 - **Interconnector capacity** sums the interconnectors listed in DUKES 5.13A by commissioning year. The table lists current links only, so a closed link would be missed for a past year.
 - **`land_use` areas** are the 2018 values, and the existing woodland areas are inherited from the ZCB default.
-- **baseline_2018 has not been rebuilt.** It predates the fixes above (miles per person, gas losses double count, oil backup efficiency, imports, biofuel, fuel prices), its car efficiency rests on an older C8 edition, and `refinery_electric_TWhy` may double count generation own use. See [audits/errata.md](../audits/errata.md).
+- **baseline_2018 miles per person are anchored to the original 2018 values.** The transport formulas scale the original 2018 baseline by passenger km and population, so the rebuilt 2018 values are the original ones with revisions applied, not an independent derivation.
 
 ## Build
 

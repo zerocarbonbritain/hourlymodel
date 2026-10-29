@@ -32,7 +32,8 @@ NS = {"a": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
       "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
       "rel": "http://schemas.openxmlformats.org/package/2006/relationships"}
 CALIBRATION_TOLERANCE = 0.005
-CALIBRATION_PASSES = 10
+CALIBRATION_PASSES = 25
+CALIBRATION_SETTLED = 1e-6
 
 
 class BuildError(Exception):
@@ -295,7 +296,7 @@ def query(grid, spec, year):
         if isinstance(value, float):
             total += value
             count += 1
-    if count == 0:
+    if count == 0 and not spec.get("allow_empty"):
         raise BuildError("%s: no rows match %r" % (where, spec["where"]))
     return total, "sum of %d rows" % count
 
@@ -465,7 +466,7 @@ def build(year, scenario_path, update_hashes, only=None):
                 r["model_start"] = model
                 r["start"] = r["value"]
             ratio = r["target"] / model
-            if abs(ratio - 1) > CALIBRATION_TOLERANCE / 10:
+            if abs(ratio - 1) > CALIBRATION_SETTLED:
                 settled = False
             r["value"] = r["value"] / ratio if spec.get("relation") == "inverse" else r["value"] * ratio
             if not path.startswith("_"):

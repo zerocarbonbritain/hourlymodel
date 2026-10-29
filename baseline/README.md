@@ -1,6 +1,6 @@
 # Baseline build
 
-Scripted derivation of baseline scenario inputs from published statistics. It covers steps 1 to 10 of [updating-the-baseline.md](../docs/updating-the-baseline.md), one input file per step, and generates every input in `scenarios/baseline_2024.json`. Known issues are tracked in [open-items.md](open-items.md).
+Scripted derivation of baseline scenario inputs from published statistics. It covers steps 1 to 10 of [updating-the-baseline.md](../docs/updating-the-baseline.md), one input file per step, and generates every input in `scenarios/baseline_2024.json` and `scenarios/baseline_2018.json` from the same files. Known issues are tracked in [open-items.md](open-items.md).
 
 ## Files
 
@@ -31,7 +31,7 @@ python3 -I baseline/build.py 2024 scenarios/baseline_2024.json --inputs 02-popul
 ## Input types
 
 - `statistic`: values read from sources, combined by `formula`, rounded to `round` decimal places.
-- `calibrated`: set so the model output named in `model_output` (multiplied by `model_scale`, default 1, to convert units) equals `target`. The output is assumed proportional to the input, or inversely proportional with `"relation": "inverse"` (for example fuel use and engine efficiency). Each pass runs the model and rescales every calibrated input by its own ratio, until all are within 0.05% or after 10 passes, so inputs that affect each other (gas losses depend on backup gas, which depends on wind) settle together. Calibration starts from the scenario's current value. A final run checks every result is within 0.5% of target.
+- `calibrated`: set so the model output named in `model_output` (multiplied by `model_scale`, default 1, to convert units) equals `target`. The output is assumed proportional to the input, or inversely proportional with `"relation": "inverse"` (for example fuel use and engine efficiency). Each pass runs the model and rescales every calibrated input by its own ratio, until every ratio is within one part in a million or after 25 passes, so results do not depend on the starting values, so inputs that affect each other (gas losses depend on backup gas, which depends on wind) settle together. Calibration starts from the scenario's current value. A final run checks every result is within 0.5% of target.
 - `intermediate`: computed like a statistic and shown in the report, but not written to the scenario. Use it for subtotals that other entries refer to.
 
 Entries whose path starts with `_` are working values and are never written to the scenario, whatever their type. A calibrated working value is useful when the model output depends on a subtotal, such as heat pump heat. Statistics that refer to a calibrated value, directly or through other entries, are recalculated after each calibration pass, so a remainder such as `1 - prc.EV` stays consistent.
@@ -66,7 +66,7 @@ A condition value can be a list, matching any of its items, can contain `*` wild
 "where": {"Year": "{year}", "CRT category": "4C*"}, "where_not": {"CRT category": ["*(III)*", "*(IV)*"]}
 ```
 
-The build stops if no rows match.
+The build stops if no rows match, unless the locator has `"allow_empty": true`, for a source that stops in a later year (ammonia production ceased in 2023).
 
 ## Coverage
 

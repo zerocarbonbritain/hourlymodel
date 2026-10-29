@@ -316,19 +316,19 @@
         "type": "assumption",
         "units": "%",
         "value": 240,
-        "note": "Seasonal efficiencies kept from the 2018 baseline. The share derivation assumes SPF 3."
+        "note": "Seasonal efficiencies kept from the 2018 baseline. The heat pump heat used for the shares is calibrated at these efficiencies."
     },
     "heating_systems.heatpump.efficiency_0C": {
         "type": "assumption",
         "units": "%",
         "value": 250,
-        "note": "Seasonal efficiencies kept from the 2018 baseline. The share derivation assumes SPF 3."
+        "note": "Seasonal efficiencies kept from the 2018 baseline. The heat pump heat used for the shares is calibrated at these efficiencies."
     },
     "heating_systems.heatpump.efficiency_10C": {
         "type": "assumption",
         "units": "%",
         "value": 320,
-        "note": "Seasonal efficiencies kept from the 2018 baseline. The share derivation assumes SPF 3."
+        "note": "Seasonal efficiencies kept from the 2018 baseline. The heat pump heat used for the shares is calibrated at these efficiencies."
     },
     "heating_systems.elres.efficiency_hot_water": {
         "type": "assumption",

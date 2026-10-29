@@ -220,10 +220,14 @@
         "note": "Evidence for the car EV share. Battery electric share of licensed cars at the end of {year} (VEH1103, UK)."
     },
     "transport.modes.Cars & Vans.prc.EV": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "fraction",
-        "value": 0.05,
-        "note": "Share of car miles. Battery electric cars were 3.8% of the licensed stock at the end of 2024 (see _transport.car_bev_stock_share), and newer cars are driven further than the fleet average, so 5% is used."
+        "values": {
+            "share": {"ref": "_transport.car_bev_stock_share"}
+        },
+        "formula": "share * 1.32",
+        "round": 4,
+        "note": "Share of car miles: the battery electric share of licensed cars times 1.32, since newer cars are driven further than the fleet average. The factor reproduces the 5% judged for 2024 and is an assumption."
     },
     "transport.modes.Cars & Vans.prc.H2": {
         "type": "assumption",

@@ -88,7 +88,7 @@
         "target": "(domestic + commercial + public + agriculture + miscellaneous) * 0.01163",
         "model_output": "supply.total_solarthermal",
         "model_scale": 0.0001,
-        "round": 2,
+        "round": 3,
         "note": "Calibrated so modelled solar thermal heat equals DUKES 6.1 final consumption of solar thermal (the column also covers a little geothermal). The same heat is added to water heating demand in 05-heating.json."
     },
     "supply.hydro_capacity": {

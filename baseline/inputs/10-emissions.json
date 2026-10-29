@@ -197,10 +197,16 @@
         "note": "Sinter, iron and steel process emissions and coke oven flaring, all gases."
     },
     "emissions_balance.ammonia": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "MtCO2e",
-        "value": 0,
-        "note": "Ammonia production ceased in the UK in 2023. The 2024 dataset has no ammonia rows, so a query would fail."
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Ammonia production"},
+                "allow_empty": true
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "Ammonia production process emissions (feedstock use of gas), all gases. Production ceased in 2023, so later years have no rows and give 0. Combustion at the plants is fuel CO2, calculated by the model."
     },
     "emissions_balance.bricks": {
         "type": "statistic",
