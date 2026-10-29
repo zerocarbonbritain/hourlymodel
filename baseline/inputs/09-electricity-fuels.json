@@ -420,5 +420,11 @@
         "units": "p/kWh fuel",
         "value": 0,
         "note": "No official series for biomass fuel prices paid by generators, so biomass generation fuel cost is left out of the LCOE."
+    },
+    "carbon_price": {
+        "type": "assumption",
+        "units": "£/tCO2",
+        "value": 0,
+        "note": "Carbon prices (UK ETS or EU ETS, plus Carbon Price Support) are left out of the LCOE. Assumptions cannot vary by year, so a sourced annual price is an open item. Set explicitly so the ZCB default does not leak in."
     }
 }

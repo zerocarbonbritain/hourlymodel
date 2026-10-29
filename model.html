@@ -55,7 +55,26 @@ table td {
  
 input[type='text'] {
     width:70px;
-}    
+}
+
+.cost-table th, .cost-table td {
+    padding:4px 3px;
+    white-space:nowrap;
+    text-align:right;
+}
+.cost-table tr:not(.units) th:first-child, .cost-table td:first-child {
+    text-align:left;
+    white-space:normal;
+}
+.cost-table tr.units th {
+    font-weight:normal;
+    font-size:12px;
+    border-top:none;
+}
+.cost-table input[type='text'] {
+    width:42px;
+    text-align:right;
+}
 
 [v-cloak] {
   display: none;
@@ -1403,36 +1422,66 @@ input[type='text'] {
     </div>
     <div class="inner" style="display:block" name="cost_model">
     
-        <p>Weighted Average Cost of Capital: 
-        <input v-model.number="i.wacc" type="text" @change="update_non_hourly" style="width:20px"  autocomplete="off"/> %</p>
-    
-        <table class="table" style="width:100%">
+        <p>Levelised costs follow the DESNZ Electricity Generation Costs method. Pre-development and construction spend is phased evenly and discounted at a technology specific hurdle rate (real, pre-tax). Costs are in 2024 prices, from DESNZ Electricity Generation Costs 2025 and calibrated against CfD Allocation Round 7 strike prices.</p>
+
+        <table class="table cost-table" style="width:100%">
             <tr>
-                <th>Component</th>
+                <th rowspan="2">Component</th>
                 <th>Capacity</th>
-                <th>Capex</th>
-                <th>Opex</th>
-                <th>Fuel</th>
-                <th>Build</th>
-                <th>Lifetime</th>
-                <th>Annual cost</th>
+                <th>Hurdle</th>
+                <th colspan="2">Pre-development</th>
+                <th colspan="2">Construction</th>
+                <th>Fixed O&amp;M</th>
+                <th>Var O&amp;M</th>
+                <th>Life</th>
+                <th>Output</th>
+                <th>LCOE</th>
+                <th>Annual</th>
+            </tr>
+            <tr class="units">
+                <th>GW</th>
+                <th>%</th>
+                <th>years</th>
+                <th>£/kW</th>
+                <th>years</th>
+                <th>£/kW</th>
+                <th>£/kW.y</th>
+                <th>£/MWh</th>
+                <th>years</th>
+                <th>TWh/y</th>
+                <th>£/MWh</th>
+                <th>£bn/y</th>
             </tr>
             <tr v-for="(row,key) in i.costs">
                 <td>{{ key }}</td>
-                <td>{{ o.costs[key].capacity | toFixed(1) }} GW</td>
-                <td><input v-model.number="row.capex" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> £/kW</td>
-                <td><input v-model.number="row.opex" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> £/kW.y</td>
-                <td><i>n/a</i></td>
-                <td><input v-model.number="row.buildmonths" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> months</td>
-                <td><input v-model.number="row.lifespan" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> years</td>
-                <td>£{{ o.costs[key].annual | toFixed(1) }} bn/year</td>
+                <td>{{ o.costs[key].capacity | toFixed(1) }}</td>
+                <td><input v-model.number="row.hurdle_rate" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.predev_years" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.predev_cost" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.build_years" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.capex" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.fixed_om" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.variable_om" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="row.lifespan" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><span v-if="o.costs[key].generation">{{ o.costs[key].generation | toFixed(1) }}</span></td>
+                <td><span v-if="o.costs[key].LCOE">{{ o.costs[key].LCOE | toFixed(0) }}</span></td>
+                <td>{{ o.costs[key].annual | toFixed(1) }}</td>
             </tr>
         </table>
-        
+        <p><i>Electric storage capacity is in GWh and its costs are per kWh of storage. Output is before curtailment for wind, solar and marine. Gas turbine LCOE excludes fuel and carbon.</i></p>
+
         <table class="table" style="width:100%">
             <tr>
                 <td>Fuel for electricity generation (p/kWh fuel): gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/></td>
                 <td>£{{ o.fuel_cost_annual | toFixed(1) }} bn/year</td>
+            </tr>
+            <tr>
+                <td>Carbon price on fossil backup (UK ETS + Carbon Price Support): <input v-model.number="i.carbon_price" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> £/tCO2, {{ o.grid_co2_emissions | toFixed(1) }} MtCO2/yr</td>
+                <td>£{{ o.carbon_cost_annual | toFixed(1) }} bn/year</td>
+            </tr>
+            <tr>
+                <td>Backup generation including fuel and carbon</td>
+                <td>£{{ o.backup_LCOE | toFixed(1) }}/MWh</td>
             </tr>
             <tr>
                 <td>Total annual cost</td>

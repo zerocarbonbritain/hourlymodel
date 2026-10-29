@@ -1741,7 +1741,8 @@ var model = {
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
         grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*coal_backup_co2_factor
         grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*0.0002678
-        
+        o.grid_co2_emissions = grid_co2_emissions*0.1   // MtCO2/yr
+
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
         
         o.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total
@@ -1821,32 +1822,30 @@ var model = {
     },
     cost_model: function() {
 
+        // Generation is in GWh over 10 years, 0.0001 converts to TWh/yr
         o.costs = {}
 
-        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity }
-        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity }
-        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity }
-        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity }
-        o.costs['Wave'] = { capacity: i.supply.wave_capacity }
-        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity }
-        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity }
-        o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW }
-        o.costs['Methanation'] = { capacity: i.methane.methanation_capacity }
-        o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement }
-        o.costs['Power to X'] = { capacity: i.power_to_X.capacity }
-        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh }
+        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity, generation: o.supply.total_onshore_wind*0.0001 }
+        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity, generation: o.supply.total_offshore_wind*0.0001 }
+        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity, generation: o.supply.total_solarpv*0.0001 }
+        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity, generation: o.supply.total_tidal*0.0001 }
+        o.costs['Wave'] = { capacity: i.supply.wave_capacity, generation: o.supply.total_wave*0.0001 }
+        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity, generation: o.supply.total_geothermal_elec*0.0001 }
+        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity, generation: o.supply.total_nuclear*0.0001 }
+        o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
+        o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
+        o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement, generation: o.electric_backup.total_before_grid_loss*0.0001 }
+        o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
+        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*0.0001 }
 
         o.total_annual_cost = 0;
 
+        // Capacity in GW (GWh for storage) and costs per kW (kWh), 0.001 gives £bn/yr
         for (var z in i.costs) {
-            o.costs[z].annual = o.costs[z].capacity * 0.001 * annual_cost(
-                    i.costs[z].capex,
-                    i.costs[z].opex,
-                    0,
-                    i.costs[z].buildmonths,
-                    i.costs[z].lifespan,
-                    i.wacc*0.01)
-            o.total_annual_cost += o.costs[z].annual
+            let c = o.costs[z]
+            c.annual = c.capacity * 0.001 * levelised_fixed_cost(i.costs[z]) + c.generation * 0.001 * i.costs[z].variable_om
+            c.LCOE = c.generation > 0 ? 1000 * c.annual / c.generation : 0
+            o.total_annual_cost += c.annual
         }
 
         // Fuel burned for electricity generation, 10 year GWh to TWh/yr, priced in pence per kWh of fuel
@@ -1857,21 +1856,42 @@ var model = {
             o.fossil_fuels.coal_for_dispatchable * i.fuel_prices.coal +
             biomass_for_backup * i.fuel_prices.biomass)
         o.total_annual_cost += o.fuel_cost_annual
-        
+
+        // Carbon price in £/tCO2 on fossil backup emissions in MtCO2/yr
+        o.carbon_cost_annual = 0.001 * o.grid_co2_emissions * i.carbon_price
+        o.total_annual_cost += o.carbon_cost_annual
+
+        let backup = o.costs['Gas turbines']
+        o.backup_LCOE = backup.generation > 0 ? 1000 * (backup.annual + o.fuel_cost_annual + o.carbon_cost_annual) / backup.generation : 0
+
         o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
-        
-        
     }
 }
 
-function annual_cost(capex,opex,fuel,months_to_build,lifespan,interest_rate) {
+// Annual cost per kW of capacity (£/kW/yr) that recovers pre-development, construction
+// and fixed O&M costs over the operating life. Follows the DESNZ levelised cost method
+// used in tools/lcoe/lcoe_lib.js: spend is phased evenly over the pre-development and
+// construction years and discounted at the hurdle rate from the start of pre-development.
+// Multiplying by capacity gives the same total as LCOE multiplied by generation.
+function levelised_fixed_cost(c) {
+    let rate = c.hurdle_rate * 0.01
+    let construction_start = c.predev_years
+    let operation_start = c.predev_years + c.build_years
+    let decommission_year = operation_start + c.lifespan
 
-    principal_at_commisioning = capex * Math.pow((1 + interest_rate), months_to_build/12)
+    let discounted_costs = 0
+    let discounted_operating_years = 0
 
-    lifespan_months = lifespan*12
-
-    monthly_payment = (interest_rate/12) * (1/(1-(1+interest_rate/12)**(-lifespan_months)))*principal_at_commisioning
-    annual_payment = monthly_payment * 12
-
-    return annual_payment + opex
+    for (let year = 0; year < decommission_year; year++) {
+        let discount_factor = 1 / Math.pow(1 + rate, year)
+        if (year < construction_start) {
+            discounted_costs += discount_factor * c.predev_cost / c.predev_years
+        } else if (year < operation_start) {
+            discounted_costs += discount_factor * c.capex / c.build_years
+        } else {
+            discounted_costs += discount_factor * c.fixed_om
+            discounted_operating_years += discount_factor
+        }
+    }
+    return discounted_costs / discounted_operating_years
 }

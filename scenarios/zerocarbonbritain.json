@@ -395,7 +395,7 @@
         "offshorewind_lifespan": 25,
         "solarpv_lifespan": 30
     },
-    "wacc": 7,
+    "carbon_price": 68,
     "fuel_prices": {
         "gas": 0,
         "oil": 0,
@@ -404,88 +404,124 @@
     },
     "costs": {
         "Onshore wind": {
-            "capex": 829.9,
-            "opex": 16.34,
-            "fuel": 0,
-            "buildmonths": 6,
-            "lifespan": 30
-        },
-        "Offshore wind": {
-            "capex": 1905.76,
-            "opex": 55.04,
-            "fuel": 0,
-            "buildmonths": 12,
-            "lifespan": 25
-        },
-        "Solar PV": {
-            "capex": 337.98,
-            "opex": 5.16,
-            "fuel": 0,
-            "buildmonths": 6,
+            "hurdle_rate": 7.6,
+            "predev_years": 8,
+            "predev_cost": 80,
+            "build_years": 2,
+            "capex": 1616,
+            "fixed_om": 39.9,
+            "variable_om": 0,
             "lifespan": 35
         },
-        "Tidal": {
-            "capex": 1720,
-            "opex": 34.4,
-            "fuel": 0,
-            "buildmonths": 12,
+        "Offshore wind": {
+            "hurdle_rate": 7.3,
+            "predev_years": 7,
+            "predev_cost": 170,
+            "build_years": 3,
+            "capex": 2500,
+            "fixed_om": 141.6,
+            "variable_om": 0,
             "lifespan": 30
         },
+        "Solar PV": {
+            "hurdle_rate": 7.6,
+            "predev_years": 3,
+            "predev_cost": 30,
+            "build_years": 1,
+            "capex": 617,
+            "fixed_om": 9.1,
+            "variable_om": 0,
+            "lifespan": 38
+        },
+        "Tidal": {
+            "hurdle_rate": 10.5,
+            "predev_years": 12,
+            "predev_cost": 230,
+            "build_years": 4,
+            "capex": 4200,
+            "fixed_om": 235.4,
+            "variable_om": 0,
+            "lifespan": 25
+        },
         "Wave": {
-            "capex": 1978,
-            "opex": 49.88,
-            "fuel": 0,
-            "buildmonths": 12,
+            "hurdle_rate": 11.4,
+            "predev_years": 12,
+            "predev_cost": 230,
+            "build_years": 4,
+            "capex": 4200,
+            "fixed_om": 235.4,
+            "variable_om": 0,
             "lifespan": 25
         },
         "Geothermal Electric": {
-            "capex": 3650.7,
-            "opex": 68.8,
-            "fuel": 0,
-            "buildmonths": 24,
-            "lifespan": 40
+            "hurdle_rate": 8.9,
+            "predev_years": 2,
+            "predev_cost": 60,
+            "build_years": 5,
+            "capex": 5980,
+            "fixed_om": 125,
+            "variable_om": 26,
+            "lifespan": 30
         },
         "Nuclear": {
-            "capex": 7886.2,
-            "opex": 137.17,
-            "fuel": 0,
-            "buildmonths": 70,
-            "lifespan": 40
+            "hurdle_rate": 6.7,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 10,
+            "capex": 11900,
+            "fixed_om": 109,
+            "variable_om": 13,
+            "lifespan": 60
         },
         "H2 Electrolysis": {
-            "capex": 327.65999999999997,
-            "opex": 11.438,
-            "fuel": 0.001204,
-            "buildmonths": 6,
+            "hurdle_rate": 10.1,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 327.66,
+            "fixed_om": 11.438,
+            "variable_om": 0,
             "lifespan": 30
         },
         "Methanation": {
+            "hurdle_rate": 10.1,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
             "capex": 235.64,
-            "opex": 10.836,
-            "fuel": 0,
-            "buildmonths": 6,
+            "fixed_om": 10.836,
+            "variable_om": 0,
             "lifespan": 30
         },
         "Gas turbines": {
-            "capex": 408.5,
-            "opex": 12.254999999999999,
-            "fuel": 0,
-            "buildmonths": 6,
-            "lifespan": 35
+            "hurdle_rate": 8.9,
+            "predev_years": 2,
+            "predev_cost": 20,
+            "build_years": 3,
+            "capex": 1015,
+            "fixed_om": 22.9,
+            "variable_om": 5,
+            "lifespan": 25
         },
         "Power to X": {
+            "hurdle_rate": 10.1,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
             "capex": 860,
-            "opex": 25.8,
-            "fuel": 0,
-            "buildmonths": 6,
+            "fixed_om": 25.8,
+            "variable_om": 0,
             "lifespan": 30
         },
         "Electric Storage": {
-            "capex": 100,
-            "opex": 4.3,
-            "fuel": 0,
-            "buildmonths": 6,
-            "lifespan": 20
+            "hurdle_rate": 8.9,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 230,
+            "fixed_om": 5,
+            "variable_om": 0,
+            "lifespan": 15
         }
     }
 }
