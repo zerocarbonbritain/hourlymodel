@@ -1181,6 +1181,7 @@ var model = {
             let coal_turbine_output = 0
             let electricity_from_dispatchable = 0
             let electricity_from_dispatchable_before_grid_loss = 0
+            let imports_dispatched = 0
             var shortfall = 0;
             
             if (balance<0.0) {
@@ -1197,6 +1198,12 @@ var model = {
                 }
 
                 let backup_requirement_before_grid_loss = backup_requirement / grid_loss_prc
+                
+                // Interconnector imports meet a share of the requirement, limited by interconnector capacity
+                imports_dispatched = backup_requirement_before_grid_loss * i.electric_backup.prc_imports * 0.01
+                if (imports_dispatched>i.supply.interconnector_capacity_GW) imports_dispatched = i.supply.interconnector_capacity_GW
+                o.supply.total_imports += imports_dispatched
+                backup_requirement_before_grid_loss -= imports_dispatched
                 
                 // Allocate to different technologies
                 hydrogen_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_hydrogen * 0.01)
@@ -1230,16 +1237,17 @@ var model = {
                 o.electric_backup.total_biomass_turbine_output += biomass_turbine_output
                 o.electric_backup.total_coal_turbine_output += coal_turbine_output 
                                 
-                // Log maximum dispatchable capacity requirement and time
-                if (backup_requirement>o.electric_backup.max_capacity_requirement) {
-                    o.electric_backup.max_capacity_requirement = backup_requirement
+                // Log maximum dispatchable capacity requirement and time (excluding imports)
+                let generation_requirement = backup_requirement - imports_dispatched * grid_loss_prc
+                if (generation_requirement>o.electric_backup.max_capacity_requirement) {
+                    o.electric_backup.max_capacity_requirement = generation_requirement
                     o.electric_backup.max_capacity_requirement_hour = hour
                 }
                 
                 electricity_from_dispatchable_before_grid_loss = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output
                 o.electric_backup.total_before_grid_loss += electricity_from_dispatchable_before_grid_loss
-                electricity_from_dispatchable = electricity_from_dispatchable_before_grid_loss * grid_loss_prc
-                o.total_losses.grid += electricity_from_dispatchable_before_grid_loss - electricity_from_dispatchable
+                electricity_from_dispatchable = (electricity_from_dispatchable_before_grid_loss + imports_dispatched) * grid_loss_prc
+                o.total_losses.grid += electricity_from_dispatchable_before_grid_loss + imports_dispatched - electricity_from_dispatchable
             }
             d.electricity_from_dispatchable.push(electricity_from_dispatchable)
 
@@ -1722,13 +1730,16 @@ var model = {
         // - coal co2 factor is 0.3166 kgCO2 per kWh = 0.0003166 MtCO2 per GWh
         // - oil co2 factor is 0.2678 kgCO2 per kWh = 0.0002678 MtCO2 per GWh
         // - gas co2 factor is 0.1839 kgCO2 per kWh = 0.0001839 MtCO2 per GWh
-        o.emissions_balance.fossil_fuel_coal = o.fossil_fuels.coal*0.1*0.0003166
+        // Coal backup may include other thermal generation (e.g. waste), with its own CO2 factor (kgCO2/kWh fuel)
+        let coal_backup_co2_factor = i.electric_backup.coal_co2_factor * 0.001
+        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable)*0.1*0.0003166
+        o.emissions_balance.fossil_fuel_coal += o.fossil_fuels.coal_for_dispatchable*0.1*coal_backup_co2_factor
         o.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
         o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
                         
         let grid_co2_emissions = 0;
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
-        grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*0.0003166
+        grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*coal_backup_co2_factor
         grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*0.0002678
         
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
@@ -1837,6 +1848,15 @@ var model = {
                     i.wacc*0.01)
             o.total_annual_cost += o.costs[z].annual
         }
+
+        // Fuel burned for electricity generation, 10 year GWh to TWh/yr, priced in pence per kWh of fuel
+        let biomass_for_backup = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
+        o.fuel_cost_annual = 0.01 * 0.0001 * (
+            o.methane.ccgt_methane_from_fossil_gas * i.fuel_prices.gas +
+            o.synth_fuel.backup_from_fossil_oil * i.fuel_prices.oil +
+            o.fossil_fuels.coal_for_dispatchable * i.fuel_prices.coal +
+            biomass_for_backup * i.fuel_prices.biomass)
+        o.total_annual_cost += o.fuel_cost_annual
         
         o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
         

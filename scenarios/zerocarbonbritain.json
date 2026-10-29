@@ -24,7 +24,8 @@
         "geothermal_heat_capacity_factor": 0.9,
         "nuclear_capacity": 0,
         "nuclear_capacity_factor": 0.9,
-        "imports_TWhy": 0
+        "imports_TWhy": 0,
+        "interconnector_capacity_GW": 0
     },
     "LAC": {
         "domestic": {
@@ -315,7 +316,9 @@
         "prc_synth_fuel": 0,
         "synth_fuel_efficiency": 21,
         "prc_coal": 0,
-        "coal_efficiency": 34
+        "coal_efficiency": 34,
+        "coal_co2_factor": 0.3166,
+        "prc_imports": 0
     },
     "energy_industry_use": {
         "electricity_grid_loss_prc": 7,
@@ -393,6 +396,12 @@
         "solarpv_lifespan": 30
     },
     "wacc": 7,
+    "fuel_prices": {
+        "gas": 0,
+        "oil": 0,
+        "coal": 0,
+        "biomass": 0
+    },
     "costs": {
         "Onshore wind": {
             "capex": 829.9,

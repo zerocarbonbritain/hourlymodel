@@ -902,6 +902,8 @@ input[type='text'] {
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_coal*0.01 | toFixed(1) }} GW</td>
         </tr>
         </table>
+        <p>Interconnector imports meet <input v-model.number="i.electric_backup.prc_imports" type="text" @change="update" style="width:50px"  autocomplete="off"/> % of the backup requirement, up to <input v-model.number="i.supply.interconnector_capacity_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GW interconnector capacity. Total imports, including any flat imports: {{ o.supply.total_imports*0.0001 | toFixed(1) }} TWh/yr</p>
+        <p>Coal backup CO2 factor (coal and other thermal): <input v-model.number="i.electric_backup.coal_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/> kgCO2/kWh fuel</p>
         
         <p>Max capacity requirement date: {{ o.electric_backup.max_capacity_requirement_date }}</p>
     </div>
@@ -1428,6 +1430,10 @@ input[type='text'] {
         </table>
         
         <table class="table" style="width:100%">
+            <tr>
+                <td>Fuel for electricity generation (p/kWh fuel): gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/></td>
+                <td>£{{ o.fuel_cost_annual | toFixed(1) }} bn/year</td>
+            </tr>
             <tr>
                 <td>Total annual cost</td>
                 <td>£{{ o.total_annual_cost | toFixed(1) }} bn/year</td>
