@@ -256,12 +256,5 @@
       "anaerobic_digestion": 0.17,
       "mechanical_biological_treatment": 0.647,
       "landfill_carbon_capture": 0
-    },
-    "costs": {
-      "Nuclear": {
-        "capex": 4400,
-        "build_years": 4,
-        "lifespan": 50
-      }
     }
   }

@@ -47,13 +47,13 @@ LCOE at the DESNZ or project load factor, compared with Allocation Round 7 (AR7)
 | Onshore wind | 30% | 72 | 72.24 (AR7) |
 | Offshore wind | 49% | 90 | 91.20 (AR7, England and Wales) |
 | Tidal | 37% | 268 | 265.00 (AR7) |
-| Nuclear | 90% | 168 | 128.9 (Hinkley Point C, £92.50 in 2012 prices) |
+| Nuclear | 90% | 168 | 124.7 (Hinkley Point C, £89.50 in 2012 prices) |
 | CCGT with fuel and carbon | 30% | 143 | 147 (DESNZ 2025 LCOE) |
 
 - **Solar and onshore wind** use DESNZ assumptions unchanged. DESNZ quotes £60 and £58/MWh at 12% and 37% load factors. AR7 prices match at load factors closer to GB fleet averages.
 - **Offshore wind** uses the DESNZ low hurdle rate of 7.3%. At the medium 8.9% it is £101/MWh, above the AR7 price.
 - **Tidal** uses a 10.5% hurdle rate. At the medium 11.4% it is £286/MWh.
-- **Nuclear** uses the Sizewell C capital cost (about £38bn in 2024 prices for 3.2 GW) and its allowed return of 6.7% real. The Hinkley Point C strike price was set in 2013, before its cost overruns. Sizewell C costs reproduce £129/MWh at a hurdle rate of about 5%. Nuclear O&M is taken from DESNZ 2020 and is unverified.
+- **Nuclear** uses the Sizewell C capital cost (about £38bn in 2024 prices for 3.2 GW, £11,900/kW) and its allowed return of 6.7% real. The Hinkley Point C strike price was set in 2013, before its cost overruns, and fell from £92.50 to £89.50 (2012 prices) when Sizewell C reached a final investment decision. Sizewell C costs reproduce the strike price at a hurdle rate of about 5%. Hinkley Point C is now estimated at £35bn in 2015 prices (EDF, February 2026), about £46bn in 2024 prices or £14,100/kW for 3.26 GW, with unit 1 due in 2030 after construction began in 2017. At 6.7% and a 13 year build that gives about £220/MWh. Sizewell C is used because it repeats the Hinkley design and is the more recent estimate. No scenario uses a lower nuclear cost. Nuclear O&M is taken from DESNZ 2020 and is unverified.
 
 The model's own load factors come from the hourly dataset and are often lower than new-build project values. For example, ZCB offshore wind runs at 43% and tidal at 24%, giving £102 and £415/MWh. Technology LCOE in the model therefore sits above strike prices where the dataset load factor is low.
 
@@ -63,5 +63,6 @@ The model's own load factors come from the hourly dataset and are often lower th
 - CEPA for DESNZ, [Hurdle rates for electricity generation](https://assets.publishing.service.gov.uk/media/68cd1d818c44a661b4995d9f/cepa-desnz-hurdle-rates-electricity.pdf).
 - DESNZ, [CfD Allocation Round 7 results](https://www.gov.uk/government/publications/contracts-for-difference-cfd-allocation-round-7-results/contracts-for-difference-allocation-round-7-results-accessible-webpage) (offshore wind) and Energy UK, [AR7 onshore results](https://www.energy-uk.org.uk/wp-content/uploads/2026/02/Energy-UK-explains-AR7-onshore-results-11-February-2026.pdf).
 - DESNZ, [Sizewell C value for money assessment](https://assets.publishing.service.gov.uk/media/687f951dfdc190fb6b84689d/szc-fid-vfm-assessment.pdf) and Centrica, [Sizewell C announcement](https://www.centrica.com/media/tfnbsmm5/centrica-2025-sizewell-c-rns-announcement-final-220725.pdf).
+- Low Carbon Contracts Company, [Hinkley Point C scheme register](https://register.lowcarboncontracts.uk/NUC-HPC-198), and New Civil Engineer, [Hinkley Point C's cost climbs to £35bn](https://www.newcivilengineer.com/latest/hinkley-point-cs-cost-climbs-to-35bn-with-confirmation-unit-1-will-power-up-in-2030-20-02-2026/).
 - Modo Energy, [GB battery capex survey 2024](https://modoenergy.com/research/battery-energy-storage-capex-containerised-bess-development-costs-oem-balance-plant-bop-grid-connections-survey-2024) and [global battery capex September 2026](https://modoenergy.com/research/global-battery-capex-september-2026-research). £230/kWh is the 2024 median (£325/kWh) less the reported 29% fall.
 - LSEG, [UKA price update Q1 2026](https://www.lseg.com/content/dam/data-analytics/en_us/documents/reports/lseg-q1-2026-eua-and-uka-price-update.pdf).
