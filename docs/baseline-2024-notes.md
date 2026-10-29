@@ -73,7 +73,7 @@ Other changes since 2018 are methodological as well as real: AR5 GWPs, explicit 
 `node docs/run_scenario.js baseline_2024` prints:
 
 ```
-Electricity demand (TWh/yr): 178.2
+Electricity demand (TWh/yr): 306.7
 Onshore wind CF: 24.5%
 Offshore wind CF: 34.5%
 Solar PV CF: 8.8%
@@ -81,8 +81,9 @@ Space heating demand (TWh/yr): 322.9
 Water heating demand (TWh/yr): 73.4
 Industry demand (TWh/yr): 191.7
 Total emissions (MtCO2e): 438.0
+Grid CO2 intensity (gCO2/kWh): 136.6
 ```
 
-"Electricity demand" is the model's fixed supply used (renewables, nuclear and imports before grid losses, less excess). It leaves out backup generation, so it is not comparable with DUKES electricity demand. Wind and solar capacity factors reproduce DUKES 6.2 generation. Heating and industry match the ECUK derivations above.
+"Electricity demand" is total generation before grid losses, including imports and backup. It is 306.7 TWh against 319.4 TWh total electricity supply in DUKES 5.1, about 4% low, mostly because modelled backup is 9 TWh below observed. Grid CO2 intensity is fossil backup CO2 over that total, 136.6 gCO2/kWh. Wind and solar capacity factors reproduce DUKES 6.2 generation. Heating and industry match the ECUK derivations above.
 
 Total emissions are 438.0 MtCO2e. The statistics give 414.6 including international aviation and shipping, and the model adds an aviation non CO2 uplift of 29.0, so the like for like comparison is 443.6. The model is 1.3% low. The main changes from the earlier 449.4 are imports replacing gas backup, transport biofuel replacing fossil oil, the gas losses double count, and aviation fuel now calibrated to DUKES.

@@ -1472,7 +1472,7 @@ input[type='text'] {
             <p style="font-size:16px"><b>Electricity</b></p>
             <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*0.0001 | toFixed(1) }} TWh</p>
             <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(1) }} TWh</p>       
-            <p style="font-size:16px">Over-supply factor: {{ o.supply.total_electricity_before_grid_loss / o.balance.total_electricity_demand | toFixed(2) }}</p>       
+            <p style="font-size:16px">Over-supply factor: {{ (o.supply.total_fixed_electricity + o.supply.total_imports) / o.balance.total_electricity_demand | toFixed(2) }}</p>       
             <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*0.0001 | toFixed(1) }} TWh ({{ (100*o.balance.total_excess_elec/o.supply.total_electricity_before_grid_loss) | toFixed(0) }}%)</p>    
             <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*0.0001 | toFixed(1) }} TWh  ({{ (100*o.balance.total_unmet_elec/o.balance.total_electricity_demand) | toFixed(0) }}%)</p>
 

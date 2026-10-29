@@ -195,7 +195,7 @@ node docs/run_scenario.js baseline_2024
 [run_scenario.js](run_scenario.js) loads the default scenario, merges the named scenario over it exactly as the web tool does, runs the 10 year simulation and prints headline outputs. For `baseline_2018` it prints:
 
 ```
-Electricity demand (TWh/yr): 160.4
+Electricity demand (TWh/yr): 350.5
 Onshore wind CF: 25.4%
 Offshore wind CF: 37.1%
 Solar PV CF: 9.4%
@@ -203,20 +203,22 @@ Space heating demand (TWh/yr): 373.9
 Water heating demand (TWh/yr): 82.2
 Industry demand (TWh/yr): 228.9
 Total emissions (MtCO2e): 519.6
+Grid CO2 intensity (gCO2/kWh): 197.4
 ```
+
+"Electricity demand" is total generation before grid losses (renewables, nuclear, imports and backup), less excess, plus unmet demand. It compares with DUKES 5.1 total electricity supply.
 
 Cross check the outputs against the statistics, as the Energy Balance sheet does for 2018:
 
 | Model output | Compare against |
 |---|---|
+| Electricity demand | DUKES 5.1 total electricity supply |
 | Backup generation (sum of `electric_backup` turbine outputs) | DUKES 5.6 dispatchable generation |
 | Offshore, onshore, solar capacity factors | DUKES 6.2 generation over end of year capacity |
 | Space and water heating demand | ECUK end use tables |
 | Industry total demand | ECUK table U4 total |
 | Transport fuel demand | ECUK C8 and DUKES transport rows |
 | Total emissions | UK GHG statistics grand total plus international bunkers |
-
-The printed "Electricity demand" is fixed supply used (renewables, nuclear and imports), not total demand, so it does not compare with DUKES.
 
 Aim for agreement within a few percent. The 2018 workbook achieved better than 1% on most totals. On emissions the model prints 519.6 MtCO2e for the 2018 baseline against 496.0 in the statistics (including international bunkers), the difference is the aviation non CO2 uplift the model adds, so expect the same offset for a new baseline.
 

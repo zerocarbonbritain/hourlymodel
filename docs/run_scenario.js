@@ -80,5 +80,6 @@ load_dataset("highresolution.csv.zip",function(result){
         console.log("Water heating demand (TWh/yr): " + (o.water_heating.total_demand*GWh_to_TWhyr).toFixed(1));
         console.log("Industry demand (TWh/yr): " + o.industry.total_demand.toFixed(1));
         console.log("Total emissions (MtCO2e): " + o.emissions_balance.total.toFixed(1));
+        console.log("Grid CO2 intensity (gCO2/kWh): " + o.emissions_balance.grid_co2_intensity.toFixed(1));
     });
 });

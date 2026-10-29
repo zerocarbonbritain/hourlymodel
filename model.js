@@ -869,6 +869,7 @@ var model = {
         o.synth_fuel.total_produced = 0
         o.synth_fuel.total_biomass_used = 0
         o.synth_fuel.total_biofuel_supply = 0
+        o.synth_fuel.backup_from_fossil_oil = 0
         o.synth_fuel.total_transport_demand = 0
         o.synth_fuel.total_industrial_demand = 0
         // Power to X
@@ -1368,6 +1369,10 @@ var model = {
             // Record unmet synth fuel demand
             if (o.synth_fuel.store_SOC<0.0) {
                 o.synth_fuel.unmet_demand += -1*o.synth_fuel.store_SOC
+                // Backup share of the unmet demand, met by fossil oil if allowed
+                if (i.fossil_fuels.allow_use_for_backup && synth_fuel_demand>0) {
+                    o.synth_fuel.backup_from_fossil_oil += -1*o.synth_fuel.store_SOC * (synth_fuel_for_dispatchable / synth_fuel_demand)
+                }
                 o.synth_fuel.store_SOC = 0.0
             }
             d.synth_fuel_store_SOC.push(o.synth_fuel.store_SOC)
@@ -1468,11 +1473,8 @@ var model = {
         o.electric_storage.cycles_per_year = (o.electric_storage.total_discharge / i.electric_storage.capacity_GWh)*0.1
         
         // -------------------------------------------------------------------------------
-        // o.supply.total_fixed_electricity
-        // o.total_losses.grid
-        // o.electric_backup.total_before_grid_loss
-        
-        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity + o.supply.total_imports // + o.electric_backup.total_before_grid_loss
+        // Total electricity generation before grid losses: fixed supply, imports and backup
+        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity + o.supply.total_imports + o.electric_backup.total_before_grid_loss
         o.balance.total_electricity_demand = o.supply.total_electricity_before_grid_loss - o.balance.total_excess_elec + o.balance.total_unmet_elec // - o.total_losses.grid
 
         
@@ -1727,6 +1729,7 @@ var model = {
         let grid_co2_emissions = 0;
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
         grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*0.0003166
+        grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*0.0002678
         
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
         

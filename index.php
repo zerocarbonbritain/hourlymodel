@@ -2,7 +2,12 @@
     $highres = 0;
     if (isset($_GET['highres']) && $_GET['highres']==1) $highres = 1;
     
-    $v = 105;
+    // Cache busting version: the latest change to any file the page loads,
+    // so edited scenarios, scripts and pages are fetched fresh
+    $v = 0;
+    foreach (array_merge(glob(__DIR__."/*.js"), glob(__DIR__."/ui/*"), glob(__DIR__."/pages/*.html"), glob(__DIR__."/scenarios/*.json")) as $file) {
+        $v = max($v, filemtime($file));
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -4,7 +4,7 @@ Items found while building baselines that need further attention. Remove an item
 
 ## Model
 
-- **"Electricity demand" output leaves out backup generation.** `o.balance.total_electricity_demand` is fixed supply used (renewables, nuclear and imports before grid losses, less excess). It is printed as electricity demand by `docs/run_scenario.js` and used for grid CO2 intensity, so neither compares with DUKES for a scenario with significant backup.
+- **LCOE leaves out fuel costs.** `o.LCOE` counts capital and operating costs only. That suits zero carbon scenarios, but for a baseline it leaves out fossil fuel, so baseline LCOE is not meaningful.
 - **Imports and biofuel are flat.** `supply.imports_TWhy` and `synth_fuel.biofuel_supply_TWhy` have no hourly profile. Real interconnector flows respond to prices, so hourly backup patterns are approximate.
 - **Coal backup share uses the coal emission factor for other thermal.** `prc_coal` is coal plus other thermal (mainly waste). Its efficiency now covers both, but fuel CO2 still uses the coal factor (0.317 kg/kWh). Municipal solid waste CO2 (7.07 Mt) is left to this route, not `emissions_balance`.
 
