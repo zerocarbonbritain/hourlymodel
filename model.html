@@ -809,10 +809,31 @@ input[type='text'] {
                   <option value="nostore">No storage</option>
                   <option value="basic">Basic, flat out</option>
                   <option value="average">Proportional: average</option>
+                  <option value="optimal">Optimal: perfect foresight</option>
               </select></td>
           <td></td>
           <td></td>
-      </tr>    
+      </tr>
+      <tr v-if="i.electric_storage.type=='optimal'">
+        <td>Value of displaced backup generation</td>
+        <td><input v-model.number="i.electric_storage.backup_value" type="text" @change="update" /> <span class="unit">£/MWh</span></td>
+        <td>(Relative to peak weight)</td>
+      </tr>
+      <tr v-if="i.electric_storage.type=='optimal'">
+        <td>Backup peak weight</td>
+        <td><input v-model.number="i.electric_storage.peak_weight" type="text" @change="update" /> <span class="unit">per GW²</span></td>
+        <td>(0 for energy only)</td>
+      </tr>
+      <tr v-if="i.electric_storage.type=='optimal'">
+        <td>Allow charging from backup</td>
+        <td><input v-model="i.electric_storage.charge_from_backup" type="checkbox" @change="update" style="width:70px" autocomplete="off" /></td>
+        <td></td>
+      </tr>
+      <tr v-if="i.electric_storage.type=='optimal'">
+        <td>State of charge levels</td>
+        <td><input v-model.number="i.electric_storage.soc_levels" type="text" @change="update" /></td>
+        <td>(More is finer, slower)</td>
+      </tr>
       <tr>
         <td>Electricity storage capacity</td>
         <td><input v-model.number="i.electric_storage.capacity_GWh" type="text" @change="update" /> <span class="unit">GWh</span></td>

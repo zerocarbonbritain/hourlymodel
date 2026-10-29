@@ -55,7 +55,7 @@ All models have limitations, here are a few limitations with this model to bear 
 
 - No European or wider grid integration: Already a reality and likely to play a more significant role over time but would require substantial increase in complexity and scope of the model to include energy demand and supply in all countries in order to establish the extent of energy flow between countries. Other studies have shown that wider grid integration may provide in the order of a 9% reduction in cost (e.g Michael Child et al. (2019)). 
 
-- Electricity and heat storage algorithms could be improved to allow better utilisation for backup fuel displacement and peak-shaving. Current implementation is limited to a simple 'flat-out' charge when surplus is available, discharge when not available, or a charge/discharge rate based on a +-12h average of energy surplus and deficit. 
+- Heat and EV storage algorithms could be improved to allow better utilisation for backup fuel displacement and peak-shaving. They use a charge/discharge rate based on a +-12h average of energy surplus and deficit. Electricity storage has an optimal perfect foresight dispatch that minimises backup energy and backup peaks.
 
 - There are currently no limitations on backup methane or hydrogen gas turbine ramp rates and the model suggests a need for these resources to ramp up from zero to high outputs over relatively short timescales. A more sophisticated implementation could make use of electricity storage to provide the fast response component allowing backup turbines to ramp up and down more slowly. Alternatively other long duration storage technologies not yet included may be used.
 

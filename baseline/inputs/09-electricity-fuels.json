@@ -197,8 +197,20 @@
             "model_output": "electric_storage.total_discharge",
             "model_scale": 0.0001,
             "tolerance": 0.1,
-            "note": "Storage output against DUKES 5.16. Reported only: the model charges storage from surplus supply, which a baseline rarely has, so it cycles far less than real storage."
+            "note": "Storage output against DUKES 5.16. Reported only. The optimal dispatch shaves backup peaks but does not model price arbitrage, so it cycles less than real storage."
         }
+    },
+    "electric_storage.type": {
+        "type": "assumption",
+        "units": "",
+        "value": "optimal",
+        "note": "Perfect foresight dispatch that minimises backup energy and backup peaks."
+    },
+    "electric_storage.charge_from_backup": {
+        "type": "assumption",
+        "units": "",
+        "value": true,
+        "note": "A baseline has little surplus supply, so storage charges from backup generation as pumped hydro does overnight."
     },
     "electric_storage.charge_capacity_GW": {
         "type": "statistic",

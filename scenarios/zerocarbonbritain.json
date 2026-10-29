@@ -266,12 +266,16 @@
         "other_non_heat_fixed_biomass_prc": 10
     },
     "electric_storage": {
-        "type": "average",
+        "type": "optimal",
         "capacity_GWh": 200,
         "charge_capacity_GW": 50,
         "discharge_capacity_GW": 50,
         "charge_efficiency": 0.95,
-        "discharge_efficiency": 0.95
+        "discharge_efficiency": 0.95,
+        "soc_levels": 500,
+        "backup_value": 150,
+        "peak_weight": 2,
+        "charge_from_backup": true
     },
     "hydrogen": {
         "electrolysis_capacity_GW": 27,

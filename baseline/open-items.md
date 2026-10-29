@@ -4,7 +4,7 @@ Items found while building baselines that need further attention. Remove an item
 
 ## Model
 
-- **Storage only charges from surplus supply.** In a baseline there is little surplus, so modelled storage output is 0.03 TWh against 3.5 TWh in DUKES 5.16. Real storage also arbitrages against prices and supports the system. The build reports this as a failed `check` on `electric_storage.capacity_GWh`.
+- **Storage cycles less than real storage.** The optimal dispatch charges from backup to shave backup peaks, giving 0.96 TWh in 2024 and 0.25 TWh in 2018 against 3.5 and 2.5 TWh in DUKES 5.16. Real storage also arbitrages against prices, which the model does not include. A higher `electric_storage.peak_weight` raises output (3.2 TWh at 50 in 2024) but has no source. The build reports this as a failed `check` on `electric_storage.capacity_GWh`.
 - **Baseline LCOE leaves out carbon prices and biomass fuel.** Fuel prices for gas, oil and coal are included (DESNZ QEP 3.2.1, which excludes carbon prices). The model now takes a `carbon_price`, but build assumptions cannot vary by year, so the baselines set it to 0 until an annual UK ETS (EU ETS for 2018) plus Carbon Price Support series is sourced. There is no official series for biomass fuel prices paid by generators.
 - **Baseline LCOE values the existing fleet at 2024 new-build costs** (see [docs/cost-assumptions.md](../docs/cost-assumptions.md)). Existing nuclear is costed at Sizewell C prices. Imports, hydro and biomass plant capital are not costed.
 - **Biofuel supply is flat.** It feeds the liquid fuel store, so the profile has little effect.

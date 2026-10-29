@@ -929,8 +929,26 @@ var model = {
         d.unmet_elec = []
         d.methane_SOC = []
         d.synth_fuel_store_SOC = []
-        
+
         let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+
+        // Optimal store schedule, computed up front from the balance before the store
+        let elec_store_schedule = null
+        if (i.electric_storage.type=="optimal" && i.electric_storage.capacity_GWh>0) {
+            elec_store_schedule = optimise_elec_store(d.balance_before_elec_store, {
+                capacity: i.electric_storage.capacity_GWh,
+                soc_levels: i.electric_storage.soc_levels,
+                charge_max: i.electric_storage.charge_capacity_GW,
+                discharge_max: i.electric_storage.discharge_capacity_GW,
+                charge_efficiency: i.electric_storage.charge_efficiency,
+                discharge_efficiency: i.electric_storage.discharge_efficiency,
+                backup_value: i.electric_storage.backup_value,
+                peak_weight: i.electric_storage.peak_weight,
+                charge_from_backup: i.electric_storage.charge_from_backup,
+                backup_limit: i.electric_backup.capacity_limit,
+                initial_soc: o.electric_storage.SOC_start
+            })
+        }
 
         for (var hour = 0; hour < i.hours; hour++)
         {
@@ -1027,7 +1045,19 @@ var model = {
                     }
                 }
             }
-            
+
+            else if (elec_store_schedule) {
+                elec_store_charge = elec_store_schedule.charge[hour]
+                elec_store_discharge = elec_store_schedule.discharge[hour]
+
+                let elec_store_charge_int = elec_store_charge*i.electric_storage.charge_efficiency
+                let elec_store_discharge_int = elec_store_discharge/i.electric_storage.discharge_efficiency
+
+                o.electric_storage.SOC += elec_store_charge_int - elec_store_discharge_int
+                balance += elec_store_discharge - elec_store_charge
+                o.total_losses.electric_storage += (elec_store_charge - elec_store_charge_int) + (elec_store_discharge_int - elec_store_discharge)
+            }
+
             if (o.electric_storage.SOC<0) o.electric_storage.SOC = 0                                                              // limits here can loose energy in the calc
             if (o.electric_storage.SOC>i.electric_storage.capacity_GWh) o.electric_storage.SOC = i.electric_storage.capacity_GWh                    // limits here can loose energy in the calc
             // ----------------------------------------------------------------------------
@@ -1894,4 +1924,127 @@ function levelised_fixed_cost(c) {
         }
     }
     return discounted_costs / discounted_operating_years
+}
+
+// Optimal electricity store dispatch with perfect foresight over the whole dataset.
+// Adapted from optimiseStoreDP in tools/ukgridsim. The state of charge is split into
+// soc_levels steps and a dynamic programme finds the schedule with the lowest cost.
+// The cost of each hour is set by the deficit left after the store:
+//
+//   backup_value per GWh of deficit (backup generation)
+//   peak_weight per GW² of deficit (so the store shaves the highest peaks)
+//   10 x backup_value per GWh of deficit above the backup capacity limit
+//
+// Surplus has no value. Both the hourly cost and the cost carried from the previous
+// hour are convex in the state of charge, so each hour is a min-plus convolution of
+// two convex sequences. Merging their slopes gives this in O(soc_levels) per hour.
+// Rows are saved at checkpoints and recomputed a block at a time to recover the schedule.
+//
+// balance is in GW before the store. Returns hourly charge and discharge in GW.
+function optimise_elec_store(balance, opts) {
+    let N = balance.length
+    let K = Math.max(2, Math.round(opts.soc_levels))
+    let step = opts.capacity / K
+    let ceff = opts.charge_efficiency
+    let deff = opts.discharge_efficiency
+    let Ce = opts.backup_value
+    let lam = opts.peak_weight
+    let Cu = 10 * Ce
+    let SOC_PEN = 1e-9 * step   // tie-break, prefer a fuller store
+
+    let up_max = Math.min(K, Math.floor(opts.charge_max * ceff / step))
+    let dn_max = Math.min(K, Math.floor(opts.discharge_max / deff / step))
+
+    // Grid side power for a change of d levels, negative when charging
+    function store_power(d) {
+        return d >= 0 ? -d * step / ceff : -d * step * deff
+    }
+
+    function hour_cost(b) {
+        if (b >= 0) return 0
+        let deficit = -b
+        let cost = Ce * deficit + lam * deficit * deficit
+        if (deficit > opts.backup_limit) cost += Cu * (deficit - opts.backup_limit)
+        return cost
+    }
+
+    // Level changes allowed in hour t. Discharge is limited to the deficit.
+    // Charge is limited to the surplus unless charging from backup is allowed.
+    let r = [0, 0]
+    function level_range(t) {
+        let net = balance[t]
+        r[0] = -Math.min(dn_max, Math.floor(Math.max(0, -net) / deff / step))
+        r[1] = up_max
+        if (!opts.charge_from_backup) r[1] = Math.min(up_max, Math.floor(Math.max(0, net) * ceff / step))
+        return r
+    }
+
+    let g = new Float64Array(up_max + dn_max + 1)
+    let lo = new Int32Array(N + 1)
+    let hi = new Int32Array(N + 1)
+
+    // Row t+1 from row t (f) into out. Rows hold the lowest cost to reach each level.
+    function forward(t, f, out) {
+        level_range(t)
+        let m = r[1] - r[0]
+        for (let j = 0; j <= m; j++) g[j] = hour_cost(balance[t] + store_power(r[0] + j))
+        out.fill(Infinity)
+        let flo = lo[t], fhi = hi[t]
+        let a = flo, j = 0
+        for (let k = flo + r[0]; ; k++) {
+            if (k >= 0 && k <= K) out[k] = f[a] + g[j] - SOC_PEN * k
+            if (a == fhi && j == m) break
+            if (j == m || (a < fhi && f[a + 1] - f[a] <= g[j + 1] - g[j])) a++
+            else j++
+        }
+        lo[t + 1] = Math.max(0, flo + r[0])
+        hi[t + 1] = Math.min(K, fhi + r[1])
+    }
+
+    let B = Math.ceil(Math.sqrt(N))
+    let nb = Math.ceil(N / B)
+    let checkpoints = new Float64Array(nb * (K + 1))
+    let block = new Float64Array(B * (K + 1))
+
+    // Forward pass
+    let cur = new Float64Array(K + 1)
+    let next = new Float64Array(K + 1)
+    let s0 = Math.min(K, Math.max(0, Math.round(opts.initial_soc / step)))
+    cur.fill(Infinity)
+    cur[s0] = 0
+    lo[0] = s0; hi[0] = s0
+    for (let t = 0; t < N; t++) {
+        if (t % B == 0) checkpoints.set(cur, (t / B) * (K + 1))
+        forward(t, cur, next)
+        let tmp = cur; cur = next; next = tmp
+    }
+
+    // Cheapest final level
+    let level = lo[N]
+    for (let s = lo[N]; s <= hi[N]; s++) if (cur[s] < cur[level]) level = s
+
+    // Backtrack one block at a time
+    let charge = new Float64Array(N)
+    let discharge = new Float64Array(N)
+    for (let b = nb - 1; b >= 0; b--) {
+        let t0 = b * B
+        let t1 = Math.min(N, t0 + B)
+        block.set(checkpoints.subarray(b * (K + 1), (b + 1) * (K + 1)))
+        for (let t = t0; t < t1 - 1; t++) {
+            forward(t, block.subarray((t - t0) * (K + 1), (t - t0 + 1) * (K + 1)), block.subarray((t - t0 + 1) * (K + 1), (t - t0 + 2) * (K + 1)))
+        }
+        for (let t = t1 - 1; t >= t0; t--) {
+            let f = block.subarray((t - t0) * (K + 1), (t - t0 + 1) * (K + 1))
+            level_range(t)
+            let best = Infinity, prev = level
+            for (let s = Math.max(lo[t], level - r[1]); s <= Math.min(hi[t], level - r[0]); s++) {
+                let cost = f[s] + hour_cost(balance[t] + store_power(level - s))
+                if (cost < best) { best = cost; prev = s }
+            }
+            let power = store_power(level - prev)
+            if (power < 0) charge[t] = -power; else discharge[t] = power
+            level = prev
+        }
+    }
+    return { charge: charge, discharge: discharge }
 }

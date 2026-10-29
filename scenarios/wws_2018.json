@@ -178,7 +178,7 @@
         "other_non_heat_fixed_biomass_prc": 0
     },
     "electric_storage": {
-        "type": "basic",
+        "type": "optimal",
         "charge_capacity_GW": 300,
         "discharge_capacity_GW": 300,
         "charge_efficiency": 0.9,

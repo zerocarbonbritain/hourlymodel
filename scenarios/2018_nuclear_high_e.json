@@ -174,7 +174,7 @@
       "other_non_heat_fixed_biomass_prc": 0
     },
     "electric_storage": {
-      "type": "basic",
+      "type": "optimal",
       "capacity_GWh": 100,
       "charge_capacity_GW": 100,
       "discharge_capacity_GW": 100,
@@ -260,7 +260,7 @@
     "costs": {
       "Nuclear": {
         "capex": 4400,
-        "buildmonths": 48,
+        "build_years": 4,
         "lifespan": 50
       }
     }

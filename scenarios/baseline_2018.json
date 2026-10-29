@@ -251,7 +251,9 @@
         "charge_capacity_GW": 3.4,
         "discharge_capacity_GW": 3.4,
         "charge_efficiency": 0.857,
-        "discharge_efficiency": 0.857
+        "discharge_efficiency": 0.857,
+        "type": "optimal",
+        "charge_from_backup": true
     },
     "hydrogen": {
         "electrolysis_capacity_GW": 0,
@@ -291,7 +293,7 @@
         "electricity_own_use_prc": 4.3,
         "refineries_gas_prc": 0.327,
         "refineries_oil_prc": 5.757,
-        "oil_gas_extraction_gas_prc": 3.401,
+        "oil_gas_extraction_gas_prc": 3.4,
         "oil_gas_extraction_oil_prc": 0.465,
         "gas_losses_prc": 0.583
     },
@@ -358,5 +360,6 @@
         "oil": 3.855,
         "coal": 1.044,
         "biomass": 0
-    }
+    },
+    "carbon_price": 0
 }

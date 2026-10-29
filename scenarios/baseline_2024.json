@@ -251,7 +251,9 @@
         "charge_capacity_GW": 8.0,
         "discharge_capacity_GW": 8.0,
         "charge_efficiency": 0.89,
-        "discharge_efficiency": 0.89
+        "discharge_efficiency": 0.89,
+        "type": "optimal",
+        "charge_from_backup": true
     },
     "hydrogen": {
         "electrolysis_capacity_GW": 0,
@@ -283,7 +285,7 @@
         "synth_fuel_efficiency": 36.8,
         "capacity_limit": 100,
         "prc_hydrogen": 0,
-        "prc_imports": 20.65,
+        "prc_imports": 20.61,
         "coal_co2_factor": 0.2542
     },
     "energy_industry_use": {
@@ -291,8 +293,8 @@
         "electricity_own_use_prc": 3.45,
         "refineries_gas_prc": 0.759,
         "refineries_oil_prc": 5.18,
-        "oil_gas_extraction_gas_prc": 3.149,
-        "oil_gas_extraction_oil_prc": 0.4,
+        "oil_gas_extraction_gas_prc": 3.148,
+        "oil_gas_extraction_oil_prc": 0.399,
         "gas_losses_prc": 0.778
     },
     "fossil_fuels": {
@@ -358,5 +360,6 @@
         "oil": 5.245,
         "coal": 1.399,
         "biomass": 0
-    }
+    },
+    "carbon_price": 0
 }
