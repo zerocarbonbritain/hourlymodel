@@ -129,7 +129,8 @@ var model = {
             total_geothermal_heat: 0,
             total_nuclear: 0,
             total_fixed_electricity: 0,
-            total_fixed_heat: 0
+            total_fixed_heat: 0,
+            total_imports: 0
 
         }
         
@@ -151,7 +152,7 @@ var model = {
             let offshore_wind = i.supply.offshore_wind_capacity * capacityfactors[1] * i.supply.offshore_wind_availability
             let wave = i.supply.wave_capacity * capacityfactors[2]
             let tidal = i.supply.tidal_capacity * capacityfactors[3]
-            let solarpv = i.supply.solarpv_capacity * capacityfactors[4]
+            let solarpv = i.supply.solarpv_capacity * capacityfactors[4] * i.supply.solarpv_availability
             let solarthermal = i.supply.solarthermal_capacity * capacityfactors[4]
             // Todo: Hydro output is somewhat weather dependent as well
             let hydro = i.supply.hydro_capacity * i.supply.hydro_capacity_factor
@@ -159,6 +160,8 @@ var model = {
             let geothermal_elec = i.supply.geothermal_elec_capacity * i.supply.geothermal_elec_capacity_factor
             let geothermal_heat = i.supply.geothermal_heat_capacity * i.supply.geothermal_heat_capacity_factor
             let nuclear = i.supply.nuclear_capacity * i.supply.nuclear_capacity_factor
+            // Net interconnector imports, flat profile
+            let imports = i.supply.imports_TWhy * 1000.0 / (365.25 * 24.0)
             
             // Totals
             o.supply.total_onshore_wind += onshore_wind            
@@ -171,10 +174,12 @@ var model = {
             o.supply.total_geothermal_elec += geothermal_elec
             o.supply.total_geothermal_heat += geothermal_heat
             o.supply.total_nuclear += nuclear
+            o.supply.total_imports += imports
             
             // Electricity supply
             let electricity_supply_before_grid_loss = onshore_wind + offshore_wind + wave + tidal + solarpv + hydro + geothermal_elec + nuclear
             o.supply.total_fixed_electricity += electricity_supply_before_grid_loss
+            electricity_supply_before_grid_loss += imports
                         
             let electricity_supply = electricity_supply_before_grid_loss * grid_loss_prc
             o.total_losses.grid += electricity_supply_before_grid_loss - electricity_supply
@@ -863,6 +868,7 @@ var model = {
         o.synth_fuel.unmet_demand = 0
         o.synth_fuel.total_produced = 0
         o.synth_fuel.total_biomass_used = 0
+        o.synth_fuel.total_biofuel_supply = 0
         o.synth_fuel.total_transport_demand = 0
         o.synth_fuel.total_industrial_demand = 0
         // Power to X
@@ -1098,6 +1104,11 @@ var model = {
             o.synth_fuel.total_biomass_used += hourly_biomass_for_biofuel
             o.synth_fuel.store_SOC += synth_fuel_produced_FT
             o.total_losses.FT += (hydrogen_to_synth_fuel + hourly_biomass_for_biofuel) - (hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req)         
+            
+            // Biofuel supply (e.g. road fuel blending), flat profile, counted as biomass used
+            let biofuel_supply = i.synth_fuel.biofuel_supply_TWhy * 1000.0 / (365.25 * 24.0)
+            o.synth_fuel.total_biofuel_supply += biofuel_supply
+            o.synth_fuel.store_SOC += biofuel_supply
             
             // 4. Hydrogen to Methanation
             let co2_for_sabatier = co2_from_biogas
@@ -1367,6 +1378,7 @@ var model = {
             // Biomass
             o.biomass.total_used += biogas_supply / i.biogas.anaerobic_digestion_efficiency 
             o.biomass.total_used += hourly_biomass_for_biofuel
+            o.biomass.total_used += biofuel_supply
             
             // Hydrogen SOC data
             let hydrogen_for_dispatchable = hydrogen_turbine_output / (i.electric_backup.hydrogen_efficiency*0.01)     
@@ -1415,11 +1427,11 @@ var model = {
          o.fossil_fuels.oil_final_demand = o.fossil_fuels.oil
          o.fossil_fuels.coal_final_demand = o.fossil_fuels.coal
          
-         o.fossil_fuels.refineries_gas_use = (o.fossil_fuels.oil) * 0.00293;
-         o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * 0.0576;
-         o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.0334;
-         o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * 0.00486;
-         o.fossil_fuels.gas_losses = (o.fossil_fuels.gas) * 0.0069;
+         o.fossil_fuels.refineries_gas_use = (o.fossil_fuels.oil) * i.energy_industry_use.refineries_gas_prc * 0.01;
+         o.fossil_fuels.refineries_oil_use = (o.fossil_fuels.oil) * i.energy_industry_use.refineries_oil_prc * 0.01;
+         o.fossil_fuels.oil_gas_extraction_gas_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * i.energy_industry_use.oil_gas_extraction_gas_prc * 0.01;
+         o.fossil_fuels.oil_gas_extraction_oil_use = (o.fossil_fuels.oil + o.fossil_fuels.gas) * i.energy_industry_use.oil_gas_extraction_oil_prc * 0.01;
+         o.fossil_fuels.gas_losses = (o.fossil_fuels.gas) * i.energy_industry_use.gas_losses_prc * 0.01;
          
          o.energy_industry_use.total += o.fossil_fuels.refineries_gas_use
          o.energy_industry_use.total += o.fossil_fuels.refineries_oil_use
@@ -1460,7 +1472,7 @@ var model = {
         // o.total_losses.grid
         // o.electric_backup.total_before_grid_loss
         
-        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity // + o.electric_backup.total_before_grid_loss
+        o.supply.total_electricity_before_grid_loss = o.supply.total_fixed_electricity + o.supply.total_imports // + o.electric_backup.total_before_grid_loss
         o.balance.total_electricity_demand = o.supply.total_electricity_before_grid_loss - o.balance.total_excess_elec + o.balance.total_unmet_elec // - o.total_losses.grid
 
         
@@ -1468,7 +1480,7 @@ var model = {
         
         o.balance.total_unmet_demand = o.balance.total_unmet_elec
         
-        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_fixed_heat + o.biomass.total_used + o.fossil_fuels.total + o.hydrogen.total_from_imports
+        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_imports + o.supply.total_fixed_heat + o.biomass.total_used + o.fossil_fuels.total + o.hydrogen.total_from_imports
         if (i.include_ambient_heat) o.balance.total_supply += o.heat.total_ambient_supply
         
         o.balance.total_demand = 0
@@ -1556,7 +1568,7 @@ var model = {
         
         // -------------------------------------------------------------------------------
         
-        o.biomass.total_direct_use = o.biomass.total_used - (i.biogas.biomass_for_biogas*10000) - o.synth_fuel.total_biomass_used
+        o.biomass.total_direct_use = o.biomass.total_used - (i.biogas.biomass_for_biogas*10000) - o.synth_fuel.total_biomass_used - o.synth_fuel.total_biofuel_supply
         
         if (i.hydrogen.electrolysis_capacity_GW>0) {
             o.hydrogen.electrolysis_capacity_factor = 100*(o.hydrogen.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * 87600))

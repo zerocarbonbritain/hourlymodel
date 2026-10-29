@@ -14,6 +14,7 @@
         "wave_capacity": 10,
         "tidal_capacity": 20,
         "solarpv_capacity": 90,
+        "solarpv_availability": 1,
         "solarthermal_capacity": 30,
         "hydro_capacity": 3,
         "hydro_capacity_factor": 0.3,
@@ -22,7 +23,8 @@
         "geothermal_heat_capacity": 2,
         "geothermal_heat_capacity_factor": 0.9,
         "nuclear_capacity": 0,
-        "nuclear_capacity_factor": 0.9
+        "nuclear_capacity_factor": 0.9,
+        "imports_TWhy": 0
     },
     "LAC": {
         "domestic": {
@@ -291,6 +293,7 @@
         "capacity_GW": 9.15,
         "store_capacity_GWh": 50000,
         "store_start_GWh": 5000,
+        "biofuel_supply_TWhy": 0,
         "FT_process_biomass_req": 1.3,
         "FT_process_hydrogen_req": 0.61
     },
@@ -316,7 +319,12 @@
     },
     "energy_industry_use": {
         "electricity_grid_loss_prc": 7,
-        "electricity_own_use_prc": 0
+        "electricity_own_use_prc": 0,
+        "refineries_gas_prc": 0.293,
+        "refineries_oil_prc": 5.76,
+        "oil_gas_extraction_gas_prc": 3.34,
+        "oil_gas_extraction_oil_prc": 0.486,
+        "gas_losses_prc": 0.69
     },
     "fossil_fuels": {
         "allow_use_for_backup": 0,

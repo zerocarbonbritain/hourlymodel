@@ -153,7 +153,7 @@ input[type='text'] {
           <td><input v-model.number="i.supply.solarpv_capacity" type="text" @change="update" /></td>
           <td>{{ o.supply.total_solarpv | format_energy }} <span class="unit">TWh/yr</span></td>
           <td>{{ o.supply.solarpv_capacity_factor | format_prc }} <span class="unit">%</span></td>
-          <td></td>
+          <td><input v-model.number="i.supply.solarpv_availability" type="text" @change="update" /></td>
         </tr>
         <tr>
           <td>Solar Thermal (heat)</td>
@@ -181,6 +181,13 @@ input[type='text'] {
           <td><input v-model.number="i.supply.nuclear_capacity" type="text" @change="update" /></td>
           <td>{{ o.supply.total_nuclear | format_energy }} <span class="unit">TWh/yr</span></td>
           <td><input v-model.number="i.supply.nuclear_capacity_factor" type="text" @change="update" /></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Net interconnector imports (flat)</td>
+          <td><input v-model.number="i.supply.imports_TWhy" type="text" @change="update" /> <span class="unit">TWh/yr</span></td>
+          <td>{{ o.supply.total_imports | format_energy }} <span class="unit">TWh/yr</span></td>
+          <td></td>
           <td></td>
         </tr>
         <tr>
@@ -979,6 +986,12 @@ input[type='text'] {
             <td><input v-model.number="i.synth_fuel.FT_process_hydrogen_req" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
         </tr>
         <tr>
+            <td>Biofuel supply (flat, e.g. road fuel blending)</td>
+            <td><input v-model.number="i.synth_fuel.biofuel_supply_TWhy" type="text" @change="update" style="width:70px"  autocomplete="off"/> TWh/yr</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
             <td>Use flat demand profiles</td>
             <td><select v-model.number="i.use_flat_profiles" autocomplete="off" @change="update">
                     <option value=0>Default (variable profiles)</option>
@@ -1012,19 +1025,19 @@ input[type='text'] {
         </tr>
         <tr>
           <td>Refineries</td>
-          <td>{{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1) }} TWh/yr</td>
-          <td>{{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.refineries_gas_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil: {{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.refineries_oil_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil: {{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1) }} TWh/yr</td>
           <td></td>
         </tr>
         <tr>
           <td>Oil and gas extraction</td>
-          <td>{{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-          <td>{{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.oil_gas_extraction_gas_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil and gas: {{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.oil_gas_extraction_oil_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil and gas: {{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
           <td></td>
         </tr>
         <tr>
           <td>Losses</td>
-          <td>{{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.gas_losses_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of gas: {{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
           <td></td>
           <td></td>
         </tr>
