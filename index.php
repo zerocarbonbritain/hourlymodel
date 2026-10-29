@@ -212,8 +212,20 @@ function load_page(page)
             i: i,
             o: o,
             selected_scenario: "zerocarbonbritain",
-            scenario_list: [],
+            scenario_list: {},
             live_edit: true
+        },
+        computed: {
+          // Scenarios grouped by their group name, in the order listed in available.json
+          scenario_groups: function () {
+            var groups = {};
+            for (var key in this.scenario_list) {
+              var group = this.scenario_list[key].group || "Other";
+              if (groups[group] == undefined) groups[group] = {};
+              groups[group][key] = this.scenario_list[key];
+            }
+            return groups;
+          }
         },
         methods: {
           update: function () {

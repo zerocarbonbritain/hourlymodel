@@ -1,32 +1,46 @@
 {
     "zerocarbonbritain": {
-        "name": "ZeroCarbonBritain (Default)"
+        "name": "ZeroCarbonBritain 2019 (Default)",
+        "group": "ZeroCarbonBritain"
+    },
+    "zcb_2024": {
+        "name": "ZeroCarbonBritain from 2024 baseline",
+        "group": "ZeroCarbonBritain"
     },
     "zcb_no_dsr": {
-        "name": "ZCB no industrial DSR"
+        "name": "ZCB no industrial DSR",
+        "group": "ZeroCarbonBritain"
     },
     "zcb_no_dsr_h2_backup": {
-        "name": "ZCB no industrial DSR with H2 backup"
+        "name": "ZCB no industrial DSR with H2 backup",
+        "group": "ZeroCarbonBritain"
     },
     "baseline_2018": {
-        "name": "2018 baseline"
+        "name": "2018 baseline",
+        "group": "Baselines"
     },
     "baseline_2024": {
-        "name": "2024 baseline"
+        "name": "2024 baseline",
+        "group": "Baselines"
     },
     "2018_re_high_e": {
-        "name": "2018 100% RE, High Industrial Electrification"
+        "name": "2018 100% RE, High Industrial Electrification",
+        "group": "Alternative pathways"
     },
     "wws_2018": {
-        "name": "2018 100% RE, Low Industrial Electrification"
+        "name": "2018 100% RE, Low Industrial Electrification",
+        "group": "Alternative pathways"
     },
     "2018_nuclear_high_e": {
-        "name": "2018 100% Nuclear, High Industrial Electrification"
+        "name": "2018 100% Nuclear, High Industrial Electrification",
+        "group": "Alternative pathways"
     },
     "fes_2022": {
-        "name": "2022 FES Leading the Way"
+        "name": "2022 FES Leading the Way",
+        "group": "Alternative pathways"
     },
     "zero_supply_demand": {
-        "name": "Zero supply demand"
+        "name": "Zero supply demand",
+        "group": "Other"
     }
 }

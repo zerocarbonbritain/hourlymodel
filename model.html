@@ -112,7 +112,9 @@ input[type='text'] {
         
         Select scenario: 
         <select id="select_scenario" @change="change_scenario" v-model="selected_scenario">
-            <option v-for="(scenario,key) in scenario_list" :value="key">{{ scenario.name }}</option>
+            <optgroup v-for="(scenarios,group) in scenario_groups" :label="group">
+                <option v-for="(scenario,key) in scenarios" :value="key">{{ scenario.name }}</option>
+            </optgroup>
         </select>
     </div>
 </div>

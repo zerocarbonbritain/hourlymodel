@@ -1,0 +1,74 @@
+{
+    "population_2030": 69256000,
+    "households_2030": 28609000,
+    "supply": {
+        "wave_capacity": 0.1,
+        "tidal_capacity": 0.5,
+        "onshore_wind_capacity": 45,
+        "solarpv_capacity": 130,
+        "offshore_wind_capacity": 120
+    },
+    "LAC": {
+        "domestic": {
+            "lighting_and_appliances_TWhy": 34.439,
+            "cooking_TWhy": 11.633
+        },
+        "services": {
+            "lighting_and_appliances_TWhy": 35.772,
+            "catering_TWhy": 15.905,
+            "cooling_TWhy": 3.855
+        }
+    },
+    "space_heating": {
+        "domestic_demand_GWK": 2.926,
+        "services_demand_GWK": 1.431,
+        "industry_demand_GWK": 0.388
+    },
+    "water_heating": {
+        "domestic_TWhy": 59.847,
+        "services_TWhy": 11.555
+    },
+    "transport": {
+        "rail_freight_elec_demand": 1.932,
+        "freight_BEV_demand": 10.143,
+        "freight_H2_demand": 3.922,
+        "freight_IC_demand": 19.881
+    },
+    "industry": {
+        "high_temp_process_TWhy": 44.62,
+        "low_temp_process_TWhy": 67.73,
+        "dry_sep_TWhy": 20.65,
+        "other_heat_TWhy": 36.58,
+        "motors_TWhy": 37.64,
+        "compressed_air_TWhy": 10.76,
+        "lighting_TWhy": 3.85,
+        "refrigeration_TWhy": 6.47,
+        "other_non_heat_TWhy": 20.58
+    },
+    "emissions_balance": {
+        "coal_mining_handling": 0.576,
+        "upstream_ch4_leakage": 0.049,
+        "refrigerants": 1.547,
+        "other_foams_solvents_aerosols": 0.759,
+        "cement": 2.917,
+        "iron_steel_and_sinter": 1.352,
+        "lime": 0.712,
+        "glass": 0.226,
+        "other_process_emissions": 0.276,
+        "agriculture_total": 18.343,
+        "biomass_burning": 0.187,
+        "land_remaining_and_converted_to_settlements": 2.461,
+        "landfill": 2.861,
+        "waste_water_handling": 0.947,
+        "waste_incineration": 0.35
+    },
+    "synth_fuel": {
+        "capacity_GW": 9.7
+    },
+    "biogas": {
+        "biomass_for_biogas": 85
+    },
+    "methane": {
+        "methanation_capacity": 4.76
+    }
+}
