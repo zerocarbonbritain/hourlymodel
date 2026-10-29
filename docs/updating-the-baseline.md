@@ -82,7 +82,7 @@ The `availability` fields calibrate the weather dataset to the real observed fle
 
 For the 2018 baseline this gave offshore 0.774 and onshore 0.785, which reproduce observed capacity factors of 37.1% and 25.4%. `solarpv_availability` works the same way for solar. It was added after the 2018 baseline, where the dataset gave about 9.4% against an observed 11%. The build calibrates all three against the model directly.
 
-`imports_TWhy` is net interconnector imports (DUKES 1.1 electricity imports less exports), added as a flat supply. `solarthermal_capacity` is calibrated so modelled solar thermal heat equals DUKES 6.1 solar thermal final consumption, the same heat that step 5 adds to water heating demand.
+Net interconnector imports (DUKES 1.1 electricity imports less exports) are dispatched with backup generation: `electric_backup.prc_imports` is the share of each hour's backup requirement met by imports, calibrated to the annual total, and `supply.interconnector_capacity_GW` (DUKES 5.13A) caps it. `imports_TWhy` adds a flat supply instead and is 0 for a baseline. `solarthermal_capacity` is calibrated so modelled solar thermal heat equals DUKES 6.1 solar thermal final consumption, the same heat that step 5 adds to water heating demand.
 
 Hydro and nuclear are flat outputs: set `hydro_capacity` and `nuclear_capacity` to installed GW and the `_capacity_factor` fields to the observed annual capacity factor.
 
@@ -120,7 +120,7 @@ Steps 5 and 6 are scripted in `baseline/inputs/05-heating.json`.
 
 - Use the U2 total space heating and water heating rows.
 - Oil heating maps to `synthfuel` (the model treats liquid fuel boilers as one category).
-- Heat pump heat is 1.5 x DUKES 6.1 ambient heat and direct electric is U2 electricity minus ambient / 2. This assumes a seasonal performance factor of 3, as in the workbook.
+- Heat pump heat is calibrated so the ambient heat drawn by the model's heat pumps equals DUKES 6.1 ambient heat, so it uses the model's own seasonal efficiency. Direct electric is U2 heating electricity less the heat pumps' electricity.
 - "Heat sold" (district and communal heat) and solar hot water are reallocated in proportion to the other fuels.
 - Set every share explicitly, including zeros such as `hydrogen.share`, so no ZCB default leaks in.
 - Efficiencies (`efficiency_hot_water`, `efficiency_0C`, `efficiency_10C`) only need revisiting if the stock changes materially, for example the growing heat pump fleet.
@@ -131,7 +131,8 @@ This step is scripted in `baseline/inputs/07-transport.json`.
 
 - `modes.*.miles_pp`: miles per person per year. The model multiplies it by population, so it must follow passenger kilometres per person. For cars, rail, bus and motorbike, scale the 2018 value by TSGB0101 passenger kilometres (baseline year over 2018) and by population (2018 over baseline year). Aviation uses AVI0201c the same way. Walking and cycling come from NTS0303, which covers England only.
 - `load_factor`: average occupancy as a fraction of full (workbook: cars 0.33, bus 0.14, rail 0.32).
-- `prc.EV / H2 / IC`: drive train shares of miles travelled. This is the field that has moved most since 2018 (EV share of car miles was 1.25%). Licensed fleet shares from VEH1103 are the evidence.
+- `prc.EV / H2 / IC`: drive train shares of miles travelled. This is the field that has moved most since 2018 (EV share of car miles was 1.25%). Licensed fleet shares from VEH1103 are the evidence. The rail electric share is calibrated so modelled rail electricity equals DUKES 1.1 rail electricity.
+- `electric_car_battery_capacity` and `electric_car_max_charge_rate`: battery electric cars (VEH1103) times an assumed average battery (60 kWh) and charger (7 kW).
 - `efficiency.IC`: an engine efficiency divisor, not kWh per vehicle km. Calibrate each mode against the model's fuel use for that mode, which is inversely proportional to it. Cars, buses and motorcycles: DUKES 1.1 road petroleum plus bioenergy times their ECUK C8 share of road fuel. Diesel rail: DUKES 1.1 rail petroleum. Aviation: DUKES 1.1 air.
 - `synth_fuel.biofuel_supply_TWhy`: DUKES 1.1 transport bioenergy. The model supplies it to the liquid fuel store, so fossil oil falls by the same amount.
 - Freight: `freight_IC_demand` (TWh) is DUKES 1.1 road liquid fuel times the C8 HGV plus LGV share, plus DUKES national navigation.
@@ -162,13 +163,14 @@ The baseline represents today's fossil generation as "backup" filling the gap le
 This step is scripted in `baseline/inputs/09-electricity-fuels.json`.
 
 - `electric_backup.prc_methane / prc_biomass / prc_coal / prc_synth_fuel`: shares of dispatchable generation (all thermal generation except nuclear) from the DUKES 5.6 annual summaries, all generating companies. `prc_coal` covers coal plus other thermal (mainly waste) and is the remainder, so the shares sum to 100. `_efficiency` values are generation over fuel used from the same table.
-- `synth_fuel_efficiency` is oil generation over fuel used. `coal_efficiency` covers coal and other thermal together, to match `prc_coal`.
+- `synth_fuel_efficiency` is oil generation over fuel used. `coal_efficiency` covers coal and other thermal together, to match `prc_coal`. `coal_co2_factor` is power station CO2 from coal, municipal solid waste and other fuels (greenhouse gas by source dataset) over coal and other thermal fuel used, since waste dominates this share.
+- `fuel_prices`: prices paid by major power producers for gas, oil and coal (DESNZ Quarterly Energy Prices table 3.2.1), used for the fuel part of the LCOE.
 - `fossil_fuels.allow_use_for_backup` must be 1 for a baseline.
 - `fossil_fuels.other_gas_use`: the ECUK U2 industry "unknown (other)" gas. `other_oil_use` and `other_coal_use`: the oil and coal of that row. Do not include gas losses here, the model calculates them.
 - `energy_industry_use.refineries_*_prc`, `oil_gas_extraction_*_prc` and `gas_losses_prc`: energy industry own use and gas losses as percentages of modelled oil and gas demand. Calibrate each so the model reproduces the DUKES 1.1 energy industry use row.
 - `energy_industry_use.electricity_grid_loss_prc` and `electricity_own_use_prc`: losses and generation own use over total supply, from DUKES 5.1.
 
-Storage, hydrogen, methanation and synthetic fuel sections stay at or near zero for a baseline, apart from `electric_storage` (pumped hydro plus batteries) and `methane.storage_capacity_GWh` (gas network storage).
+Hydrogen, methanation and synthetic fuel sections stay at or near zero for a baseline, apart from `methane.storage_capacity_GWh` (gas network storage). `electric_storage` power is pumped hydro plus grid batteries from DUKES 5.16, with charge and discharge efficiencies from its round trip. DUKES has no storage energy capacity, so that is an estimate.
 
 ## Step 10: emissions balance and land use
 
@@ -249,5 +251,5 @@ Changes since 2018 that need more than a value refresh:
 - **Coal.** `electric_backup.prc_coal` goes to 0 and gas takes the remaining dispatchable share.
 - **EV shares.** `transport.modes.*.prc.EV` at 1.25% for cars is far below the current fleet share, take vehicle licensing statistics (DfT table VEH) or ECUK C8 fuel data.
 - **Heat pumps.** `heating_systems.heatpump.share` (3.58% in 2018) should be rederived from the ECUK end use tables and DUKES 6.1 ambient heat rows.
-- **Interconnector imports.** Net imports were 29.7 TWh in 2025 against 20.1 TWh in 2018. The 2018 workbook folded imports into backup generation. Use `supply.imports_TWhy` instead.
+- **Interconnector imports.** Net imports were 29.7 TWh in 2025 against 20.1 TWh in 2018. The 2018 workbook folded imports into backup generation. Use `electric_backup.prc_imports` and `supply.interconnector_capacity_GW` instead.
 - **Emissions balance.** Copy the full source category table from the 2024 final statistics into the GHG sheet, all `emissions_balance` fields shift.

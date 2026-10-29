@@ -103,6 +103,19 @@
         "round": 1,
         "note": "Coal and other thermal together, matching prc_coal, which covers both."
     },
+    "electric_backup.coal_co2_factor": {
+        "type": "statistic",
+        "units": "kgCO2/kWh fuel",
+        "values": {
+            "co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "GHG grouped": "CO2", "Territorial Emissions Statistics category": [ "Power stations - coal", "Power stations - municipal solid waste", "Power stations - other fuel" ]}
+            },
+            "coal_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Coal (thermal)"},
+            "other_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Other (thermal) [note 3]"}
+        },
+        "formula": "co2 * 1000 / (coal_fuel + other_fuel)",
+        "round": 4,
+        "note": "Power station CO2 from coal, municipal solid waste and other fuels over coal and other thermal fuel used (DUKES 5.6, GWh). Matches prc_coal and coal_efficiency, which cover the same plants. Municipal solid waste CO2 therefore stays out of emissions_balance."
+    },
     "electric_backup.hydrogen_efficiency": {
         "type": "assumption",
         "units": "%",
@@ -167,45 +180,67 @@
         "round": 1,
         "note": "ECUK industry unknown (other) solid fuel (ktoe). 0.06 TWh, rounds to 0.1."
     },
-    "_fuels.pumped_hydro_capacity_GW": {
-        "type": "intermediate",
-        "units": "GW",
-        "values": {
-            "capacity": {"source": "dukes_5.7", "sheet": "5.7", "block": "Table 5.7.A Capacity by fuel", "row": [ "All generating companies", "Pumped hydro" ], "column": "{year}"}
-        },
-        "formula": "capacity / 1000",
-        "round": 2,
-        "note": "Evidence for the electric_storage assumptions."
-    },
     "electric_storage.capacity_GWh": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "GWh",
-        "value": 30,
-        "note": "Pumped hydro (about 26 GWh across Dinorwig, Cruachan, Foyers and Ffestiniog) plus grid batteries. DUKES does not report battery energy capacity."
+        "values": {
+            "battery": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.C Power capacity", "row": [ "Battery storage - grid scale" ], "column": "{year}"}
+        },
+        "formula": "24 + battery / 1000 * 1.3",
+        "round": 0,
+        "note": "DUKES does not report storage energy capacity. Pumped hydro is about 24 GWh across Dinorwig, Cruachan, Foyers and Ffestiniog. Grid batteries (DUKES 5.16 power capacity) are assumed to average 1.3 hours.",
+        "check": {
+            "values": {
+                "output": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.A Electricity output", "row": [ "Total" ], "column": "{year}"}
+            },
+            "target": "output / 1000",
+            "model_output": "electric_storage.total_discharge",
+            "model_scale": 0.0001,
+            "tolerance": 0.1,
+            "note": "Storage output against DUKES 5.16. Reported only: the model charges storage from surplus supply, which a baseline rarely has, so it cycles far less than real storage."
+        }
     },
     "electric_storage.charge_capacity_GW": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "GW",
-        "value": 7,
-        "note": "Pumped hydro 2.7 GW (DUKES 5.7, see _fuels.pumped_hydro_capacity_GW) plus about 4 GW of grid batteries. DUKES 5.7 has no battery row."
+        "values": {
+            "total": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.C Power capacity", "row": [ "Total" ], "column": "{year}"}
+        },
+        "formula": "total / 1000",
+        "round": 1,
+        "note": "Power capacity of pumped hydro and grid batteries, DUKES 5.16."
     },
     "electric_storage.discharge_capacity_GW": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "GW",
-        "value": 7,
+        "values": {
+            "total": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.C Power capacity", "row": [ "Total" ], "column": "{year}"}
+        },
+        "formula": "total / 1000",
+        "round": 1,
         "note": "As charge_capacity_GW."
     },
     "electric_storage.charge_efficiency": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "fraction",
-        "value": 0.85,
-        "note": "Carried from the 2018 baseline. Round trip about 72%, close to pumped hydro."
+        "values": {
+            "output": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.A Electricity output", "row": [ "Total" ], "column": "{year}"},
+            "input": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.B Electricity input", "row": [ "Total" ], "column": "{year}"}
+        },
+        "formula": "(output / input) ** 0.5",
+        "round": 3,
+        "note": "Square root of the DUKES 5.16 round trip efficiency (output over input), split evenly between charge and discharge."
     },
     "electric_storage.discharge_efficiency": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "fraction",
-        "value": 0.85,
-        "note": "As charge_efficiency."
+        "values": {
+            "output": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.A Electricity output", "row": [ "Total" ], "column": "{year}"},
+            "input": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.B Electricity input", "row": [ "Total" ], "column": "{year}"}
+        },
+        "formula": "(output / input) ** 0.5",
+        "round": 3,
+        "note": "Square root of the DUKES 5.16 round trip efficiency (output over input), split evenly between charge and discharge."
     },
     "hydrogen.electrolysis_capacity_GW": {
         "type": "assumption",
@@ -349,5 +384,41 @@
         "type": "assumption",
         "value": 1,
         "note": "Ambient heat counted in supply, as in the ZCB default. Set explicitly so the ZCB default does not leak in."
+    },
+    "fuel_prices.gas": {
+        "type": "statistic",
+        "units": "p/kWh fuel",
+        "values": {
+            "price": {"source": "qep_3.2.1", "sheet": "3.2.1 (Annual)", "block": "Table 3.2.1 Average prices of fuels purchased", "row": [ "{year}" ], "column": "Major power producers: Natural gas (pence per kWh)"}
+        },
+        "formula": "price",
+        "round": 3,
+        "note": "Average price paid by major power producers (DESNZ QEP 3.2.1, cash terms). Excludes carbon prices (UK ETS and Carbon Price Support), so the LCOE leaves them out."
+    },
+    "fuel_prices.oil": {
+        "type": "statistic",
+        "units": "p/kWh fuel",
+        "values": {
+            "price": {"source": "qep_3.2.1", "sheet": "3.2.1 (Annual)", "block": "Table 3.2.1 Average prices of fuels purchased", "row": [ "{year}" ], "column": "Major power producers: Oil (pence per kWh)"}
+        },
+        "formula": "price",
+        "round": 3,
+        "note": "Average price paid by major power producers (DESNZ QEP 3.2.1, cash terms). Excludes carbon prices (UK ETS and Carbon Price Support), so the LCOE leaves them out."
+    },
+    "fuel_prices.coal": {
+        "type": "statistic",
+        "units": "p/kWh fuel",
+        "values": {
+            "price": {"source": "qep_3.2.1", "sheet": "3.2.1 (Annual)", "block": "Table 3.2.1 Average prices of fuels purchased", "row": [ "{year}" ], "column": "Major power producers: Coal (pence per kWh)"}
+        },
+        "formula": "price",
+        "round": 3,
+        "note": "Average price paid by major power producers (DESNZ QEP 3.2.1, cash terms). Excludes carbon prices (UK ETS and Carbon Price Support), so the LCOE leaves them out."
+    },
+    "fuel_prices.biomass": {
+        "type": "assumption",
+        "units": "p/kWh fuel",
+        "value": 0,
+        "note": "No official series for biomass fuel prices paid by generators, so biomass generation fuel cost is left out of the LCOE."
     }
 }

@@ -44,10 +44,15 @@
         "note": "Carried from the 2018 workbook."
     },
     "transport.modes.Rail.prc.EV": {
-        "type": "assumption",
+        "type": "calibrated",
         "units": "fraction",
-        "value": 0.66,
-        "note": "Share of rail passenger km on electric traction. ORR traction energy is 47% electric but diesel uses about twice the energy per km, so 66% (the 2018 value) is kept."
+        "values": {
+            "electricity": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Rail" ], "column": "Electricity"}
+        },
+        "target": "electricity * 0.01163",
+        "model_output": "transport.modes.Rail.EV.TWh",
+        "round": 3,
+        "note": "Share of rail passenger km on electric traction, calibrated so modelled rail electricity equals DUKES 1.1 rail electricity. Uses the ZCB electric efficiency (0.9) and mechanical kWh per passenger km. Diesel efficiency is calibrated separately to DUKES rail petroleum."
     },
     "transport.modes.Rail.prc.H2": {
         "type": "assumption",
@@ -317,19 +322,27 @@
         },
         "formula": "bev",
         "round": 1,
-        "note": "Battery electric cars licensed at the end of {year} (VEH1103, UK). Evidence for the EV battery and charge rate assumptions."
+        "note": "Battery electric cars licensed at the end of the year (VEH1103, UK)."
     },
     "transport.electric_car_battery_capacity": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "GWh",
-        "value": 75,
-        "note": "Aggregate EV battery available to the model. About 58 kWh for each of the 1.29 million battery electric cars at the end of 2024."
+        "values": {
+            "cars": {"ref": "_transport.bev_cars_thousands"}
+        },
+        "formula": "cars * 60 / 1000",
+        "round": 0,
+        "note": "Battery electric cars times 60 kWh, an assumed fleet average battery. Only buffers the standard charging profile while smart charging and V2G are off."
     },
     "transport.electric_car_max_charge_rate": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "GW",
-        "value": 9,
-        "note": "Aggregate EV charge rate, about 7 kW per battery electric car."
+        "values": {
+            "cars": {"ref": "_transport.bev_cars_thousands"}
+        },
+        "formula": "cars * 7 / 1000",
+        "round": 1,
+        "note": "Battery electric cars times 7 kW, an assumed typical home charger. The model scales it by the share of cars plugged in each hour."
     },
     "transport.rail_freight_elec_demand": {
         "type": "assumption",

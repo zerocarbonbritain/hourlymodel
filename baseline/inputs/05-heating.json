@@ -206,27 +206,30 @@
         "round": 3,
         "note": "All heat pump ambient heat in final consumption."
     },
+    "_heating.heatpump_TWh": {
+        "type": "calibrated",
+        "units": "TWh/yr",
+        "values": {
+            "ambient": {"ref": "_heating.ambient_TWh"}
+        },
+        "target": "ambient",
+        "model_output": "heat.total_ambient_supply",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Heat pump heat, calibrated so the ambient heat the model's heat pumps draw equals DUKES 6.1 ambient heat. This uses the model's own seasonal efficiency instead of assuming SPF 3. A working value, not written to the scenario."
+    },
     "_heating.elres_TWh": {
         "type": "intermediate",
         "units": "TWh/yr",
         "values": {
             "space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Space heating" ], "column": "Electricity"},
             "water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Water heating" ], "column": "Electricity"},
-            "ambient": {"ref": "_heating.ambient_TWh"}
+            "ambient": {"ref": "_heating.ambient_TWh"},
+            "heatpump": {"ref": "_heating.heatpump_TWh"}
         },
-        "formula": "(space + water) * 0.01163 - ambient / 2",
+        "formula": "(space + water) * 0.01163 - (heatpump - ambient)",
         "round": 3,
-        "note": "Electricity for space and water heat less heat pump input. Heat pump input is ambient / 2 (seasonal performance factor 3), as in the 2018 workbook."
-    },
-    "_heating.heatpump_TWh": {
-        "type": "intermediate",
-        "units": "TWh/yr",
-        "values": {
-            "ambient": {"ref": "_heating.ambient_TWh"}
-        },
-        "formula": "ambient * 1.5",
-        "round": 3,
-        "note": "Ambient heat plus electricity input (ambient / 2)."
+        "note": "Heating electricity less the electricity used by heat pumps (heat pump heat less ambient heat)."
     },
     "_heating.total_TWh": {
         "type": "intermediate",

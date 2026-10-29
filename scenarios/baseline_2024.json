@@ -17,7 +17,8 @@
         "nuclear_capacity": 5.88,
         "nuclear_capacity_factor": 0.787,
         "solarpv_availability": 0.933,
-        "imports_TWhy": 33.4
+        "imports_TWhy": 0,
+        "interconnector_capacity_GW": 9.84
     },
     "LAC": {
         "domestic": {
@@ -46,13 +47,13 @@
     },
     "heating_systems": {
         "heatpump": {
-            "share": 5.89,
+            "share": 6.02,
             "efficiency_hot_water": 240,
             "efficiency_0C": 250,
             "efficiency_10C": 320
         },
         "elres": {
-            "share": 6.45,
+            "share": 6.32,
             "efficiency_hot_water": 100,
             "efficiency_0C": 100,
             "efficiency_10C": 100
@@ -111,12 +112,12 @@
                 "miles_pp": 683,
                 "load_factor": 0.324,
                 "prc": {
-                    "EV": 0.66,
+                    "EV": 0.721,
                     "H2": 0,
-                    "IC": 0.34
+                    "IC": 0.279
                 },
                 "efficiency": {
-                    "IC": 0.3467,
+                    "IC": 0.2845,
                     "EV": 0.9,
                     "H2": 0.3564
                 },
@@ -183,8 +184,8 @@
                 "load_factor": 0.85
             }
         },
-        "electric_car_battery_capacity": 75,
-        "electric_car_max_charge_rate": 9,
+        "electric_car_battery_capacity": 77,
+        "electric_car_max_charge_rate": 9.0,
         "rail_freight_elec_demand": 0,
         "freight_BEV_demand": 0,
         "freight_H2_demand": 0,
@@ -246,11 +247,11 @@
         "other_non_heat_fixed_H2_prc": 0
     },
     "electric_storage": {
-        "capacity_GWh": 30,
-        "charge_capacity_GW": 7,
-        "discharge_capacity_GW": 7,
-        "charge_efficiency": 0.85,
-        "discharge_efficiency": 0.85
+        "capacity_GWh": 31,
+        "charge_capacity_GW": 8.0,
+        "discharge_capacity_GW": 8.0,
+        "charge_efficiency": 0.89,
+        "discharge_efficiency": 0.89
     },
     "hydrogen": {
         "electrolysis_capacity_GW": 0,
@@ -281,7 +282,9 @@
         "coal_efficiency": 24.7,
         "synth_fuel_efficiency": 36.8,
         "capacity_limit": 100,
-        "prc_hydrogen": 0
+        "prc_hydrogen": 0,
+        "prc_imports": 20.65,
+        "coal_co2_factor": 0.2542
     },
     "energy_industry_use": {
         "electricity_grid_loss_prc": 8.8,
@@ -289,7 +292,7 @@
         "refineries_gas_prc": 0.759,
         "refineries_oil_prc": 5.18,
         "oil_gas_extraction_gas_prc": 3.149,
-        "oil_gas_extraction_oil_prc": 0.399,
+        "oil_gas_extraction_oil_prc": 0.4,
         "gas_losses_prc": 0.778
     },
     "fossil_fuels": {
@@ -349,5 +352,11 @@
     "power_to_X": {
         "capacity": 0
     },
-    "include_ambient_heat": 1
+    "include_ambient_heat": 1,
+    "fuel_prices": {
+        "gas": 3.499,
+        "oil": 5.245,
+        "coal": 1.399,
+        "biomass": 0
+    }
 }

@@ -166,5 +166,37 @@
         "url": "https://assets.publishing.service.gov.uk/media/6a69f4332c4b5ba9d1242a68/DUKES_4.1.xlsx",
         "file": "DUKES_4.1.xlsx",
         "sha256": "a117e2fb7ba83985168184940590897d59b1c2d092eff18dd5dcb5f1520ecf95"
+    },
+    "dukes_5.13": {
+        "title": "DUKES 5.13 Capacity, net imports and utilisation of interconnectors",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a3675bf4a7aca8f8976c3/DUKES_5.13.xlsx",
+        "file": "DUKES_5.13.xlsx",
+        "sha256": "c83999650bf5a21b8bf0b177b712f5e20ccdc352f989a3ec89779cc43983ae2b"
+    },
+    "dukes_5.14": {
+        "title": "DUKES 5.14 Estimated carbon dioxide intensity of electricity supplied",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a3684bf4a7aca8f8976c4/DUKES_5.14.xlsx",
+        "file": "DUKES_5.14.xlsx",
+        "sha256": "bd587b66c0001ff08ab821d14fea2bd0a6e09633019a5a0bac25b80b43064ece"
+    },
+    "dukes_5.16": {
+        "title": "DUKES 5.16 Energy storage overview",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a36a0bf4a7aca8f8976c6/DUKES_5.16.xlsx",
+        "file": "DUKES_5.16.xlsx",
+        "sha256": "81a2f075be500d68c12bcd78d86407953b2d60a85698f4cb1faa869a9f5cbe58"
+    },
+    "qep_3.2.1": {
+        "title": "QEP 3.2.1 Prices of fuels purchased by major power producers",
+        "edition": "Quarterly Energy Prices, September 2026",
+        "page": "https://www.gov.uk/government/statistical-data-sets/prices-of-fuels-purchased-by-major-power-producers",
+        "url": "https://assets.publishing.service.gov.uk/media/6ab54240734e2435f202f060/table_321.xlsx",
+        "file": "table_321.xlsx",
+        "sha256": "b58d7dc9dcb3313876b77f31af59a1e2b218b7872211550602fe024b5d57740c"
     }
 }

@@ -252,7 +252,8 @@ def locate(grid, spec, year):
 
 def query(grid, spec, year):
     """Sum a column over the rows of a long format table that match every condition in where
-    and none in where_not. Condition values may contain * wildcards."""
+    and none in where_not. Condition values may contain * wildcards, or start with <= for a
+    numeric upper limit."""
     where = "%s!%s" % (spec["source"], spec["sheet"])
 
     def patterns(spec_conditions):
@@ -262,8 +263,13 @@ def query(grid, spec, year):
             out[norm(column)] = [norm(sub_year(str(v), year)) for v in values]
         return out
 
+    def match(cell, p):
+        if p.startswith("<="):
+            return isinstance(cell, float) and cell <= float(p[2:])
+        return fnmatch.fnmatchcase(norm(cell), p)
+
     def matches(cell, pats):
-        return cell is not None and any(fnmatch.fnmatchcase(norm(cell), p) for p in pats)
+        return cell is not None and any(match(cell, p) for p in pats)
 
     include = patterns(spec["where"])
     exclude = patterns(spec.get("where_not", {}))
@@ -414,19 +420,39 @@ def build(year, scenario_path, update_hashes, only=None):
             names["value"] = r["value"]
             r["check"] = dict(check, observed=evaluate(check["target"], names))
         try:
-            r["current"] = None if spec["type"] == "intermediate" else get_path(current, path)
+            r["current"] = None if spec["type"] == "intermediate" or path.startswith("_") else get_path(current, path)
         except KeyError:
             r["current"] = None
         results[path] = r
 
+    # Paths starting with _ are working values, never written to the scenario
     scenario = copy.deepcopy(current)
     for path, r in results.items():
-        if r["type"] != "intermediate":
+        if r["type"] != "intermediate" and not path.startswith("_"):
             set_path(scenario, path, r["value"])
 
     # Calibrated inputs can affect each other (gas losses depend on backup gas, which depends on
     # wind), so each pass rescales every input by its own target ratio until all are within tolerance.
     calibrated = [p for p, r in results.items() if r["type"] == "calibrated"]
+
+    # Statistics that refer, directly or through other entries, to a calibrated input are
+    # recalculated after each pass, for example a remainder share such as 1 - prc.EV.
+    dependents = []
+    changing = set(calibrated)
+    for path, spec in inputs.items():
+        if spec["type"] in ("statistic", "intermediate") and \
+                any(v.get("ref") in changing for v in spec["values"].values()):
+            dependents.append(path)
+            changing.add(path)
+
+    def refresh_dependents():
+        for path in dependents:
+            spec, r = inputs[path], results[path]
+            names = extract_values(spec["values"], sources, results, year, sheets, [])
+            r["value"] = rounded(evaluate(spec["formula"], names), spec.get("round", 3))
+            if r["type"] != "intermediate" and not path.startswith("_"):
+                set_path(scenario, path, r["value"])
+
     for n in range(CALIBRATION_PASSES):
         if not calibrated:
             break
@@ -442,12 +468,16 @@ def build(year, scenario_path, update_hashes, only=None):
             if abs(ratio - 1) > CALIBRATION_TOLERANCE / 10:
                 settled = False
             r["value"] = r["value"] / ratio if spec.get("relation") == "inverse" else r["value"] * ratio
-            set_path(scenario, path, r["value"])
+            if not path.startswith("_"):
+                set_path(scenario, path, r["value"])
+        refresh_dependents()
         if settled:
             break
     for path in calibrated:
         results[path]["value"] = rounded(results[path]["value"], inputs[path].get("round", 3))
-        set_path(scenario, path, results[path]["value"])
+        if not path.startswith("_"):
+            set_path(scenario, path, results[path]["value"])
+    refresh_dependents()
 
     # Verification run with final values
     out = run_model(scenario)
@@ -467,7 +497,7 @@ def build(year, scenario_path, update_hashes, only=None):
     with open(os.path.join(ROOT, "scenarios", "zerocarbonbritain.json")) as f:
         default = json.load(f)
     own = set(leaves(scenario))
-    built = {p for p, r in results.items() if r["type"] != "intermediate"}
+    built = {p for p, r in results.items() if r["type"] != "intermediate" and not p.startswith("_")}
     coverage = {
         "inherited": [p for p in leaves(default) if p not in own],
         "not_built": [p for p in leaves(scenario) if p not in built],
@@ -501,8 +531,8 @@ def report(year, scenario_path, sources, status, results, failures, coverage):
               "| Input | Value | Previous | Units | Type |",
               "|---|---|---|---|---|"]
     for path, r in results.items():
-        if r["type"] == "intermediate":
-            lines.append("| `%s` | %s | - | %s | intermediate |" % (path, fmt(r["value"]), r["units"]))
+        if r["type"] == "intermediate" or path.startswith("_"):
+            lines.append("| `%s` | %s | - | %s | %s |" % (path, fmt(r["value"]), r["units"], r["type"]))
             continue
         changed = "" if r["current"] == r["value"] else " (changed)"
         lines.append("| `%s` | %s | %s%s | %s | %s |" % (
@@ -569,7 +599,7 @@ def main():
         f.write(report(args.year, scenario_path, sources, status, results, failures, coverage))
 
     for path, r in results.items():
-        mark = "" if r["type"] == "intermediate" or r["current"] == r["value"] else "  <- was %s" % fmt(r["current"])
+        mark = "" if r["type"] == "intermediate" or path.startswith("_") or r["current"] == r["value"] else "  <- was %s" % fmt(r["current"])
         print("%-40s %10s%s" % (path, fmt(r["value"]), mark))
     print("Report: " + os.path.relpath(report_path, ROOT))
 

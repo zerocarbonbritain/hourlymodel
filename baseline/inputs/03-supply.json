@@ -142,15 +142,47 @@
         "formula": "generation / (capacity * 8766)",
         "round": 3
     },
-    "supply.imports_TWhy": {
-        "type": "statistic",
+    "_supply.net_imports_TWh": {
+        "type": "intermediate",
         "units": "TWh/yr",
         "values": {
             "imports": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Imports" ], "column": "Electricity"},
             "exports": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Exports" ], "column": "Electricity"}
         },
         "formula": "(imports + exports) * 0.01163",
-        "round": 1,
-        "note": "Net interconnector imports from DUKES 1.1 (exports are negative). The model adds them as a flat supply before grid losses."
+        "round": 2,
+        "note": "Net interconnector imports from DUKES 1.1 (exports are negative)."
+    },
+    "supply.imports_TWhy": {
+        "type": "assumption",
+        "units": "TWh/yr",
+        "value": 0,
+        "note": "No flat imports. Imports are dispatched against the backup requirement instead, see electric_backup.prc_imports."
+    },
+    "supply.interconnector_capacity_GW": {
+        "type": "statistic",
+        "units": "GW",
+        "values": {
+            "capacity": {"source": "dukes_5.13", "sheet": "5.13A", "sum": "Capacity (MW)", "where": { "Year Commissioned": "<={year}"},
+                "where_not": {
+                    "Connecting Country": "within the UK"
+                }
+            }
+        },
+        "formula": "capacity / 1000",
+        "round": 2,
+        "note": "Interconnectors commissioned by the end of the year (DUKES 5.13A), excluding Moyle, which links Northern Ireland and Great Britain within the UK. Lists current interconnectors only, so closed links would be missed for past years."
+    },
+    "electric_backup.prc_imports": {
+        "type": "calibrated",
+        "units": "%",
+        "values": {
+            "imports": {"ref": "_supply.net_imports_TWh"}
+        },
+        "target": "imports",
+        "model_output": "supply.total_imports",
+        "model_scale": 0.0001,
+        "round": 2,
+        "note": "Share of each hour's backup requirement met by imports, limited by interconnector capacity, calibrated so modelled imports equal DUKES net imports. Imports then arrive when wind and solar are low, as in practice. The fuel shares split the rest."
     }
 }
