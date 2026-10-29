@@ -1,0 +1,98 @@
+{
+    "LAC.domestic.lighting_and_appliances_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Domestic", "Lighting and appliances"], "column": "Electricity"}
+        },
+        "formula": "elec * 0.01163",
+        "round": 2,
+        "note": "ECUK U2 is in ktoe. 1 ktoe = 0.01163 TWh."
+    },
+    "LAC.domestic.cooking_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Domestic", "Cooking/catering"], "column": "Electricity"}
+        },
+        "formula": "elec * 0.01163",
+        "round": 2,
+        "note": "Fuel input, used directly by the model as electricity demand."
+    },
+    "LAC.domestic.cooking_gas_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Domestic", "Cooking/catering"], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Domestic", "Cooking/catering"], "column": "Oil"}
+        },
+        "formula": "(gas + oil) * 0.01163",
+        "round": 2,
+        "note": "Fuel input. Oil is zero in 2024 but is included so it is not lost if it appears."
+    },
+    "LAC.services.lighting_and_appliances_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "lighting": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Lighting"], "column": "Electricity"},
+            "computing": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Computing"], "column": "Electricity"},
+            "other": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Other"], "column": "Electricity"}
+        },
+        "formula": "(lighting + computing + other) * 0.01163",
+        "round": 2,
+        "note": "Lighting, computing and the electric part of other, as in the 2018 workbook."
+    },
+    "LAC.services.lighting_and_appliances_gas_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Other"], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Other"], "column": "Oil"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Other"], "column": "Heat"},
+            "bio": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Other"], "column": "Bioenergy & waste"}
+        },
+        "formula": "(gas + oil + heat + bio) * 0.01163",
+        "round": 2,
+        "note": "Non electric part of services other. Oil, heat sold and bioenergy are folded into gas, as in the 2018 workbook."
+    },
+    "LAC.services.catering_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Cooking/catering"], "column": "Electricity"}
+        },
+        "formula": "elec * 0.01163",
+        "round": 2
+    },
+    "LAC.services.catering_gas_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Cooking/catering"], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Cooking/catering"], "column": "Oil"}
+        },
+        "formula": "(gas + oil) * 0.01163",
+        "round": 2,
+        "note": "Oil is folded into gas, as in the 2018 workbook."
+    },
+    "LAC.services.cooling_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Cooling and ventilation"], "column": "Electricity"}
+        },
+        "formula": "elec * 0.01163",
+        "round": 2
+    },
+    "LAC.services.cooling_gas_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Cooling and ventilation"], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": ["{year}", "Services", "Cooling and ventilation"], "column": "Oil"}
+        },
+        "formula": "(gas + oil) * 0.01163",
+        "round": 2,
+        "note": "Oil is folded into gas, as in the 2018 workbook."
+    }
+}

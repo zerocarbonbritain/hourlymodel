@@ -1,0 +1,443 @@
+{
+    "_heating.domestic_space_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Oil"},
+            "solid": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Solid fuel"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Electricity"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Heat"},
+            "bio": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Bioenergy & waste"},
+            "elec_water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Electricity"},
+            "ambient": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Domestic" ], "column": "Heat pumps"}
+        },
+        "formula": "((gas * 0.825 + oil * 0.825 + solid * 0.75 + elec + heat + bio * 0.7) + ambient * elec / (elec + elec_water)) * 0.01163",
+        "round": 3,
+        "note": "ECUK U2 fuel (ktoe) to heat with workbook efficiencies: gas and oil 82.5%, solid fuel 75%, bioenergy 70%, electricity and heat sold 100%. Heat pump ambient heat from DUKES 6.1 is added, split between space and water in proportion to electricity use. Electricity already includes heat pump input."
+    },
+    "_heating.domestic_water_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Oil"},
+            "solid": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Solid fuel"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Electricity"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Heat"},
+            "bio": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Water heating" ], "column": "Bioenergy & waste"},
+            "elec_space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Domestic", "Space heating" ], "column": "Electricity"},
+            "ambient": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Domestic" ], "column": "Heat pumps"},
+            "solar": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Domestic" ], "column": "Solar PV solar thermal geothermal"}
+        },
+        "formula": "((gas * 0.825 + oil * 0.825 + solid * 0.75 + elec + heat + bio * 0.7) + ambient * elec / (elec + elec_space) + solar) * 0.01163",
+        "round": 3,
+        "note": "As domestic space heat, plus solar thermal from DUKES 6.1 final consumption (the column also covers geothermal; PV is in transformation)."
+    },
+    "_heating.services_space_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Oil"},
+            "solid": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Solid fuel"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Electricity"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Heat"},
+            "bio": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Bioenergy & waste"},
+            "elec_water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Electricity"},
+            "ambient_commercial": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Commercial" ], "column": "Heat pumps"},
+            "ambient_public": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Public administration" ], "column": "Heat pumps"},
+            "ambient_agriculture": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Agriculture" ], "column": "Heat pumps"},
+            "ambient_misc": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Miscellaneous" ], "column": "Heat pumps"}
+        },
+        "formula": "((gas * 0.825 + oil * 0.825 + solid * 0.75 + elec + heat + bio * 0.7) + (ambient_commercial + ambient_public + ambient_agriculture + ambient_misc) * elec / (elec + elec_water)) * 0.01163",
+        "round": 3,
+        "note": "As domestic, with DUKES 6.1 commercial, public administration, agriculture and miscellaneous rows for ambient heat."
+    },
+    "_heating.services_water_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Oil"},
+            "solid": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Solid fuel"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Electricity"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Heat"},
+            "bio": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Water heating" ], "column": "Bioenergy & waste"},
+            "elec_space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Services", "Space heating" ], "column": "Electricity"},
+            "ambient_commercial": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Commercial" ], "column": "Heat pumps"},
+            "ambient_public": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Public administration" ], "column": "Heat pumps"},
+            "ambient_agriculture": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Agriculture" ], "column": "Heat pumps"},
+            "ambient_misc": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Miscellaneous" ], "column": "Heat pumps"},
+            "solar_commercial": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Commercial" ], "column": "Solar PV solar thermal geothermal"},
+            "solar_public": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Public administration" ], "column": "Solar PV solar thermal geothermal"},
+            "solar_agriculture": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Agriculture" ], "column": "Solar PV solar thermal geothermal"},
+            "solar_misc": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Miscellaneous" ], "column": "Solar PV solar thermal geothermal"}
+        },
+        "formula": "((gas * 0.825 + oil * 0.825 + solid * 0.75 + elec + heat + bio * 0.7) + (ambient_commercial + ambient_public + ambient_agriculture + ambient_misc) * elec / (elec + elec_space) + (solar_commercial + solar_public + solar_agriculture + solar_misc)) * 0.01163",
+        "round": 3
+    },
+    "_heating.industry_space_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Space heating" ], "column": "Natural gas"},
+            "oil": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Space heating" ], "column": "Oil"},
+            "solid": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Space heating" ], "column": "Solid fuel"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Space heating" ], "column": "Electricity"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Space heating" ], "column": "Heat"},
+            "bio": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Space heating" ], "column": "Bioenergy & waste"},
+            "ambient": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Industry" ], "column": "Heat pumps"}
+        },
+        "formula": "((gas * 0.825 + oil * 0.825 + solid * 0.75 + elec + heat + bio * 0.7) + ambient) * 0.01163",
+        "round": 3,
+        "note": "ECUK has no industry water heating row, so all industry ambient heat is space heat. The U2 industry unknown (heat) row is in industry.other_heat_TWhy."
+    },
+    "space_heating.domestic_demand_GWK": {
+        "type": "calibrated",
+        "units": "GW/K",
+        "values": {
+            "heat": {"ref": "_heating.domestic_space_TWh"}
+        },
+        "target": "heat",
+        "model_output": "space_heating.total_domestic_demand",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Whole stock heat loss coefficient. Model output is 10 year GWh, scaled to TWh/yr."
+    },
+    "space_heating.services_demand_GWK": {
+        "type": "calibrated",
+        "units": "GW/K",
+        "values": {
+            "heat": {"ref": "_heating.services_space_TWh"}
+        },
+        "target": "heat",
+        "model_output": "space_heating.total_services_demand",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Whole stock heat loss coefficient. Model output is 10 year GWh, scaled to TWh/yr."
+    },
+    "space_heating.industry_demand_GWK": {
+        "type": "calibrated",
+        "units": "GW/K",
+        "values": {
+            "heat": {"ref": "_heating.industry_space_TWh"}
+        },
+        "target": "heat",
+        "model_output": "space_heating.total_industry_demand",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Whole stock heat loss coefficient. Model output is 10 year GWh, scaled to TWh/yr."
+    },
+    "space_heating.base_temperature": {
+        "type": "assumption",
+        "units": "C",
+        "value": 15.3,
+        "note": "Model default, kept from the 2018 baseline. The GW/K calibration absorbs any error in it."
+    },
+    "water_heating.domestic_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "heat": {"ref": "_heating.domestic_water_TWh"}
+        },
+        "formula": "heat",
+        "round": 2,
+        "note": "Heat demand, not fuel."
+    },
+    "water_heating.services_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "heat": {"ref": "_heating.services_water_TWh"}
+        },
+        "formula": "heat",
+        "round": 2,
+        "note": "Heat demand, not fuel."
+    },
+    "_heating.methane_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Space heating" ], "column": "Natural gas"},
+            "water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Water heating" ], "column": "Natural gas"}
+        },
+        "formula": "(space + water) * 0.825 * 0.01163",
+        "round": 3
+    },
+    "_heating.synthfuel_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Space heating" ], "column": "Oil"},
+            "water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Water heating" ], "column": "Oil"}
+        },
+        "formula": "(space + water) * 0.825 * 0.01163",
+        "round": 3,
+        "note": "Oil boilers map to synthfuel."
+    },
+    "_heating.biomass_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Space heating" ], "column": "Bioenergy & waste"},
+            "water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Water heating" ], "column": "Bioenergy & waste"}
+        },
+        "formula": "(space + water) * 0.7 * 0.01163",
+        "round": 3
+    },
+    "_heating.solid_fuel_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Space heating" ], "column": "Solid fuel"},
+            "water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Water heating" ], "column": "Solid fuel"}
+        },
+        "formula": "(space + water) * 0.75 * 0.01163",
+        "round": 3
+    },
+    "_heating.ambient_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "ambient": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Final consumption" ], "column": "Heat pumps"}
+        },
+        "formula": "ambient * 0.01163",
+        "round": 3,
+        "note": "All heat pump ambient heat in final consumption."
+    },
+    "_heating.elres_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "space": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Space heating" ], "column": "Electricity"},
+            "water": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Total", "Water heating" ], "column": "Electricity"},
+            "ambient": {"ref": "_heating.ambient_TWh"}
+        },
+        "formula": "(space + water) * 0.01163 - ambient / 2",
+        "round": 3,
+        "note": "Electricity for space and water heat less heat pump input. Heat pump input is ambient / 2 (seasonal performance factor 3), as in the 2018 workbook."
+    },
+    "_heating.heatpump_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "ambient": {"ref": "_heating.ambient_TWh"}
+        },
+        "formula": "ambient * 1.5",
+        "round": 3,
+        "note": "Ambient heat plus electricity input (ambient / 2)."
+    },
+    "_heating.total_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "heatpump": {"ref": "_heating.heatpump_TWh"},
+            "elres": {"ref": "_heating.elres_TWh"},
+            "methane": {"ref": "_heating.methane_TWh"},
+            "synthfuel": {"ref": "_heating.synthfuel_TWh"},
+            "biomass": {"ref": "_heating.biomass_TWh"},
+            "solid_fuel": {"ref": "_heating.solid_fuel_TWh"}
+        },
+        "formula": "heatpump + elres + methane + synthfuel + biomass + solid_fuel",
+        "round": 3,
+        "note": "Heat sold and solar thermal are left out, which reallocates them in proportion to the other systems."
+    },
+    "heating_systems.heatpump.share": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "heat": {"ref": "_heating.heatpump_TWh"},
+            "total": {"ref": "_heating.total_TWh"}
+        },
+        "formula": "100 * heat / total",
+        "round": 2
+    },
+    "heating_systems.elres.share": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "heat": {"ref": "_heating.elres_TWh"},
+            "total": {"ref": "_heating.total_TWh"}
+        },
+        "formula": "100 * heat / total",
+        "round": 2
+    },
+    "heating_systems.methane.share": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "heat": {"ref": "_heating.methane_TWh"},
+            "total": {"ref": "_heating.total_TWh"}
+        },
+        "formula": "100 * heat / total",
+        "round": 2
+    },
+    "heating_systems.synthfuel.share": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "heat": {"ref": "_heating.synthfuel_TWh"},
+            "total": {"ref": "_heating.total_TWh"}
+        },
+        "formula": "100 * heat / total",
+        "round": 2
+    },
+    "heating_systems.biomass.share": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "heat": {"ref": "_heating.biomass_TWh"},
+            "total": {"ref": "_heating.total_TWh"}
+        },
+        "formula": "100 * heat / total",
+        "round": 2
+    },
+    "heating_systems.solid_fuel.share": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "heat": {"ref": "_heating.solid_fuel_TWh"},
+            "total": {"ref": "_heating.total_TWh"}
+        },
+        "formula": "100 * heat / total",
+        "round": 2
+    },
+    "heating_systems.hydrogen.share": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen heating. Set explicitly so no default leaks in."
+    },
+    "heating_systems.heatpump.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 240,
+        "note": "Seasonal efficiencies kept from the 2018 baseline. The share derivation assumes SPF 3."
+    },
+    "heating_systems.heatpump.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 250,
+        "note": "Seasonal efficiencies kept from the 2018 baseline. The share derivation assumes SPF 3."
+    },
+    "heating_systems.heatpump.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 320,
+        "note": "Seasonal efficiencies kept from the 2018 baseline. The share derivation assumes SPF 3."
+    },
+    "heating_systems.elres.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Direct electric. Set explicitly, matches the model default."
+    },
+    "heating_systems.elres.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Direct electric. Set explicitly, matches the model default."
+    },
+    "heating_systems.elres.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Direct electric. Set explicitly, matches the model default."
+    },
+    "heating_systems.methane.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Workbook gas boiler efficiency, also used to derive the shares."
+    },
+    "heating_systems.methane.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Workbook gas boiler efficiency, also used to derive the shares."
+    },
+    "heating_systems.methane.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Workbook gas boiler efficiency, also used to derive the shares."
+    },
+    "heating_systems.hydrogen.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Kept from the 2018 baseline. Not used with a zero share."
+    },
+    "heating_systems.hydrogen.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Kept from the 2018 baseline. Not used with a zero share."
+    },
+    "heating_systems.hydrogen.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Kept from the 2018 baseline. Not used with a zero share."
+    },
+    "heating_systems.synthfuel.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Workbook oil boiler efficiency, also used to derive the shares."
+    },
+    "heating_systems.synthfuel.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Workbook oil boiler efficiency, also used to derive the shares."
+    },
+    "heating_systems.synthfuel.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 82.5,
+        "note": "Workbook oil boiler efficiency, also used to derive the shares."
+    },
+    "heating_systems.biomass.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 70,
+        "note": "Workbook wood efficiency, also used to derive the shares."
+    },
+    "heating_systems.biomass.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 70,
+        "note": "Workbook wood efficiency, also used to derive the shares."
+    },
+    "heating_systems.biomass.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 70,
+        "note": "Workbook wood efficiency, also used to derive the shares."
+    },
+    "heating_systems.solid_fuel.efficiency_hot_water": {
+        "type": "assumption",
+        "units": "%",
+        "value": 75,
+        "note": "Workbook solid fuel efficiency, also used to derive the shares."
+    },
+    "heating_systems.solid_fuel.efficiency_0C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 75,
+        "note": "Workbook solid fuel efficiency, also used to derive the shares."
+    },
+    "heating_systems.solid_fuel.efficiency_10C": {
+        "type": "assumption",
+        "units": "%",
+        "value": 75,
+        "note": "Workbook solid fuel efficiency, also used to derive the shares."
+    },
+    "heatstore.enabled": {
+        "type": "assumption",
+        "value": false,
+        "note": "No heat stores in the baseline. Set explicitly so the ZCB default does not leak in."
+    }
+}

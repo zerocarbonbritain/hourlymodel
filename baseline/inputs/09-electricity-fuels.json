@@ -1,0 +1,353 @@
+{
+    "_fuels.dispatchable_generation_GWh": {
+        "type": "intermediate",
+        "units": "GWh",
+        "values": {
+            "coal": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Coal (thermal)"},
+            "oil": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Oil (thermal)"},
+            "gas": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Gas (thermal)"},
+            "bio": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Bioenergy (thermal)"},
+            "other": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Other (thermal)"}
+        },
+        "formula": "coal + oil + gas + bio + other",
+        "round": 1,
+        "note": "Thermal generation excluding nuclear, all generating companies. This is the generation the model represents as backup."
+    },
+    "electric_backup.prc_methane": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Gas (thermal)"},
+            "total": {"ref": "_fuels.dispatchable_generation_GWh"}
+        },
+        "formula": "generation / total * 100",
+        "round": 2,
+        "note": "Gas share of dispatchable generation."
+    },
+    "electric_backup.methane_efficiency": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Gas (thermal)"},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Gas (thermal)"}
+        },
+        "formula": "generation / fuel * 100",
+        "round": 1,
+        "note": "Generation over fuel used, gross calorific value. DUKES 5.10 gives 48.56% for CCGT stations only."
+    },
+    "electric_backup.prc_biomass": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Bioenergy (thermal)"},
+            "total": {"ref": "_fuels.dispatchable_generation_GWh"}
+        },
+        "formula": "generation / total * 100",
+        "round": 2,
+        "note": "Bioenergy share of dispatchable generation, including biogas."
+    },
+    "electric_backup.biomass_efficiency": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Bioenergy (thermal)"},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Bioenergy (thermal)"}
+        },
+        "formula": "generation / fuel * 100",
+        "round": 1
+    },
+    "electric_backup.prc_synth_fuel": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Oil (thermal)"},
+            "total": {"ref": "_fuels.dispatchable_generation_GWh"}
+        },
+        "formula": "generation / total * 100",
+        "round": 2,
+        "note": "Oil share of dispatchable generation. The model treats liquid fuel generation as synthetic fuel."
+    },
+    "electric_backup.synth_fuel_efficiency": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Oil (thermal)"},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Oil (thermal)"}
+        },
+        "formula": "generation / fuel * 100",
+        "round": 1,
+        "note": "Oil generation over fuel used. Without it the ZCB default of 21% applies."
+    },
+    "electric_backup.prc_coal": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "methane": {"ref": "electric_backup.prc_methane"},
+            "biomass": {"ref": "electric_backup.prc_biomass"},
+            "oil": {"ref": "electric_backup.prc_synth_fuel"}
+        },
+        "formula": "100 - methane - biomass - oil",
+        "round": 2,
+        "note": "Coal plus other thermal (mainly non biodegradable waste), taken as the remainder so the shares sum to 100. Calculated directly it is 6.03."
+    },
+    "electric_backup.coal_efficiency": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "coal_gen": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Coal (thermal)"},
+            "other_gen": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Other (thermal) [note 3]"},
+            "coal_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Coal (thermal)"},
+            "other_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Other (thermal) [note 3]"}
+        },
+        "formula": "(coal_gen + other_gen) / (coal_fuel + other_fuel) * 100",
+        "round": 1,
+        "note": "Coal and other thermal together, matching prc_coal, which covers both."
+    },
+    "electric_backup.hydrogen_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 47.8,
+        "note": "Carried from the 2018 baseline (the 2018 gas efficiency). Unused because the baseline has no hydrogen generation."
+    },
+    "energy_industry_use.electricity_grid_loss_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "losses": {"source": "dukes_5.1", "sheet": "5.1", "block": "Table 5.1 electricity commodity balance", "row": [ "Losses" ], "column": "{year}"},
+            "supply": {"source": "dukes_5.1", "sheet": "5.1", "block": "Table 5.1 electricity commodity balance", "row": [ "Total supply" ], "column": "{year}"}
+        },
+        "formula": "losses / supply * 100",
+        "round": 1,
+        "note": "Transmission and distribution losses as a share of total supply, which includes imports."
+    },
+    "energy_industry_use.electricity_own_use_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "own_use": {"source": "dukes_5.1", "sheet": "5.1", "block": "Table 5.1 electricity commodity balance", "row": [ "Electricity generation" ], "column": "{year}"},
+            "supply": {"source": "dukes_5.1", "sheet": "5.1", "block": "Table 5.1 electricity commodity balance", "row": [ "Total supply" ], "column": "{year}"}
+        },
+        "formula": "own_use / supply * 100",
+        "round": 2,
+        "note": "Energy industry use by electricity generation as a share of total supply. Use by other energy industries is in industry.refinery_electric_TWhy."
+    },
+    "fossil_fuels.allow_use_for_backup": {
+        "type": "assumption",
+        "units": "flag",
+        "value": 1,
+        "note": "Required for a baseline, backup generation runs on fossil fuel."
+    },
+    "fossil_fuels.other_gas_use": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "unallocated": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Natural gas"}
+        },
+        "formula": "unallocated * 0.01163",
+        "round": 1,
+        "note": "The ECUK industry unknown (other) gas. Gas losses are a model calculation, calibrated in energy_industry_use.gas_losses_prc."
+    },
+    "fossil_fuels.other_oil_use": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "unallocated": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Oil"}
+        },
+        "formula": "unallocated * 0.01163",
+        "round": 1,
+        "note": "ECUK industry unknown (other) oil (ktoe)."
+    },
+    "fossil_fuels.other_coal_use": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "unallocated": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Solid fuel"}
+        },
+        "formula": "unallocated * 0.01163",
+        "round": 1,
+        "note": "ECUK industry unknown (other) solid fuel (ktoe). 0.06 TWh, rounds to 0.1."
+    },
+    "_fuels.pumped_hydro_capacity_GW": {
+        "type": "intermediate",
+        "units": "GW",
+        "values": {
+            "capacity": {"source": "dukes_5.7", "sheet": "5.7", "block": "Table 5.7.A Capacity by fuel", "row": [ "All generating companies", "Pumped hydro" ], "column": "{year}"}
+        },
+        "formula": "capacity / 1000",
+        "round": 2,
+        "note": "Evidence for the electric_storage assumptions."
+    },
+    "electric_storage.capacity_GWh": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 30,
+        "note": "Pumped hydro (about 26 GWh across Dinorwig, Cruachan, Foyers and Ffestiniog) plus grid batteries. DUKES does not report battery energy capacity."
+    },
+    "electric_storage.charge_capacity_GW": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 7,
+        "note": "Pumped hydro 2.7 GW (DUKES 5.7, see _fuels.pumped_hydro_capacity_GW) plus about 4 GW of grid batteries. DUKES 5.7 has no battery row."
+    },
+    "electric_storage.discharge_capacity_GW": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 7,
+        "note": "As charge_capacity_GW."
+    },
+    "electric_storage.charge_efficiency": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.85,
+        "note": "Carried from the 2018 baseline. Round trip about 72%, close to pumped hydro."
+    },
+    "electric_storage.discharge_efficiency": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.85,
+        "note": "As charge_efficiency."
+    },
+    "hydrogen.electrolysis_capacity_GW": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "No electrolysis at scale in the baseline year."
+    },
+    "hydrogen.storage_capacity_GWh": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 0.1,
+        "note": "Near zero, carried from the 2018 baseline."
+    },
+    "biogas.biomass_for_biogas": {
+        "type": "assumption",
+        "units": "TWh/yr",
+        "value": 0,
+        "note": "Anaerobic digestion biogas is counted within bioenergy backup and other bioenergy use, not this pathway."
+    },
+    "_fuels.gas_storage_capacity_GWh": {
+        "type": "intermediate",
+        "units": "GWh",
+        "values": {
+            "capacity": {"source": "dukes_4.4", "sheet": "4.4a", "block": "Table 4.4a Natural gas stock", "row": [ "Storage capacity" ], "column": "{year}"}
+        },
+        "formula": "capacity",
+        "round": 0,
+        "note": "Evidence for methane.storage_capacity_GWh."
+    },
+    "methane.methanation_capacity": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "No methanation in the baseline year."
+    },
+    "methane.SOC_start": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 0,
+        "note": "Carried from the 2018 baseline."
+    },
+    "methane.storage_capacity_GWh": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 120000,
+        "note": "2018 convention covering network linepack and supply flexibility. Storage sites alone are 35.5 TWh (see _fuels.gas_storage_capacity_GWh)."
+    },
+    "synth_fuel.capacity_GW": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "No synthetic fuel production in the baseline year."
+    },
+    "synth_fuel.store_start_GWh": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 0,
+        "note": "Carried from the 2018 baseline."
+    },
+    "energy_industry_use.refineries_gas_prc": {
+        "type": "calibrated",
+        "units": "%",
+        "values": {
+            "use": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Petroleum refineries" ], "column": "Natural gas [note 2]", "after": "Energy industry use"}
+        },
+        "target": "use * 0.01163",
+        "model_output": "fossil_fuels.refineries_gas_use",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Refinery own use of gas, as a percentage of oil demand. Calibrated to the DUKES 1.1 energy industry use rows."
+    },
+    "energy_industry_use.refineries_oil_prc": {
+        "type": "calibrated",
+        "units": "%",
+        "values": {
+            "use": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Petroleum refineries" ], "column": "Petroleum products", "after": "Energy industry use"}
+        },
+        "target": "use * 0.01163",
+        "model_output": "fossil_fuels.refineries_oil_use",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Refinery own use of oil, as a percentage of oil demand. Calibrated to the DUKES 1.1 energy industry use rows."
+    },
+    "energy_industry_use.oil_gas_extraction_gas_prc": {
+        "type": "calibrated",
+        "units": "%",
+        "values": {
+            "use": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Oil and gas extraction" ], "column": "Natural gas [note 2]", "after": "Energy industry use"}
+        },
+        "target": "use * 0.01163",
+        "model_output": "fossil_fuels.oil_gas_extraction_gas_use",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Extraction own use of gas, as a percentage of oil and gas demand. Calibrated to the DUKES 1.1 energy industry use rows."
+    },
+    "energy_industry_use.oil_gas_extraction_oil_prc": {
+        "type": "calibrated",
+        "units": "%",
+        "values": {
+            "use": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Oil and gas extraction" ], "column": "Petroleum products", "after": "Energy industry use"}
+        },
+        "target": "use * 0.01163",
+        "model_output": "fossil_fuels.oil_gas_extraction_oil_use",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Extraction own use of oil, as a percentage of oil and gas demand. Calibrated to the DUKES 1.1 energy industry use rows."
+    },
+    "energy_industry_use.gas_losses_prc": {
+        "type": "calibrated",
+        "units": "%",
+        "values": {
+            "use": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Losses" ], "column": "Natural gas [note 2]", "after": "Energy industry use"}
+        },
+        "target": "use * 0.01163",
+        "model_output": "fossil_fuels.gas_losses",
+        "model_scale": 0.0001,
+        "round": 3,
+        "note": "Gas losses, as a percentage of gas demand. Calibrated to the DUKES 1.1 energy industry use rows."
+    },
+    "electric_backup.capacity_limit": {
+        "type": "assumption",
+        "value": 100,
+        "note": "No limit on backup capacity. Set explicitly so the ZCB default does not leak in."
+    },
+    "electric_backup.prc_hydrogen": {
+        "type": "assumption",
+        "value": 0,
+        "note": "No hydrogen generation today. Set explicitly so the ZCB default does not leak in."
+    },
+    "power_to_X.capacity": {
+        "type": "assumption",
+        "value": 0,
+        "note": "No power to X today. Set explicitly so the ZCB default does not leak in."
+    },
+    "hydrogen.hydrogen_from_imports": {
+        "type": "assumption",
+        "value": 0,
+        "note": "No hydrogen imports today. Set explicitly so the ZCB default does not leak in."
+    },
+    "include_ambient_heat": {
+        "type": "assumption",
+        "value": 1,
+        "note": "Ambient heat counted in supply, as in the ZCB default. Set explicitly so the ZCB default does not leak in."
+    }
+}

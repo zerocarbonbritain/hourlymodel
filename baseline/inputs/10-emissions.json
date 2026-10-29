@@ -1,0 +1,505 @@
+{
+    "_emissions.territorial_total": {
+        "type": "intermediate",
+        "units": "MtCO2e",
+        "values": {
+            "total": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes"}
+            }
+        },
+        "formula": "total",
+        "round": 3,
+        "note": "UK territorial total, excluding international aviation and shipping."
+    },
+    "_emissions.international_aviation_shipping": {
+        "type": "intermediate",
+        "units": "MtCO2e",
+        "values": {
+            "total": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "No", "Territorial Emissions Statistics sector": "International aviation and shipping"}
+            }
+        },
+        "formula": "total",
+        "round": 3
+    },
+    "_emissions.total_including_bunkers": {
+        "type": "intermediate",
+        "units": "MtCO2e",
+        "values": {
+            "territorial": {"ref": "_emissions.territorial_total"},
+            "bunkers": {"ref": "_emissions.international_aviation_shipping"}
+        },
+        "formula": "territorial + bunkers",
+        "round": 3,
+        "note": "Compare with the model total emissions, which adds an aviation non CO2 uplift."
+    },
+    "emissions_balance.power_station": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics subsector": "Power stations", "GHG grouped": [ "CH4", "N2O", "HFCs", "PFCs", "SF6", "NF3" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "CH4 and N2O only. Fuel CO2 is calculated by the model. Non-biomass municipal solid waste CO2 (7.1 Mt in 2024) is also left out: DUKES 5.6 counts it under other thermal, which the baseline maps to coal backup."
+    },
+    "emissions_balance.manufacture_solid_fuels": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "coke": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Iron and steel - coke production"}
+            },
+            "ssf": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Coal mining and handling", "Source": [ "Solid smokeless fuel production", "Charcoal production" ]}
+            }
+        },
+        "formula": "coke + ssf",
+        "round": 3,
+        "note": "Coke production, solid smokeless fuel and charcoal production, all gases. The model has no solid fuel transformation."
+    },
+    "emissions_balance.coal_mining_handling": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "all": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Coal mining and handling"}
+            },
+            "ssf": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Coal mining and handling", "Source": [ "Solid smokeless fuel production", "Charcoal production" ]}
+            }
+        },
+        "formula": "all - ssf",
+        "round": 3,
+        "note": "Coal mining and handling, all gases, less solid fuel manufacture (counted in manufacture_solid_fuels)."
+    },
+    "emissions_balance.upstream_ch4_leakage": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "og_nonco2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics subsector": "Oil and gas supply", "GHG grouped": [ "CH4", "N2O", "HFCs", "PFCs", "SF6", "NF3" ]}
+            },
+            "og_process_co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics subsector": "Oil and gas supply", "GHG grouped": "CO2", "Fuel group": "Other emissions"}
+            },
+            "fv_nonco2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Gas - flaring", "Gas - venting", "Oil - flaring", "Oil - venting" ], "GHG grouped": [ "CH4", "N2O", "HFCs", "PFCs", "SF6", "NF3" ]}
+            },
+            "fv_process_co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Gas - flaring", "Gas - venting", "Oil - flaring", "Oil - venting" ], "GHG grouped": "CO2", "Fuel group": "Other emissions"}
+            }
+        },
+        "formula": "og_nonco2 + og_process_co2 - fv_nonco2 - fv_process_co2",
+        "round": 3,
+        "note": "Oil and gas supply less flaring and venting: leakage, fugitives, process CO2, and CH4 and N2O from fuel combustion. Fuel CO2 is calculated by the model."
+    },
+    "emissions_balance.oil_and_gas_flaring_venting": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "fv": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Gas - flaring", "Gas - venting", "Oil - flaring", "Oil - venting" ]}
+            }
+        },
+        "formula": "fv",
+        "round": 3,
+        "note": "Gas and oil flaring and venting, all gases."
+    },
+    "emissions_balance.refrigerants": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "fgas": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Commercial refrigeration - F-gases", "Industrial refrigeration - F-gases", "Residential refrigeration - F-gases", "Stationary air-conditioning and heat pumps - F-gases", "Mobile air-conditioning - F-gases", "Transport refrigeration - F-gases" ]}
+            }
+        },
+        "formula": "fgas",
+        "round": 3,
+        "note": "Refrigeration, air conditioning and heat pump F-gases, including mobile and transport."
+    },
+    "emissions_balance.other_foams_solvents_aerosols": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "uses": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Foams - F-gases", "Firefighting - F-gases", "Anaesthetic use of N2O", "Electronics and other - F-gases", "Other product uses", "Lubricant use in industrial engines", "Accidental fires", "Halocarbon production - F-gases", "Magnesium cover gas - F-gases", "Aluminium production - F-gases" ]}
+            },
+            "combustion": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Commercial combustion", "Public sector combustion", "Other industrial combustion", "Industrial off-road mobile machinery", "Iron and steel production", "House and garden mobile machinery" ], "GHG grouped": [ "CH4", "N2O", "HFCs", "PFCs", "SF6", "NF3" ]}
+            }
+        },
+        "formula": "uses + combustion",
+        "round": 3,
+        "note": "Product uses, F-gas production, industrial lubricants and accidental fires (all gases), plus CH4 and N2O from commercial, public and industrial combustion. Follows the 2018 workbook, where these were the business sector emissions other than fuel CO2 and refrigeration."
+    },
+    "emissions_balance.transport_ch4_and_n2o": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "nonco2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics sector": "Domestic transport", "GHG grouped": [ "CH4", "N2O", "HFCs", "PFCs", "SF6", "NF3" ]}
+            },
+            "fgas": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Mobile air-conditioning - F-gases", "Transport refrigeration - F-gases" ]}
+            },
+            "non_energy": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Lubricant use in engines", "Urea use in transport" ]}
+            }
+        },
+        "formula": "nonco2 - fgas + non_energy",
+        "round": 3,
+        "note": "Domestic transport CH4 and N2O, plus lubricant and urea CO2. Transport F-gases are in refrigerants."
+    },
+    "emissions_balance.domestic_combustion_ch4_and_n20": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Residential combustion", "GHG grouped": [ "CH4", "N2O", "HFCs", "PFCs", "SF6", "NF3" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.domestic_aerosols": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Metered dose inhalers and other aerosols - F-gases"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.cement": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Cement production"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.lime": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Lime production"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.glass": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Glass production"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.iron_steel_and_sinter": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Sinter production", "Iron and steel production processes", "Iron and steel - coke production fugitives" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "Sinter, iron and steel process emissions and coke oven flaring, all gases."
+    },
+    "emissions_balance.ammonia": {
+        "type": "assumption",
+        "units": "MtCO2e",
+        "value": 0,
+        "note": "Ammonia production ceased in the UK in 2023. The 2024 dataset has no ammonia rows, so a query would fail."
+    },
+    "emissions_balance.bricks": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Bricks production", "Fletton brick production" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.other_process_emissions": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "all": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics subsector": "Industrial processes"}
+            },
+            "named": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": [ "Cement production", "Lime production", "Glass production", "Bricks production", "Fletton brick production", "Sinter production", "Iron and steel production processes", "Iron and steel - coke production fugitives", "Halocarbon production - F-gases", "Magnesium cover gas - F-gases", "Aluminium production - F-gases" ]}
+            }
+        },
+        "formula": "all - named",
+        "round": 3,
+        "note": "Industrial processes not mapped to another field. F-gas production is in other_foams_solvents_aerosols."
+    },
+    "emissions_balance.agriculture_total": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "all": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics sector": "Agriculture"}
+            },
+            "fuel_co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics subsector": "Agricultural combustion", "GHG grouped": "CO2"}
+            }
+        },
+        "formula": "all - fuel_co2",
+        "round": 3,
+        "note": "Agriculture, all gases, less CO2 from agricultural fuel combustion, which the model calculates."
+    },
+    "emissions_balance.biomass_burning": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "CRT category": "4*(IV)*"}
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "LULUCF wildfires and controlled burning, CRT (IV) codes."
+    },
+    "emissions_balance.land_remaining_and_converted_to_grassland": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "CRT category": "4C*"},
+                "where_not": {
+                    "CRT category": ["*(III)*", "*(IV)*"]
+                }
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "CRT 4C, excluding burning and N2O from mineralisation."
+    },
+    "emissions_balance.land_remaining_and_converted_to_cropland": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "CRT category": "4B*"},
+                "where_not": {
+                    "CRT category": ["*(III)*", "*(IV)*"]
+                }
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "CRT 4B, including bioenergy crops, excluding burning and N2O from mineralisation."
+    },
+    "emissions_balance.land_remaining_and_converted_to_settlements": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "CRT category": "4E*"},
+                "where_not": {
+                    "CRT category": ["*(III)*", "*(IV)*"]
+                }
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "CRT 4E, excluding burning and N2O from mineralisation."
+    },
+    "emissions_balance.land_remaining_and_converted_to_wetlands": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "CRT category": "4D*"},
+                "where_not": {
+                    "CRT category": ["*(III)*", "*(IV)*"]
+                }
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "CRT 4D (peat extraction and other wetlands), excluding burning."
+    },
+    "emissions_balance.land_use_n2o": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "CRT category": [ "4*(III)*", "4A2(I)a" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "Direct and indirect N2O from N mineralisation, CRT (III) codes, and N fertiliser on forest land."
+    },
+    "emissions_balance.landfill": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Landfill"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.waste_water_handling": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Wastewater"}
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "Includes effluent N2O, reported from the 2024 inventory."
+    },
+    "emissions_balance.waste_incineration": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Incineration without energy recovery"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.composting": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Composting", "Source": [ "Composting (at household)", "Total composting (non-household)" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3,
+        "note": "Household and non-household composting. Mechanical biological treatment is separate."
+    },
+    "emissions_balance.anaerobic_digestion": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Anaerobic digestion", "Source": "Anaerobic Digestion (other)"}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.mechanical_biological_treatment": {
+        "type": "statistic",
+        "units": "MtCO2e",
+        "values": {
+            "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Source": [ "Mechanical Biological Treatment - Composting", "Mechanical Biological Treatment - Anaerobic Digestion" ]}
+            }
+        },
+        "formula": "a",
+        "round": 3
+    },
+    "emissions_balance.landfill_carbon_capture": {
+        "type": "assumption",
+        "units": "MtCO2e",
+        "value": 0,
+        "note": "No landfill carbon capture in a baseline."
+    },
+    "_emissions.lulucf_left_to_land_use_model": {
+        "type": "intermediate",
+        "units": "MtCO2e",
+        "values": {
+            "lulucf": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics sector": "LULUCF"}
+            },
+            "f0": {"ref": "emissions_balance.biomass_burning"},
+            "f1": {"ref": "emissions_balance.land_remaining_and_converted_to_grassland"},
+            "f2": {"ref": "emissions_balance.land_remaining_and_converted_to_cropland"},
+            "f3": {"ref": "emissions_balance.land_remaining_and_converted_to_settlements"},
+            "f4": {"ref": "emissions_balance.land_remaining_and_converted_to_wetlands"},
+            "f5": {"ref": "emissions_balance.land_use_n2o"}
+        },
+        "formula": "lulucf - (f0 + f1 + f2 + f3 + f4 + f5)",
+        "round": 3,
+        "note": "LULUCF not in emissions_balance: forest land carbon stock and drainage, and harvested wood products. Compare with the modelled forest sink plus harvested wood."
+    },
+    "_emissions.left_to_model": {
+        "type": "intermediate",
+        "units": "MtCO2e",
+        "values": {
+            "total": {"ref": "_emissions.territorial_total"},
+            "f0": {"ref": "emissions_balance.power_station"},
+            "f1": {"ref": "emissions_balance.manufacture_solid_fuels"},
+            "f2": {"ref": "emissions_balance.coal_mining_handling"},
+            "f3": {"ref": "emissions_balance.upstream_ch4_leakage"},
+            "f4": {"ref": "emissions_balance.oil_and_gas_flaring_venting"},
+            "f5": {"ref": "emissions_balance.refrigerants"},
+            "f6": {"ref": "emissions_balance.other_foams_solvents_aerosols"},
+            "f7": {"ref": "emissions_balance.transport_ch4_and_n2o"},
+            "f8": {"ref": "emissions_balance.domestic_combustion_ch4_and_n20"},
+            "f9": {"ref": "emissions_balance.domestic_aerosols"},
+            "f10": {"ref": "emissions_balance.cement"},
+            "f11": {"ref": "emissions_balance.lime"},
+            "f12": {"ref": "emissions_balance.glass"},
+            "f13": {"ref": "emissions_balance.iron_steel_and_sinter"},
+            "f14": {"ref": "emissions_balance.ammonia"},
+            "f15": {"ref": "emissions_balance.bricks"},
+            "f16": {"ref": "emissions_balance.other_process_emissions"},
+            "f17": {"ref": "emissions_balance.agriculture_total"},
+            "f18": {"ref": "emissions_balance.biomass_burning"},
+            "f19": {"ref": "emissions_balance.land_remaining_and_converted_to_grassland"},
+            "f20": {"ref": "emissions_balance.land_remaining_and_converted_to_cropland"},
+            "f21": {"ref": "emissions_balance.land_remaining_and_converted_to_settlements"},
+            "f22": {"ref": "emissions_balance.land_remaining_and_converted_to_wetlands"},
+            "f23": {"ref": "emissions_balance.land_use_n2o"},
+            "f24": {"ref": "emissions_balance.landfill"},
+            "f25": {"ref": "emissions_balance.waste_water_handling"},
+            "f26": {"ref": "emissions_balance.waste_incineration"},
+            "f27": {"ref": "emissions_balance.composting"},
+            "f28": {"ref": "emissions_balance.anaerobic_digestion"},
+            "f29": {"ref": "emissions_balance.mechanical_biological_treatment"},
+            "f30": {"ref": "emissions_balance.landfill_carbon_capture"}
+        },
+        "formula": "total - (f0 + f1 + f2 + f3 + f4 + f5 + f6 + f7 + f8 + f9 + f10 + f11 + f12 + f13 + f14 + f15 + f16 + f17 + f18 + f19 + f20 + f21 + f22 + f23 + f24 + f25 + f26 + f27 + f28 + f29 + f30)",
+        "round": 3,
+        "note": "Territorial emissions the model must calculate itself: fuel combustion CO2, forest and harvested wood, and municipal solid waste CO2."
+    },
+    "land_use.new_natural_broadleaf_woodland": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 1475,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.new_natural_coniferous_woodland": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 0,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.new_productive_broadleaf_woodland": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 0,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.new_productive_coniferous_woodland": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 0,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.short_rotation_forestry": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 0,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.perrennial_grass_miscanthus": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 0,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.rotational_grass_ryegrass": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 0,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.intensive_and_rough_grazing": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 11522,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.food_crops": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 2557,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    },
+    "land_use.feed_crops_for_livestock": {
+        "type": "assumption",
+        "units": "kha",
+        "value": 2557,
+        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    }
+}

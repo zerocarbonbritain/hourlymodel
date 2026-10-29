@@ -1,0 +1,170 @@
+{
+    "ons_population": {
+        "title": "ONS population estimates for the UK, mid-1851 to mid-2025",
+        "edition": "Mid-2025 release",
+        "page": "https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland",
+        "url": "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland/ukpopulationestimates1838to2025/ukpopulationestimates18382025.xlsx",
+        "file": "ukpopulationestimates18382025.xlsx",
+        "sha256": "5f2b92d0c9191198f5fd0d9515928f8d48c13aba1b52d8e7399c82cc2dd25bb0"
+    },
+    "ons_households": {
+        "title": "ONS families and households, UK",
+        "edition": "2025 edition, April 2026",
+        "page": "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds",
+        "url": "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/families/datasets/familiesandhouseholdsfamiliesandhouseholds/current/familiesandhouseholdsuk2025.xlsx",
+        "file": "familiesandhouseholdsuk2025.xlsx",
+        "sha256": "a89eaa3d7f519bfa949c7cfa12f531b8c7a86c704adcb70e81f49567ae724a91"
+    },
+    "dukes_1.1": {
+        "title": "DUKES 1.1 Aggregate energy balance",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/energy-chapter-1-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a69ee13f23ff62c51c1a850/DUKES_1.1.xlsx",
+        "file": "DUKES_1.1.xlsx",
+        "sha256": "caa9c43e9fd7a74f96870cbf7a3dadcdd47a331ee9f9f62ba1d61e1dd713317c"
+    },
+    "dukes_4.4": {
+        "title": "DUKES 4.4 Natural gas storage",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/natural-gas-chapter-4-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a69f4561bcde42205705fec/DUKES_4.4.xlsx",
+        "file": "DUKES_4.4.xlsx",
+        "sha256": "0c9f37a6561c18c7ed6065da42f7e454452e8aa368dab95068a00ad72326daa8"
+    },
+    "dukes_5.1": {
+        "title": "DUKES 5.1 Electricity commodity balances",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a35d80ddb7e4831c629ef/DUKES_5.1.xlsx",
+        "file": "DUKES_5.1.xlsx",
+        "sha256": "eef166729893ce49b8885c7bdd1ba86f390c56c4f450cba89a33eaa9b0215cca"
+    },
+    "dukes_5.6": {
+        "title": "DUKES 5.6 Electricity fuel use, generation and supply",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a3616862aaf18d9c629eb/DUKES_5.6.xlsx",
+        "file": "DUKES_5.6.xlsx",
+        "sha256": "1335dce766c36a3fa4a27be2ad951292b994877998839a9fdb21670957d30d64"
+    },
+    "dukes_5.7": {
+        "title": "DUKES 5.7 Plant capacity, United Kingdom",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a3622cceb23e8678976bf/DUKES_5.7.xlsx",
+        "file": "DUKES_5.7.xlsx",
+        "sha256": "fca07a66112ac5af52d9b57e4e176a9174c5c7f039fa7c577ba886bf3804727b"
+    },
+    "dukes_5.10": {
+        "title": "DUKES 5.10 Plant loads, demand and efficiency",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a364b0ddb7e4831c629f2/DUKES_5.10.xlsx",
+        "file": "DUKES_5.10.xlsx",
+        "sha256": "ee622e8e5bf7ad6643f348f62090a5e76ef03e7e854537448dc323d359ef9c7d"
+    },
+    "dukes_6.1": {
+        "title": "DUKES 6.1 Renewables commodity balances",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/renewable-sources-of-energy-chapter-6-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a2756862aaf18d9c629e2/DUKES_6.1.xlsx",
+        "file": "DUKES_6.1.xlsx",
+        "sha256": "2a8c6f6b97e74c1493ce3a4e76da0f6d59623c21ec7e9ddc92b2c605b4ef63e2"
+    },
+    "dukes_6.2": {
+        "title": "DUKES 6.2 Renewable electricity capacity and generation",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/renewable-sources-of-energy-chapter-6-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a6a27620c36759b5ccaa1d1/DUKES_6.2.xlsx",
+        "file": "DUKES_6.2.xlsx",
+        "sha256": "63be0161359794618424f9258fffb860ad16e46016248ae90dc5457a380a35b1"
+    },
+    "ecuk_end_use": {
+        "title": "ECUK end use tables",
+        "edition": "ECUK 2025, revised April 2026",
+        "page": "https://www.gov.uk/government/statistics/energy-consumption-in-the-uk-2025",
+        "url": "https://assets.publishing.service.gov.uk/media/69e6362644a079b27f997f8d/ECUK_2025_End_Use_tables_200426.xlsx",
+        "file": "ECUK_2025_End_Use_tables_200426.xlsx",
+        "sha256": "98de3e94430c9e03c5b57ca46baac0bd87473ffe3210321237bf829d3d62e300"
+    },
+    "ecuk_consumption": {
+        "title": "ECUK consumption tables",
+        "edition": "ECUK 2025",
+        "page": "https://www.gov.uk/government/statistics/energy-consumption-in-the-uk-2025",
+        "url": "https://assets.publishing.service.gov.uk/media/6925cb9047904590c9da2d21/ECUK_2025_Consumption_tables.xlsx",
+        "file": "ECUK_2025_Consumption_tables.xlsx",
+        "sha256": "fd02b8e0b2873204be3fb9150ac5bc7869bb7d14abffec0e38ecb61eacd60b7c"
+    },
+    "ghg_by_source": {
+        "title": "Final UK greenhouse gas emissions 2024, by source dataset",
+        "edition": "1990 to 2024",
+        "page": "https://www.gov.uk/government/statistics/final-uk-greenhouse-gas-emissions-statistics-1990-to-2024",
+        "url": "https://assets.publishing.service.gov.uk/media/69ca3ef3471d520038d0f819/final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx",
+        "file": "final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx",
+        "sha256": "c51c9095fd31d31657e4ce531b5a10cdc89dd78ff6eeaa92bc742d06e63a57b9"
+    },
+    "ghg_tables": {
+        "title": "Final UK greenhouse gas emissions 2024, data tables",
+        "edition": "1990 to 2024",
+        "page": "https://www.gov.uk/government/statistics/final-uk-greenhouse-gas-emissions-statistics-1990-to-2024",
+        "url": "https://assets.publishing.service.gov.uk/media/6982294819d3abdb495f37ce/final-greenhouse-gas-emissions-tables-2024.xlsx",
+        "file": "final-greenhouse-gas-emissions-tables-2024.xlsx",
+        "sha256": "39849813643d6ed812c10030fb4fdcba98e598d7f8a890a446450c74baba66fa"
+    },
+    "nts0303": {
+        "title": "NTS0303 Average miles travelled per person per year by mode",
+        "edition": "NTS 2024",
+        "page": "https://www.gov.uk/government/statistical-data-sets/nts03-modal-comparisons",
+        "url": "https://assets.publishing.service.gov.uk/media/6a9eca62474b8101ece4642e/nts0303.ods",
+        "file": "nts0303.ods",
+        "sha256": "6dee1fabbae1721674f5298c83df4d66b72b0fe5c49dcbca7952b80677ae00a7"
+    },
+    "tsgb0101": {
+        "title": "TSGB0101 Passenger transport by mode",
+        "edition": "TSGB 2025",
+        "page": "https://www.gov.uk/government/statistical-data-sets/tsgb01-modal-comparisons",
+        "url": "https://assets.publishing.service.gov.uk/media/69395b7e6a12691d48491d13/tsgb0101.ods",
+        "file": "tsgb0101.ods",
+        "sha256": "e8397aa4009cce90dc12a9dc77ab3e1b62b4bee71975d22ff962cd919fafb4d1"
+    },
+    "avi0201": {
+        "title": "AVI0201 Air passenger kilometres",
+        "edition": "TSGB 2025",
+        "page": "https://www.gov.uk/government/statistical-data-sets/aviation-statistics-data-tables-avi",
+        "url": "https://assets.publishing.service.gov.uk/media/6936e39592da4705a575d42c/avi0201.ods",
+        "file": "avi0201.ods",
+        "sha256": "6b4b243b9347822bbead4d85fe5aff2600b125128c49e616e95bec4d37361b03"
+    },
+    "veh0101": {
+        "title": "VEH0101 Licensed vehicles by body type",
+        "edition": "Vehicle licensing statistics",
+        "page": "https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-tables",
+        "url": "https://assets.publishing.service.gov.uk/media/6aad561a2f29b38884818708/veh0101.ods",
+        "file": "veh0101.ods",
+        "sha256": "e82f30ba228aec992763e82073ec8a802bc8996f22ec5c353279be20333675b1"
+    },
+    "veh1103": {
+        "title": "VEH1103 Licensed vehicles by fuel type",
+        "edition": "Vehicle licensing statistics",
+        "page": "https://www.gov.uk/government/statistical-data-sets/vehicle-licensing-statistics-data-tables",
+        "url": "https://assets.publishing.service.gov.uk/media/6aad561cce3f006bd4346ce3/veh1103.ods",
+        "file": "veh1103.ods",
+        "sha256": "8f734d45ee7fbc460c98d14cbf5e7d8d1bfdb9bf03bbe2ef3e4354a0e661a7aa"
+    },
+    "et_7.1": {
+        "title": "Energy Trends 7.1 Average temperatures and heating degree days",
+        "edition": "October 2026",
+        "page": "https://www.gov.uk/government/statistics/energy-trends-section-7-weather",
+        "url": "https://assets.publishing.service.gov.uk/media/6ae0cc4c16428df53760625a/ET_7.1_OCT_26.xlsx",
+        "file": "ET_7.1_OCT_26.xlsx",
+        "sha256": "c816f4c912b9107c1ad51257c19ae7085f4fb5736f7ea208a04a9c7f3e7abbd6"
+    },
+    "dukes_4.1": {
+        "title": "DUKES 4.1 Natural gas commodity balance",
+        "edition": "DUKES 2026",
+        "page": "https://www.gov.uk/government/statistics/natural-gas-chapter-4-digest-of-united-kingdom-energy-statistics-dukes",
+        "url": "https://assets.publishing.service.gov.uk/media/6a69f4332c4b5ba9d1242a68/DUKES_4.1.xlsx",
+        "file": "DUKES_4.1.xlsx",
+        "sha256": "a117e2fb7ba83985168184940590897d59b1c2d092eff18dd5dcb5f1520ecf95"
+    }
+}

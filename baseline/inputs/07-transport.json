@@ -1,0 +1,558 @@
+{
+    "transport.modes.Walking.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "miles": {"source": "nts0303", "sheet": "NTS0303c_miles", "block": "NTS0303c", "row": [ "{year}" ], "column": "Walk"}
+        },
+        "formula": "miles",
+        "round": 0,
+        "note": "NTS0303c, England only, used as a UK proxy as in the 2018 baseline."
+    },
+    "transport.modes.Cycling.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "miles": {"source": "nts0303", "sheet": "NTS0303c_miles", "block": "NTS0303c", "row": [ "{year}" ], "column": "Pedal cycle"}
+        },
+        "formula": "miles",
+        "round": 0,
+        "note": "NTS0303c, England only, used as a UK proxy as in the 2018 baseline."
+    },
+    "transport.modes.Ebikes.miles_pp": {
+        "type": "assumption",
+        "units": "miles/person",
+        "value": 0,
+        "note": "Not separated in NTS or TSGB. Zero as in the 2018 baseline."
+    },
+    "transport.modes.Rail.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "pkm": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "{year}" ], "column": "Rail"},
+            "pkm_2018": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "2018" ], "column": "Rail"},
+            "population": {"ref": "population_2030"}
+        },
+        "formula": "754 * (pkm / pkm_2018) * (66460000 / population)",
+        "round": 0,
+        "note": "2018 baseline 754 miles per person, scaled by TSGB0101 rail passenger km {year} over 2018 (both from the current edition, which absorbs DfT revisions) and by 2018 population (66460000, the 2018 baseline value) over {year} population."
+    },
+    "transport.modes.Rail.load_factor": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.324,
+        "note": "Carried from the 2018 workbook."
+    },
+    "transport.modes.Rail.prc.EV": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.66,
+        "note": "Share of rail passenger km on electric traction. ORR traction energy is 47% electric but diesel uses about twice the energy per km, so 66% (the 2018 value) is kept."
+    },
+    "transport.modes.Rail.prc.H2": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0,
+        "note": "No hydrogen rail."
+    },
+    "transport.modes.Rail.prc.IC": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "ev": {"ref": "transport.modes.Rail.prc.EV"},
+            "h2": {"ref": "transport.modes.Rail.prc.H2"}
+        },
+        "formula": "1 - ev - h2",
+        "round": 3,
+        "note": "Remainder after electric and hydrogen."
+    },
+    "transport.modes.Bus.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "pkm": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "{year}" ], "column": "Road: buses and coaches"},
+            "pkm_2018": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "2018" ], "column": "Road: buses and coaches"},
+            "population": {"ref": "population_2030"}
+        },
+        "formula": "325 * (pkm / pkm_2018) * (66460000 / population)",
+        "round": 0,
+        "note": "2018 baseline 325 miles per person, scaled by TSGB0101 buses and coaches passenger km {year} over 2018 (both from the current edition, which absorbs DfT revisions) and by 2018 population (66460000, the 2018 baseline value) over {year} population."
+    },
+    "transport.modes.Bus.mechanical_kwhppkm_full": {
+        "type": "assumption",
+        "units": "kWh/pkm",
+        "value": 0.0163,
+        "note": "Carried from the 2018 workbook."
+    },
+    "transport.modes.Bus.load_factor": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.1432,
+        "note": "Carried from the 2018 workbook."
+    },
+    "transport.modes.Bus.prc.EV": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "bev": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Buses and coaches"},
+                "sum": "Battery electric"
+            },
+            "total": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Buses and coaches"},
+                "sum": "Total"
+            }
+        },
+        "formula": "bev / total",
+        "round": 3,
+        "note": "Battery electric share of licensed buses and coaches at the end of {year} (VEH1103, UK), used as the share of bus miles."
+    },
+    "transport.modes.Bus.prc.H2": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0,
+        "note": "Fuel cell buses are about 0.06% of the fleet. Negligible."
+    },
+    "transport.modes.Bus.prc.IC": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "ev": {"ref": "transport.modes.Bus.prc.EV"},
+            "h2": {"ref": "transport.modes.Bus.prc.H2"}
+        },
+        "formula": "1 - ev - h2",
+        "round": 3,
+        "note": "Remainder after electric and hydrogen."
+    },
+    "transport.modes.Motorbike.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "pkm": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "{year}" ], "column": "Road: motorcycles"},
+            "pkm_2018": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "2018" ], "column": "Road: motorcycles"},
+            "population": {"ref": "population_2030"}
+        },
+        "formula": "46 * (pkm / pkm_2018) * (66460000 / population)",
+        "round": 0,
+        "note": "2018 baseline 46 miles per person, scaled by TSGB0101 motorcycles passenger km {year} over 2018 (both from the current edition, which absorbs DfT revisions) and by 2018 population (66460000, the 2018 baseline value) over {year} population."
+    },
+    "transport.modes.Motorbike.load_factor": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 1.071,
+        "note": "Carried from the 2018 workbook."
+    },
+    "transport.modes.Motorbike.prc.EV": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "bev": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Motorcycles"},
+                "sum": "Battery electric"
+            },
+            "total": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Motorcycles"},
+                "sum": "Total"
+            }
+        },
+        "formula": "bev / total",
+        "round": 2,
+        "note": "Battery electric share of licensed motorcycles at the end of {year} (VEH1103, UK), used as the share of miles."
+    },
+    "transport.modes.Motorbike.prc.IC": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "ev": {"ref": "transport.modes.Motorbike.prc.EV"}
+        },
+        "formula": "1 - ev",
+        "round": 2,
+        "note": "Remainder after electric."
+    },
+    "transport.modes.Motorbike.efficiency.IC": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "petroleum": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Road" ], "column": "Petroleum products"},
+            "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Road" ], "column": "Bioenergy & waste"},
+            "motorcycles": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "Motorcycles - petrol"},
+            "diesel": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - white diesel"},
+            "petrol": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - petrol"}
+        },
+        "target": "(petroleum + bio) * motorcycles / (diesel + petrol) * 0.01163",
+        "model_output": "transport.modes.Motorbike.IC.TWh",
+        "relation": "inverse",
+        "round": 4,
+        "note": "Calibrated so modelled motorcycle fuel equals DUKES 1.1 road liquid fuel times the C8 motorcycle share."
+    },
+    "transport.modes.Cars & Vans.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "pkm": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "{year}" ], "column": "Road: cars, vans and taxis"},
+            "pkm_2018": {"source": "tsgb0101", "sheet": "TSGB0101a", "block": "Passenger transport by mode", "row": [ "2018" ], "column": "Road: cars, vans and taxis"},
+            "population": {"ref": "population_2030"}
+        },
+        "formula": "6299 * (pkm / pkm_2018) * (66460000 / population)",
+        "round": 0,
+        "note": "2018 baseline 6299 miles per person, scaled by TSGB0101 cars, vans and taxis passenger km {year} over 2018 (both from the current edition, which absorbs DfT revisions) and by 2018 population (66460000, the 2018 baseline value) over {year} population."
+    },
+    "transport.modes.Cars & Vans.load_factor": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.3288,
+        "note": "Carried from the 2018 workbook (1.64 occupants of 5 seats)."
+    },
+    "_transport.car_bev_stock_share": {
+        "type": "intermediate",
+        "units": "fraction",
+        "values": {
+            "bev": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Cars"},
+                "sum": "Battery electric"
+            },
+            "total": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Cars"},
+                "sum": "Total"
+            }
+        },
+        "formula": "bev / total",
+        "round": 4,
+        "note": "Evidence for the car EV share. Battery electric share of licensed cars at the end of {year} (VEH1103, UK)."
+    },
+    "transport.modes.Cars & Vans.prc.EV": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.05,
+        "note": "Share of car miles. Battery electric cars were 3.8% of the licensed stock at the end of 2024 (see _transport.car_bev_stock_share), and newer cars are driven further than the fleet average, so 5% is used."
+    },
+    "transport.modes.Cars & Vans.prc.H2": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0,
+        "note": "Fuel cell cars are about 100 vehicles. Negligible."
+    },
+    "transport.modes.Cars & Vans.prc.IC": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "ev": {"ref": "transport.modes.Cars & Vans.prc.EV"},
+            "h2": {"ref": "transport.modes.Cars & Vans.prc.H2"}
+        },
+        "formula": "1 - ev - h2",
+        "round": 3,
+        "note": "Remainder after electric and hydrogen."
+    },
+    "_transport.road_liquid_ktoe": {
+        "type": "intermediate",
+        "units": "ktoe",
+        "values": {
+            "petroleum": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Road" ], "column": "Petroleum products"},
+            "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Road" ], "column": "Bioenergy & waste"}
+        },
+        "formula": "petroleum + bio",
+        "round": 1,
+        "note": "DUKES 1.1 road transport petroleum products plus bioenergy for 2024. Excludes natural gas and electricity. The sheet name is fixed at 2024."
+    },
+    "_transport.c8_cars_share": {
+        "type": "intermediate",
+        "units": "fraction",
+        "values": {
+            "cars": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "Cars - all"},
+            "diesel": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - white diesel"},
+            "petrol": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - petrol"}
+        },
+        "formula": "cars / (diesel + petrol)",
+        "round": 5,
+        "note": "Share of C8 road petrol and diesel used by cars. ECUK C8 runs a year behind, so the 2023 row is used for a 2024 baseline."
+    },
+    "_transport.car_fuel_TWh": {
+        "type": "intermediate",
+        "units": "TWh/yr",
+        "values": {
+            "road": {"ref": "_transport.road_liquid_ktoe"},
+            "share": {"ref": "_transport.c8_cars_share"}
+        },
+        "formula": "road * share * 0.01163",
+        "round": 2,
+        "note": "Car liquid fuel including biofuel: DUKES road liquid fuel allocated by the C8 car share. 1 ktoe = 0.01163 TWh."
+    },
+    "transport.modes.Cars & Vans.efficiency.IC": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "fuel": {"ref": "_transport.car_fuel_TWh"}
+        },
+        "target": "fuel",
+        "model_output": "transport.modes.Cars & Vans.IC.TWh",
+        "relation": "inverse",
+        "round": 4,
+        "note": "Engine efficiency divisor calibrated so modelled car IC fuel equals _transport.car_fuel_TWh. Fuel is inversely proportional to it."
+    },
+    "transport.modes.Aviation.miles_pp": {
+        "type": "statistic",
+        "units": "miles/person",
+        "values": {
+            "pkm": {"source": "avi0201", "sheet": "AVI0201c", "block": "Passenger kilometres flown", "row": [ "All Services Total" ], "column": "{year}"},
+            "pkm_2018": {"source": "avi0201", "sheet": "AVI0201c", "block": "Passenger kilometres flown", "row": [ "All Services Total" ], "column": "2018"},
+            "population": {"ref": "population_2030"}
+        },
+        "formula": "3580 * (pkm / pkm_2018) * (66460000 / population)",
+        "round": 0,
+        "note": "2018 baseline 3580 miles per person, scaled by AVI0201c passenger km flown by UK registered airlines (all services) {year} over 2018 and by 2018 population (66460000) over {year} population."
+    },
+    "transport.modes.Aviation.prc.EV": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0,
+        "note": "No electric aviation."
+    },
+    "transport.modes.Aviation.prc.IC": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 1,
+        "note": "All aviation is liquid fuelled."
+    },
+    "_transport.bev_cars_thousands": {
+        "type": "intermediate",
+        "units": "thousand",
+        "values": {
+            "bev": {"source": "veh1103", "sheet": "VEH1103a_RoadUsing", "where": { "Geography": "United Kingdom", "Date": "{year} Q4 (end December)", "Body Type": "Cars"},
+                "sum": "Battery electric"
+            }
+        },
+        "formula": "bev",
+        "round": 1,
+        "note": "Battery electric cars licensed at the end of {year} (VEH1103, UK). Evidence for the EV battery and charge rate assumptions."
+    },
+    "transport.electric_car_battery_capacity": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 75,
+        "note": "Aggregate EV battery available to the model. About 58 kWh for each of the 1.29 million battery electric cars at the end of 2024."
+    },
+    "transport.electric_car_max_charge_rate": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 9,
+        "note": "Aggregate EV charge rate, about 7 kW per battery electric car."
+    },
+    "transport.rail_freight_elec_demand": {
+        "type": "assumption",
+        "units": "TWh/yr",
+        "value": 0,
+        "note": "Rail freight is not separated, as in the 2018 baseline."
+    },
+    "transport.freight_BEV_demand": {
+        "type": "assumption",
+        "units": "TWh/yr",
+        "value": 0,
+        "note": "Battery electric LGVs and HGVs are under 2% of the fleet. Their electricity is in the DUKES road electricity row, which this baseline does not allocate."
+    },
+    "transport.freight_H2_demand": {
+        "type": "assumption",
+        "units": "TWh/yr",
+        "value": 0,
+        "note": "No hydrogen freight."
+    },
+    "_transport.c8_freight_share": {
+        "type": "intermediate",
+        "units": "fraction",
+        "values": {
+            "hgv": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "HGV - white diesel"},
+            "lgv": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "LGV - all"},
+            "diesel": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - white diesel"},
+            "petrol": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - petrol"}
+        },
+        "formula": "(hgv + lgv) / (diesel + petrol)",
+        "round": 5,
+        "note": "Share of C8 road petrol and diesel used by HGVs and LGVs, 2023 row."
+    },
+    "transport.freight_IC_demand": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "road": {"ref": "_transport.road_liquid_ktoe"},
+            "share": {"ref": "_transport.c8_freight_share"},
+            "navigation": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "National navigation" ], "column": "Petroleum products"}
+        },
+        "formula": "(road * share + navigation) * 0.01163",
+        "round": 1,
+        "note": "HGV and LGV liquid fuel including biofuel (DUKES road liquid fuel allocated by the C8 freight share) plus DUKES national navigation. Allocating the DUKES total by C8 shares replaces the 2018 workbook's separate 'other road' balancing item."
+    },
+    "transport.modes.Bus.efficiency.IC": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "petroleum": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Road" ], "column": "Petroleum products"},
+            "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Road" ], "column": "Bioenergy & waste"},
+            "buses": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "Buses - white diesel"},
+            "diesel": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - white diesel"},
+            "petrol": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": [ "{year-1}" ], "column": "All - petrol"}
+        },
+        "target": "(petroleum + bio) * buses / (diesel + petrol) * 0.01163",
+        "model_output": "transport.modes.Bus.IC.TWh",
+        "relation": "inverse",
+        "round": 4,
+        "note": "Calibrated so modelled bus fuel equals DUKES 1.1 road liquid fuel times the C8 bus share, as for cars and freight."
+    },
+    "transport.modes.Rail.efficiency.IC": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "petroleum": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Rail" ], "column": "Petroleum products"}
+        },
+        "target": "petroleum * 0.01163",
+        "model_output": "transport.modes.Rail.IC.TWh",
+        "relation": "inverse",
+        "round": 4,
+        "note": "Calibrated so modelled diesel rail fuel equals DUKES 1.1 rail petroleum. The electric share stays a judgement value."
+    },
+    "transport.modes.Aviation.efficiency.IC": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "petroleum": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Air" ], "column": "Petroleum products"},
+            "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Air" ], "column": "Bioenergy & waste"}
+        },
+        "target": "(petroleum + bio) * 0.01163",
+        "model_output": "transport.modes.Aviation.IC.TWh",
+        "relation": "inverse",
+        "round": 4,
+        "note": "Calibrated so modelled aviation fuel equals DUKES 1.1 air (domestic and international). Passenger km are UK airlines only, so this also absorbs that boundary difference."
+    },
+    "synth_fuel.biofuel_supply_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Transport" ], "column": "Bioenergy & waste"}
+        },
+        "formula": "bio * 0.01163",
+        "round": 1,
+        "note": "Transport biofuel (road and aviation) from DUKES 1.1. The model supplies it to the liquid fuel store, so fossil oil falls by the same amount."
+    },
+    "transport.km_per_mile": {
+        "type": "assumption",
+        "value": 1.609344,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.smart_charging_enabled": {
+        "type": "assumption",
+        "value": 0,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.smart_charge_type": {
+        "type": "assumption",
+        "value": "average",
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.V2G_enabled": {
+        "type": "assumption",
+        "value": 0,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.V2G_discharge_type": {
+        "type": "assumption",
+        "value": "average",
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Ebikes.mechanical_kwhppkm_full": {
+        "type": "assumption",
+        "value": 0.0081,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Ebikes.load_factor": {
+        "type": "assumption",
+        "value": 1,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Ebikes.prc.EV": {
+        "type": "assumption",
+        "value": 1,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Ebikes.efficiency.EV": {
+        "type": "assumption",
+        "value": 0.8,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Rail.mechanical_kwhppkm_full": {
+        "type": "assumption",
+        "value": 0.027,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Rail.efficiency.EV": {
+        "type": "assumption",
+        "value": 0.9,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Rail.efficiency.H2": {
+        "type": "assumption",
+        "value": 0.3564,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Bus.efficiency.EV": {
+        "type": "assumption",
+        "value": 0.8,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Bus.efficiency.H2": {
+        "type": "assumption",
+        "value": 0.3564,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Motorbike.mechanical_kwhppkm_full": {
+        "type": "assumption",
+        "value": 0.054,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Motorbike.prc.H2": {
+        "type": "assumption",
+        "value": 0,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Motorbike.efficiency.EV": {
+        "type": "assumption",
+        "value": 0.8,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Motorbike.efficiency.H2": {
+        "type": "assumption",
+        "value": 0.3564,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Cars & Vans.mechanical_kwhppkm_full": {
+        "type": "assumption",
+        "value": 0.031,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Cars & Vans.efficiency.EV": {
+        "type": "assumption",
+        "value": 0.8,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Cars & Vans.efficiency.H2": {
+        "type": "assumption",
+        "value": 0.3564,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Aviation.mechanical_kwhppkm_full": {
+        "type": "assumption",
+        "value": 0.07,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Aviation.load_factor": {
+        "type": "assumption",
+        "value": 0.85,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Aviation.prc.H2": {
+        "type": "assumption",
+        "value": 0,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Aviation.efficiency.EV": {
+        "type": "assumption",
+        "value": 0.8,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.modes.Aviation.efficiency.H2": {
+        "type": "assumption",
+        "value": 0.2574,
+        "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    }
+}

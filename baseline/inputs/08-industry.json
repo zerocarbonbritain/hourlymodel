@@ -1,0 +1,423 @@
+{
+    "industry.high_temp_process_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "ECUK U4 total industries, ktoe. 1 ktoe = 0.01163 TWh."
+    },
+    "industry.high_temp_process_fixed_CH4_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - natural gas"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.high_temp_process_fixed_liquid_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - oil"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.high_temp_process_fixed_coal_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - solid fuel"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.high_temp_process_fixed_elec_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "gas": {"ref": "industry.high_temp_process_fixed_CH4_prc"},
+            "oil": {"ref": "industry.high_temp_process_fixed_liquid_prc"},
+            "coal": {"ref": "industry.high_temp_process_fixed_coal_prc"}
+        },
+        "formula": "100 - gas - oil - coal",
+        "round": 1,
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+    },
+    "industry.high_temp_process_fixed_biomass_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "U4 has no bioenergy column."
+    },
+    "industry.high_temp_process_DSR_CH4_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No demand side response in a baseline."
+    },
+    "industry.low_temp_process_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "ECUK U4 total industries, ktoe. 1 ktoe = 0.01163 TWh."
+    },
+    "industry.low_temp_process_fixed_CH4_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - natural gas"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.low_temp_process_fixed_liquid_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - oil"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.low_temp_process_fixed_coal_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - solid fuel"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.low_temp_process_fixed_elec_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "gas": {"ref": "industry.low_temp_process_fixed_CH4_prc"},
+            "oil": {"ref": "industry.low_temp_process_fixed_liquid_prc"},
+            "coal": {"ref": "industry.low_temp_process_fixed_coal_prc"}
+        },
+        "formula": "100 - gas - oil - coal",
+        "round": 1,
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+    },
+    "industry.low_temp_process_fixed_biomass_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "U4 has no bioenergy column."
+    },
+    "industry.low_temp_process_DSR_CH4_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No demand side response in a baseline."
+    },
+    "industry.dry_sep_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "ECUK U4 total industries, ktoe. 1 ktoe = 0.01163 TWh."
+    },
+    "industry.dry_sep_fixed_CH4_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - natural gas"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.dry_sep_fixed_liquid_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - oil"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.dry_sep_fixed_coal_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - solid fuel"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+        },
+        "formula": "fuel / total * 100",
+        "round": 1
+    },
+    "industry.dry_sep_fixed_elec_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "gas": {"ref": "industry.dry_sep_fixed_CH4_prc"},
+            "oil": {"ref": "industry.dry_sep_fixed_liquid_prc"},
+            "coal": {"ref": "industry.dry_sep_fixed_coal_prc"}
+        },
+        "formula": "100 - gas - oil - coal",
+        "round": 1,
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+    },
+    "industry.dry_sep_fixed_biomass_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "U4 has no bioenergy column."
+    },
+    "industry.dry_sep_DSR_CH4_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No demand side response in a baseline."
+    },
+    "industry.other_heat_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "ECUK U2 industry \"Unknown (heat)\" row: heat sold and bioenergy not allocated to an end use."
+    },
+    "industry.other_heat_fixed_elec_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Electricity"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"}
+        },
+        "formula": "elec / total * 100",
+        "round": 1
+    },
+    "industry.other_heat_fixed_CH4_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Natural gas"},
+            "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Heat"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"}
+        },
+        "formula": "(gas + heat) / total * 100",
+        "round": 1,
+        "note": "Heat sold is mapped to methane, as most heat networks are gas fired."
+    },
+    "industry.other_heat_fixed_biomass_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "gas": {"ref": "industry.other_heat_fixed_CH4_prc"},
+            "elec": {"ref": "industry.other_heat_fixed_elec_prc"}
+        },
+        "formula": "100 - gas - elec",
+        "round": 1,
+        "note": "Remainder, so shares sum to 100. In 2024 the remainder is all bioenergy and waste. Oil or solid fuel in this row would also land here, since the baseline has no other_heat liquid or coal fields."
+    },
+    "industry.other_heat_DSR_CH4_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No demand side response in a baseline."
+    },
+    "industry.motors_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Motors - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "Model treats this end use as all electric. U4 shows it is all electric in 2024."
+    },
+    "industry.compressed_air_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Compressed air - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "Model treats this end use as all electric. U4 shows it is all electric in 2024."
+    },
+    "industry.lighting_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Lighting - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "Model treats this end use as all electric. U4 shows it is all electric in 2024."
+    },
+    "industry.refrigeration_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Refrigeration - total"}
+        },
+        "formula": "total * 0.01163",
+        "round": 1,
+        "note": "Model treats this end use as all electric. U4 shows it is all electric in 2024."
+    },
+    "industry.refinery_electric_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "eiu": {"source": "dukes_5.1", "sheet": "5.1", "block": "Category", "row": [ "Energy industry use" ], "column": "{year}"},
+            "generation": {"source": "dukes_5.1", "sheet": "5.1", "block": "Category", "row": [ "Electricity generation" ], "column": "{year}"},
+            "storage": {"source": "dukes_5.1", "sheet": "5.1", "block": "Category", "row": [ "Energy storage" ], "column": "{year}"}
+        },
+        "formula": "(eiu - generation - storage) / 1000",
+        "round": 1,
+        "note": "DUKES 5.1 energy industry use of electricity, excluding generation own use (in electricity_own_use_prc) and storage losses. Covers refineries, oil and gas extraction, coal, blast furnaces and other. GWh to TWh."
+    },
+    "industry.other_non_heat_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - total"},
+            "unknown_elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Electricity"}
+        },
+        "formula": "(total + unknown_elec) * 0.01163",
+        "round": 1,
+        "note": "ECUK U4 \"Other\" end use plus the electricity in the U2 industry \"Unknown (other)\" row. The other fuels in that row are carried in fossil_fuels."
+    },
+    "industry.other_non_heat_fixed_CH4_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - natural gas"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - total"},
+            "unknown_elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Electricity"}
+        },
+        "formula": "fuel / (total + unknown_elec) * 100",
+        "round": 1
+    },
+    "industry.other_non_heat_fixed_liquid_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - oil"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - total"},
+            "unknown_elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Electricity"}
+        },
+        "formula": "fuel / (total + unknown_elec) * 100",
+        "round": 1
+    },
+    "industry.other_non_heat_fixed_coal_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - solid fuel"},
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Other - total"},
+            "unknown_elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (other)" ], "column": "Electricity"}
+        },
+        "formula": "fuel / (total + unknown_elec) * 100",
+        "round": 1
+    },
+    "industry.other_non_heat_fixed_elec_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "gas": {"ref": "industry.other_non_heat_fixed_CH4_prc"},
+            "oil": {"ref": "industry.other_non_heat_fixed_liquid_prc"},
+            "coal": {"ref": "industry.other_non_heat_fixed_coal_prc"}
+        },
+        "formula": "100 - gas - oil - coal",
+        "round": 1,
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+    },
+    "industry.other_non_heat_fixed_biomass_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "U4 has no bioenergy column."
+    },
+    "industry.high_temp_process_fixed_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.high_temp_process_DSR_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.low_temp_process_fixed_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.low_temp_process_DSR_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.dry_sep_fixed_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.dry_sep_DSR_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.other_heat_fixed_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.other_heat_fixed_liquid_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "U2 industry \"Unknown (heat)\" has no oil in 2024. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.other_heat_fixed_coal_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "U2 industry \"Unknown (heat)\" has no solid fuel in 2024. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.other_heat_DSR_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.other_non_heat_fixed_H2_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    }
+}

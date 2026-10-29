@@ -1,0 +1,22 @@
+{
+    "population_2030": {
+        "type": "statistic",
+        "units": "people",
+        "values": {
+            "population": {"source": "ons_population", "sheet": "Table 1", "block": "Table 1", "row": ["Mid-{year}"], "column": "Total Population"}
+        },
+        "formula": "population",
+        "round": -3,
+        "note": "UK mid year estimate from the latest release, so it includes revisions to earlier years. The field name is historical, the value is for the baseline year."
+    },
+    "households_2030": {
+        "type": "statistic",
+        "units": "households",
+        "values": {
+            "households": {"source": "ons_households", "sheet": "5", "block": "Number of households (thousands)", "row": ["All households"], "column": "{year} Estimate"}
+        },
+        "formula": "households * 1000",
+        "round": -3,
+        "note": "UK households from the Labour Force Survey, April to June quarter. The field name is historical, the value is for the baseline year."
+    }
+}

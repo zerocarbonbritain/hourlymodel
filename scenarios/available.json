@@ -11,6 +11,9 @@
     "baseline_2018": {
         "name": "2018 baseline"
     },
+    "baseline_2024": {
+        "name": "2024 baseline"
+    },
     "2018_re_high_e": {
         "name": "2018 100% RE, High Industrial Electrification"
     },

@@ -1,0 +1,156 @@
+{
+    "supply.offshore_wind_capacity": {
+        "type": "statistic",
+        "units": "GW",
+        "values": {
+            "fixed": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": [ "Offshore Wind" ], "column": "{year}"},
+            "floating": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": [ "Floating offshore wind" ], "column": "{year}"}
+        },
+        "formula": "(fixed + floating) / 1000",
+        "round": 2,
+        "note": "End of year capacity. Floating is listed separately from fixed offshore in 6.2 capacity but included in offshore generation."
+    },
+    "supply.offshore_wind_availability": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "generation": {"source": "dukes_6.2", "sheet": "6.2", "block": "Generation (GWh)", "row": [ "Offshore" ], "column": "{year}"},
+            "capacity": {"ref": "supply.offshore_wind_capacity"}
+        },
+        "target": "generation / (capacity * 8766)",
+        "model_output": "supply.offshore_wind_capacity_factor",
+        "round": 3,
+        "note": "Target is observed capacity factor on end of year capacity. Not the DUKES 6.3 load factor, which uses average capacity."
+    },
+    "supply.onshore_wind_capacity": {
+        "type": "statistic",
+        "units": "GW",
+        "values": {
+            "capacity": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": [ "Onshore" ], "column": "{year}"}
+        },
+        "formula": "capacity / 1000",
+        "round": 2
+    },
+    "supply.onshore_wind_availability": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "generation": {"source": "dukes_6.2", "sheet": "6.2", "block": "Generation (GWh)", "row": [ "Onshore" ], "column": "{year}"},
+            "capacity": {"ref": "supply.onshore_wind_capacity"}
+        },
+        "target": "generation / (capacity * 8766)",
+        "model_output": "supply.onshore_wind_capacity_factor",
+        "round": 3
+    },
+    "supply.wave_capacity": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "Marine capacity in 6.2 is about 10 MW, not split into wave and tidal. Negligible."
+    },
+    "supply.tidal_capacity": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "See wave_capacity."
+    },
+    "supply.solarpv_capacity": {
+        "type": "statistic",
+        "units": "GW",
+        "values": {
+            "capacity": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": [ "Solar photovoltaics" ], "column": "{year}"}
+        },
+        "formula": "capacity / 1000",
+        "round": 2
+    },
+    "supply.solarpv_availability": {
+        "type": "calibrated",
+        "units": "fraction",
+        "values": {
+            "generation": {"source": "dukes_6.2", "sheet": "6.2", "block": "Generation (GWh)", "row": [ "Solar photovoltaics" ], "column": "{year}"},
+            "capacity": {"ref": "supply.solarpv_capacity"}
+        },
+        "target": "generation / (capacity * 8766)",
+        "model_output": "supply.solarpv_capacity_factor",
+        "round": 3,
+        "note": "Target is observed capacity factor on end of year capacity, as for wind."
+    },
+    "supply.solarthermal_capacity": {
+        "type": "calibrated",
+        "units": "GW",
+        "values": {
+            "domestic": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Domestic" ], "column": "Solar PV solar thermal geothermal"},
+            "commercial": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Commercial" ], "column": "Solar PV solar thermal geothermal"},
+            "public": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Public administration" ], "column": "Solar PV solar thermal geothermal"},
+            "agriculture": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Agriculture" ], "column": "Solar PV solar thermal geothermal"},
+            "miscellaneous": {"source": "dukes_6.1", "sheet": "{year}", "block": "Renewables and waste: commodity balances", "row": [ "Miscellaneous" ], "column": "Solar PV solar thermal geothermal"}
+        },
+        "target": "(domestic + commercial + public + agriculture + miscellaneous) * 0.01163",
+        "model_output": "supply.total_solarthermal",
+        "model_scale": 0.0001,
+        "round": 2,
+        "note": "Calibrated so modelled solar thermal heat equals DUKES 6.1 final consumption of solar thermal (the column also covers a little geothermal). The same heat is added to water heating demand in 05-heating.json."
+    },
+    "supply.hydro_capacity": {
+        "type": "statistic",
+        "units": "GW",
+        "values": {
+            "capacity": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": [ "Hydro" ], "column": "{year}"}
+        },
+        "formula": "capacity / 1000",
+        "round": 2,
+        "note": "Natural flow hydro, small and large scale. Excludes pumped storage."
+    },
+    "supply.hydro_capacity_factor": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "generation": {"source": "dukes_6.2", "sheet": "6.2", "block": "Generation (GWh)", "row": [ "Hydro" ], "column": "{year}"},
+            "capacity": {"ref": "supply.hydro_capacity"}
+        },
+        "formula": "generation / (capacity * 8766)",
+        "round": 3
+    },
+    "supply.geothermal_elec_capacity": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "No geothermal electricity in DUKES."
+    },
+    "supply.geothermal_heat_capacity": {
+        "type": "assumption",
+        "units": "GW",
+        "value": 0,
+        "note": "Deep geothermal heat is negligible."
+    },
+    "supply.nuclear_capacity": {
+        "type": "statistic",
+        "units": "GW",
+        "values": {
+            "capacity": {"source": "dukes_5.7", "sheet": "5.7", "block": "Table 5.7.A Capacity by fuel", "row": [ "All generating companies", "Nuclear stations" ], "column": "{year}"}
+        },
+        "formula": "capacity / 1000",
+        "round": 2
+    },
+    "supply.nuclear_capacity_factor": {
+        "type": "statistic",
+        "units": "fraction",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Nuclear (thermal)"},
+            "capacity": {"ref": "supply.nuclear_capacity"}
+        },
+        "formula": "generation / (capacity * 8766)",
+        "round": 3
+    },
+    "supply.imports_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "imports": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Imports" ], "column": "Electricity"},
+            "exports": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Exports" ], "column": "Electricity"}
+        },
+        "formula": "(imports + exports) * 0.01163",
+        "round": 1,
+        "note": "Net interconnector imports from DUKES 1.1 (exports are negative). The model adds them as a flat supply before grid losses."
+    }
+}
