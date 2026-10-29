@@ -18,6 +18,6 @@
   "author": "Trystan Lea",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "jszip": "^3.5.0"
+    "jszip": "^3.10.1"
   }
 }

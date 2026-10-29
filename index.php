@@ -18,14 +18,11 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300&display=swap" rel="stylesheet"> 
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="lib/jquery-4.0.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.selection.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.time.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.stack.min.js"></script>
+    <script src="lib/flot-5.1.0.mod.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 
@@ -132,6 +129,7 @@ $.ajax({url: "scenarios/zerocarbonbritain.json?v="+v, async: false, success: fun
 var default_scenario = JSON.parse(JSON.stringify(i));
 
 var sidenav_visible = true;
+var app_mounted = false;
 var window_width = 0;
 var load_high_res = <?php echo $highres; ?>;
 var files_to_load = 2;
@@ -311,6 +309,7 @@ function load_page(page)
         }
     });
 
+    app_mounted = true;
     resize();
     model_ui();
     scroll_to_hash();
@@ -351,9 +350,13 @@ function resize() {
         sidenav_visible = false;
     }
     draw_sidebar();
-      
+
+    // Vue takes #app as its template on mount, so the chart is left alone until then
+    if (!app_mounted) return;
+
     var width = $("#placeholder_bound").width();
     var height = $("#placeholder_bound").height();
+    if (width == 0) return;
     $("#placeholder").width(width);
     $("#placeholder").height(width*0.52);
     

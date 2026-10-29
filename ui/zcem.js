@@ -1,4 +1,4 @@
-previousPoint = false
+var plot = null;
 // ---------------------------------------------------------------------------    
 	
 function model_ui() {
@@ -137,7 +137,7 @@ function model_view()
     if (view_mode=="electricity")
     {
         console.log("view mode electric")
-        $.plot("#placeholder", [
+        plot = Flot.plot(document.getElementById("placeholder"), [
 
             // {label: "Heatstore", data:timeseries(d.heatstore, color:"#cc3311"},
 
@@ -154,16 +154,16 @@ function model_view()
             ], {
                 canvas: true,
                 series: {lines: {lineWidth:0, fill: 1.0 } },
-                xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
+                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 grid: {hoverable: true, clickable: true},
                 selection: { mode: "x" },
-                legend: {position: "nw"}
+                legend: {show: true, position: "nw"}
             }
         );
     }
     if (view_mode=="stores")
     {
-        $.plot("#placeholder", [
+        plot = Flot.plot(document.getElementById("placeholder"), [
                 {stack:true, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:3, color:"#1960d5", lines: {lineWidth:0, fill: 0.8 }},
                 // {stack:true, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:3, color:"#cc3311", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:3, color:"#aac15b", lines: {lineWidth:0, fill: 0.8 }},
@@ -171,17 +171,17 @@ function model_view()
                 {stack:true, label: "Synth Fuel Store", data:timeseries(d.synth_fuel_store_SOC), yaxis:3, color:"#cb9950", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "Methane Store", data:timeseries(d.methane_SOC), yaxis:3, color:"#ccaa00", lines: {lineWidth:0, fill: 0.8 }}
             ], {
-                xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
+                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 yaxes: [{},{min: 0},{}],
                 grid: {hoverable: true, clickable: true},
                 selection: { mode: "x" },
-                legend: {position: "nw"}
+                legend: {show: true, position: "nw"}
             }
         );
     }
     if (view_mode=="backup")
     {
-        $.plot("#placeholder", [
+        plot = Flot.plot(document.getElementById("placeholder"), [
                 {stack:true, label: "CCGT output", data:timeseries(d.electricity_from_dispatchable), yaxis:1, color:"#ccaa00", lines: {lineWidth:0, fill: 1.0 }},
                 {stack:true, label: "Elec Store discharge", data:timeseries(d.elec_store_discharge), yaxis:1, color:"#1960d5", lines: {lineWidth:0, fill: 1.0 }},
                 {stack:true, label: "EV Smart discharge", data:timeseries(d.EV_smart_discharge), yaxis:1, color:"#aac15b", lines: {lineWidth:0, fill: 1.0 }},
@@ -189,28 +189,28 @@ function model_view()
                 {stack:false, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:2, color:"#1960d5", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:2, color:"#aac15b", lines: {lineWidth:1, fill: false }},       
             ], {
-                xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
+                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 yaxes: [{},{min: 0},{}],
                 grid: {hoverable: true, clickable: true},
                 selection: { mode: "x" },
-                legend: {position: "nw"}
+                legend: {show: true, position: "nw"}
             }
         );
     }
     if (view_mode=="heat")
     {
-        $.plot("#placeholder", [
+        plot = Flot.plot(document.getElementById("placeholder"), [
                 {stack:true, label: "Direct heat", data:timeseries(d.spacewater_heat), color:"#cc6622", lines: {lineWidth:0, fill: 1.0 }},
                 // {stack:true, label: "Heatstore discharge", data:timeseries(d.heatstore_discharge_GWth), color:"#a3511b", lines: {lineWidth:0, fill: 1.0 }} ,
                 // {stack:false, label: "Heatstore SOC", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "Electric for heat", data:timeseries(d.spacewater_elec), color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:false, label: "Heat Demand", data:timeseries(d.spacewater_balance), yaxis:1, color:"#000", lines: {lineWidth:1, fill: false }}
             ], {
-                xaxis:{mode:"time", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
+                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
                 yaxes: [{},{min: 0},{}],
                 grid: {hoverable: true, clickable: true},
                 selection: { mode: "x" },
-                legend: {position: "nw"}
+                legend: {show: true, position: "nw"}
             }
         );
     }
@@ -220,45 +220,72 @@ if (typeof loading_prc === "undefined") {
     function loading_prc(a,b){console.log(b)}
 }
 
-$("body").bind("plotselected","#placeholder", function (event, ranges) {
+// Flot 5 passes the handler arguments in event.detail
+document.addEventListener("plotselected", function (event) {
+    if (event.target.id != "placeholder") return;
+    var ranges = event.detail[0];
     view.start = ranges.xaxis.from*0.001;
     view.end = ranges.xaxis.to*0.001;
     view.calc_interval();
     model_view();
 });
 
-$("body").bind("plothover","#placeholder", function (event, pos, item) {
-    if (item) {
-        if (previousPoint != item.datapoint) {
-            previousPoint = item.datapoint;
-            $("#tooltip").remove();
-            tooltip(item.pageX, item.pageY, item.datapoint[1].toFixed(3), "#DDDDDD");
-        }
-    } else {
-        $("#tooltip").remove();
-        previousPoint = null;
-    }
-});
-    
-function tooltip(x, y, contents, bgColour)
-{
-    var offset = 15; // use higher values for a little spacing between `x,y` and tooltip
-    var elem = $('<div id="tooltip">' + contents + '</div>').css({
-        position: 'absolute',
-        display: 'none',
-        'font-weight':'bold',
-        border: '1px solid rgb(255, 221, 221)',
-        padding: '2px',
-        'background-color': bgColour,
-        opacity: '0.8'
-    }).appendTo("body").fadeIn(200);
+document.addEventListener("plothover", function (event) {
+    if (event.target.id != "placeholder") return;
+    var pos = event.detail[0];
+    if (!plot) return;
 
-    var elemY = y - elem.height() - offset;
-    var elemX = x - elem.width()  - offset;
-    if (elemY < 0) { elemY = 0; } 
-    if (elemX < 0) { elemX = 0; } 
-    elem.css({
-        top: elemY,
-        left: elemX
-    });
-};
+    // Flot also sends plothover when the pointer leaves the plot area
+    var offset = plot.offset();
+    var x = pos.pageX - offset.left;
+    var y = pos.pageY - offset.top;
+    if (x < 0 || x > plot.width() || y < 0 || y > plot.height()) { $("#tooltip").remove(); return; }
+
+    var series = plot.getData();
+
+    // Series share timestamps, but some may be empty
+    var data = [];
+    for (var s = 0; s < series.length; s++) {
+        if (series[s].data.length > data.length) data = series[s].data;
+    }
+    if (!data.length) { $("#tooltip").remove(); return; }
+    var index = 0;
+    for (var n = 1; n < data.length; n++) {
+        if (Math.abs(data[n][0] - pos.x) < Math.abs(data[index][0] - pos.x)) index = n;
+    }
+
+    var out = '<div class="tooltip-time">' + tooltip_time(data[index][0]) + '</div><table>';
+    for (var s = 0; s < series.length; s++) {
+        var point = series[s].data[index];
+        if (!point || point[1] == null) continue;
+        // Store levels are drawn on the second and third y axes
+        var unit = series[s].yaxis.n > 1 ? "GWh" : "GW";
+        out += '<tr><td><span class="tooltip-swatch" style="background-color:' + series[s].color + '"></span>' + series[s].label + '</td>';
+        out += '<td class="tooltip-value">' + point[1].toFixed(1) + ' ' + unit + '</td></tr>';
+    }
+    out += '</table>';
+
+    var elem = $("#tooltip");
+    if (!elem.length) elem = $('<div id="tooltip"></div>').appendTo("body");
+    elem.html(out);
+
+    // Place to the right of the cursor, or to the left near the window edge
+    var gap = 15;
+    var left = pos.pageX + gap;
+    if (left + elem.outerWidth() > $(window).scrollLeft() + $(window).width()) left = pos.pageX - elem.outerWidth() - gap;
+    elem.css({ top: Math.max(0, pos.pageY - elem.outerHeight() * 0.5), left: Math.max(0, left) });
+});
+
+$(document).on("mouseleave", "#placeholder", function () {
+    $("#tooltip").remove();
+});
+
+function tooltip_time(time)
+{
+    var date = new Date(time);
+    var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    var hours = ("0" + date.getUTCHours()).slice(-2);
+    var minutes = ("0" + date.getUTCMinutes()).slice(-2);
+    return days[date.getUTCDay()] + " " + date.getUTCDate() + " " + months[date.getUTCMonth()] + " " + date.getUTCFullYear() + " " + hours + ":" + minutes;
+}
