@@ -4,7 +4,7 @@
   "description": "ZeroCarbonBritain Hourly Model",
   "main": "run.js",
   "scripts": {
-    "test": "test"
+    "test": "python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json --strict"
   },
   "repository": {
     "type": "git",

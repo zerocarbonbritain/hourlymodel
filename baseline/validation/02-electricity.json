@@ -1,0 +1,339 @@
+{
+    "electricity.generation_total": {
+        "group": "Electricity",
+        "label": "UK electricity generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Total All Sources (thermal and non-thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "balance.total_electricity_demand",
+                "b": "supply.total_imports"
+            },
+            "formula": "(a - b) / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "independent",
+        "note": "All generating companies, including storage output. Modelled generation is total supply less imports.",
+        "issue": "Storage output is low, see the storage check."
+    },
+    "electricity.net_imports": {
+        "group": "Electricity",
+        "label": "Net electricity imports",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "imports": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Imports"], "column": "Electricity"},
+                "exports": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Exports"], "column": "Electricity"}
+            },
+            "formula": "(imports + exports) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "supply.total_imports"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.01,
+        "basis": "calibrated"
+    },
+    "electricity.wind": {
+        "group": "Electricity",
+        "label": "Wind generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Wind (non thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "supply.total_offshore_wind",
+                "b": "supply.total_onshore_wind"
+            },
+            "formula": "(a + b) / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "calibrated"
+    },
+    "electricity.solar": {
+        "group": "Electricity",
+        "label": "Solar generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Solar (non thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "supply.total_solarpv"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "calibrated"
+    },
+    "electricity.nuclear": {
+        "group": "Electricity",
+        "label": "Nuclear generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Nuclear (thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "supply.total_nuclear"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "input"
+    },
+    "electricity.hydro": {
+        "group": "Electricity",
+        "label": "Hydro generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Hydro (natural flow, non-thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "supply.total_hydro"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "input"
+    },
+    "electricity.gas": {
+        "group": "Electricity",
+        "label": "Gas generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Gas (thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "electric_backup.total_methane_turbine_output"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Shares of dispatchable generation are inputs. The total comes from the hourly balance."
+    },
+    "electricity.bioenergy": {
+        "group": "Electricity",
+        "label": "Bioenergy generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Bioenergy (thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "electric_backup.total_biomass_turbine_output"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent"
+    },
+    "electricity.coal_other": {
+        "group": "Electricity",
+        "label": "Coal and other thermal generation",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "c": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Coal (thermal)"},
+                "o": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Other (thermal)"}
+            },
+            "formula": "(c + o) / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "electric_backup.total_coal_turbine_output"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent"
+    },
+    "electricity.storage": {
+        "group": "Electricity",
+        "label": "Electricity storage output",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "o": {"source": "dukes_5.16", "sheet": "5.16", "block": "Table 5.16.A Electricity output", "row": ["Total"], "column": "{year}"}
+            },
+            "formula": "o / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "electric_storage.total_discharge"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "issue": "The optimal dispatch shaves backup peaks but does not arbitrage against prices, so storage cycles less than real storage (open-items.md, Model)."
+    },
+    "electricity.peak_demand": {
+        "group": "Electricity",
+        "label": "Peak electricity demand",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "p": {"source": "dukes_5.10", "sheet": "5.10.A", "block": "Table 5.10.A", "row": ["Simultaneous maximum load met, MW", "Total"], "column": "{year}"}
+            },
+            "formula": "p / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "balance.max_electricity_demand"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "End use demand grossed up for losses, highest hour in the ten weather years, against the 2024 simultaneous maximum load met. The model peak includes demand met by embedded generation and the coldest of ten winters, so it is expected to be higher.",
+        "issue": "The model peak is higher than any year in DUKES 5.10 since 2010 (open-items.md, Model)."
+    },
+    "electricity.dispatchable_capacity": {
+        "group": "Electricity",
+        "label": "Dispatchable capacity",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "fossil": {"source": "dukes_5.7", "sheet": "5.7", "block": "Table 5.7.A Capacity by fuel", "row": ["All generating companies", "Total fossil fuels capacity"], "column": "{year}"},
+                "bio": {"source": "dukes_5.7", "sheet": "5.7", "block": "Table 5.7.A Capacity by fuel", "row": ["All generating companies", "Bioenergy and waste"], "column": "{year}"}
+            },
+            "formula": "(fossil + bio) / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "electric_backup.max_capacity_requirement"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.25,
+        "basis": "independent",
+        "note": "The model sizes backup to the highest hourly need, with no reserve margin or outages, so it should be lower than installed capacity.",
+        "issue": "Backup capacity, and its cost, is a third below the installed fleet, which also covers outages and a reserve margin (open-items.md, Model)."
+    },
+    "electricity.offshore_capacity": {
+        "group": "Electricity",
+        "label": "Offshore wind capacity",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "f": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": ["Offshore Wind"], "column": "{year}"},
+                "fl": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": ["Floating offshore wind"], "column": "{year}"}
+            },
+            "formula": "(f + fl) / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.supply.offshore_wind_capacity"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input"
+    },
+    "electricity.onshore_capacity": {
+        "group": "Electricity",
+        "label": "Onshore wind capacity",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "c": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": ["Onshore"], "column": "{year}"}
+            },
+            "formula": "c / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.supply.onshore_wind_capacity"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input"
+    },
+    "electricity.solar_capacity": {
+        "group": "Electricity",
+        "label": "Solar capacity",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "c": {"source": "dukes_6.2", "sheet": "6.2", "block": "Installed Capacity (MW)", "row": ["Solar photovoltaics"], "column": "{year}"}
+            },
+            "formula": "c / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.supply.solarpv_capacity"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input"
+    },
+    "electricity.nuclear_capacity": {
+        "group": "Electricity",
+        "label": "Nuclear capacity",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "c": {"source": "dukes_5.7", "sheet": "5.7", "block": "Table 5.7.A Capacity by fuel", "row": ["All generating companies", "Nuclear stations"], "column": "{year}"}
+            },
+            "formula": "c / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.supply.nuclear_capacity"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input"
+    },
+    "electricity.interconnector_capacity": {
+        "group": "Electricity",
+        "label": "Interconnector capacity",
+        "units": "GW",
+        "observed": {
+            "values": {
+                "c": {"source": "dukes_5.13", "sheet": "5.13A", "sum": "Capacity (MW)", "where": {"Year Commissioned": "<={year}"}, "where_not": {"Connecting Country": "within the UK"}}
+            },
+            "formula": "c / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.supply.interconnector_capacity_GW"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input"
+    }
+}

@@ -5,7 +5,7 @@
     // Cache busting version: the latest change to any file the page loads,
     // so edited scenarios, scripts and pages are fetched fresh
     $v = 0;
-    foreach (array_merge(glob(__DIR__."/*.js"), glob(__DIR__."/ui/*"), glob(__DIR__."/pages/*.html"), glob(__DIR__."/scenarios/*.json")) as $file) {
+    foreach (array_merge(glob(__DIR__."/*.js"), glob(__DIR__."/ui/*"), glob(__DIR__."/pages/*.html"), glob(__DIR__."/scenarios/*.json"), glob(__DIR__."/scenarios/validation/*.json")) as $file) {
         $v = max($v, filemtime($file));
     }
 ?>
@@ -51,6 +51,7 @@
         <br>
         <div class="menu-items" name="fullmodel">
           <div class="menu-item"><a href="#overview">Overview</a></div>      
+          <div class="menu-item"><a href="#validation">Validation (baselines)</a></div>
           <div class="menu-item"><a href="#supply">Supply</a></div>
           <div class="menu-item"><a href="#lac">Lighting & Appliances</a></div>
           <div class="menu-item"><a href="#spacewaterheat">Space & Water heat demand</a></div>   
@@ -130,6 +131,7 @@ var default_scenario = JSON.parse(JSON.stringify(i));
 
 var sidenav_visible = true;
 var app_mounted = false;
+var app = null;
 var window_width = 0;
 var load_high_res = <?php echo $highres; ?>;
 var files_to_load = 2;
@@ -190,6 +192,7 @@ function scroll_to_hash() {
     
         $(".inner").hide();
         $(".inner[name='overview']").show();
+        $(".inner[name='validation']").show();
         $(".inner[name='balance']").show();
         $(".inner[name='"+section+"']").show();
         $(".inner[name='"+section+"']").parent().get(0).scrollIntoView();    
@@ -206,14 +209,17 @@ function load_page(page)
     var time_elapsed = (Date.now() - timerStart)
     loading_prc(100,"Load time "+(time_elapsed*0.001).toFixed(1)+"s");
     
-    var app = new Vue({
+    app = new Vue({
         el: '#app',
         data: {
             i: i,
             o: o,
             selected_scenario: "zcb_2024",
             scenario_list: {},
-            live_edit: true
+            live_edit: true,
+            validation: null,
+            validation_open: "",
+            validation_tick: 0
         },
         computed: {
           // Scenarios grouped by their group name, in the order listed in available.json
@@ -225,6 +231,32 @@ function load_page(page)
               groups[group][key] = this.scenario_list[key];
             }
             return groups;
+          },
+          // Validation checks grouped, with model values evaluated against the current run
+          validation_groups: function () {
+            this.validation_tick;
+            if (!this.validation) return [];
+            var groups = [];
+            var by_name = {};
+            for (var c of this.validation.checks) {
+              if (by_name[c.group] == undefined) {
+                by_name[c.group] = { name: c.group, checks: [] };
+                groups.push(by_name[c.group]);
+              }
+              by_name[c.group].checks.push(validation_row(c, this.validation.warn_factor));
+            }
+            return groups;
+          },
+          validation_summary: function () {
+            var counts = {};
+            for (var g of this.validation_groups) {
+              for (var c of g.checks) counts[c.status_text] = (counts[c.status_text] || 0) + 1;
+            }
+            var parts = [];
+            for (var s of ["ok", "warn", "fail", "known issue", "n/a"]) {
+              if (counts[s]) parts.push(counts[s] + " " + s);
+            }
+            return parts.join(", ");
           }
         },
         methods: {
@@ -233,17 +265,20 @@ function load_page(page)
               model.run();
               model_view();
               model_ui();
+              app.validation_tick++;
             }
           },
           update_non_hourly: function () {
             model.update_non_hourly();
             model_view();
             model_ui();
+            app.validation_tick++;
           },
           simulate: function () {
             model.run();
             model_view();
             model_ui();
+            app.validation_tick++;
           },
           pan_left: function () {
             view.pan_left();
@@ -333,6 +368,13 @@ function load_page(page)
     $.ajax({url: "scenarios/available.json?v="+v, async: false, success: function(data){
       app.scenario_list = data;
     }});
+
+    // ?scenario=baseline_2024 opens a scenario directly
+    var requested = new URLSearchParams(window.location.search).get("scenario");
+    if (requested && app.scenario_list[requested] && requested != app.selected_scenario) {
+      app.selected_scenario = requested;
+      load_scenario(requested);
+    }
 }
 
 $("#model").on("click",".viewmode",function(){
@@ -484,6 +526,62 @@ function load_scenario(name) {
   model.run();
   model_view();
   model_ui();
+  load_validation(name);
+}
+
+// Baselines have checks against observed statistics, written by baseline/validate.py
+function load_validation(name) {
+  app.validation = null;
+  app.validation_open = "";
+  if (name.indexOf("baseline") != 0) return;
+  $.ajax({url: "scenarios/validation/"+name+".json?v="+v, dataType: "json", async: false,
+    success: function(data){ app.validation = data; },
+    error: function(){ console.log("No validation file for " + name); }
+  });
+}
+
+// Model side of a check: named output paths, or i. input paths, combined by a formula
+function validation_model_value(spec) {
+  var names = [], values = [];
+  for (var name in spec.values) {
+    var path = spec.values[name];
+    var obj = path.indexOf("i.") == 0 ? i : o;
+    var keys = path.indexOf("i.") == 0 ? path.substring(2).split(".") : path.split(".");
+    for (var k of keys) {
+      if (obj == undefined) return NaN;
+      obj = obj[k];
+    }
+    names.push(name);
+    values.push(obj);
+  }
+  return Function.apply(null, names.concat(["return (" + spec.formula + ");"])).apply(null, values);
+}
+
+function validation_number(x) {
+  if (x == null || isNaN(x)) return "-";
+  var a = Math.abs(x);
+  if (a >= 100) return Math.round(x).toLocaleString("en-GB");
+  if (a >= 10) return x.toFixed(1);
+  return x.toPrecision(3);
+}
+
+function validation_row(c, warn_factor) {
+  var row = Object.assign({}, c);
+  row.observed_text = validation_number(c.observed);
+  if (c.observed == null) {
+    row.status = "unavailable"; row.status_text = "n/a";
+    row.model_text = "-"; row.error_text = "-";
+    return row;
+  }
+  var model = validation_model_value(c.model);
+  var error = model / c.observed - 1;
+  row.model_text = validation_number(model);
+  row.error_text = isNaN(error) ? "-" : (error >= 0 ? "+" : "") + (error * 100).toFixed(1) + "%";
+  var status = Math.abs(error) <= c.tolerance ? "ok" : (Math.abs(error) <= c.tolerance * warn_factor ? "warn" : "fail");
+  if (status != "ok" && c.issue) status = "known";
+  row.status = status;
+  row.status_text = {ok: "ok", warn: "warn", fail: "fail", known: "known issue"}[status];
+  return row;
 }
 
 

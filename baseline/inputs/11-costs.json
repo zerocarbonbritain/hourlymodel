@@ -1,0 +1,567 @@
+{
+    "_retail.elec_supplier_typical_gbp": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/yr at 3,100 kWh",
+        "values": {
+            "total": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T45:W45",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B45": "Total_GB average",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "df": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T31:W31",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B31": "DF",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "cm": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T32:W32",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B32": "CM",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "pc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T34:W34",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B34": "PC",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "nc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T35:W35",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B35": "NC",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "total - df - cm - pc - nc",
+        "round": 2,
+        "note": "Supplier operating costs, smart metering, payment method, EBIT, headroom and adjustment allowances at the 3,100 kWh benchmark: total less wholesale (DF), capacity market (CM), policy (PC) and network (NC)."
+    },
+    "_retail.elec_supplier_nil_gbp": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "total": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T27:W27",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B27": "Total_GB average",
+                    "T12": "Jan 2024 - Mar 2024",
+                    "W12": "Oct 2024 - Dec 2024"
+                }
+            },
+            "pc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T16:W16",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B16": "PC",
+                    "T12": "Jan 2024 - Mar 2024",
+                    "W12": "Oct 2024 - Dec 2024"
+                }
+            },
+            "nc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T17:W17",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B17": "NC",
+                    "T12": "Jan 2024 - Mar 2024",
+                    "W12": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "total - pc - nc",
+        "round": 2,
+        "note": "The same allowances at nil consumption (standing charge)."
+    },
+    "retail.electricity.network_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "typical": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T35:W35",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B35": "NC",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "nil": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T17:W17",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B17": "NC",
+                    "T12": "Jan 2024 - Mar 2024",
+                    "W12": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "(typical - nil) / 3100 * 100",
+        "round": 3,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Network costs (transmission, distribution, balancing) per kWh, from the 3,100 kWh benchmark less nil consumption."
+    },
+    "retail.electricity.network_gbp": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "nil": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T17:W17",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B17": "NC",
+                    "T12": "Jan 2024 - Mar 2024",
+                    "W12": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "nil",
+        "round": 2,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Network costs recovered in the standing charge."
+    },
+    "retail.electricity.policy_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "eco": {
+                "source": "ofgem_cap",
+                "sheet": "3d PC",
+                "range": "AD55:AG55",
+                "expect": {
+                    "C55": "ECO",
+                    "AD50": "January 2024 - March 2024",
+                    "AG50": "October 2024 - December 2024"
+                }
+            },
+            "aahedc": {
+                "source": "ofgem_cap",
+                "sheet": "3d PC",
+                "range": "AD58:AG58",
+                "expect": {
+                    "C58": "AAHEDC (GB average)",
+                    "AD50": "January 2024 - March 2024",
+                    "AG50": "October 2024 - December 2024"
+                }
+            }
+        },
+        "formula": "(eco + aahedc) / 10",
+        "round": 3,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Social and other policy costs only (ECO and AAHEDC, £/MWh). RO, FiT and the capacity market pay generators, so they are part of the generation cost the model calculates and are left out here."
+    },
+    "retail.electricity.policy_gbp": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "nil": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T16:W16",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B16": "PC",
+                    "T12": "Jan 2024 - Mar 2024",
+                    "W12": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "nil",
+        "round": 2,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Warm Home Discount, recovered per customer."
+    },
+    "retail.electricity.supplier_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "typical": {
+                "ref": "_retail.elec_supplier_typical_gbp"
+            },
+            "nil": {
+                "ref": "_retail.elec_supplier_nil_gbp"
+            }
+        },
+        "formula": "(typical - nil) / 3100 * 100",
+        "round": 3,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Supplier costs and margins per kWh."
+    },
+    "retail.electricity.supplier_gbp": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "nil": {
+                "ref": "_retail.elec_supplier_nil_gbp"
+            }
+        },
+        "formula": "nil",
+        "round": 2,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Supplier costs and margins per customer."
+    },
+    "_retail.gas_supplier_typical_gbp": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/yr at 12,000 kWh",
+        "values": {
+            "total": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD45:CG45",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL45": "Total_GB average",
+                    "CD30": "Jan 2024 - Mar 2024",
+                    "CG30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "df": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD31:CG31",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL31": "DF",
+                    "CD30": "Jan 2024 - Mar 2024",
+                    "CG30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "pc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD34:CG34",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL34": "PC",
+                    "CD30": "Jan 2024 - Mar 2024",
+                    "CG30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "nc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD35:CG35",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL35": "NC",
+                    "CD30": "Jan 2024 - Mar 2024",
+                    "CG30": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "total - df - pc - nc",
+        "round": 2,
+        "note": "Gas supplier allowances at the 12,000 kWh benchmark."
+    },
+    "_retail.gas_supplier_nil_gbp": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "total": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD27:CG27",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL27": "Total_GB average",
+                    "CD12": "Jan 2024 - Mar 2024",
+                    "CG12": "Oct 2024 - Dec 2024"
+                }
+            },
+            "pc": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD16:CG16",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL16": "PC",
+                    "CD12": "Jan 2024 - Mar 2024",
+                    "CG12": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "total - pc",
+        "round": 2,
+        "note": "Gas supplier allowances at nil consumption. Gas network costs have no nil consumption part."
+    },
+    "retail.gas.network_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "typical": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD35:CG35",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL35": "NC",
+                    "CD30": "Jan 2024 - Mar 2024",
+                    "CG30": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "typical / 12000 * 100",
+        "round": 3,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Gas network costs, all recovered per kWh."
+    },
+    "retail.gas.network_gbp": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "value": 0,
+        "note": "The 2024 cap recovers gas network costs per kWh only (the nil consumption NC row is blank)."
+    },
+    "retail.gas.policy_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "eco": {
+                "source": "ofgem_cap",
+                "sheet": "3d PC",
+                "range": "AD69:AG69",
+                "expect": {
+                    "C69": "ECO",
+                    "AD50": "January 2024 - March 2024",
+                    "AG50": "October 2024 - December 2024",
+                    "B69": "Gas"
+                }
+            }
+        },
+        "formula": "eco / 10",
+        "round": 3,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. ECO."
+    },
+    "retail.gas.policy_gbp": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "nil": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD16:CG16",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL16": "PC",
+                    "CD12": "Jan 2024 - Mar 2024",
+                    "CG12": "Oct 2024 - Dec 2024"
+                }
+            }
+        },
+        "formula": "nil",
+        "round": 2,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Warm Home Discount and Green Gas Levy."
+    },
+    "retail.gas.supplier_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "typical": {
+                "ref": "_retail.gas_supplier_typical_gbp"
+            },
+            "nil": {
+                "ref": "_retail.gas_supplier_nil_gbp"
+            }
+        },
+        "formula": "(typical - nil) / 12000 * 100",
+        "round": 3,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Supplier costs and margins per kWh."
+    },
+    "retail.gas.supplier_gbp": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/yr",
+        "values": {
+            "nil": {
+                "ref": "_retail.gas_supplier_nil_gbp"
+            }
+        },
+        "formula": "nil",
+        "round": 2,
+        "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Supplier costs and margins per customer."
+    },
+    "retail.gas.households_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 84,
+        "note": "Share of households with a gas supply, about 24 million domestic gas meters in GB. Not yet taken from a cached source (see open-items.md)."
+    },
+    "retail.vat_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 5,
+        "note": "Reduced rate of VAT on domestic fuel and power."
+    },
+    "retail.road_fuel.petrol_p_litre": {
+        "type": "statistic",
+        "units": "p/litre",
+        "values": {
+            "p": {
+                "source": "qep_4.1",
+                "sheet": "4.1.2",
+                "block": "Table 4.1.2 Typical retail prices",
+                "row": [
+                    "{year}"
+                ],
+                "column": "Motor spirit: Premium unleaded / ULSP (Pence per litre)"
+            }
+        },
+        "formula": "p",
+        "round": 2,
+        "note": "Annual average pump price of unleaded petrol, including duty and VAT."
+    },
+    "retail.road_fuel.diesel_p_litre": {
+        "type": "statistic",
+        "units": "p/litre",
+        "values": {
+            "p": {
+                "source": "qep_4.1",
+                "sheet": "4.1.2",
+                "block": "Table 4.1.2 Typical retail prices",
+                "row": [
+                    "{year}"
+                ],
+                "column": "Derv: Diesel / ULSD (Pence per litre)"
+            }
+        },
+        "formula": "p",
+        "round": 2,
+        "note": "Annual average pump price of diesel, including duty and VAT."
+    },
+    "retail.road_fuel.petrol_kWh_per_litre": {
+        "type": "assumption",
+        "units": "kWh/litre",
+        "value": 9.69,
+        "note": "Gross calorific value of motor spirit, 47.1 GJ/t at 1,350 litres per tonne (DUKES Annex A). Not yet taken from a cached source."
+    },
+    "retail.road_fuel.diesel_kWh_per_litre": {
+        "type": "assumption",
+        "units": "kWh/litre",
+        "value": 10.69,
+        "note": "Gross calorific value of DERV, 45.6 GJ/t at 1,185 litres per tonne (DUKES Annex A). Not yet taken from a cached source."
+    },
+    "retail.road_fuel.car_diesel_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "diesel": {
+                "source": "ecuk_consumption",
+                "sheet": "Table C8",
+                "block": "Road transport energy use by vehicle type",
+                "row": [
+                    "{year-1}"
+                ],
+                "column": "Cars - white diesel"
+            },
+            "all": {
+                "source": "ecuk_consumption",
+                "sheet": "Table C8",
+                "block": "Road transport energy use by vehicle type",
+                "row": [
+                    "{year-1}"
+                ],
+                "column": "Cars - all"
+            }
+        },
+        "formula": "diesel / all * 100",
+        "round": 1,
+        "note": "Diesel share of car fuel energy. ECUK C8 runs a year behind."
+    }
+}

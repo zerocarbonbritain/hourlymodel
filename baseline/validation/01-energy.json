@@ -1,0 +1,409 @@
+{
+    "energy.primary_supply": {
+        "group": "Energy balance",
+        "label": "Primary energy supply",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "supply": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total supply"], "column": "Total"},
+                "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Total"},
+                "nuclear_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Fuel used"], "column": "Nuclear (thermal)"},
+                "nuclear_gen": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Nuclear (thermal)"}
+            },
+            "formula": "(supply - non_energy) * 0.01163 - (nuclear_fuel - nuclear_gen) / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "balance.total_supply"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DUKES 1.1 total supply less non energy use, with nuclear counted as electricity generated rather than reactor heat (DUKES 5.6), as the model does. Includes ambient heat, which DUKES counts under bioenergy and waste."
+    },
+    "energy.final_total": {
+        "group": "Energy balance",
+        "label": "Final energy consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "final": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Total"},
+                "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Total"}
+            },
+            "formula": "(final - non_energy) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.total"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DUKES 1.1 final consumption excluding non energy use."
+    },
+    "energy.final_electricity": {
+        "group": "Energy balance",
+        "label": "Final electricity consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "e": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Electricity"}
+            },
+            "formula": "e * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.electricity"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "independent",
+        "note": "Electricity delivered to end users. The model excludes refinery electricity, which DUKES counts as energy industry use."
+    },
+    "energy.final_gas": {
+        "group": "Energy balance",
+        "label": "Final gas consumption, including heat sold",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "gas": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Natural gas"},
+                "heat": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Heat sold"}
+            },
+            "formula": "(gas + heat) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.gas"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "The baseline maps heat sold to gas heating, so heat sold is added to the observed gas."
+    },
+    "energy.final_liquid": {
+        "group": "Energy balance",
+        "label": "Final liquid fuel consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "oil": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Petroleum products"},
+                "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Petroleum products"},
+                "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Transport"], "column": "Bioenergy & waste"}
+            },
+            "formula": "(oil - non_energy + bio) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.liquid"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Petroleum products excluding non energy use, plus transport biofuels, which the model supplies through the liquid fuel store."
+    },
+    "energy.final_coal": {
+        "group": "Energy balance",
+        "label": "Final coal and manufactured fuel consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "coal": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Coal"},
+                "manufactured": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Manufactured fuel"},
+                "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Manufactured fuel"}
+            },
+            "formula": "(coal + manufactured - non_energy) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.coal"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent"
+    },
+    "energy.final_bioenergy": {
+        "group": "Energy balance",
+        "label": "Final bioenergy, ambient and solar heat",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Bioenergy & waste"},
+                "transport_bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Transport"], "column": "Bioenergy & waste"}
+            },
+            "formula": "(bio - transport_bio) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.bioenergy",
+                "b": "final_consumption.renewable_heat"
+            },
+            "formula": "(a + b) / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "DUKES bioenergy and waste final consumption includes heat pump ambient heat and solar thermal. Transport biofuels are counted with liquid fuels."
+    },
+    "energy.domestic_total": {
+        "group": "Energy balance",
+        "label": "Domestic final consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "t": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Total"}
+            },
+            "formula": "t * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.domestic.total"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent"
+    },
+    "energy.domestic_electricity": {
+        "group": "Energy balance",
+        "label": "Domestic electricity",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "e": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Electricity"}
+            },
+            "formula": "e * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.domestic.electricity"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DUKES counts electric vehicle charging under road transport, as does the model.",
+        "issue": "One heating system mix is shared by all sectors, so domestic heating electricity follows the all sector heat pump and direct electric shares (open-items.md, Model)."
+    },
+    "energy.domestic_gas": {
+        "group": "Energy balance",
+        "label": "Domestic gas, including heat sold",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Natural gas"},
+                "h": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Heat sold"}
+            },
+            "formula": "(g + h) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.domestic.gas"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "issue": "One heating system mix is shared by all sectors. Homes use more gas and less oil and electricity for heat than services, so the model moves gas from homes to services (open-items.md, Model)."
+    },
+    "energy.services_total": {
+        "group": "Energy balance",
+        "label": "Services final consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "p": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Public administration"], "column": "Total"},
+                "c": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Commercial"], "column": "Total"},
+                "a": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Agriculture"], "column": "Total"},
+                "x": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Miscellaneous"], "column": "Total"}
+            },
+            "formula": "(p + c + a + x) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.services.total"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Public administration, commercial, agriculture and miscellaneous."
+    },
+    "energy.services_gas": {
+        "group": "Energy balance",
+        "label": "Services gas, including heat sold",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "p": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Public administration"], "column": "Natural gas"},
+                "c": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Commercial"], "column": "Natural gas"},
+                "a": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Agriculture"], "column": "Natural gas"},
+                "hp": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Public administration"], "column": "Heat sold"},
+                "hc": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Commercial"], "column": "Heat sold"},
+                "ha": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Agriculture"], "column": "Heat sold"}
+            },
+            "formula": "(p + c + a + hp + hc + ha) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.services.gas"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "issue": "See domestic gas: the shared heating mix moves gas from homes to services."
+    },
+    "energy.industry_total": {
+        "group": "Energy balance",
+        "label": "Industry final consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "t": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Industry"], "column": "Total"}
+            },
+            "formula": "t * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.industry.total"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "DUKES 1.1 industry including unclassified. The baseline is built from ECUK, whose industry total (227 TWh) is higher than DUKES because of boundary differences."
+    },
+    "energy.industry_electricity": {
+        "group": "Energy balance",
+        "label": "Industry electricity",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "e": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Industry"], "column": "Electricity"}
+            },
+            "formula": "e * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.industry.electricity"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent"
+    },
+    "energy.transport_total": {
+        "group": "Energy balance",
+        "label": "Transport final consumption",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "t": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Transport"], "column": "Total"}
+            },
+            "formula": "t * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "final_consumption.transport.total"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "calibrated",
+        "note": "Including international aviation, as in DUKES. Fuel use for each mode is calibrated."
+    },
+    "energy.gas_demand": {
+        "group": "Energy balance",
+        "label": "Natural gas total demand",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Natural gas"}
+            },
+            "formula": "g * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "fossil_fuels.gas"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.03,
+        "basis": "independent",
+        "note": "Including gas for power, energy industry use and losses."
+    },
+    "energy.oil_demand": {
+        "group": "Energy balance",
+        "label": "Oil total demand",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "crude": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Primary oils"},
+                "products": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Petroleum products"},
+                "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Petroleum products"}
+            },
+            "formula": "(crude + products - non_energy) * 0.01163"
+        },
+        "model": {
+            "values": {
+                "a": "fossil_fuels.oil"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Primary oils plus net petroleum products, excluding non energy use and marine bunkers. Biofuels are excluded on both sides."
+    },
+    "energy.coal_demand": {
+        "group": "Energy balance",
+        "label": "Coal, manufactured fuel and other thermal fuel demand",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "coal": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Coal"},
+                "manufactured": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Manufactured fuel"},
+                "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Manufactured fuel"},
+                "other_thermal": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Fuel used"], "column": "Other (thermal)"}
+            },
+            "formula": "(coal + manufactured - non_energy) * 0.01163 + other_thermal / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "fossil_fuels.coal"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "The model's coal backup share also covers other thermal generation, mainly waste, so DUKES 5.6 other thermal fuel is added to the observed coal.",
+        "issue": "Coal and coke used in blast furnaces and coke ovens (about 12 TWh in 2024) are transformation in DUKES and are not in the model (open-items.md, Industry)."
+    },
+    "energy.bioenergy_demand": {
+        "group": "Energy balance",
+        "label": "Bioenergy, ambient and solar heat total demand",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "bio": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Bioenergy & waste"},
+                "other_thermal": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Fuel used"], "column": "Other (thermal)"}
+            },
+            "formula": "bio * 0.01163 - other_thermal / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "biomass.total_used",
+                "b": "heat.total_ambient_supply",
+                "c": "supply.total_fixed_heat"
+            },
+            "formula": "(a + b + c) / 10000"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Other thermal fuel (waste) is moved to the coal check, matching the model."
+    }
+}

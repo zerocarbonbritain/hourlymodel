@@ -1,0 +1,264 @@
+{
+    "emissions.total": {
+        "group": "Emissions",
+        "label": "Total emissions including international aviation and shipping",
+        "units": "MtCO2e",
+        "observed": {
+            "values": {
+                "t": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}"}}
+            },
+            "formula": "t"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.total",
+                "b": "emissions_balance.aviation_co2e"
+            },
+            "formula": "a - b"
+        },
+        "tolerance": 0.03,
+        "basis": "independent",
+        "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink."
+    },
+    "emissions.fuel_co2": {
+        "group": "Emissions",
+        "label": "Fuel combustion CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "fuel": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": ["Gaseous fuels", "Petroleum", "Coal", "Other solid fuels"]}},
+                "waste": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": "Other emissions", "Territorial Emissions Statistics sector": "Electricity supply"}}
+            },
+            "formula": "fuel + waste"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.fossil_fuel_coal",
+                "b": "emissions_balance.fossil_fuel_oil",
+                "c": "emissions_balance.fossil_fuel_gas"
+            },
+            "formula": "a + b + c"
+        },
+        "tolerance": 0.03,
+        "basis": "independent",
+        "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup."
+    },
+    "emissions.gas_co2": {
+        "group": "Emissions",
+        "label": "Natural gas CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "g": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Natural Gas"}}
+            },
+            "formula": "g"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.fossil_fuel_gas"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.03,
+        "basis": "independent"
+    },
+    "emissions.oil_co2": {
+        "group": "Emissions",
+        "label": "Oil CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "p": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": "Petroleum"}},
+                "lpg": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Petroleum gases"}}
+            },
+            "formula": "p + lpg"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.fossil_fuel_oil"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Petroleum including bunkers, plus LPG and refinery gases, which the inventory groups with gaseous fuels."
+    },
+    "emissions.coal_co2": {
+        "group": "Emissions",
+        "label": "Coal, solid fuels and waste CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "coal": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Coal"}},
+                "solid": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other solid fuels"}},
+                "gases": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other gases"}},
+                "waste": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": "Other emissions", "Territorial Emissions Statistics sector": "Electricity supply"}}
+            },
+            "formula": "coal + solid + gases + waste"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.fossil_fuel_coal"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Other gases are blast furnace and coke oven gas, made from coal.",
+        "issue": "Blast furnace and coke oven coal is not modelled, and the coal plus waste backup CO2 factor (0.254) averages coal and waste (open-items.md, Industry)."
+    },
+    "emissions.electricity_co2": {
+        "group": "Emissions",
+        "label": "Electricity supply CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "e": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Territorial Emissions Statistics sector": "Electricity supply"}}
+            },
+            "formula": "e"
+        },
+        "model": {
+            "values": {
+                "a": "grid_co2_emissions"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Inventory power stations. Autogenerator emissions sit in industry in the inventory but are part of modelled backup."
+    },
+    "emissions.grid_intensity": {
+        "group": "Emissions",
+        "label": "Grid CO2 intensity, DUKES basis",
+        "units": "gCO2/kWh",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.14", "sheet": "5.14", "block": "Table 5.14", "row": ["All fuels (including nuclear and renewables)"], "column": "{year}"}
+            },
+            "formula": "g"
+        },
+        "model": {
+            "values": {
+                "co2": "grid_co2_emissions",
+                "gen": "balance.total_electricity_demand",
+                "imports": "supply.total_imports",
+                "own_use": "i.energy_industry_use.electricity_own_use_prc"
+            },
+            "formula": "1000 * co2 / ((gen - imports) / 10000 * (1 - own_use / 100))"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DUKES 5.14 divides generation CO2 by UK electricity supplied, excluding imports. The model's own grid intensity divides by total supply including imports."
+    },
+    "emissions.domestic_transport_co2": {
+        "group": "Emissions",
+        "label": "Domestic transport CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "t": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Territorial Emissions Statistics sector": "Domestic transport"}}
+            },
+            "formula": "t"
+        },
+        "model": {
+            "values": {
+                "ic": "transport.fuel_totals.IC",
+                "air": "transport.modes.Aviation.IC.TWh",
+                "bio": "synth_fuel.total_biofuel_supply",
+                "liquid": "synth_fuel.total_demand"
+            },
+            "formula": "(ic - air) * (1 - bio / liquid) * 0.2678"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Road, rail and domestic shipping fuel, net of the average biofuel share of liquid fuel, at the model's oil factor. Domestic aviation is in the aviation check.",
+        "issue": "The model uses one oil CO2 factor, 0.2678 kg/kWh, close to fuel oil. Petrol, diesel and jet fuel are about 0.24 to 0.25 kg/kWh gross (open-items.md, Model)."
+    },
+    "emissions.aviation_co2": {
+        "group": "Emissions",
+        "label": "Aviation CO2, domestic and international",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "a": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Aviation turbine fuel"}}
+            },
+            "formula": "a"
+        },
+        "model": {
+            "values": {
+                "air": "transport.modes.Aviation.IC.TWh",
+                "bio": "synth_fuel.total_biofuel_supply",
+                "liquid": "synth_fuel.total_demand"
+            },
+            "formula": "air * (1 - bio / liquid) * 0.2678"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "The model applies the average liquid biofuel share to aviation, which overstates sustainable aviation fuel.",
+        "issue": "See domestic transport CO2: the single oil CO2 factor is high for jet fuel."
+    },
+    "emissions.forest_sink": {
+        "group": "Emissions",
+        "label": "Forest land carbon sink",
+        "units": "MtCO2e",
+        "observed": {
+            "values": {
+                "f": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "Territorial Emissions Statistics sector": "LULUCF", "CRT category": "4A*"}, "where_not": {"CRT category": ["*(III)*", "*(IV)*"]}}
+            },
+            "formula": "f"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.reforestation"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Forest land carbon stock change and drainage. In the model this is sequestration by new woodland only; existing woodland is not credited.",
+        "issue": "The baseline represents the existing forest sink with 1,475 kha of new natural broadleaf woodland, which is not real land (open-items.md, Inputs)."
+    },
+    "emissions.harvested_wood": {
+        "group": "Emissions",
+        "label": "Harvested wood products",
+        "units": "MtCO2e",
+        "observed": {
+            "values": {
+                "h": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "Territorial Emissions Statistics sector": "LULUCF", "CRT category": "4G*"}}
+            },
+            "formula": "h"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.harvested_wood"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "issue": "5.3 MtCO2 of the modelled harvested wood comes from 320 kha of hemp inherited from the ZCB scenario (open-items.md, Inputs)."
+    },
+    "emissions.land_sink_total": {
+        "group": "Emissions",
+        "label": "Forest, harvested wood and biochar sink",
+        "units": "MtCO2e",
+        "observed": {
+            "values": {
+                "f": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "Territorial Emissions Statistics sector": "LULUCF", "CRT category": "4A*"}, "where_not": {"CRT category": ["*(III)*", "*(IV)*"]}},
+                "h": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "Territorial Emissions Statistics sector": "LULUCF", "CRT category": "4G*"}}
+            },
+            "formula": "f + h"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.reforestation",
+                "b": "emissions_balance.harvested_wood",
+                "c": "emissions_balance.biochar_carbon_capture"
+            },
+            "formula": "a + b + c"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "The part of LULUCF left to the land use model. The total is close, but see the two checks above: the components do not match, and the model adds 1.3 MtCO2 of landfill biochar that has no inventory counterpart."
+    }
+}

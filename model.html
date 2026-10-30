@@ -76,6 +76,30 @@ input[type='text'] {
     text-align:right;
 }
 
+.validation-table th, .validation-table td {
+    padding:4px 6px;
+    text-align:right;
+}
+.validation-table th:first-child, .validation-table td:first-child {
+    text-align:left;
+}
+.validation-detail td {
+    text-align:left !important;
+    background-color:rgba(255,255,255,0.6);
+    font-size:14px;
+}
+.vstatus {
+    padding:1px 6px;
+    border-radius:3px;
+    color:#fff;
+    white-space:nowrap;
+}
+.vstatus-ok { background-color:#3a9b4a; }
+.vstatus-warn { background-color:#d08a12; }
+.vstatus-fail { background-color:#c8322f; }
+.vstatus-known { background-color:#8a5a9e; }
+.vstatus-unavailable { background-color:#999; }
+
 [v-cloak] {
   display: none;
 }
@@ -116,6 +140,43 @@ input[type='text'] {
                 <option v-for="(scenario,key) in scenarios" :value="key">{{ scenario.name }}</option>
             </optgroup>
         </select>
+    </div>
+</div>
+
+<div class="box" v-if="validation">
+    <div class="box-title"><img class="icon-expand" src="img/expand.png"><b>VALIDATION AGAINST {{ validation.year }} STATISTICS
+        <span style="float:right">{{ validation_summary }}</span></b>
+    </div>
+    <div class="inner" style="display:block" name="validation">
+        <p>The baseline is checked against what was observed in {{ validation.year }}: energy use, generation, emissions, land use and prices. Model values update live, so editing an input shows how far it moves the result from the statistics. <b>Basis</b> says how much a check tests the model: <i>independent</i> outputs are not fitted to the observed value, <i>calibrated</i> outputs are fitted by the baseline build, and <i>input</i> checks confirm an input matches its source. Status is ok within the tolerance, warn within twice it and fail beyond. Click a row for sources and notes. Report: <a :href="'baseline/reports/validation_'+validation.scenario+'.md'">validation_{{ validation.scenario }}.md</a>.</p>
+
+        <div v-for="group in validation_groups">
+            <h3 style="margin-top:16px">{{ group.name }}</h3>
+            <table class="table validation-table" style="width:100%">
+                <tr>
+                    <th>Check</th><th>Units</th><th>Observed</th><th>Model</th><th>Error</th><th>Tolerance</th><th>Basis</th><th>Status</th>
+                </tr>
+                <template v-for="c in group.checks">
+                    <tr @click="validation_open = (validation_open == c.id ? '' : c.id)" style="cursor:pointer">
+                        <td>{{ c.label }}</td>
+                        <td>{{ c.units }}</td>
+                        <td>{{ c.observed_text }}</td>
+                        <td>{{ c.model_text }}</td>
+                        <td>{{ c.error_text }}</td>
+                        <td>{{ c.tolerance*100 | toFixed(0) }}%</td>
+                        <td>{{ c.basis }}</td>
+                        <td><span :class="'vstatus vstatus-'+c.status">{{ c.status_text }}</span></td>
+                    </tr>
+                    <tr v-if="validation_open == c.id" class="validation-detail">
+                        <td colspan="8">
+                            <div v-if="c.note">{{ c.note }}</div>
+                            <div v-if="c.issue"><b>Issue:</b> {{ c.issue }}</div>
+                            <div style="font-size:12px; margin-top:6px; color:#666"><div v-for="s in c.sources">{{ s }}</div></div>
+                        </td>
+                    </tr>
+                </template>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -1567,7 +1628,40 @@ input[type='text'] {
             </tr>
         </table>
         <p><i>* Detailed modelling by BEIS 'Appendix I: Electricity Networks Modelling' August 2022 suggests that while significant network investments are required for net zero scenarios the network costs are likely to stay relatively flat on a per unit basis at around £50/MWh due to higher electricity volumes.</i></p>
-        
+
+        <h3>Retail prices</h3>
+        <p>Domestic prices build on the modelled costs. The electricity unit rate starts from the system cost per kWh delivered to end users, and gas from the gas fuel price. Network, social policy (ECO, Warm Home Discount) and supplier costs are added per kWh and per customer, then VAT. Defaults are the 2024 Ofgem price cap allowances. RO, FiT and the capacity market pay generators, so they are not added: the modelled generation cost replaces them.</p>
+        <table class="table cost-table" style="width:100%">
+            <tr><th></th><th>Generation or wholesale</th><th>Network</th><th>Policy</th><th>Supplier</th><th>Unit rate</th><th>Standing charge</th><th>Use per customer</th><th>Bill</th><th>Households</th></tr>
+            <tr class="units"><th></th><th>p/kWh</th><th>p/kWh, £/yr</th><th>p/kWh, £/yr</th><th>p/kWh, £/yr</th><th>p/kWh</th><th>£/yr</th><th>kWh/yr</th><th>£/yr</th><th>£bn/yr</th></tr>
+            <tr>
+                <td>Electricity</td>
+                <td>{{ o.retail.electricity.generation_p_kWh | toFixed(2) }}</td>
+                <td><input v-model.number="i.retail.electricity.network_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.electricity.network_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="i.retail.electricity.policy_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.electricity.policy_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="i.retail.electricity.supplier_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.electricity.supplier_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }}</td>
+                <td>{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}</td>
+                <td>{{ o.retail.electricity.household_kWh | toFixed(0) }}</td>
+                <td>{{ o.retail.electricity.bill_gbp | toFixed(0) }}</td>
+                <td>{{ o.retail.electricity.household_spend_bn | toFixed(1) }}</td>
+            </tr>
+            <tr>
+                <td>Gas</td>
+                <td>{{ o.retail.gas.wholesale_p_kWh | toFixed(2) }}</td>
+                <td><input v-model.number="i.retail.gas.network_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.gas.network_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="i.retail.gas.policy_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.gas.policy_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td><input v-model.number="i.retail.gas.supplier_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.gas.supplier_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
+                <td>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }}</td>
+                <td>{{ o.retail.gas.standing_charge_gbp | toFixed(0) }}</td>
+                <td>{{ o.retail.gas.household_kWh | toFixed(0) }}</td>
+                <td>{{ o.retail.gas.bill_gbp | toFixed(0) }}</td>
+                <td>{{ o.retail.gas.household_spend_bn | toFixed(1) }}</td>
+            </tr>
+        </table>
+        <p>VAT <input v-model.number="i.retail.vat_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Households with gas <input v-model.number="i.retail.gas.households_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Use per customer is the modelled domestic final consumption, which differs by scenario.</p>
+        <p>Road fuel at the pump, including duty and VAT: petrol <input v-model.number="i.retail.road_fuel.petrol_p_litre" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/> p/litre ({{ o.retail.road_fuel.petrol_p_kWh | toFixed(1) }} p/kWh), diesel <input v-model.number="i.retail.road_fuel.diesel_p_litre" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/> p/litre ({{ o.retail.road_fuel.diesel_p_kWh | toFixed(1) }} p/kWh), diesel share of car fuel <input v-model.number="i.retail.road_fuel.car_diesel_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Car fuel costs £{{ o.retail.road_fuel.car_fuel_spend_bn | toFixed(1) }} bn/year.</p>
+
     </div>
 </div>
 

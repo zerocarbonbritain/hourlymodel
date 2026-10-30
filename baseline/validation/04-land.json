@@ -1,0 +1,213 @@
+{
+    "land.area": {
+        "group": "Land use",
+        "label": "UK area",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "uaa": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["Utilised agricultural area (UAA)"], "column": "{year}"},
+                "share": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["UAA as a proportion of total UK area"], "column": "{year}"}
+            },
+            "formula": "uaa / share / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "land_use.total",
+                "b": "land_use.total_prc"
+            },
+            "formula": "a / b"
+        },
+        "tolerance": 0.02,
+        "basis": "input",
+        "note": "Defra's UK area, implied by the utilised agricultural area and its share of the total. The model uses a fixed 24,728 kha."
+    },
+    "land.allocated": {
+        "group": "Land use",
+        "label": "Land allocated by the land use model",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "uaa": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["Utilised agricultural area (UAA)"], "column": "{year}"},
+                "share": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["UAA as a proportion of total UK area"], "column": "{year}"}
+            },
+            "formula": "uaa / share / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "land_use.total"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.02,
+        "basis": "independent",
+        "note": "All land uses in the model, including land it derives for bioenergy crops, against the UK area.",
+        "issue": "The baseline allocates more land than the UK has: inherited ZCB areas, phantom new woodland and bioenergy crops for imported biomass (open-items.md, Inputs)."
+    },
+    "land.woodland": {
+        "group": "Land use",
+        "label": "Woodland",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "w": {"value": 3286, "cite": "Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/)"}
+            },
+            "formula": "w"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.existing_natural_broadleaf_woodland",
+                "b": "i.land_use.existing_productive_broadleaf_woodland",
+                "c": "i.land_use.new_natural_broadleaf_woodland",
+                "d": "i.land_use.new_productive_broadleaf_woodland",
+                "e": "i.land_use.existing_natural_coniferous_woodland",
+                "f": "i.land_use.existing_productive_coniferous_woodland",
+                "g": "i.land_use.new_natural_coniferous_woodland",
+                "h": "i.land_use.new_productive_coniferous_woodland",
+                "i": "i.land_use.short_rotation_forestry"
+            },
+            "formula": "a + b + c + d + e + f + g + h + i"
+        },
+        "tolerance": 0.05,
+        "basis": "input",
+        "issue": "Existing woodland areas are inherited from the ZCB scenario and the baseline adds 1,475 kha of new woodland (open-items.md, Inputs)."
+    },
+    "land.broadleaf": {
+        "group": "Land use",
+        "label": "Broadleaf woodland",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "w": {"value": 1710, "cite": "Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/)"}
+            },
+            "formula": "w"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.existing_natural_broadleaf_woodland",
+                "b": "i.land_use.existing_productive_broadleaf_woodland",
+                "c": "i.land_use.new_natural_broadleaf_woodland",
+                "d": "i.land_use.new_productive_broadleaf_woodland"
+            },
+            "formula": "a + b + c + d"
+        },
+        "tolerance": 0.05,
+        "basis": "input",
+        "issue": "See woodland."
+    },
+    "land.conifer": {
+        "group": "Land use",
+        "label": "Conifer woodland",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "w": {"value": 1576, "cite": "Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/)"}
+            },
+            "formula": "w"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.existing_natural_coniferous_woodland",
+                "b": "i.land_use.existing_productive_coniferous_woodland",
+                "c": "i.land_use.new_natural_coniferous_woodland",
+                "d": "i.land_use.new_productive_coniferous_woodland"
+            },
+            "formula": "a + b + c + d"
+        },
+        "tolerance": 0.05,
+        "basis": "input",
+        "issue": "See woodland."
+    },
+    "land.croppable": {
+        "group": "Land use",
+        "label": "Croppable land",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "c": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["Total croppable area"], "column": "{year}"}
+            },
+            "formula": "c / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.food_crops",
+                "b": "i.land_use.feed_crops_for_livestock",
+                "c": "i.land_use.annual_grass_hemp",
+                "d": "land_use.perrennial_grass_miscanthus",
+                "e": "land_use.rotational_grass_ryegrass",
+                "f": "land_use.short_rotation_coppice"
+            },
+            "formula": "a + b + c + d + e + f"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Defra croppable area, including temporary grass and uncropped arable land. Model crops plus the bioenergy crop land it derives.",
+        "issue": "The land use model grows all solid biomass on UK short rotation coppice. Most biomass for power is imported (open-items.md, Inputs)."
+    },
+    "land.livestock": {
+        "group": "Land use",
+        "label": "Land feeding livestock",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "feed": {"source": "defra_land_feed", "sheet": "Land_use_area_summary", "block": "Land used to feed livestock", "row": ["To feed livestock(1)"], "column": "{year}"},
+                "common": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["Common rough grazing"], "column": "{year}"}
+            },
+            "formula": "feed / 1000 + common / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.feed_crops_for_livestock",
+                "b": "i.land_use.intensive_and_rough_grazing"
+            },
+            "formula": "a + b"
+        },
+        "tolerance": 0.1,
+        "basis": "input",
+        "note": "Grassland and crops fed to livestock, plus common rough grazing."
+    },
+    "land.grassland": {
+        "group": "Land use",
+        "label": "Permanent grassland and rough grazing",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "p": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["Total permanent grassland"], "column": "{year}"},
+                "c": {"source": "defra_land_use", "sheet": "Land_use", "block": "Land use on agricultural holdings", "row": ["Common rough grazing"], "column": "{year}"}
+            },
+            "formula": "(p + c) / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.intensive_and_rough_grazing"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "input",
+        "note": "Temporary grass is in croppable land."
+    },
+    "land.crops_other": {
+        "group": "Land use",
+        "label": "Croppable land not feeding livestock",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "c": {"source": "defra_land_feed", "sheet": "Land_use_area_summary", "block": "Land used to feed livestock", "row": ["For other uses"], "column": "{year}", "after": "Croppable area"}
+            },
+            "formula": "c / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "i.land_use.food_crops",
+                "b": "i.land_use.annual_grass_hemp",
+                "c": "land_use.perrennial_grass_miscanthus",
+                "d": "land_use.short_rotation_coppice"
+            },
+            "formula": "a + b + c + d"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Food, industrial and energy crops and uncropped arable land.",
+        "issue": "See croppable land."
+    }
+}

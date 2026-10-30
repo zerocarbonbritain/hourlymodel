@@ -62,6 +62,7 @@ var model = {
 
         model.fossil_fuels();
         model.final();
+        model.final_consumption();
         model.land_use();
         model.scaled_by();
         model.embodied_energy();
@@ -449,6 +450,8 @@ var model = {
             o.heating_systems[z] = {
                 heat_demand: 0,
                 fuel_demand: 0,
+                water_heat_demand: 0,
+                water_fuel_demand: 0,
                 efficiency_slope: slope,
                 efficiency_intercept: intercept
             }
@@ -479,6 +482,8 @@ var model = {
                 
                 let system_water_heat_demand = water_heat_demand * (i.heating_systems[z].share * 0.01)
                 let system_water_fuel_demand = system_water_heat_demand / (water_heat_efficiency*0.01)
+                o.heating_systems[z].water_heat_demand += system_water_heat_demand
+                o.heating_systems[z].water_fuel_demand += system_water_fuel_demand
 
                 d.heating_systems[z].heat_demand.push(system_space_heat_demand + system_water_heat_demand)
                 d.heating_systems[z].fuel_demand.push(system_space_fuel_demand + system_water_fuel_demand)
@@ -1611,12 +1616,19 @@ var model = {
             o.power_to_X.capacity_factor = 0
         }
         
+        // Peak end use demand grossed up for grid losses and own use, comparable with the
+        // DUKES 5.10 simultaneous maximum load met. Storage charging, electrolysis and power to X are left out.
+        let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+        o.balance.max_electricity_demand = 0
+
         var out = "";
         var error = 0
         for (var hour = 0; hour < i.hours; hour++) {
-            
+
             let supply = d.elec_supply_hourly[hour]
-            let demand = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour] + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
+            let end_use = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour]
+            if (end_use / grid_loss_prc > o.balance.max_electricity_demand) o.balance.max_electricity_demand = end_use / grid_loss_prc
+            let demand = end_use + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
             let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.excess_elec[hour]
             error += Math.abs(balance)
         } 
@@ -1638,6 +1650,97 @@ var model = {
         o.electric_backup.max_shortfall_date = h+":00 "+(date.getDate())+" "+months[date.getMonth()]+" "+date.getFullYear();
     },
     
+    // ----------------------------------------------------------------------------
+    // Final consumption by sector and fuel, on the DUKES 1.1 basis: energy delivered
+    // to end users, including ambient and solar heat. Heating systems share their
+    // fuel between sectors in proportion to each sector's space and water heat.
+    // Units are GWh over the 10 year dataset, as elsewhere.
+    // ----------------------------------------------------------------------------
+    final_consumption: function() {
+
+        let fuels = ["electricity", "gas", "liquid", "coal", "bioenergy", "hydrogen", "renewable_heat"]
+        let sectors = ["domestic", "services", "industry", "transport"]
+        let fc = {}
+        for (let s of sectors) {
+            fc[s] = {}
+            for (let f of fuels) fc[s][f] = 0
+        }
+
+        let space_total = o.space_heating.total_demand
+        let space_share = {
+            domestic: space_total > 0 ? o.space_heating.total_domestic_demand / space_total : 0,
+            services: space_total > 0 ? o.space_heating.total_services_demand / space_total : 0,
+            industry: space_total > 0 ? o.space_heating.total_industry_demand / space_total : 0
+        }
+        let water_total = i.water_heating.domestic_TWhy + i.water_heating.services_TWhy
+        let water_share = {
+            domestic: water_total > 0 ? i.water_heating.domestic_TWhy / water_total : 0,
+            services: water_total > 0 ? i.water_heating.services_TWhy / water_total : 0,
+            industry: 0
+        }
+        let heat_total = space_total + o.water_heating.total_demand
+
+        let system_fuel = { heatpump: "electricity", elres: "electricity", methane: "gas", hydrogen: "hydrogen",
+                            synthfuel: "liquid", biomass: "bioenergy", solid_fuel: "coal" }
+
+        for (let s of ["domestic", "services", "industry"]) {
+            for (let z in i.heating_systems) {
+                let hs = o.heating_systems[z]
+                let space_fuel = hs.fuel_demand - hs.water_fuel_demand
+                let fuel = space_fuel * space_share[s] + hs.water_fuel_demand * water_share[s]
+                fc[s][system_fuel[z]] += fuel
+                if (z == "heatpump") {
+                    let space_heat = hs.heat_demand - hs.water_heat_demand
+                    fc[s].renewable_heat += (space_heat * space_share[s] + hs.water_heat_demand * water_share[s]) - fuel
+                }
+            }
+            // Solar thermal displaces space and water heat in proportion to each
+            let sector_heat = space_total * space_share[s] + o.water_heating.total_demand * water_share[s]
+            if (heat_total > 0) fc[s].renewable_heat += o.supply.total_fixed_heat * sector_heat / heat_total
+        }
+
+        // Lighting, appliances and cooking, split by the annual inputs
+        let lac_elec = {
+            domestic: i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.domestic.cooking_TWhy,
+            services: i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.catering_TWhy + i.LAC.services.cooling_TWhy
+        }
+        let lac_gas = {
+            domestic: i.LAC.domestic.cooking_gas_TWhy,
+            services: i.LAC.services.lighting_and_appliances_gas_TWhy + i.LAC.services.catering_gas_TWhy + i.LAC.services.cooling_gas_TWhy
+        }
+        let lac_elec_total = lac_elec.domestic + lac_elec.services
+        let lac_gas_total = lac_gas.domestic + lac_gas.services
+        for (let s of ["domestic", "services"]) {
+            if (lac_elec_total > 0) fc[s].electricity += o.LAC.total * lac_elec[s] / lac_elec_total
+            if (lac_gas_total > 0) fc[s].gas += o.LAC.total_gas * lac_gas[s] / lac_gas_total
+        }
+
+        // Refinery electricity is energy industry use in DUKES. The fossil_fuels other use
+        // inputs are the ECUK industry "unknown (other)" row.
+        fc.industry.electricity += o.industry.total_elec_demand - i.industry.refinery_electric_TWhy * 10000
+        fc.industry.gas += o.industry.total_methane_demand + i.fossil_fuels.other_gas_use * 10000
+        fc.industry.liquid += o.industry.total_synth_fuel_demand + i.fossil_fuels.other_oil_use * 10000
+        fc.industry.coal += o.industry.total_coal_demand + i.fossil_fuels.other_coal_use * 10000
+        fc.industry.bioenergy += o.industry.total_biomass_demand
+        fc.industry.hydrogen += o.industry.total_hydrogen_demand
+
+        fc.transport.electricity += o.electric_transport.total_EV_charge + o.electric_transport.total_elec_trains_demand
+        fc.transport.liquid += o.synth_fuel.total_transport_demand
+        fc.transport.hydrogen += o.hydrogen.total_vehicle_demand
+
+        fc.total = 0
+        for (let f of fuels) fc[f] = 0
+        for (let s of sectors) {
+            fc[s].total = 0
+            for (let f of fuels) {
+                fc[s].total += fc[s][f]
+                fc[f] += fc[s][f]
+            }
+            fc.total += fc[s].total
+        }
+        o.final_consumption = fc
+    },
+
     land_use: function() {
         o.land_use = {}
         
@@ -1884,6 +1987,46 @@ var model = {
         o.backup_LCOE = backup.generation > 0 ? 1000 * (backup.annual + o.fuel_cost_annual + o.carbon_cost_annual) / backup.generation : 0
 
         o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
+
+        // Retail prices. The electricity unit rate starts from the modelled system cost per kWh
+        // delivered to end users, and gas from the gas fuel price. Network, social policy and
+        // supplier costs are inputs, per kWh and per customer per year, before VAT.
+        // £bn/yr over TWh/yr gives £/kWh, so 100 converts to p/kWh.
+        let r = i.retail
+        let vat = 1 + r.vat_prc * 0.01
+        let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * 0.0001
+        let households_kWh = (GWh) => GWh * 0.1 * 1000000 / i.households_2030
+        o.retail = {}
+
+        let e = r.electricity
+        let elec = { generation_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0 }
+        elec.unit_rate_p_kWh = (elec.generation_p_kWh + e.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
+        elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
+        elec.household_kWh = households_kWh(o.final_consumption.domestic.electricity)
+        elec.bill_gbp = elec.unit_rate_p_kWh * 0.01 * elec.household_kWh + elec.standing_charge_gbp
+        elec.household_spend_bn = elec.bill_gbp * i.households_2030 * 1e-9
+        o.retail.electricity = elec
+
+        let g = r.gas
+        let gas = { wholesale_p_kWh: i.fuel_prices.gas }
+        gas.unit_rate_p_kWh = (gas.wholesale_p_kWh + g.network_p_kWh + g.policy_p_kWh + g.supplier_p_kWh) * vat
+        gas.standing_charge_gbp = (g.network_gbp + g.policy_gbp + g.supplier_gbp) * vat
+        gas.customers = i.households_2030 * g.households_prc * 0.01
+        gas.household_kWh = gas.customers > 0 ? o.final_consumption.domestic.gas * 0.1 * 1000000 / gas.customers : 0
+        gas.bill_gbp = gas.customers > 0 ? gas.unit_rate_p_kWh * 0.01 * gas.household_kWh + gas.standing_charge_gbp : 0
+        gas.household_spend_bn = gas.bill_gbp * gas.customers * 1e-9
+        o.retail.gas = gas
+
+        // Road fuel at the pump, including duty and VAT, blended by the car diesel share
+        let f = r.road_fuel
+        let diesel = f.car_diesel_prc * 0.01
+        let road = {
+            petrol_p_kWh: f.petrol_p_litre / f.petrol_kWh_per_litre,
+            diesel_p_kWh: f.diesel_p_litre / f.diesel_kWh_per_litre
+        }
+        road.car_p_kWh = road.petrol_p_kWh * (1 - diesel) + road.diesel_p_kWh * diesel
+        road.car_fuel_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.car_p_kWh * 0.01
+        o.retail.road_fuel = road
     }
 }
 

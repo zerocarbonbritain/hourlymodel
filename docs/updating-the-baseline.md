@@ -210,18 +210,13 @@ Grid CO2 intensity (gCO2/kWh): 200.6
 
 "Electricity demand" is total generation before grid losses (renewables, nuclear, imports and backup), less excess, plus unmet demand. It compares with DUKES 5.1 total electricity supply.
 
-Cross check the outputs against the statistics, as the Energy Balance sheet does for 2018:
+Then run the validation, which compares about 70 model outputs with the observed statistics for the year:
 
-| Model output | Compare against |
-|---|---|
-| Electricity demand | DUKES 5.1 total electricity supply |
-| Backup generation (sum of `electric_backup` turbine outputs) | DUKES 5.6 dispatchable generation |
-| Offshore, onshore, solar capacity factors | DUKES 6.2 generation over end of year capacity |
-| Space and water heating demand | ECUK end use tables |
-| Industry total demand | ECUK table U4 total |
-| Transport fuel demand | ECUK C8 and DUKES transport rows |
-| Total emissions | UK GHG statistics grand total plus international bunkers |
-| Grid CO2 intensity | DUKES 5.14, all fuels |
+```bash
+python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json
+```
+
+It covers the energy balance (primary supply, final consumption by fuel and sector, fuel demand), electricity (generation by fuel, imports, peak demand, capacities), emissions (total, CO2 by fuel, power, transport, land sink), land use (area, woodland, crops, grassland) and costs (domestic unit rates, standing charges and bills, household spend, pump prices). The checks are in `baseline/validation/*.json` and use the same locators as the inputs. The report goes to `baseline/reports/validation_<scenario>.md`, and `scenarios/validation/<scenario>.json` gives the UI the observed values, so the comparison shows live when the baseline is selected. See [baseline/README.md](../baseline/README.md#validation). Each failing check should either be fixed or have an `issue` that points to [baseline/open-items.md](../baseline/open-items.md).
 
 Aim for agreement within a few percent. On emissions the model prints 526.4 MtCO2e for the 2018 baseline against 507.0 in the statistics including international bunkers. The model adds an aviation non CO2 uplift of 29.1, so the like for like comparison is 536.1 and the model is 1.8% low. The 2024 baseline is 1.7% low on the same basis.
 

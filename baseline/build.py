@@ -55,6 +55,8 @@ def fetch_sources(sources, update_hashes):
     status = {}
     for key, src in sources.items():
         path = os.path.join(CACHE, src["file"])
+        if not os.path.exists(path) and src.get("manual"):
+            raise BuildError("%s is missing. %s" % (src["file"], src["manual"]))
         if not os.path.exists(path):
             print("Downloading " + src["url"])
             req = urllib.request.Request(src["url"], headers={"User-Agent": "Mozilla/5.0 (hourlymodel-baseline)"})
@@ -301,6 +303,29 @@ def query(grid, spec, year):
     return total, "sum of %d rows" % count
 
 
+def cell_range(grid, spec):
+    """Mean of a row of cells such as "T32:W32", for workbooks whose repeated row labels and
+    headers defeat locate. Each cell in expect must hold the given text, so a moved table
+    stops the build."""
+    where = "%s!%s" % (spec["source"], spec["sheet"])
+    for ref, text in spec.get("expect", {}).items():
+        m = re.match(r"([A-Z]+)(\d+)$", ref)
+        found = grid.get(int(m.group(2)), {}).get(col_index(m.group(1)))
+        if found is None or norm(found) != norm(text):
+            raise BuildError("%s!%s is %r, expected %r" % (where, ref, found, text))
+    m = re.match(r"([A-Z]+)(\d+):([A-Z]+)(\d+)$", spec["range"])
+    if m.group(2) != m.group(4):
+        raise BuildError("%s: range %s must be within one row" % (where, spec["range"]))
+    row = grid.get(int(m.group(2)), {})
+    values = []
+    for c in range(col_index(m.group(1)), col_index(m.group(3)) + 1):
+        value = row.get(c)
+        if not isinstance(value, float):
+            raise BuildError("%s!%s%s is %r, expected a number" % (where, col_letters(c), m.group(2), value))
+        values.append(value)
+    return sum(values) / len(values), "mean of %s" % spec["range"]
+
+
 # Inputs
 
 def get_path(obj, path):
@@ -332,7 +357,9 @@ def extract_values(specs, sources, results, year, sheets, refs):
         key = (spec["source"], spec["sheet"])
         if key not in sheets:
             sheets[key] = read_sheet(os.path.join(CACHE, src["file"]), spec["sheet"])
-        if "where" in spec:
+        if "range" in spec:
+            value, ref = cell_range(sheets[key], spec)
+        elif "where" in spec:
             value, ref = query(sheets[key], spec, year)
             ref = "%s where %s" % (ref, sub_year(json.dumps(spec["where"]), year))
             if "where_not" in spec:
@@ -387,7 +414,8 @@ def load_inputs(only):
 def build(year, scenario_path, update_hashes, only=None):
     with open(os.path.join(BASE, "sources.json")) as f:
         sources = json.load(f)
-    inputs = load_inputs(only)
+    # Entries that list years, such as those located by cell range, apply to those years only
+    inputs = {p: s for p, s in load_inputs(only).items() if year in s.get("years", [year])}
     with open(scenario_path) as f:
         current = json.load(f)
 

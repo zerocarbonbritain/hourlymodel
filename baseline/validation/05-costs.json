@@ -1,0 +1,319 @@
+{
+    "costs.generation": {
+        "group": "Costs",
+        "label": "Generation cost in the domestic unit rate",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "df": {"source": "ofgem_cap", "sheet": "1b Historical level tables", "range": "T31:W31", "expect": {"B8": "Other Payment Method", "B10": "Electricity: Single-Rate Metering Arrangement", "B31": "DF", "T30": "Jan 2024 - Mar 2024", "W30": "Oct 2024 - Dec 2024"}},
+                "cm": {"source": "ofgem_cap", "sheet": "1b Historical level tables", "range": "T32:W32", "expect": {"B8": "Other Payment Method", "B10": "Electricity: Single-Rate Metering Arrangement", "B32": "CM", "T30": "Jan 2024 - Mar 2024", "W30": "Oct 2024 - Dec 2024"}},
+                "ro": {"source": "ofgem_cap", "sheet": "3d PC", "range": "AD53:AG53", "expect": {"C53": "RO", "AD50": "January 2024 - March 2024", "AG50": "October 2024 - December 2024"}},
+                "fit": {"source": "ofgem_cap", "sheet": "3d PC", "range": "AD54:AG54", "expect": {"C54": "FiT", "AD50": "January 2024 - March 2024", "AG50": "October 2024 - December 2024"}}
+            },
+            "formula": "(df + cm) / 3100 * 100 + (ro + fit) / 10"
+        },
+        "model": {
+            "values": {
+                "a": "retail.electricity.generation_p_kWh"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled system cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store).",
+        "issue": "The model costs generation at average new build cost. Consumers paid wholesale prices set by gas plants, forward bought in 2023, plus support for older renewables, and imports are not costed (open-items.md, Model).",
+        "years": [2024]
+    },
+    "costs.electricity_unit_rate": {
+        "group": "Costs",
+        "label": "Domestic electricity unit rate",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "u": {"source": "qep_2.2.4", "sheet": "2.2.4", "block": "Table 2.2.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average variable unit price (£/kWh)"}
+            },
+            "formula": "u * 100"
+        },
+        "model": {
+            "values": {
+                "a": "retail.electricity.unit_rate_p_kWh"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to its own generation cost.",
+        "issue": "Follows from the generation cost check."
+    },
+    "costs.electricity_standing": {
+        "group": "Costs",
+        "label": "Domestic electricity standing charge",
+        "units": "£/yr",
+        "observed": {
+            "values": {
+                "f": {"source": "qep_2.2.4", "sheet": "2.2.4", "block": "Table 2.2.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"}
+            },
+            "formula": "f"
+        },
+        "model": {
+            "values": {
+                "a": "retail.electricity.standing_charge_gbp"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "input",
+        "note": "Built from the Ofgem cap nil consumption allowances, including VAT."
+    },
+    "costs.electricity_bill": {
+        "group": "Costs",
+        "label": "Domestic electricity bill at 3,400 kWh",
+        "units": "£/yr",
+        "observed": {
+            "values": {
+                "b": {"source": "qep_2.2.1", "sheet": "2.2.1", "block": "Average annual domestic Standard Electricity bills", "row": ["{year}"], "column": "Overall: All Tariffs (pounds)"}
+            },
+            "formula": "b"
+        },
+        "model": {
+            "values": {
+                "u": "retail.electricity.unit_rate_p_kWh",
+                "s": "retail.electricity.standing_charge_gbp"
+            },
+            "formula": "u * 34 + s"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DESNZ standard bill at 3,400 kWh a year.",
+        "issue": "Follows from the generation cost check."
+    },
+    "costs.gas_wholesale": {
+        "group": "Costs",
+        "label": "Wholesale gas cost in the domestic unit rate",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "df": {"source": "ofgem_cap", "sheet": "1b Historical level tables", "range": "CD31:CG31", "expect": {"B8": "Other Payment Method", "BL10": "Gas", "BL31": "DF", "CD30": "Jan 2024 - Mar 2024", "CG30": "Oct 2024 - Dec 2024"}}
+            },
+            "formula": "df / 12000 * 100"
+        },
+        "model": {
+            "values": {
+                "a": "i.fuel_prices.gas"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "input",
+        "note": "Ofgem cap gas wholesale allowance against the gas price paid by power producers (QEP 3.2.1), which the model uses for both.",
+        "years": [2024]
+    },
+    "costs.gas_unit_rate": {
+        "group": "Costs",
+        "label": "Domestic gas unit rate",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "u": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average variable unit price (£/kWh)"}
+            },
+            "formula": "u * 100"
+        },
+        "model": {
+            "values": {
+                "a": "retail.gas.unit_rate_p_kWh"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DESNZ average variable unit price including VAT."
+    },
+    "costs.gas_standing": {
+        "group": "Costs",
+        "label": "Domestic gas standing charge",
+        "units": "£/yr",
+        "observed": {
+            "values": {
+                "f": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"}
+            },
+            "formula": "f"
+        },
+        "model": {
+            "values": {
+                "a": "retail.gas.standing_charge_gbp"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "input"
+    },
+    "costs.gas_bill": {
+        "group": "Costs",
+        "label": "Domestic gas bill at 11,200 kWh",
+        "units": "£/yr",
+        "observed": {
+            "values": {
+                "b": {"source": "qep_2.3.1", "sheet": "2.3.1", "block": "Average annual domestic gas bills", "row": ["{year}"], "column": "Overall: All Tariffs (pounds)"}
+            },
+            "formula": "b"
+        },
+        "model": {
+            "values": {
+                "u": "retail.gas.unit_rate_p_kWh",
+                "s": "retail.gas.standing_charge_gbp"
+            },
+            "formula": "u * 112 + s"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "DESNZ bill at 11,200 kWh a year."
+    },
+    "costs.electricity_spend": {
+        "group": "Costs",
+        "label": "Household electricity spend, DUKES use at QEP prices",
+        "units": "£bn/yr",
+        "observed": {
+            "values": {
+                "e": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Electricity"},
+                "u": {"source": "qep_2.2.4", "sheet": "2.2.4", "block": "Table 2.2.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average variable unit price (£/kWh)"},
+                "h": {"source": "ons_households", "sheet": "5", "block": "Number of households (thousands)", "row": ["All households"], "column": "{year} Estimate"},
+                "f": {"source": "qep_2.2.4", "sheet": "2.2.4", "block": "Table 2.2.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"}
+            },
+            "formula": "e * 0.01163 * u + h * 1000 * f / 1e9"
+        },
+        "model": {
+            "values": {
+                "a": "retail.electricity.household_spend_bn"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Domestic electricity use times the average unit price, plus the average fixed cost for every household. Tests consumption and price together.",
+        "issue": "Follows from the generation cost check, partly offset by domestic electricity use 6% above DUKES."
+    },
+    "costs.electricity_spend_ons": {
+        "group": "Costs",
+        "label": "Household electricity spend, ONS",
+        "units": "£bn/yr",
+        "observed": {
+            "values": {
+                "s": {"source": "qep_2.6.1", "sheet": "2.6.1", "block": "Table 2.6.1", "row": ["{year}"], "column": "Electricity (£ million)"}
+            },
+            "formula": "s / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "retail.electricity.household_spend_bn"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "ONS consumer expenditure. It is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree."
+    },
+    "costs.gas_spend": {
+        "group": "Costs",
+        "label": "Household gas spend, DUKES use at QEP prices",
+        "units": "£bn/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Natural gas"},
+                "u": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average variable unit price (£/kWh)"},
+                "h": {"source": "ons_households", "sheet": "5", "block": "Number of households (thousands)", "row": ["All households"], "column": "{year} Estimate"},
+                "f": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"}
+            },
+            "formula": "g * 0.01163 * u + h * 1000 * 0.84 * f / 1e9"
+        },
+        "model": {
+            "values": {
+                "a": "retail.gas.household_spend_bn"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Domestic gas use times the average unit price, plus the fixed cost for 84% of households (the model's assumed share with gas).",
+        "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check) and the gas unit rate is 7% low."
+    },
+    "costs.gas_spend_ons": {
+        "group": "Costs",
+        "label": "Household gas spend, ONS",
+        "units": "£bn/yr",
+        "observed": {
+            "values": {
+                "s": {"source": "qep_2.6.1", "sheet": "2.6.1", "block": "Table 2.6.1", "row": ["{year}"], "column": "Gas (£ million)"}
+            },
+            "formula": "s / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "retail.gas.household_spend_bn"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "ONS consumer expenditure. It is about 25% below DUKES use at QEP prices for 2024."
+    },
+    "costs.vehicle_fuel_spend": {
+        "group": "Costs",
+        "label": "Household vehicle fuel spend",
+        "units": "£bn/yr",
+        "observed": {
+            "values": {
+                "s": {"source": "qep_2.6.1", "sheet": "2.6.1", "block": "Table 2.6.1", "row": ["{year}"], "column": "Vehicle Fuels and Lubricants (£ million)"}
+            },
+            "formula": "s / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "retail.road_fuel.car_fuel_spend_bn"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "ONS household spend on vehicle fuels and lubricants against modelled car fuel at pump prices. Car fuel is calibrated to the ECUK car share of road fuel, which includes company cars that households do not pay for."
+    },
+    "costs.petrol_price": {
+        "group": "Costs",
+        "label": "Petrol pump price",
+        "units": "p/litre",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_4.1", "sheet": "4.1.2", "block": "Table 4.1.2 Typical retail prices", "row": ["{year}"], "column": "Motor spirit: Premium unleaded / ULSP (Pence per litre)"}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {
+                "a": "i.retail.road_fuel.petrol_p_litre"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Including duty and VAT."
+    },
+    "costs.diesel_price": {
+        "group": "Costs",
+        "label": "Diesel pump price",
+        "units": "p/litre",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_4.1", "sheet": "4.1.2", "block": "Table 4.1.2 Typical retail prices", "row": ["{year}"], "column": "Derv: Diesel / ULSD (Pence per litre)"}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {
+                "a": "i.retail.road_fuel.diesel_p_litre"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Including duty and VAT."
+    }
+}

@@ -1,0 +1,1684 @@
+{
+ "scenario": "baseline_2024",
+ "year": 2024,
+ "generated": "2026-10-30",
+ "warn_factor": 2,
+ "checks": [
+  {
+   "group": "Energy balance",
+   "label": "Primary energy supply",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.primary_supply",
+   "model": {
+    "values": {
+     "a": "balance.total_supply"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "DUKES 1.1 total supply less non energy use, with nuclear counted as electricity generated rather than reactor heat (DUKES 5.6), as the model does. Includes ambient heat, which DUKES counts under bioenergy and waste.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 1852.6206124999997,
+   "model_at_build": 1796.177658469997,
+   "sources": [
+    "supply = 169158.49 (DUKES_1.1.xlsx, 2024!K10)",
+    "non_energy = 4534.64 (DUKES_1.1.xlsx, 2024!K62)",
+    "nuclear_fuel = 102542.6078 (DUKES_5.6.xlsx, 5.6 Annual summaries!F522)",
+    "nuclear_gen = 40587.8448 (DUKES_5.6.xlsx, 5.6 Annual summaries!F523)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Final energy consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.final_total",
+   "model": {
+    "values": {
+     "a": "final_consumption.total"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "DUKES 1.1 final consumption excluding non energy use.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 1489.3868785999998,
+   "model_at_build": 1483.1450184178689,
+   "sources": [
+    "final = 132598.86 (DUKES_1.1.xlsx, 2024!K35)",
+    "non_energy = 4534.64 (DUKES_1.1.xlsx, 2024!K62)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Final electricity consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "independent",
+   "id": "energy.final_electricity",
+   "model": {
+    "values": {
+     "a": "final_consumption.electricity"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Electricity delivered to end users. The model excludes refinery electricity, which DUKES counts as energy industry use.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 270.9621365,
+   "model_at_build": 264.43728768809535,
+   "sources": [
+    "e = 23298.55 (DUKES_1.1.xlsx, 2024!I35)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Final gas consumption, including heat sold",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.final_gas",
+   "model": {
+    "values": {
+     "a": "final_consumption.gas"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "The baseline maps heat sold to gas heating, so heat sold is added to the observed gas.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 442.4534645,
+   "model_at_build": 450.8597296516462,
+   "sources": [
+    "gas = 36821.33 (DUKES_1.1.xlsx, 2024!F35)",
+    "heat = 1222.82 (DUKES_1.1.xlsx, 2024!J35)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Final liquid fuel consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.final_liquid",
+   "model": {
+    "values": {
+     "a": "final_consumption.liquid"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Petroleum products excluding non energy use, plus transport biofuels, which the model supplies through the liquid fuel store.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 708.5083225,
+   "model_at_build": 692.8255761720975,
+   "sources": [
+    "oil = 62697.83 (DUKES_1.1.xlsx, 2024!E35)",
+    "non_energy = 4530.08 (DUKES_1.1.xlsx, 2024!E62)",
+    "bio = 2753 (DUKES_1.1.xlsx, 2024!G50)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Final coal and manufactured fuel consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.final_coal",
+   "model": {
+    "values": {
+     "a": "final_consumption.coal"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 9.6597617,
+   "model_at_build": 9.500250167157407,
+   "sources": [
+    "coal = 506.3 (DUKES_1.1.xlsx, 2024!B35)",
+    "manufactured = 328.85 (DUKES_1.1.xlsx, 2024!C35)",
+    "non_energy = 4.56 (DUKES_1.1.xlsx, 2024!C62)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Final bioenergy, ambient and solar heat",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.final_bioenergy",
+   "model": {
+    "values": {
+     "a": "final_consumption.bioenergy",
+     "b": "final_consumption.renewable_heat"
+    },
+    "formula": "(a + b) / 10000"
+   },
+   "note": "DUKES bioenergy and waste final consumption includes heat pump ambient heat and solar thermal. Transport biofuels are counted with liquid fuels.",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 57.803193400000005,
+   "model_at_build": 65.52217473887193,
+   "sources": [
+    "bio = 7723.18 (DUKES_1.1.xlsx, 2024!G35)",
+    "transport_bio = 2753 (DUKES_1.1.xlsx, 2024!G50)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Domestic final consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.domestic_total",
+   "model": {
+    "values": {
+     "a": "final_consumption.domestic.total"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 394.5914788,
+   "model_at_build": 397.72798106181614,
+   "sources": [
+    "t = 33928.76 (DUKES_1.1.xlsx, 2024!K57)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Domestic electricity",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.domestic_electricity",
+   "model": {
+    "values": {
+     "a": "final_consumption.domestic.electricity"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "DUKES counts electric vehicle charging under road transport, as does the model.",
+   "issue": "One heating system mix is shared by all sectors, so domestic heating electricity follows the all sector heat pump and direct electric shares (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 93.721518,
+   "model_at_build": 99.00686500518879,
+   "sources": [
+    "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Domestic gas, including heat sold",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.domestic_gas",
+   "model": {
+    "values": {
+     "a": "final_consumption.domestic.gas"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "One heating system mix is shared by all sectors. Homes use more gas and less oil and electricity for heat than services, so the model moves gas from homes to services (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 255.51575200000002,
+   "model_at_build": 230.4176609047209,
+   "sources": [
+    "g = 21697.75 (DUKES_1.1.xlsx, 2024!F57)",
+    "h = 272.65 (DUKES_1.1.xlsx, 2024!J57)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Services final consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.services_total",
+   "model": {
+    "values": {
+     "a": "final_consumption.services.total"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Public administration, commercial, agriculture and miscellaneous.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 255.7012505,
+   "model_at_build": 235.82801040632538,
+   "sources": [
+    "p = 4628.14 (DUKES_1.1.xlsx, 2024!K58)",
+    "c = 15969.78 (DUKES_1.1.xlsx, 2024!K59)",
+    "a = 1383.51 (DUKES_1.1.xlsx, 2024!K60)",
+    "x = 4.92 (DUKES_1.1.xlsx, 2024!K61)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Services gas, including heat sold",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.services_gas",
+   "model": {
+    "values": {
+     "a": "final_consumption.services.gas"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "See domestic gas: the shared heating mix moves gas from homes to services.",
+   "status_at_build": "known",
+   "observed": 108.89576050000001,
+   "model_at_build": 125.31335456496056,
+   "sources": [
+    "p = 2414.58 (DUKES_1.1.xlsx, 2024!F58)",
+    "c = 6545.75 (DUKES_1.1.xlsx, 2024!F59)",
+    "a = 67 (DUKES_1.1.xlsx, 2024!F60)",
+    "hp = 80.11 (DUKES_1.1.xlsx, 2024!J58)",
+    "hc = 230.57 (DUKES_1.1.xlsx, 2024!J59)",
+    "ha = 25.34 (DUKES_1.1.xlsx, 2024!J60)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Industry final consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.industry_total",
+   "model": {
+    "values": {
+     "a": "final_consumption.industry.total"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "DUKES 1.1 industry including unclassified. The baseline is built from ECUK, whose industry total (227 TWh) is higher than DUKES because of boundary differences.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 211.80032649999998,
+   "model_at_build": 228.00926294699423,
+   "sources": [
+    "t = 18211.55 (DUKES_1.1.xlsx, 2024!K36)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Industry electricity",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.industry_electricity",
+   "model": {
+    "values": {
+     "a": "final_consumption.industry.electricity"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 78.2728075,
+   "model_at_build": 77.23098218451189,
+   "sources": [
+    "e = 6730.25 (DUKES_1.1.xlsx, 2024!I36)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Transport final consumption",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "calibrated",
+   "id": "energy.transport_total",
+   "model": {
+    "values": {
+     "a": "final_consumption.transport.total"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Including international aviation, as in DUKES. Fuel use for each mode is calibrated.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 627.2939391,
+   "model_at_build": 621.5797640027329,
+   "sources": [
+    "t = 53937.57 (DUKES_1.1.xlsx, 2024!K50)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Natural gas total demand",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "independent",
+   "id": "energy.gas_demand",
+   "model": {
+    "values": {
+     "a": "fossil_fuels.gas"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Including gas for power, energy industry use and losses.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 682.4019963,
+   "model_at_build": 668.1633955855274,
+   "sources": [
+    "g = 58676.01 (DUKES_1.1.xlsx, 2024!F12)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Oil total demand",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "energy.oil_demand",
+   "model": {
+    "values": {
+     "a": "fossil_fuels.oil"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Primary oils plus net petroleum products, excluding non energy use and marine bunkers. Biofuels are excluded on both sides.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 727.1384194999999,
+   "model_at_build": 703.7620294859266,
+   "sources": [
+    "crude = 55412.51 (DUKES_1.1.xlsx, 2024!D12)",
+    "products = 11640.22 (DUKES_1.1.xlsx, 2024!E12)",
+    "non_energy = 4530.08 (DUKES_1.1.xlsx, 2024!E62)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Coal, manufactured fuel and other thermal fuel demand",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.coal_demand",
+   "model": {
+    "values": {
+     "a": "fossil_fuels.coal"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "The model's coal backup share also covers other thermal generation, mainly waste, so DUKES 5.6 other thermal fuel is added to the observed coal.",
+   "issue": "Coal and coke used in blast furnaces and coke ovens (about 12 TWh in 2024) are transformation in DUKES and are not in the model (open-items.md, Industry).",
+   "status_at_build": "known",
+   "observed": 58.1519296,
+   "model_at_build": 40.871815651560006,
+   "sources": [
+    "coal = 1446.3 (DUKES_1.1.xlsx, 2024!B12)",
+    "manufactured = 1096.92 (DUKES_1.1.xlsx, 2024!C12)",
+    "non_energy = 4.56 (DUKES_1.1.xlsx, 2024!C62)",
+    "other_thermal = 28627.3138 (DUKES_5.6.xlsx, 5.6 Annual summaries!H522)"
+   ]
+  },
+  {
+   "group": "Energy balance",
+   "label": "Bioenergy, ambient and solar heat total demand",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "energy.bioenergy_demand",
+   "model": {
+    "values": {
+     "a": "biomass.total_used",
+     "b": "heat.total_ambient_supply",
+     "c": "supply.total_fixed_heat"
+    },
+    "formula": "(a + b + c) / 10000"
+   },
+   "note": "Other thermal fuel (waste) is moved to the coal check, matching the model.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 208.157858,
+   "model_at_build": 205.1017862191696,
+   "sources": [
+    "bio = 20359.86 (DUKES_1.1.xlsx, 2024!G12)",
+    "other_thermal = 28627.3138 (DUKES_5.6.xlsx, 5.6 Annual summaries!H522)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "UK electricity generation",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "independent",
+   "id": "electricity.generation_total",
+   "model": {
+    "values": {
+     "a": "balance.total_electricity_demand",
+     "b": "supply.total_imports"
+    },
+    "formula": "(a - b) / 10000"
+   },
+   "note": "All generating companies, including storage output. Modelled generation is total supply less imports.",
+   "issue": "Storage output is low, see the storage check.",
+   "status_at_build": "known",
+   "observed": 286.0275332,
+   "model_at_build": 273.5799000918608,
+   "sources": [
+    "g = 286027.5332 (DUKES_5.6.xlsx, 5.6 Annual summaries!N523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Net electricity imports",
+   "units": "TWh/yr",
+   "tolerance": 0.01,
+   "basis": "calibrated",
+   "id": "electricity.net_imports",
+   "model": {
+    "values": {
+     "a": "supply.total_imports"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 33.40787280000001,
+   "model_at_build": 33.41556763688641,
+   "sources": [
+    "imports = 3760.36 (DUKES_1.1.xlsx, 2024!I6)",
+    "exports = -887.8 (DUKES_1.1.xlsx, 2024!I7)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Wind generation",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "calibrated",
+   "id": "electricity.wind",
+   "model": {
+    "values": {
+     "a": "supply.total_offshore_wind",
+     "b": "supply.total_onshore_wind"
+    },
+    "formula": "(a + b) / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 83.6307271,
+   "model_at_build": 83.58138463760959,
+   "sources": [
+    "g = 83630.7271 (DUKES_5.6.xlsx, 5.6 Annual summaries!L523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Solar generation",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "calibrated",
+   "id": "electricity.solar",
+   "model": {
+    "values": {
+     "a": "supply.total_solarpv"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 14.992,
+   "model_at_build": 14.99336808531966,
+   "sources": [
+    "g = 14992 (DUKES_5.6.xlsx, 5.6 Annual summaries!M523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Nuclear generation",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "input",
+   "id": "electricity.nuclear",
+   "model": {
+    "values": {
+     "a": "supply.total_nuclear"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 40.5878448,
+   "model_at_build": 40.55963788795349,
+   "sources": [
+    "g = 40587.8448 (DUKES_5.6.xlsx, 5.6 Annual summaries!F523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Hydro generation",
+   "units": "TWh/yr",
+   "tolerance": 0.03,
+   "basis": "input",
+   "id": "electricity.hydro",
+   "model": {
+    "values": {
+     "a": "supply.total_hydro"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 5.731,
+   "model_at_build": 5.728673279994867,
+   "sources": [
+    "g = 5731 (DUKES_5.6.xlsx, 5.6 Annual summaries!J523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Gas generation",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "electricity.gas",
+   "model": {
+    "values": {
+     "a": "electric_backup.total_methane_turbine_output"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "Shares of dispatchable generation are inputs. The total comes from the hourly balance.",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 87.4093044,
+   "model_at_build": 81.78692191147815,
+   "sources": [
+    "g = 87409.3044 (DUKES_5.6.xlsx, 5.6 Annual summaries!E523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Bioenergy generation",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "electricity.bioenergy",
+   "model": {
+    "values": {
+     "a": "electric_backup.total_biomass_turbine_output"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 40.131,
+   "model_at_build": 37.54681322250312,
+   "sources": [
+    "g = 40131 (DUKES_5.6.xlsx, 5.6 Annual summaries!G523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Coal and other thermal generation",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "electricity.coal_other",
+   "model": {
+    "values": {
+     "a": "electric_backup.total_coal_turbine_output"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 8.2899657,
+   "model_at_build": 7.748776674647464,
+   "sources": [
+    "c = 2040.0817 (DUKES_5.6.xlsx, 5.6 Annual summaries!C523)",
+    "o = 6249.884 (DUKES_5.6.xlsx, 5.6 Annual summaries!H523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Electricity storage output",
+   "units": "TWh/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "electricity.storage",
+   "model": {
+    "values": {
+     "a": "electric_storage.total_discharge"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "The optimal dispatch shaves backup peaks but does not arbitrage against prices, so storage cycles less than real storage (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 3.515052,
+   "model_at_build": 0.9610093619999932,
+   "sources": [
+    "o = 3515.052 (DUKES_5.16.xlsx, 5.16!AD12)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Peak electricity demand",
+   "units": "GW",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "electricity.peak_demand",
+   "model": {
+    "values": {
+     "a": "balance.max_electricity_demand"
+    },
+    "formula": "a"
+   },
+   "note": "End use demand grossed up for losses, highest hour in the ten weather years, against the 2024 simultaneous maximum load met. The model peak includes demand met by embedded generation and the coldest of ten winters, so it is expected to be higher.",
+   "issue": "The model peak is higher than any year in DUKES 5.10 since 2010 (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 47.361,
+   "model_at_build": 55.18838121534326,
+   "sources": [
+    "p = 47361 (DUKES_5.10.xlsx, 5.10.A!AE7)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Dispatchable capacity",
+   "units": "GW",
+   "tolerance": 0.25,
+   "basis": "independent",
+   "id": "electricity.dispatchable_capacity",
+   "model": {
+    "values": {
+     "a": "electric_backup.max_capacity_requirement"
+    },
+    "formula": "a"
+   },
+   "note": "The model sizes backup to the highest hourly need, with no reserve margin or outages, so it should be lower than installed capacity.",
+   "issue": "Backup capacity, and its cost, is a third below the installed fleet, which also covers outages and a reserve margin (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 46.2026789,
+   "model_at_build": 30.17801979811835,
+   "sources": [
+    "fossil = 37937.1522 (DUKES_5.7.xlsx, 5.7!AE47)",
+    "bio = 8265.5267 (DUKES_5.7.xlsx, 5.7!AE43)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Offshore wind capacity",
+   "units": "GW",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "electricity.offshore_capacity",
+   "model": {
+    "values": {
+     "a": "i.supply.offshore_wind_capacity"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 16.13968,
+   "model_at_build": 16.14,
+   "sources": [
+    "f = 16060.05 (DUKES_6.2.xlsx, 6.2!AJ8)",
+    "fl = 79.63 (DUKES_6.2.xlsx, 6.2!AJ9)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Onshore wind capacity",
+   "units": "GW",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "electricity.onshore_capacity",
+   "model": {
+    "values": {
+     "a": "i.supply.onshore_wind_capacity"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 16.19927,
+   "model_at_build": 16.2,
+   "sources": [
+    "c = 16199.27 (DUKES_6.2.xlsx, 6.2!AJ7)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Solar capacity",
+   "units": "GW",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "electricity.solar_capacity",
+   "model": {
+    "values": {
+     "a": "i.supply.solarpv_capacity"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 19.42991,
+   "model_at_build": 19.43,
+   "sources": [
+    "c = 19429.91 (DUKES_6.2.xlsx, 6.2!AJ11)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Nuclear capacity",
+   "units": "GW",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "electricity.nuclear_capacity",
+   "model": {
+    "values": {
+     "a": "i.supply.nuclear_capacity"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 5.883,
+   "model_at_build": 5.88,
+   "sources": [
+    "c = 5883 (DUKES_5.7.xlsx, 5.7!AE36)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Interconnector capacity",
+   "units": "GW",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "electricity.interconnector_capacity",
+   "model": {
+    "values": {
+     "a": "i.supply.interconnector_capacity_GW"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 9.84,
+   "model_at_build": 9.84,
+   "sources": [
+    "c = 9840 (DUKES_5.13.xlsx, 5.13A!sum of 9 rows where {\"Year Commissioned\": \"<=2024\"} and not {\"Connecting Country\": \"within the UK\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Total emissions including international aviation and shipping",
+   "units": "MtCO2e",
+   "tolerance": 0.03,
+   "basis": "independent",
+   "id": "emissions.total",
+   "model": {
+    "values": {
+     "a": "emissions_balance.total",
+     "b": "emissions_balance.aviation_co2e"
+    },
+    "formula": "a - b"
+   },
+   "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 414.640274014361,
+   "model_at_build": 407.07983211780925,
+   "sources": [
+    "t = 414.640274 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 2456 rows where {\"Year\": \"2024\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Fuel combustion CO2",
+   "units": "MtCO2",
+   "tolerance": 0.03,
+   "basis": "independent",
+   "id": "emissions.fuel_co2",
+   "model": {
+    "values": {
+     "a": "emissions_balance.fossil_fuel_coal",
+     "b": "emissions_balance.fossil_fuel_oil",
+     "c": "emissions_balance.fossil_fuel_gas"
+    },
+    "formula": "a + b + c"
+   },
+   "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 327.64136755129715,
+   "model_at_build": 322.32515109356683,
+   "sources": [
+    "fuel = 320.5730257 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 241 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": [\"Gaseous fuels\", \"Petroleum\", \"Coal\", \"Other solid fuels\"]})",
+    "waste = 7.068341841 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Other emissions\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Natural gas CO2",
+   "units": "MtCO2",
+   "tolerance": 0.03,
+   "basis": "independent",
+   "id": "emissions.gas_co2",
+   "model": {
+    "values": {
+     "a": "emissions_balance.fossil_fuel_gas"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 125.09672914784066,
+   "model_at_build": 122.8752484481785,
+   "sources": [
+    "g = 125.0967291 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 36 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Natural Gas\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Oil CO2",
+   "units": "MtCO2",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "emissions.oil_co2",
+   "model": {
+    "values": {
+     "a": "emissions_balance.fossil_fuel_oil"
+    },
+    "formula": "a"
+   },
+   "note": "Petroleum including bunkers, plus LPG and refinery gases, which the inventory groups with gaseous fuels.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 181.08339455483582,
+   "model_at_build": 188.46747149633117,
+   "sources": [
+    "p = 171.2432859 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 140 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Petroleum\"})",
+    "lpg = 9.840108667 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 8 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Petroleum gases\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Coal, solid fuels and waste CO2",
+   "units": "MtCO2",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "emissions.coal_co2",
+   "model": {
+    "values": {
+     "a": "emissions_balance.fossil_fuel_coal"
+    },
+    "formula": "a"
+   },
+   "note": "Other gases are blast furnace and coke oven gas, made from coal.",
+   "issue": "Blast furnace and coke oven coal is not modelled, and the coal plus waste backup CO2 factor (0.254) averages coal and waste (open-items.md, Industry).",
+   "status_at_build": "known",
+   "observed": 21.461243848620775,
+   "model_at_build": 10.98243114905717,
+   "sources": [
+    "coal = 3.593506516 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 26 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Coal\"})",
+    "solid = 5.613581378 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 21 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\"})",
+    "gases = 5.185814113 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 10 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other gases\"})",
+    "waste = 7.068341841 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Other emissions\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Electricity supply CO2",
+   "units": "MtCO2",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "emissions.electricity_co2",
+   "model": {
+    "values": {
+     "a": "grid_co2_emissions"
+    },
+    "formula": "a"
+   },
+   "note": "Inventory power stations. Autogenerator emissions sit in industry in the inventory but are part of modelled backup.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 36.98354548196988,
+   "model_at_build": 39.992871068453795,
+   "sources": [
+    "e = 36.98354548 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 6 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Grid CO2 intensity, DUKES basis",
+   "units": "gCO2/kWh",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "emissions.grid_intensity",
+   "model": {
+    "values": {
+     "co2": "grid_co2_emissions",
+     "gen": "balance.total_electricity_demand",
+     "imports": "supply.total_imports",
+     "own_use": "i.energy_industry_use.electricity_own_use_prc"
+    },
+    "formula": "1000 * co2 / ((gen - imports) / 10000 * (1 - own_use / 100))"
+   },
+   "note": "DUKES 5.14 divides generation CO2 by UK electricity supplied, excluding imports. The model's own grid intensity divides by total supply including imports.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 153.7,
+   "model_at_build": 151.40705715477196,
+   "sources": [
+    "g = 153.7 (DUKES_5.14.xlsx, 5.14!AD8)"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Domestic transport CO2",
+   "units": "MtCO2",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "emissions.domestic_transport_co2",
+   "model": {
+    "values": {
+     "ic": "transport.fuel_totals.IC",
+     "air": "transport.modes.Aviation.IC.TWh",
+     "bio": "synth_fuel.total_biofuel_supply",
+     "liquid": "synth_fuel.total_demand"
+    },
+    "formula": "(ic - air) * (1 - bio / liquid) * 0.2678"
+   },
+   "note": "Road, rail and domestic shipping fuel, net of the average biofuel share of liquid fuel, at the model's oil factor. Domestic aviation is in the aviation check.",
+   "issue": "The model uses one oil CO2 factor, 0.2678 kg/kWh, close to fuel oil. Petrol, diesel and jet fuel are about 0.24 to 0.25 kg/kWh gross (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 107.96963824211298,
+   "model_at_build": 116.13497105567755,
+   "sources": [
+    "t = 107.9696382 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 70 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Territorial Emissions Statistics sector\": \"Domestic transport\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Aviation CO2, domestic and international",
+   "units": "MtCO2",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "emissions.aviation_co2",
+   "model": {
+    "values": {
+     "air": "transport.modes.Aviation.IC.TWh",
+     "bio": "synth_fuel.total_biofuel_supply",
+     "liquid": "synth_fuel.total_demand"
+    },
+    "formula": "air * (1 - bio / liquid) * 0.2678"
+   },
+   "note": "The model applies the average liquid biofuel share to aviation, which overstates sustainable aviation fuel.",
+   "issue": "See domestic transport CO2: the single oil CO2 factor is high for jet fuel.",
+   "status_at_build": "known",
+   "observed": 37.75651679309696,
+   "model_at_build": 40.14248653935,
+   "sources": [
+    "a = 37.75651679 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 13 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Aviation turbine fuel\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Forest land carbon sink",
+   "units": "MtCO2e",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "emissions.forest_sink",
+   "model": {
+    "values": {
+     "a": "emissions_balance.reforestation"
+    },
+    "formula": "a"
+   },
+   "note": "Forest land carbon stock change and drainage. In the model this is sequestration by new woodland only; existing woodland is not credited.",
+   "issue": "The baseline represents the existing forest sink with 1,475 kha of new natural broadleaf woodland, which is not real land (open-items.md, Inputs).",
+   "status_at_build": "known",
+   "observed": -17.984511270153526,
+   "model_at_build": -12.980000000000002,
+   "sources": [
+    "f = -17.98451127 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 169 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4A*\"} and not {\"CRT category\": [\"*(III)*\", \"*(IV)*\"]})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Harvested wood products",
+   "units": "MtCO2e",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "emissions.harvested_wood",
+   "model": {
+    "values": {
+     "a": "emissions_balance.harvested_wood"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "5.3 MtCO2 of the modelled harvested wood comes from 320 kha of hemp inherited from the ZCB scenario (open-items.md, Inputs).",
+   "status_at_build": "known",
+   "observed": -2.216628701639777,
+   "model_at_build": -8.018972166666666,
+   "sources": [
+    "h = -2.216628702 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 12 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4G*\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Forest, harvested wood and biochar sink",
+   "units": "MtCO2e",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "emissions.land_sink_total",
+   "model": {
+    "values": {
+     "a": "emissions_balance.reforestation",
+     "b": "emissions_balance.harvested_wood",
+     "c": "emissions_balance.biochar_carbon_capture"
+    },
+    "formula": "a + b + c"
+   },
+   "note": "The part of LULUCF left to the land use model. The total is close, but see the two checks above: the components do not match, and the model adds 1.3 MtCO2 of landfill biochar that has no inventory counterpart.",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": -20.201139971793303,
+   "model_at_build": -22.347318975757577,
+   "sources": [
+    "f = -17.98451127 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 169 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4A*\"} and not {\"CRT category\": [\"*(III)*\", \"*(IV)*\"]})",
+    "h = -2.216628702 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 12 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4G*\"})"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "UK area",
+   "units": "kha",
+   "tolerance": 0.02,
+   "basis": "input",
+   "id": "land.area",
+   "model": {
+    "values": {
+     "a": "land_use.total",
+     "b": "land_use.total_prc"
+    },
+    "formula": "a / b"
+   },
+   "note": "Defra's UK area, implied by the utilised agricultural area and its share of the total. The model uses a fixed 24,728 kha.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 24416.79573,
+   "model_at_build": 24728.0,
+   "sources": [
+    "uaa = 16760080.49 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP4)",
+    "share = 0.6864160505 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP5)"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Land allocated by the land use model",
+   "units": "kha",
+   "tolerance": 0.02,
+   "basis": "independent",
+   "id": "land.allocated",
+   "model": {
+    "values": {
+     "a": "land_use.total"
+    },
+    "formula": "a"
+   },
+   "note": "All land uses in the model, including land it derives for bioenergy crops, against the UK area.",
+   "issue": "The baseline allocates more land than the UK has: inherited ZCB areas, phantom new woodland and bioenergy crops for imported biomass (open-items.md, Inputs).",
+   "status_at_build": "known",
+   "observed": 24416.79573,
+   "model_at_build": 29950.247854782356,
+   "sources": [
+    "uaa = 16760080.49 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP4)",
+    "share = 0.6864160505 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP5)"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Woodland",
+   "units": "kha",
+   "tolerance": 0.05,
+   "basis": "input",
+   "id": "land.woodland",
+   "model": {
+    "values": {
+     "a": "i.land_use.existing_natural_broadleaf_woodland",
+     "b": "i.land_use.existing_productive_broadleaf_woodland",
+     "c": "i.land_use.new_natural_broadleaf_woodland",
+     "d": "i.land_use.new_productive_broadleaf_woodland",
+     "e": "i.land_use.existing_natural_coniferous_woodland",
+     "f": "i.land_use.existing_productive_coniferous_woodland",
+     "g": "i.land_use.new_natural_coniferous_woodland",
+     "h": "i.land_use.new_productive_coniferous_woodland",
+     "i": "i.land_use.short_rotation_forestry"
+    },
+    "formula": "a + b + c + d + e + f + g + h + i"
+   },
+   "note": "",
+   "issue": "Existing woodland areas are inherited from the ZCB scenario and the baseline adds 1,475 kha of new woodland (open-items.md, Inputs).",
+   "status_at_build": "known",
+   "observed": 3286,
+   "model_at_build": 4369,
+   "sources": [
+    "w = 3286 (published: Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/))"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Broadleaf woodland",
+   "units": "kha",
+   "tolerance": 0.05,
+   "basis": "input",
+   "id": "land.broadleaf",
+   "model": {
+    "values": {
+     "a": "i.land_use.existing_natural_broadleaf_woodland",
+     "b": "i.land_use.existing_productive_broadleaf_woodland",
+     "c": "i.land_use.new_natural_broadleaf_woodland",
+     "d": "i.land_use.new_productive_broadleaf_woodland"
+    },
+    "formula": "a + b + c + d"
+   },
+   "note": "",
+   "issue": "See woodland.",
+   "status_at_build": "known",
+   "observed": 1710,
+   "model_at_build": 2861,
+   "sources": [
+    "w = 1710 (published: Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/))"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Conifer woodland",
+   "units": "kha",
+   "tolerance": 0.05,
+   "basis": "input",
+   "id": "land.conifer",
+   "model": {
+    "values": {
+     "a": "i.land_use.existing_natural_coniferous_woodland",
+     "b": "i.land_use.existing_productive_coniferous_woodland",
+     "c": "i.land_use.new_natural_coniferous_woodland",
+     "d": "i.land_use.new_productive_coniferous_woodland"
+    },
+    "formula": "a + b + c + d"
+   },
+   "note": "",
+   "issue": "See woodland.",
+   "status_at_build": "ok",
+   "observed": 1576,
+   "model_at_build": 1508,
+   "sources": [
+    "w = 1576 (published: Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/))"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Croppable land",
+   "units": "kha",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "land.croppable",
+   "model": {
+    "values": {
+     "a": "i.land_use.food_crops",
+     "b": "i.land_use.feed_crops_for_livestock",
+     "c": "i.land_use.annual_grass_hemp",
+     "d": "land_use.perrennial_grass_miscanthus",
+     "e": "land_use.rotational_grass_ryegrass",
+     "f": "land_use.short_rotation_coppice"
+    },
+    "formula": "a + b + c + d + e + f"
+   },
+   "note": "Defra croppable area, including temporary grass and uncropped arable land. Model crops plus the bioenergy crop land it derives.",
+   "issue": "The land use model grows all solid biomass on UK short rotation coppice. Most biomass for power is imported (open-items.md, Inputs).",
+   "status_at_build": "known",
+   "observed": 6167.466875779968,
+   "model_at_build": 8187.247854782355,
+   "sources": [
+    "c = 6167466.876 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP9)"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Land feeding livestock",
+   "units": "kha",
+   "tolerance": 0.1,
+   "basis": "input",
+   "id": "land.livestock",
+   "model": {
+    "values": {
+     "a": "i.land_use.feed_crops_for_livestock",
+     "b": "i.land_use.intensive_and_rough_grazing"
+    },
+    "formula": "a + b"
+   },
+   "note": "Grassland and crops fed to livestock, plus common rough grazing.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 15252.002831797388,
+   "model_at_build": 14079,
+   "sources": [
+    "feed = 14054673.83 (Land-use-for-animal-feed-251217.ods, Land_use_area_summary!P4)",
+    "common = 1197329 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP7)"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Permanent grassland and rough grazing",
+   "units": "kha",
+   "tolerance": 0.1,
+   "basis": "input",
+   "id": "land.grassland",
+   "model": {
+    "values": {
+     "a": "i.land_use.intensive_and_rough_grazing"
+    },
+    "formula": "a"
+   },
+   "note": "Temporary grass is in croppable land.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 10576.9716145,
+   "model_at_build": 11522,
+   "sources": [
+    "p = 9379642.615 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP19)",
+    "c = 1197329 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP7)"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Croppable land not feeding livestock",
+   "units": "kha",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "land.crops_other",
+   "model": {
+    "values": {
+     "a": "i.land_use.food_crops",
+     "b": "i.land_use.annual_grass_hemp",
+     "c": "land_use.perrennial_grass_miscanthus",
+     "d": "land_use.short_rotation_coppice"
+    },
+    "formula": "a + b + c + d"
+   },
+   "note": "Food, industrial and energy crops and uncropped arable land.",
+   "issue": "See croppable land.",
+   "status_at_build": "known",
+   "observed": 2701.7236584825782,
+   "model_at_build": 5630.247854782355,
+   "sources": [
+    "c = 2701723.658 (Land-use-for-animal-feed-251217.ods, Land_use_area_summary!P8)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Generation cost in the domestic unit rate",
+   "units": "p/kWh",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "costs.generation",
+   "model": {
+    "values": {
+     "a": "retail.electricity.generation_p_kWh"
+    },
+    "formula": "a"
+   },
+   "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled system cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store).",
+   "issue": "The model costs generation at average new build cost. Consumers paid wholesale prices set by gas plants, forward bought in 2023, plus support for older renewables, and imports are not costed (open-items.md, Model).",
+   "status_at_build": "known",
+   "observed": 16.358265549176576,
+   "model_at_build": 11.336233812087949,
+   "sources": [
+    "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
+    "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
+    "ro = 30.755745 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD53:AG53)",
+    "fit = 7.407030899 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD54:AG54)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Domestic electricity unit rate",
+   "units": "p/kWh",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.electricity_unit_rate",
+   "model": {
+    "values": {
+     "a": "retail.electricity.unit_rate_p_kWh"
+    },
+    "formula": "a"
+   },
+   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to its own generation cost.",
+   "issue": "Follows from the generation cost check.",
+   "status_at_build": "known",
+   "observed": 25.82700021794268,
+   "model_at_build": 19.723445502692346,
+   "sources": [
+    "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Domestic electricity standing charge",
+   "units": "\u00a3/yr",
+   "tolerance": 0.05,
+   "basis": "input",
+   "id": "costs.electricity_standing",
+   "model": {
+    "values": {
+     "a": "retail.electricity.standing_charge_gbp"
+    },
+    "formula": "a"
+   },
+   "note": "Built from the Ofgem cap nil consumption allowances, including VAT.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 205.1094903566591,
+   "model_at_build": 210.91350000000003,
+   "sources": [
+    "f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Domestic electricity bill at 3,400 kWh",
+   "units": "\u00a3/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.electricity_bill",
+   "model": {
+    "values": {
+     "u": "retail.electricity.unit_rate_p_kWh",
+     "s": "retail.electricity.standing_charge_gbp"
+    },
+    "formula": "u * 34 + s"
+   },
+   "note": "DESNZ standard bill at 3,400 kWh a year.",
+   "issue": "Follows from the generation cost check.",
+   "status_at_build": "known",
+   "observed": 1083.2274977667098,
+   "model_at_build": 881.5106470915398,
+   "sources": [
+    "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Wholesale gas cost in the domestic unit rate",
+   "units": "p/kWh",
+   "tolerance": 0.1,
+   "basis": "input",
+   "id": "costs.gas_wholesale",
+   "model": {
+    "values": {
+     "a": "i.fuel_prices.gas"
+    },
+    "formula": "a"
+   },
+   "note": "Ofgem cap gas wholesale allowance against the gas price paid by power producers (QEP 3.2.1), which the model uses for both.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 3.6956346230405073,
+   "model_at_build": 3.499,
+   "sources": [
+    "df = 443.4761548 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of CD31:CG31)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Domestic gas unit rate",
+   "units": "p/kWh",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.gas_unit_rate",
+   "model": {
+    "values": {
+     "a": "retail.gas.unit_rate_p_kWh"
+    },
+    "formula": "a"
+   },
+   "note": "DESNZ average variable unit price including VAT.",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 6.542750544471211,
+   "model_at_build": 6.08685,
+   "sources": [
+    "u = 0.06542750544 (table_234__1_.xlsx, 2.3.4!J232)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Domestic gas standing charge",
+   "units": "\u00a3/yr",
+   "tolerance": 0.05,
+   "basis": "input",
+   "id": "costs.gas_standing",
+   "model": {
+    "values": {
+     "a": "retail.gas.standing_charge_gbp"
+    },
+    "formula": "a"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 112.9466738272855,
+   "model_at_build": 109.494,
+   "sources": [
+    "f = 112.9466738 (table_234__1_.xlsx, 2.3.4!K232)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Domestic gas bill at 11,200 kWh",
+   "units": "\u00a3/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.gas_bill",
+   "model": {
+    "values": {
+     "u": "retail.gas.unit_rate_p_kWh",
+     "s": "retail.gas.standing_charge_gbp"
+    },
+    "formula": "u * 112 + s"
+   },
+   "note": "DESNZ bill at 11,200 kWh a year.",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 845.7347348080573,
+   "model_at_build": 791.2212000000001,
+   "sources": [
+    "b = 845.7347348 (table_231__1_.xlsx, 2.3.1!M19)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Household electricity spend, DUKES use at QEP prices",
+   "units": "\u00a3bn/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.electricity_spend",
+   "model": {
+    "values": {
+     "a": "retail.electricity.household_spend_bn"
+    },
+    "formula": "a"
+   },
+   "note": "Domestic electricity use times the average unit price, plus the average fixed cost for every household. Tests consumption and price together.",
+   "issue": "Follows from the generation cost check, partly offset by domestic electricity use 6% above DUKES.",
+   "status_at_build": "known",
+   "observed": 30.07343406773285,
+   "model_at_build": 25.56158938472259,
+   "sources": [
+    "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
+    "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
+    "h = 28609 (familiesandhouseholdsuk2025.xlsx, 5!E21)",
+    "f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Household electricity spend, ONS",
+   "units": "\u00a3bn/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "costs.electricity_spend_ons",
+   "model": {
+    "values": {
+     "a": "retail.electricity.household_spend_bn"
+    },
+    "formula": "a"
+   },
+   "note": "ONS consumer expenditure. It is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 26.289,
+   "model_at_build": 25.56158938472259,
+   "sources": [
+    "s = 26289 (table_261.xlsx, 2.6.1!D62)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Household gas spend, DUKES use at QEP prices",
+   "units": "\u00a3bn/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.gas_spend",
+   "model": {
+    "values": {
+     "a": "retail.gas.household_spend_bn"
+    },
+    "formula": "a"
+   },
+   "note": "Domestic gas use times the average unit price, plus the fixed cost for 84% of households (the model's assumed share with gas).",
+   "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check) and the gas unit rate is 7% low.",
+   "status_at_build": "known",
+   "observed": 19.224577671219556,
+   "model_at_build": 16.656489023419006,
+   "sources": [
+    "g = 21697.75 (DUKES_1.1.xlsx, 2024!F57)",
+    "u = 0.06542750544 (table_234__1_.xlsx, 2.3.4!J232)",
+    "h = 28609 (familiesandhouseholdsuk2025.xlsx, 5!E21)",
+    "f = 112.9466738 (table_234__1_.xlsx, 2.3.4!K232)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Household gas spend, ONS",
+   "units": "\u00a3bn/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "costs.gas_spend_ons",
+   "model": {
+    "values": {
+     "a": "retail.gas.household_spend_bn"
+    },
+    "formula": "a"
+   },
+   "note": "ONS consumer expenditure. It is about 25% below DUKES use at QEP prices for 2024.",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 14.641,
+   "model_at_build": 16.656489023419006,
+   "sources": [
+    "s = 14641 (table_261.xlsx, 2.6.1!C62)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Household vehicle fuel spend",
+   "units": "\u00a3bn/yr",
+   "tolerance": 0.1,
+   "basis": "independent",
+   "id": "costs.vehicle_fuel_spend",
+   "model": {
+    "values": {
+     "a": "retail.road_fuel.car_fuel_spend_bn"
+    },
+    "formula": "a"
+   },
+   "note": "ONS household spend on vehicle fuels and lubricants against modelled car fuel at pump prices. Car fuel is calibrated to the ECUK car share of road fuel, which includes company cars that households do not pay for.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 38.183,
+   "model_at_build": 38.44367783295395,
+   "sources": [
+    "s = 38183 (table_261.xlsx, 2.6.1!G62)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Petrol pump price",
+   "units": "p/litre",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "costs.petrol_price",
+   "model": {
+    "values": {
+     "a": "i.retail.road_fuel.petrol_p_litre"
+    },
+    "formula": "a"
+   },
+   "note": "Including duty and VAT.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 141.47766540670264,
+   "model_at_build": 141.48,
+   "sources": [
+    "p = 141.4776654 (table_411_413.xlsx, 4.1.2!D61)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Diesel pump price",
+   "units": "p/litre",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "costs.diesel_price",
+   "model": {
+    "values": {
+     "a": "i.retail.road_fuel.diesel_p_litre"
+    },
+    "formula": "a"
+   },
+   "note": "Including duty and VAT.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 148.32888483333338,
+   "model_at_build": 148.33,
+   "sources": [
+    "p = 148.3288848 (table_411_413.xlsx, 4.1.2!E61)"
+   ]
+  }
+ ]
+}

@@ -372,5 +372,32 @@
         "coal": 1.399,
         "biomass": 0
     },
-    "carbon_price": 0
+    "carbon_price": 0,
+    "retail": {
+        "electricity": {
+            "network_p_kWh": 3.394,
+            "network_gbp": 116.23,
+            "policy_p_kWh": 0.878,
+            "policy_gbp": 10.76,
+            "supplier_p_kWh": 3.176,
+            "supplier_gbp": 73.88
+        },
+        "gas": {
+            "network_p_kWh": 1.414,
+            "network_gbp": 0,
+            "policy_p_kWh": 0.273,
+            "policy_gbp": 11.16,
+            "supplier_p_kWh": 0.611,
+            "supplier_gbp": 93.12,
+            "households_prc": 84
+        },
+        "vat_prc": 5,
+        "road_fuel": {
+            "petrol_p_litre": 141.48,
+            "diesel_p_litre": 148.33,
+            "petrol_kWh_per_litre": 9.69,
+            "diesel_kWh_per_litre": 10.69,
+            "car_diesel_prc": 44.3
+        }
+    }
 }

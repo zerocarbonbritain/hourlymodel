@@ -68,6 +68,15 @@ A condition value can be a list, matching any of its items, can contain `*` wild
 
 The build stops if no rows match, unless the locator has `"allow_empty": true`, for a source that stops in a later year (ammonia production ceased in 2023).
 
+A locator can also take the mean of a row of cells, for workbooks such as the Ofgem cap model where row labels and headers repeat. `expect` gives cells that must hold the stated text, so a moved table stops the build. Entries located this way are year specific, so they list the years they apply to and are skipped for others:
+
+```
+{"source": "ofgem_cap", "sheet": "1b Historical level tables", "range": "T35:W35",
+ "expect": {"B35": "NC", "T30": "Jan 2024 - Mar 2024", "W30": "Oct 2024 - Dec 2024"}}
+```
+
+A source marked `manual` in `sources.json` is not downloaded. The build stops with the instruction if it is missing.
+
 ## Coverage
 
 The report ends with two lists: values set in the scenario that the build does not generate, and values the scenario inherits from the default scenario, `scenarios/zcb_2024.json`. Inherited values should be things a baseline does not use, such as costs or settings for processes with zero capacity. Anything else should get an entry, even if it is an `assumption` with the default value, so a change to the ZCB scenario cannot change the baseline.
@@ -78,3 +87,34 @@ The report ends with two lists: values set in the scenario that the build does n
 2. Run the build. It stops on a hash mismatch. Check the new file, then rerun with `--update-hashes`.
 3. Fix any locator errors in `inputs/`.
 4. Review the report and compare it with the previous baseline before running with `--write`.
+
+## Validation
+
+`validate.py` tests whether a baseline reproduces its year: energy use, generation, emissions, land use and prices. It does not change the scenario.
+
+```
+python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json
+python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json --strict
+```
+
+Checks are in `validation/*.json`, one file per area, merged in name order:
+
+```
+"costs.electricity_unit_rate": {
+    "group": "Costs", "label": "Domestic electricity unit rate", "units": "p/kWh",
+    "observed": {"values": {"u": {"source": "qep_2.2.4", ...}}, "formula": "u * 100"},
+    "model": {"values": {"a": "retail.electricity.unit_rate_p_kWh"}, "formula": "a"},
+    "tolerance": 0.05,
+    "basis": "independent",
+    "note": "...",
+    "issue": "..."
+}
+```
+
+- `observed` uses the input locators. A value can also be `{"value": 3286, "cite": "..."}` for a figure published only in a report.
+- `model` names model outputs (paths in `o`) or scenario inputs (paths starting `i.`) and combines them with `formula`. Formulas use arithmetic only, since the UI evaluates the same expression in JavaScript.
+- `basis` says how much the check tests the model: `independent` outputs are not fitted to the observed value, `calibrated` outputs are fitted by the build, and `input` checks confirm an input matches its source.
+- `tolerance` is a fraction. A check is ok within it, a warning within twice it and a failure beyond. A failing check with an `issue` is reported as a known issue. The issue should point to a section of [open-items.md](open-items.md).
+- `years` limits a check to the years its source covers. Other years report it as unavailable.
+
+The script writes `reports/validation_<scenario>.md` and `../scenarios/validation/<scenario>.json`. The UI loads the JSON when a scenario whose name starts with `baseline` is selected, evaluates the model side of each check on every run and shows the result under the overview. `--strict` exits with status 1 if any check fails without a recorded issue, so it can be used as a regression test after model changes (`npm test`).
