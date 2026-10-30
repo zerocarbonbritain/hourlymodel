@@ -886,7 +886,8 @@ input[type='text'] {
         <div style="font-size:14px"><i>DSR options implement a substitutable heat source, direct electricity is used when excess renewable energy is available, methane or hydrogen is used when direct electricity supply is not sufficient.</i></div>
         <br>
         <div style="font-size:14px"><i>* Refineries includes electric for oil and gas exploration, refineries, solid fuel manufacture and unallocated electricity use.</i></div>
-        
+        <p>Coal and coke used in blast furnaces and coke ovens: <input v-model.number="i.industry.blast_furnace_coal_TWhy" type="text" @change="update" style="width:50px" autocomplete="off"/> TWh/yr at <input v-model.number="i.co2_factors.blast_furnace" type="text" @change="update" style="width:50px" autocomplete="off"/> kgCO2/kWh ({{ o.emissions_balance.blast_furnace | toFixed(1) }} MtCO2/yr). This is the reductant for iron making, counted as energy industry use and not included in the totals below.</p>
+
         <p><b>Total demand by fuel:</b></p>
         
         <table class="table" style="width:100%">
@@ -1633,8 +1634,27 @@ input[type='text'] {
         </table>
         <p><i>* Detailed modelling by BEIS 'Appendix I: Electricity Networks Modelling' August 2022 suggests that while significant network investments are required for net zero scenarios the network costs are likely to stay relatively flat on a per unit basis at around £50/MWh due to higher electricity volumes.</i></p>
 
+        <h3>Price view</h3>
+        <p>The LCOE above is a resource cost: what the generation fleet would cost to build and run at today's costs. The price view is what consumers pay generators: each technology's output times a price per MWh, such as wholesale value plus support payments for a baseline or a CfD strike price for a scenario. A blank price uses the resource cost. Electrolysis, methanation and power to X always use the resource cost.</p>
+        <table class="table cost-table" style="width:100%">
+            <tr><th>Technology</th><th>Output</th><th>Price</th><th>Annual</th></tr>
+            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£bn/y</th></tr>
+            <tr v-for="(row,key) in o.price_view.by_tech" v-if="row.generation > 0 || i.price_view.price_gbp_MWh[key] !== null">
+                <td>{{ key.replace(/_/g, ' ') }}</td>
+                <td>{{ row.generation | toFixed(1) }}</td>
+                <td><input v-model.number="i.price_view.price_gbp_MWh[key]" type="text" @change="price_view_change(key)" autocomplete="off" :placeholder="row.price | toFixed(0)"/></td>
+                <td>{{ row.annual | toFixed(2) }}</td>
+            </tr>
+            <tr><td>Fuel production plant (resource cost)</td><td></td><td></td><td>{{ o.price_view.fuel_production_annual | toFixed(2) }}</td></tr>
+            <tr><td>Support not split by technology (Feed-in Tariffs, capacity market)</td><td></td><td><input v-model.number="i.price_view.other_support_gbp_bn" type="text" @change="update_non_hourly" autocomplete="off"/></td><td>{{ i.price_view.other_support_gbp_bn | toFixed(2) }}</td></tr>
+            <tr><th>Total</th><th></th><th></th><th>{{ o.price_view.total_annual | toFixed(1) }}</th></tr>
+        </table>
+        <p>Generation cost per kWh delivered: resource cost {{ o.retail.electricity.resource_p_kWh | toFixed(2) }} p/kWh, price view {{ o.retail.electricity.price_view_p_kWh | toFixed(2) }} p/kWh. Retail prices use the
+            <select v-model="i.retail.generation_basis" @change="update_non_hourly"><option value="price">price view</option><option value="cost">resource cost</option></select>,
+            plus a year specific domestic wholesale adjustment of <input v-model.number="i.retail.electricity.wholesale_adjustment_p_kWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> p/kWh for electricity and <input v-model.number="i.retail.gas.wholesale_adjustment_p_kWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> p/kWh for gas (forward purchasing and the domestic profile, 0 in scenarios).</p>
+
         <h3>Retail prices</h3>
-        <p>Domestic prices build on the modelled costs. The electricity unit rate starts from the system cost per kWh delivered to end users, and gas from the gas fuel price. Network, social policy (ECO, Warm Home Discount) and supplier costs are added per kWh and per customer, then VAT. Defaults are the 2024 Ofgem price cap allowances. RO, FiT and the capacity market pay generators, so they are not added: the modelled generation cost replaces them.</p>
+        <p>Domestic prices build on the modelled costs. The electricity unit rate starts from the generation cost per kWh delivered to end users (price view or resource cost, above), and gas from the gas fuel price. Network, social policy (ECO, Warm Home Discount) and supplier costs are added per kWh and per customer, then VAT. Defaults are the 2024 Ofgem price cap allowances. RO, FiT and the capacity market pay generators, so they are part of the generation cost, not added here.</p>
         <table class="table cost-table" style="width:100%">
             <tr><th></th><th>Generation or wholesale</th><th>Network</th><th>Policy</th><th>Supplier</th><th>Unit rate</th><th>Standing charge</th><th>Use per customer</th><th>Bill</th><th>Households</th></tr>
             <tr class="units"><th></th><th>p/kWh</th><th>p/kWh, £/yr</th><th>p/kWh, £/yr</th><th>p/kWh, £/yr</th><th>p/kWh</th><th>£/yr</th><th>kWh/yr</th><th>£/yr</th><th>£bn/yr</th></tr>

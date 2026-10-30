@@ -295,5 +295,23 @@
         "url": "https://assets.publishing.service.gov.uk/media/69f9bf208f3213f7384ecae6/Subnational_gas_consumption_statistics_2005-2024.xlsx",
         "file": "Subnational_gas_consumption_statistics_2005-2024.xlsx",
         "sha256": "192c5f81f953c9ab6b5c2dc4a3ca5ddccf5e98f53d39c0ce368c3c532b209cd3"
+    },
+    "ofgem_ro": {
+        "title": "Ofgem Renewables Obligation annual report, scheme year 23, dataset",
+        "edition": "SY23 (2024-25), March 2026",
+        "page": "https://www.ofgem.gov.uk/transparency-document/renewables-obligation-annual-report-scheme-year-23-1-april-2024-31-march-2025",
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2026-03/Renewables_Obligation_Annual_Report_Scheme_Year_23_Dataset-20260327121339.xlsx",
+        "file": "Renewables_Obligation_Annual_Report_Scheme_Year_23_Dataset.xlsx",
+        "sha256": "2b44030b3ba329d51955e9aaaf15f1539de1b80850899fcd2c0844d11a4847a1",
+        "manual": "Ofgem refuses scripted downloads. Download the url in a browser into baseline/cache as Renewables_Obligation_Annual_Report_Scheme_Year_23_Dataset.xlsx."
+    },
+    "ofgem_fit": {
+        "title": "Ofgem Feed-in Tariff annual report, scheme year 15, dataset",
+        "edition": "SY15 (2024-25), December 2025",
+        "page": "https://www.ofgem.gov.uk/energy-policy-and-regulation/policy-and-regulatory-programmes/feed-tariffs-fit",
+        "url": "https://www.ofgem.gov.uk/sites/default/files/2025-12/FIT_Annual_Report_SY15_Dataset.xlsx",
+        "file": "FIT_Annual_Report_SY15_Dataset.xlsx",
+        "sha256": "2eb65613fa88b43bccab3ef36d900195f37d39c9e9e700c88699c6d7bae82fad",
+        "manual": "Ofgem refuses scripted downloads. Download the url in a browser into baseline/cache as FIT_Annual_Report_SY15_Dataset.xlsx."
     }
 }

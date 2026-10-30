@@ -21,7 +21,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1876.5196809999998,
-   "model_at_build": 1820.0862705741529,
+   "model_at_build": 1832.6162705741528,
    "sources": [
     "supply = 169158.49 (DUKES_1.1.xlsx, 2024!K10)",
     "bunkers = -2054.95 (DUKES_1.1.xlsx, 2024!K8)",
@@ -415,11 +415,11 @@
     },
     "formula": "a / 10000"
    },
-   "note": "The model's coal backup share also covers other thermal generation, mainly waste, so DUKES 5.6 other thermal fuel is added to the observed coal.",
-   "issue": "Coal and coke used in blast furnaces and coke ovens (about 12 TWh in 2024) are transformation in DUKES and are not in the model (open-items.md, Industry).",
-   "status_at_build": "known",
+   "note": "The model's coal backup share also covers other thermal generation, mainly waste, so DUKES 5.6 other thermal fuel is added to the observed coal. Blast furnace and coke oven fuel is included on both sides.",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 58.1519296,
-   "model_at_build": 40.871815651560006,
+   "model_at_build": 53.40181565156001,
    "sources": [
     "coal = 1446.3 (DUKES_1.1.xlsx, 2024!B12)",
     "manufactured = 1096.92 (DUKES_1.1.xlsx, 2024!C12)",
@@ -847,10 +847,10 @@
     "formula": "a - b"
    },
    "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink.",
-   "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry).",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 414.640274014361,
-   "model_at_build": 399.42803290432676,
+   "model_at_build": 404.1956979043267,
    "sources": [
     "t = 414.640274 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 2456 rows where {\"Year\": \"2024\"})"
    ]
@@ -871,12 +871,12 @@
     "formula": "a + b + c"
    },
    "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup.",
-   "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry).",
-   "status_at_build": "known",
-   "observed": 327.64136755129715,
-   "model_at_build": 313.374343777054,
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 326.55450446290166,
+   "model_at_build": 318.142008777054,
    "sources": [
-    "fuel = 320.5730257 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 241 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": [\"Gaseous fuels\", \"Petroleum\", \"Coal\", \"Other solid fuels\"]})",
+    "fuel = 319.4861626 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 235 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": [\"Gaseous fuels\", \"Petroleum\", \"Coal\", \"Other solid fuels\"]} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
     "waste = 7.068341841 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Other emissions\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
    ]
   },
@@ -915,14 +915,15 @@
     },
     "formula": "a"
    },
-   "note": "Petroleum including bunkers, plus LPG and refinery gases, which the inventory groups with gaseous fuels.",
+   "note": "Petroleum including bunkers, plus LPG and refinery gases, which the inventory groups with gaseous fuels, and petroleum coke burned in refineries, which it groups with solid fuels.",
    "issue": "",
    "status_at_build": "ok",
-   "observed": 181.08339455483582,
+   "observed": 184.64818691635583,
    "model_at_build": 179.33867762314,
    "sources": [
     "p = 171.2432859 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 140 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Petroleum\"})",
-    "lpg = 9.840108667 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 8 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Petroleum gases\"})"
+    "lpg = 9.840108667 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 8 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Petroleum gases\"})",
+    "coke = 3.564792362 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\", \"Territorial Emissions Statistics category\": \"Oil refineries\"})"
    ]
   },
   {
@@ -938,15 +939,16 @@
     },
     "formula": "a"
    },
-   "note": "Other gases are blast furnace and coke oven gas, made from coal.",
-   "issue": "Blast furnace and coke oven coal is not modelled, and the coal plus waste backup CO2 factor (0.254) averages coal and waste (open-items.md, Industry).",
-   "status_at_build": "known",
-   "observed": 21.461243848620775,
-   "model_at_build": 11.01197692707703,
+   "note": "Other gases are blast furnace and coke oven gas, made from coal. Petroleum coke in refineries is in the oil check, and sinter, process and coke production CO2 are inputs.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 16.812349539219763,
+   "model_at_build": 15.77964192707703,
    "sources": [
-    "coal = 3.593506516 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 26 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Coal\"})",
-    "solid = 5.613581378 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 21 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\"})",
-    "gases = 5.185814113 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 10 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other gases\"})",
+    "coal = 3.593506516 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 26 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Coal\"} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
+    "solid = 4.988806051 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 19 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\"} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
+    "gases = 4.726487492 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 7 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other gases\"} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
+    "coke = 3.564792362 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\", \"Territorial Emissions Statistics category\": \"Oil refineries\"})",
     "waste = 7.068341841 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Other emissions\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
    ]
   },
@@ -1385,22 +1387,48 @@
   },
   {
    "group": "Costs",
-   "label": "Generation cost in the domestic unit rate",
+   "label": "Generation cost in the unit rate, resource cost",
    "units": "p/kWh",
    "tolerance": 0.1,
    "basis": "independent",
-   "id": "costs.generation",
+   "id": "costs.generation_resource",
    "model": {
     "values": {
-     "a": "retail.electricity.generation_p_kWh"
+     "a": "retail.electricity.resource_p_kWh"
     },
     "formula": "a"
    },
-   "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled system cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store).",
-   "issue": "The model costs generation at average new build cost. Consumers paid wholesale prices set by gas plants, forward bought in 2023, plus support for older renewables, and imports are not costed (open-items.md, Model).",
+   "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled resource cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new build costs).",
+   "issue": "The resource cost is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The price view check below rebuilds what was paid (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
    "model_at_build": 11.336370655840819,
+   "sources": [
+    "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
+    "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
+    "ro = 30.755745 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD53:AG53)",
+    "fit = 7.407030899 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD54:AG54)"
+   ]
+  },
+  {
+   "group": "Costs",
+   "label": "Generation cost in the unit rate, price view",
+   "units": "p/kWh",
+   "tolerance": 0.05,
+   "basis": "input",
+   "id": "costs.generation_price",
+   "model": {
+    "values": {
+     "a": "retail.electricity.price_view_p_kWh",
+     "b": "i.retail.electricity.wholesale_adjustment_p_kWh"
+    },
+    "formula": "a + b"
+   },
+   "note": "Modelled generation for each technology at its 2024 capture price plus RO, CfD, FiT and capacity market payments, per kWh delivered, plus the 2024 domestic wholesale adjustment (forward purchasing and the domestic profile). Prices are observed, volumes are modelled.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 16.358265549176576,
+   "model_at_build": 16.78793557977764,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1421,11 +1449,11 @@
     },
     "formula": "a"
    },
-   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to its own generation cost.",
-   "issue": "Follows from the generation cost check.",
-   "status_at_build": "known",
+   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to the price view generation cost.",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 25.82700021794268,
-   "model_at_build": 19.723589188632857,
+   "model_at_build": 25.447732358766523,
    "sources": [
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
    ]
@@ -1467,10 +1495,10 @@
     "formula": "u * 34 + s"
    },
    "note": "DESNZ standard bill at 3,400 kWh a year.",
-   "issue": "Follows from the generation cost check.",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 1083.2274977667098,
-   "model_at_build": 881.5155324135171,
+   "model_at_build": 1076.136400198062,
    "sources": [
     "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
    ]
@@ -1479,20 +1507,20 @@
    "group": "Costs",
    "label": "Wholesale gas cost in the domestic unit rate",
    "units": "p/kWh",
-   "tolerance": 0.1,
+   "tolerance": 0.02,
    "basis": "input",
    "id": "costs.gas_wholesale",
    "model": {
     "values": {
-     "a": "i.fuel_prices.gas"
+     "a": "retail.gas.wholesale_p_kWh"
     },
     "formula": "a"
    },
-   "note": "Ofgem cap gas wholesale allowance against the gas price paid by power producers (QEP 3.2.1), which the model uses for both.",
+   "note": "Ofgem cap gas wholesale allowance against the model's domestic gas wholesale cost: the gas price paid by power producers (QEP 3.2.1) plus the 2024 domestic adjustment.",
    "issue": "",
    "status_at_build": "ok",
    "observed": 3.6956346230405073,
-   "model_at_build": 3.499,
+   "model_at_build": 3.696,
    "sources": [
     "df = 443.4761548 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of CD31:CG31)"
    ]
@@ -1512,9 +1540,9 @@
    },
    "note": "DESNZ average variable unit price including VAT.",
    "issue": "",
-   "status_at_build": "warn",
+   "status_at_build": "ok",
    "observed": 6.542750544471211,
-   "model_at_build": 6.08685,
+   "model_at_build": 6.2937,
    "sources": [
     "u = 0.06542750544 (table_234__1_.xlsx, 2.3.4!J232)"
    ]
@@ -1557,9 +1585,9 @@
    },
    "note": "DESNZ bill at 11,200 kWh a year.",
    "issue": "",
-   "status_at_build": "warn",
+   "status_at_build": "ok",
    "observed": 845.7347348080573,
-   "model_at_build": 791.2212000000001,
+   "model_at_build": 814.3884,
    "sources": [
     "b = 845.7347348 (table_231__1_.xlsx, 2.3.1!M19)"
    ]
@@ -1578,10 +1606,10 @@
     "formula": "a"
    },
    "note": "Domestic electricity use times the average unit price, plus the average fixed cost for every household. Tests consumption and price together.",
-   "issue": "Follows from the generation cost check, partly offset by domestic electricity use 6% above DUKES.",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 30.07343406773285,
-   "model_at_build": 25.56173164366775,
+   "model_at_build": 31.22902634482572,
    "sources": [
     "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
@@ -1602,11 +1630,11 @@
     },
     "formula": "a"
    },
-   "note": "ONS consumer expenditure. It is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree.",
-   "issue": "",
-   "status_at_build": "ok",
+   "note": "ONS consumer expenditure.",
+   "issue": "ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).",
+   "status_at_build": "known",
    "observed": 26.289,
-   "model_at_build": 25.56173164366775,
+   "model_at_build": 31.22902634482572,
    "sources": [
     "s = 26289 (table_261.xlsx, 2.6.1!D62)"
    ]
@@ -1625,10 +1653,10 @@
     "formula": "a"
    },
    "note": "Domestic gas use times the average unit price, plus the fixed cost for every domestic gas meter in Great Britain.",
-   "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check) and the gas unit rate is 7% low.",
+   "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check).",
    "status_at_build": "known",
    "observed": 19.30038160546539,
-   "model_at_build": 16.72853684187701,
+   "model_at_build": 17.205155773458426,
    "sources": [
     "g = 21697.75 (DUKES_1.1.xlsx, 2024!F57)",
     "u = 0.06542750544 (table_234__1_.xlsx, 2.3.4!J232)",
@@ -1649,11 +1677,11 @@
     },
     "formula": "a"
    },
-   "note": "ONS consumer expenditure. It is about 25% below DUKES use at QEP prices for 2024.",
-   "issue": "",
-   "status_at_build": "warn",
+   "note": "ONS consumer expenditure.",
+   "issue": "ONS spend is about 25% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).",
+   "status_at_build": "known",
    "observed": 14.641,
-   "model_at_build": 16.72853684187701,
+   "model_at_build": 17.205155773458426,
    "sources": [
     "s = 14641 (table_261.xlsx, 2.6.1!C62)"
    ]

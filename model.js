@@ -1493,6 +1493,10 @@ var model = {
          o.fossil_fuels.gas += i.fossil_fuels.other_gas_use * 10000
          o.fossil_fuels.oil += i.fossil_fuels.other_oil_use * 10000
          o.fossil_fuels.coal += i.fossil_fuels.other_coal_use * 10000
+         // Coal and coke used in blast furnaces and coke ovens, transformation and energy industry use in DUKES
+         o.fossil_fuels.blast_furnace = i.industry.blast_furnace_coal_TWhy * 10000
+         o.fossil_fuels.coal += o.fossil_fuels.blast_furnace
+         o.energy_industry_use.total += o.fossil_fuels.blast_furnace
          // Add to energy_industry_use total
          o.energy_industry_use.total += i.fossil_fuels.other_gas_use * 10000
          o.energy_industry_use.total += i.fossil_fuels.other_oil_use * 10000
@@ -1865,8 +1869,10 @@ var model = {
         let f = {}
         for (let z in i.co2_factors) f[z] = i.co2_factors[z] * 0.001
         let coal_backup_co2_factor = i.electric_backup.coal_co2_factor * 0.001
-        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable)*0.1*f.coal
+        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable - o.fossil_fuels.blast_furnace)*0.1*f.coal
         o.emissions_balance.fossil_fuel_coal += o.fossil_fuels.coal_for_dispatchable*0.1*coal_backup_co2_factor
+        o.emissions_balance.blast_furnace = o.fossil_fuels.blast_furnace*0.1*f.blast_furnace
+        o.emissions_balance.fossil_fuel_coal += o.emissions_balance.blast_furnace
         o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*f.gas
 
         // Fossil oil from the liquid fuel store is shared between its uses by their demand. Backup
@@ -2020,8 +2026,45 @@ var model = {
 
         o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
 
-        // Retail prices. The electricity unit rate starts from the modelled system cost per kWh
-        // delivered to end users, and gas from the gas fuel price. Network, social policy and
+        // Price view: what consumers pay generators, as generation times a price per MWh for each
+        // technology (wholesale value plus support, or a contract price). A null price uses the
+        // modelled resource cost. Fuel production plant (electrolysis, methanation, power to X)
+        // always uses resource cost. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and
+        // TWh times £/MWh times 0.001 gives £bn.
+        let backup_annual = o.costs['Gas turbines'].annual + o.fuel_cost_annual + o.carbon_cost_annual
+        let backup_output = o.electric_backup.total_before_grid_loss
+        let backup_resource = (gen) => backup_output > 0 ? backup_annual * gen / backup_output : 0
+        let resource = (key) => o.costs[key] ? o.costs[key].annual : 0
+        let techs = {
+            offshore_wind: [o.supply.total_offshore_wind, () => resource('Offshore wind')],
+            onshore_wind: [o.supply.total_onshore_wind, () => resource('Onshore wind')],
+            solar: [o.supply.total_solarpv, () => resource('Solar PV')],
+            tidal: [o.supply.total_tidal, () => resource('Tidal')],
+            wave: [o.supply.total_wave, () => resource('Wave')],
+            geothermal: [o.supply.total_geothermal_elec, () => resource('Geothermal Electric')],
+            nuclear: [o.supply.total_nuclear, () => resource('Nuclear')],
+            hydro: [o.supply.total_hydro, () => 0],
+            imports: [o.supply.total_imports, () => 0],
+            gas: [o.electric_backup.total_methane_turbine_output, () => backup_resource(o.electric_backup.total_methane_turbine_output)],
+            biomass: [o.electric_backup.total_biomass_turbine_output, () => backup_resource(o.electric_backup.total_biomass_turbine_output)],
+            coal_other: [o.electric_backup.total_coal_turbine_output, () => backup_resource(o.electric_backup.total_coal_turbine_output)],
+            oil: [o.electric_backup.total_synth_fuel_turbine_output, () => backup_resource(o.electric_backup.total_synth_fuel_turbine_output)],
+            hydrogen: [o.electric_backup.total_hydrogen_turbine_output, () => backup_resource(o.electric_backup.total_hydrogen_turbine_output)],
+            storage: [o.electric_storage.total_discharge, () => resource('Electric Storage')]
+        }
+        o.price_view = { by_tech: {}, total_annual: 0 }
+        for (let z in techs) {
+            let generation = techs[z][0] * 0.0001
+            let price = i.price_view.price_gbp_MWh[z]
+            let annual = (price === null || price === undefined) ? techs[z][1]() : generation * price * 0.001
+            o.price_view.by_tech[z] = { generation: generation, price: generation > 0 ? 1000 * annual / generation : 0, annual: annual, priced: !(price === null || price === undefined) }
+            o.price_view.total_annual += annual
+        }
+        o.price_view.fuel_production_annual = resource('H2 Electrolysis') + resource('Methanation') + resource('Power to X')
+        o.price_view.total_annual += o.price_view.fuel_production_annual + i.price_view.other_support_gbp_bn
+
+        // Retail prices. The electricity unit rate starts from the generation cost per kWh delivered
+        // to end users (price view or resource cost), and gas from the gas fuel price. Network, social policy and
         // supplier costs are inputs, per kWh and per customer per year, before VAT.
         // £bn/yr over TWh/yr gives £/kWh, so 100 converts to p/kWh.
         let r = i.retail
@@ -2031,7 +2074,12 @@ var model = {
         o.retail = {}
 
         let e = r.electricity
-        let elec = { generation_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0 }
+        let elec = {
+            resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
+            price_view_p_kWh: delivered_TWh > 0 ? 100 * o.price_view.total_annual / delivered_TWh : 0
+        }
+        // The unit rate uses the resource cost or the price view, plus any year specific wholesale adjustment
+        elec.generation_p_kWh = (r.generation_basis == "price" ? elec.price_view_p_kWh : elec.resource_p_kWh) + e.wholesale_adjustment_p_kWh
         elec.unit_rate_p_kWh = (elec.generation_p_kWh + e.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
         elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
         elec.household_kWh = households_kWh(o.final_consumption.domestic.electricity)
@@ -2040,7 +2088,7 @@ var model = {
         o.retail.electricity = elec
 
         let g = r.gas
-        let gas = { wholesale_p_kWh: i.fuel_prices.gas }
+        let gas = { wholesale_p_kWh: i.fuel_prices.gas + g.wholesale_adjustment_p_kWh }
         gas.unit_rate_p_kWh = (gas.wholesale_p_kWh + g.network_p_kWh + g.policy_p_kWh + g.supplier_p_kWh) * vat
         gas.standing_charge_gbp = (g.network_gbp + g.policy_gbp + g.supplier_gbp) * vat
         gas.customers = i.households_2030 * g.households_prc * 0.01

@@ -538,5 +538,21 @@
         "units": "%",
         "value": 0,
         "note": "No change from the baseline year."
+    },
+    "industry.blast_furnace_coal_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "coke_coal": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Coke manufacture"], "column": "Coal", "after": "Transformation"},
+            "coke_manufactured": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Coke manufacture"], "column": "Manufactured fuel", "after": "Transformation"},
+            "bf_coal": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Blast furnaces"], "column": "Coal", "after": "Transformation"},
+            "bf_manufactured": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Blast furnaces"], "column": "Manufactured fuel", "after": "Transformation"},
+            "eiu_coke": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Coke manufacture"], "column": "Manufactured fuel", "after": "Energy industry use"},
+            "eiu_bf": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Blast furnaces"], "column": "Manufactured fuel", "after": "Energy industry use"},
+            "losses": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Losses"], "column": "Manufactured fuel"}
+        },
+        "formula": "(-(coke_coal + coke_manufactured + bf_coal + bf_manufactured) + eiu_coke + eiu_bf + losses) * 0.01163",
+        "round": 2,
+        "note": "Coal and coke used in coke ovens and blast furnaces: DUKES 1.1 transformation (net of coke and blast furnace gas produced), energy industry use and losses of manufactured fuel. The model counts it as energy industry use. It is the reductant for iron making and cannot be replaced by heat."
     }
 }

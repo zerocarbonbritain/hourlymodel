@@ -256,7 +256,8 @@
         "other_heat_elec_efficiency": 100,
         "activity_prc": 100,
         "material_efficiency_prc": 0,
-        "energy_efficiency_prc": 0
+        "energy_efficiency_prc": 0,
+        "blast_furnace_coal_TWhy": 12.53
     },
     "electric_storage": {
         "capacity_GWh": 31,
@@ -390,7 +391,8 @@
             "policy_p_kWh": 0.878,
             "policy_gbp": 10.76,
             "supplier_p_kWh": 3.176,
-            "supplier_gbp": 73.88
+            "supplier_gbp": 73.88,
+            "wholesale_adjustment_p_kWh": 3.189
         },
         "gas": {
             "network_p_kWh": 1.414,
@@ -399,7 +401,8 @@
             "policy_gbp": 11.16,
             "supplier_p_kWh": 0.611,
             "supplier_gbp": 93.12,
-            "households_prc": 86.3
+            "households_prc": 86.3,
+            "wholesale_adjustment_p_kWh": 0.197
         },
         "vat_prc": 5,
         "road_fuel": {
@@ -408,7 +411,8 @@
             "petrol_kWh_per_litre": 9.468,
             "diesel_kWh_per_litre": 10.511,
             "car_diesel_prc": 44.3
-        }
+        },
+        "generation_basis": "price"
     },
     "co2_factors": {
         "gas": 0.18412,
@@ -419,12 +423,33 @@
         "gas_oil": 0.25359,
         "fuel_oil": 0.26709,
         "refinery": 0.24571,
-        "marine": 0.25486
+        "marine": 0.25486,
+        "blast_furnace": 0.3805
     },
     "land_model": {
         "uk_area_kha": 24417,
         "uk_crop_biomass_prc": 0.454,
         "existing_woodland_tCO2_per_ha": 5.473,
         "landfill_biochar_MtCO2": 0
+    },
+    "price_view": {
+        "price_gbp_MWh": {
+            "offshore_wind": 163.44,
+            "onshore_wind": 121.16,
+            "solar": 108.42,
+            "hydro": 105.51,
+            "nuclear": 71.86,
+            "gas": 85.04,
+            "biomass": 131.33,
+            "coal_other": 85.5,
+            "oil": 114.48,
+            "imports": 76.19,
+            "tidal": null,
+            "wave": null,
+            "geothermal": null,
+            "hydrogen": null,
+            "storage": null
+        },
+        "other_support_gbp_bn": 2.984
     }
 }

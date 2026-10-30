@@ -57,6 +57,13 @@ LCOE at the DESNZ or project load factor, compared with Allocation Round 7 (AR7)
 
 The model's own load factors come from the hourly dataset and are often lower than new-build project values. For example, ZCB offshore wind runs at 43% and tidal at 24%, giving £102 and £415/MWh. Technology LCOE in the model therefore sits above strike prices where the dataset load factor is low.
 
+## Price view
+
+The price view is what consumers pay generators rather than what the fleet costs. Each technology's output is multiplied by `price_view.price_gbp_MWh`, and `price_view.other_support_gbp_bn` adds support that is not split by technology. A null price uses the resource cost above. Retail electricity prices use the price view when `retail.generation_basis` is `price`.
+
+- **2024 baseline:** capture price plus support per MWh. Offshore wind £163, onshore £121, solar £108, hydro £106, nuclear £72, gas £85, bioenergy £131, oil £114 and imports £76/MWh, plus £3.0bn of Feed-in Tariff and capacity market payments. Built by `baseline/inputs/13-prices.json`, see [baseline-2024-notes.md](baseline-2024-notes.md).
+- **zcb_2024:** AR7 strike prices for wind, solar and tidal, and the Hinkley Point C strike price for nuclear, from the table above. Other plant uses resource cost.
+
 ## Sources
 
 - DESNZ, [Electricity Generation Costs 2025](https://www.gov.uk/government/publications/electricity-generation-costs-2025), Annex A key assumptions, 2024 prices.

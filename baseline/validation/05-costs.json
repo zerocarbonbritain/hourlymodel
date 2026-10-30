@@ -1,7 +1,7 @@
 {
-    "costs.generation": {
+    "costs.generation_resource": {
         "group": "Costs",
-        "label": "Generation cost in the domestic unit rate",
+        "label": "Generation cost in the unit rate, resource cost",
         "units": "p/kWh",
         "observed": {
             "values": {
@@ -14,14 +14,39 @@
         },
         "model": {
             "values": {
-                "a": "retail.electricity.generation_p_kWh"
+                "a": "retail.electricity.resource_p_kWh"
             },
             "formula": "a"
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled system cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store).",
-        "issue": "The model costs generation at average new build cost. Consumers paid wholesale prices set by gas plants, forward bought in 2023, plus support for older renewables, and imports are not costed (open-items.md, Model).",
+        "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled resource cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new build costs).",
+        "issue": "The resource cost is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The price view check below rebuilds what was paid (open-items.md, Model).",
+        "years": [2024]
+    },
+    "costs.generation_price": {
+        "group": "Costs",
+        "label": "Generation cost in the unit rate, price view",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "df": {"source": "ofgem_cap", "sheet": "1b Historical level tables", "range": "T31:W31", "expect": {"B8": "Other Payment Method", "B10": "Electricity: Single-Rate Metering Arrangement", "B31": "DF", "T30": "Jan 2024 - Mar 2024", "W30": "Oct 2024 - Dec 2024"}},
+                "cm": {"source": "ofgem_cap", "sheet": "1b Historical level tables", "range": "T32:W32", "expect": {"B8": "Other Payment Method", "B10": "Electricity: Single-Rate Metering Arrangement", "B32": "CM", "T30": "Jan 2024 - Mar 2024", "W30": "Oct 2024 - Dec 2024"}},
+                "ro": {"source": "ofgem_cap", "sheet": "3d PC", "range": "AD53:AG53", "expect": {"C53": "RO", "AD50": "January 2024 - March 2024", "AG50": "October 2024 - December 2024"}},
+                "fit": {"source": "ofgem_cap", "sheet": "3d PC", "range": "AD54:AG54", "expect": {"C54": "FiT", "AD50": "January 2024 - March 2024", "AG50": "October 2024 - December 2024"}}
+            },
+            "formula": "(df + cm) / 3100 * 100 + (ro + fit) / 10"
+        },
+        "model": {
+            "values": {
+                "a": "retail.electricity.price_view_p_kWh",
+                "b": "i.retail.electricity.wholesale_adjustment_p_kWh"
+            },
+            "formula": "a + b"
+        },
+        "tolerance": 0.05,
+        "basis": "input",
+        "note": "Modelled generation for each technology at its 2024 capture price plus RO, CfD, FiT and capacity market payments, per kWh delivered, plus the 2024 domestic wholesale adjustment (forward purchasing and the domestic profile). Prices are observed, volumes are modelled.",
         "years": [2024]
     },
     "costs.electricity_unit_rate": {
@@ -42,8 +67,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to its own generation cost.",
-        "issue": "Follows from the generation cost check."
+        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to the price view generation cost."
     },
     "costs.electricity_standing": {
         "group": "Costs",
@@ -84,8 +108,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "DESNZ standard bill at 3,400 kWh a year.",
-        "issue": "Follows from the generation cost check."
+        "note": "DESNZ standard bill at 3,400 kWh a year."
     },
     "costs.gas_wholesale": {
         "group": "Costs",
@@ -99,13 +122,13 @@
         },
         "model": {
             "values": {
-                "a": "i.fuel_prices.gas"
+                "a": "retail.gas.wholesale_p_kWh"
             },
             "formula": "a"
         },
-        "tolerance": 0.1,
+        "tolerance": 0.02,
         "basis": "input",
-        "note": "Ofgem cap gas wholesale allowance against the gas price paid by power producers (QEP 3.2.1), which the model uses for both.",
+        "note": "Ofgem cap gas wholesale allowance against the model's domestic gas wholesale cost: the gas price paid by power producers (QEP 3.2.1) plus the 2024 domestic adjustment.",
         "years": [2024]
     },
     "costs.gas_unit_rate": {
@@ -189,8 +212,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "Domestic electricity use times the average unit price, plus the average fixed cost for every household. Tests consumption and price together.",
-        "issue": "Follows from the generation cost check, partly offset by domestic electricity use 6% above DUKES."
+        "note": "Domestic electricity use times the average unit price, plus the average fixed cost for every household. Tests consumption and price together."
     },
     "costs.electricity_spend_ons": {
         "group": "Costs",
@@ -210,7 +232,8 @@
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "ONS consumer expenditure. It is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree."
+        "note": "ONS consumer expenditure.",
+        "issue": "ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data)."
     },
     "costs.gas_spend": {
         "group": "Costs",
@@ -234,7 +257,7 @@
         "tolerance": 0.05,
         "basis": "independent",
         "note": "Domestic gas use times the average unit price, plus the fixed cost for every domestic gas meter in Great Britain.",
-        "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check) and the gas unit rate is 7% low."
+        "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check)."
     },
     "costs.gas_spend_ons": {
         "group": "Costs",
@@ -254,7 +277,8 @@
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "ONS consumer expenditure. It is about 25% below DUKES use at QEP prices for 2024."
+        "note": "ONS consumer expenditure.",
+        "issue": "ONS spend is about 25% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data)."
     },
     "costs.vehicle_fuel_spend": {
         "group": "Costs",

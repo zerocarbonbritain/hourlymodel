@@ -274,6 +274,11 @@ function load_page(page)
             model_ui();
             app.validation_tick++;
           },
+          // An emptied price box goes back to null, which uses the resource cost
+          price_view_change: function (key) {
+            if (i.price_view.price_gbp_MWh[key] === "") i.price_view.price_gbp_MWh[key] = null;
+            this.update_non_hourly();
+          },
           simulate: function () {
             model.run();
             model_view();

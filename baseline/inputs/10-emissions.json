@@ -549,5 +549,16 @@
         "formula": "f",
         "round": 5,
         "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Marine gas oil, for international shipping. Marine fuel oil is 0.259."
+    },
+    "co2_factors.blast_furnace": {
+        "type": "statistic",
+        "units": "kgCO2/kWh",
+        "values": {
+            "co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "Included in UK territorial total": "Yes", "Territorial Emissions Statistics category": "Iron and steel production", "GHG grouped": "CO2", "Fuel": ["Coal", "Other solid fuels", "Other gases"]}},
+            "fuel": {"ref": "industry.blast_furnace_coal_TWhy"}
+        },
+        "formula": "co2 / fuel",
+        "round": 4,
+        "note": "Inventory CO2 from coal, solid fuels and blast furnace and coke oven gases burned in iron and steel production, over the blast furnace fuel. DUKES nets the gases produced off the coke used, so a coal factor would understate the CO2. Sinter, process and coke production emissions are already emissions_balance inputs."
     }
 }

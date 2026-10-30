@@ -1,0 +1,701 @@
+{
+    "_prices.support_offshore": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "roc22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F27:F27",
+                "expect": {
+                    "B27": "SY22 (2023-24)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "roc23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F28:F28",
+                "expect": {
+                    "B28": "SY23 (2024-25)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "r0_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "I79:I79",
+                "expect": {
+                    "I63": "ROCs issued\nOffshore wind",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r0_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "I80:I80",
+                "expect": {
+                    "I63": "ROCs issued\nOffshore wind",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "cfd0": {
+                "value": 1887096579,
+                "cite": "Low Carbon Contracts Company, Actual CfD generation and avoided GHG emissions (dp.lowcarboncontracts.uk dataset 8e8ca0d5-c774-4dc8-a079-347f1c180c0f), sum of CFD_Payments_GBP over 2024 settlement dates for offshore wind"
+            },
+            "gen": {
+                "source": "dukes_6.2",
+                "sheet": "6.2",
+                "block": "Generation (GWh)",
+                "row": [
+                    "Offshore"
+                ],
+                "column": "{year}"
+            }
+        },
+        "formula": "(((0.25 * r0_22 + 0.75 * r0_23)) * (0.25 * roc22 + 0.75 * roc23) + cfd0) / (gen * 1000)",
+        "round": 2,
+        "note": "Offshore wind support. RO ROCs issued times the worth of a ROC to a supplier, plus CfD difference payments, over all generation of the technology. Calendar 2024 is taken as a quarter of scheme year 2023-24 plus three quarters of 2024-25."
+    },
+    "_prices.support_onshore": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "roc22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F27:F27",
+                "expect": {
+                    "B27": "SY22 (2023-24)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "roc23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F28:F28",
+                "expect": {
+                    "B28": "SY23 (2024-25)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "r0_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "K79:K79",
+                "expect": {
+                    "K63": "ROCs issued\nOnshore wind",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r0_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "K80:K80",
+                "expect": {
+                    "K63": "ROCs issued\nOnshore wind",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "cfd0": {
+                "value": 73664523,
+                "cite": "Low Carbon Contracts Company, Actual CfD generation and avoided GHG emissions (dp.lowcarboncontracts.uk dataset 8e8ca0d5-c774-4dc8-a079-347f1c180c0f), sum of CFD_Payments_GBP over 2024 settlement dates for onshore wind"
+            },
+            "gen": {
+                "source": "dukes_6.2",
+                "sheet": "6.2",
+                "block": "Generation (GWh)",
+                "row": [
+                    "Onshore"
+                ],
+                "column": "{year}"
+            }
+        },
+        "formula": "(((0.25 * r0_22 + 0.75 * r0_23)) * (0.25 * roc22 + 0.75 * roc23) + cfd0) / (gen * 1000)",
+        "round": 2,
+        "note": "Onshore wind support. RO ROCs issued times the worth of a ROC to a supplier, plus CfD difference payments, over all generation of the technology. Calendar 2024 is taken as a quarter of scheme year 2023-24 plus three quarters of 2024-25."
+    },
+    "_prices.support_solar": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "roc22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F27:F27",
+                "expect": {
+                    "B27": "SY22 (2023-24)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "roc23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F28:F28",
+                "expect": {
+                    "B28": "SY23 (2024-25)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "r0_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "O79:O79",
+                "expect": {
+                    "O63": "ROCs issued\nSolar PV",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r0_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "O80:O80",
+                "expect": {
+                    "O63": "ROCs issued\nSolar PV",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "cfd0": {
+                "value": 1107064,
+                "cite": "Low Carbon Contracts Company, Actual CfD generation and avoided GHG emissions (dp.lowcarboncontracts.uk dataset 8e8ca0d5-c774-4dc8-a079-347f1c180c0f), sum of CFD_Payments_GBP over 2024 settlement dates for solar PV"
+            },
+            "gen": {
+                "source": "dukes_6.2",
+                "sheet": "6.2",
+                "block": "Generation (GWh)",
+                "row": [
+                    "Solar photovoltaics"
+                ],
+                "column": "{year}"
+            }
+        },
+        "formula": "(((0.25 * r0_22 + 0.75 * r0_23)) * (0.25 * roc22 + 0.75 * roc23) + cfd0) / (gen * 1000)",
+        "round": 2,
+        "note": "Solar support, excluding Feed-in Tariffs, which are not split by technology. RO ROCs issued times the worth of a ROC to a supplier, plus CfD difference payments, over all generation of the technology. Calendar 2024 is taken as a quarter of scheme year 2023-24 plus three quarters of 2024-25."
+    },
+    "_prices.support_hydro": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "roc22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F27:F27",
+                "expect": {
+                    "B27": "SY22 (2023-24)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "roc23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F28:F28",
+                "expect": {
+                    "B28": "SY23 (2024-25)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "r0_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "E79:E79",
+                "expect": {
+                    "E63": "ROCs issued\nHydro",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r0_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "E80:E80",
+                "expect": {
+                    "E63": "ROCs issued\nHydro",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "gen": {
+                "source": "dukes_6.2",
+                "sheet": "6.2",
+                "block": "Generation (GWh)",
+                "row": [
+                    "Hydro"
+                ],
+                "column": "{year}"
+            }
+        },
+        "formula": "(((0.25 * r0_22 + 0.75 * r0_23)) * (0.25 * roc22 + 0.75 * roc23) + 0) / (gen * 1000)",
+        "round": 2,
+        "note": "Hydro support. RO ROCs issued times the worth of a ROC to a supplier, plus CfD difference payments, over all generation of the technology. Calendar 2024 is taken as a quarter of scheme year 2023-24 plus three quarters of 2024-25."
+    },
+    "_prices.support_biomass": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "roc22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F27:F27",
+                "expect": {
+                    "B27": "SY22 (2023-24)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "roc23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 5.11",
+                "range": "F28:F28",
+                "expect": {
+                    "B28": "SY23 (2024-25)",
+                    "F13": "Worth of a ROC to a supplier"
+                }
+            },
+            "r0_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "C79:C79",
+                "expect": {
+                    "C63": "ROCs issued\nFuelled",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r0_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "C80:C80",
+                "expect": {
+                    "C63": "ROCs issued\nFuelled",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "r1_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "G79:G79",
+                "expect": {
+                    "G63": "ROCs issued\nLandfill gas",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r1_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "G80:G80",
+                "expect": {
+                    "G63": "ROCs issued\nLandfill gas",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "r2_22": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "M79:M79",
+                "expect": {
+                    "M63": "ROCs issued\nSewage gas",
+                    "B79": "SY22 (2023-24)"
+                }
+            },
+            "r2_23": {
+                "source": "ofgem_ro",
+                "sheet": "Figure 3.6 (a-i)",
+                "range": "M80:M80",
+                "expect": {
+                    "M63": "ROCs issued\nSewage gas",
+                    "B80": "SY23 (2024-25)"
+                }
+            },
+            "cfd0": {
+                "value": 308198207,
+                "cite": "Low Carbon Contracts Company, Actual CfD generation and avoided GHG emissions (dp.lowcarboncontracts.uk dataset 8e8ca0d5-c774-4dc8-a079-347f1c180c0f), sum of CFD_Payments_GBP over 2024 settlement dates for biomass conversion"
+            },
+            "cfd1": {
+                "value": 87285608,
+                "cite": "Low Carbon Contracts Company, Actual CfD generation and avoided GHG emissions (dp.lowcarboncontracts.uk dataset 8e8ca0d5-c774-4dc8-a079-347f1c180c0f), sum of CFD_Payments_GBP over 2024 settlement dates for dedicated biomass"
+            },
+            "gen": {
+                "source": "dukes_5.6",
+                "sheet": "5.6 Annual summaries",
+                "block": "Table 5.6.J {year} summary",
+                "row": [
+                    "All generating companies",
+                    "Generation"
+                ],
+                "column": "Bioenergy (thermal) [note 2]"
+            }
+        },
+        "formula": "(((0.25 * r0_22 + 0.75 * r0_23) + (0.25 * r1_22 + 0.75 * r1_23) + (0.25 * r2_22 + 0.75 * r2_23)) * (0.25 * roc22 + 0.75 * roc23) + cfd0 + cfd1) / (gen * 1000)",
+        "round": 2,
+        "note": "Bioenergy support: RO fuelled, landfill gas and sewage gas, and CfD biomass conversion and dedicated biomass. RO ROCs issued times the worth of a ROC to a supplier, plus CfD difference payments, over all generation of the technology. Calendar 2024 is taken as a quarter of scheme year 2023-24 plus three quarters of 2024-25."
+    },
+    "_prices.support_other_thermal": {
+        "type": "intermediate",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "cfd": {
+                "value": 2876436,
+                "cite": "Low Carbon Contracts Company, Actual CfD generation and avoided GHG emissions (dp.lowcarboncontracts.uk dataset 8e8ca0d5-c774-4dc8-a079-347f1c180c0f), sum of CFD_Payments_GBP over 2024 settlement dates for energy from waste"
+            },
+            "gen": {
+                "source": "dukes_5.6",
+                "sheet": "5.6 Annual summaries",
+                "block": "Table 5.6.J {year} summary",
+                "row": [
+                    "All generating companies",
+                    "Generation"
+                ],
+                "column": "Other (thermal) [note 3]"
+            }
+        },
+        "formula": "cfd / (gen * 1000)",
+        "round": 2,
+        "note": "Energy from waste CfD payments over other thermal generation."
+    },
+    "price_view.price_gbp_MWh.offshore_wind": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 66.15,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for wind (transmission connected)"
+            },
+            "support": {
+                "ref": "_prices.support_offshore"
+            }
+        },
+        "formula": "capture + support",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
+    },
+    "price_view.price_gbp_MWh.onshore_wind": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 66.15,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for wind (transmission connected)"
+            },
+            "support": {
+                "ref": "_prices.support_onshore"
+            }
+        },
+        "formula": "capture + support",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. Embedded wind captured £63.99/MWh, so this is slightly high for onshore wind."
+    },
+    "price_view.price_gbp_MWh.solar": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 65.02,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by NESO estimated embedded solar generation (demanddata_2024)"
+            },
+            "support": {
+                "ref": "_prices.support_solar"
+            }
+        },
+        "formula": "capture + support",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
+    },
+    "price_view.price_gbp_MWh.hydro": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 76.99,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for hydro"
+            },
+            "support": {
+                "ref": "_prices.support_hydro"
+            }
+        },
+        "formula": "capture + support",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
+    },
+    "price_view.price_gbp_MWh.nuclear": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 71.86,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for nuclear"
+            }
+        },
+        "formula": "capture",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. Existing nuclear has no support contract."
+    },
+    "price_view.price_gbp_MWh.gas": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 85.04,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT"
+            }
+        },
+        "formula": "capture",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. Fuel and carbon are paid from this revenue."
+    },
+    "price_view.price_gbp_MWh.biomass": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 77.42,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for biomass"
+            },
+            "support": {
+                "ref": "_prices.support_biomass"
+            }
+        },
+        "formula": "capture + support",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
+    },
+    "price_view.price_gbp_MWh.coal_other": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 85.04,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT, as a proxy for coal and waste plant"
+            },
+            "support": {
+                "ref": "_prices.support_other_thermal"
+            }
+        },
+        "formula": "capture + support",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
+    },
+    "price_view.price_gbp_MWh.oil": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 114.48,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for OCGT"
+            }
+        },
+        "formula": "capture",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. "
+    },
+    "price_view.price_gbp_MWh.imports": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 76.19,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by NESO national demand (demanddata_2024), as a proxy for import flows"
+            }
+        },
+        "formula": "capture",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. The demand weighted price is used because imports flow when GB prices are high."
+    },
+    "price_view.price_gbp_MWh.tidal": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "value": null,
+        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+    },
+    "price_view.price_gbp_MWh.wave": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "value": null,
+        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+    },
+    "price_view.price_gbp_MWh.geothermal": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "value": null,
+        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+    },
+    "price_view.price_gbp_MWh.hydrogen": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "value": null,
+        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+    },
+    "price_view.price_gbp_MWh.storage": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "value": null,
+        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+    },
+    "price_view.other_support_gbp_bn": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£bn/yr",
+        "values": {
+            "fit22": {
+                "source": "ofgem_fit",
+                "sheet": "Fig 3.8",
+                "range": "C39:C39",
+                "expect": {
+                    "B39": "SY14\n(2023-2024)",
+                    "C35": "Annual levelisation fund"
+                }
+            },
+            "fit23": {
+                "source": "ofgem_fit",
+                "sheet": "Fig 3.8",
+                "range": "C40:C40",
+                "expect": {
+                    "B40": "SY15\n(2024-2025)",
+                    "C35": "Annual levelisation fund"
+                }
+            },
+            "cm23": {
+                "value": 1248021982.66,
+                "cite": "EMR Settlement, Key figures for payments 2023-24, table 5 total annual capacity payments, final reconciliation (https://www.emrsettlement.co.uk/document/settlement-data/key-figures-for-payments-2023-24/)"
+            },
+            "cm24": {
+                "value": 1258936499.07,
+                "cite": "EMR Settlement, Key figures for payments 2024-25, table 5 total annual capacity payments, final reconciliation (https://www.emrsettlement.co.uk/document/settlement-data/key-figures-for-payments-2024-25/)"
+            }
+        },
+        "formula": "(0.25 * fit22 + 0.75 * fit23) / 1000 + (0.75 * cm23 + 0.25 * cm24) / 1e9",
+        "round": 3,
+        "note": "Feed-in Tariff levelisation (£m, scheme years April to March) and capacity market payments (delivery years October to September), weighted to calendar 2024. Neither is split by technology."
+    },
+    "retail.electricity.wholesale_adjustment_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "df": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "T31:W31",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "B10": "Electricity: Single-Rate Metering Arrangement",
+                    "B31": "DF",
+                    "T30": "Jan 2024 - Mar 2024",
+                    "W30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "spot": {
+                "value": 76.19,
+                "cite": "NESO national demand weighted mean of the LCCC GB day ahead hourly price, 2024"
+            },
+            "grid": {
+                "ref": "energy_industry_use.electricity_grid_loss_prc"
+            },
+            "own": {
+                "ref": "energy_industry_use.electricity_own_use_prc"
+            }
+        },
+        "formula": "df / 3100 * 100 - spot / 10 / (1 - (grid + own) / 100)",
+        "round": 3,
+        "note": "Domestic wholesale cost above the demand weighted spot price grossed up for losses: the 2024 caps passed through power bought forward in 2023, and the domestic profile is peakier than average demand. Specific to the year, 0 in scenarios."
+    },
+    "retail.generation_basis": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "units": "",
+        "value": "price",
+        "note": "The retail unit rate starts from the price view, which reproduces what consumers paid, rather than the resource cost."
+    },
+    "retail.gas.wholesale_adjustment_p_kWh": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "p/kWh",
+        "values": {
+            "df": {
+                "source": "ofgem_cap",
+                "sheet": "1b Historical level tables",
+                "range": "CD31:CG31",
+                "expect": {
+                    "B8": "Other Payment Method",
+                    "BL10": "Gas",
+                    "BL31": "DF",
+                    "CD30": "Jan 2024 - Mar 2024",
+                    "CG30": "Oct 2024 - Dec 2024"
+                }
+            },
+            "mpp": {
+                "ref": "fuel_prices.gas"
+            }
+        },
+        "formula": "df / 12000 * 100 - mpp",
+        "round": 3,
+        "note": "Ofgem cap domestic wholesale gas cost above the gas price paid by power producers (QEP 3.2.1): forward purchasing, the domestic demand profile and shrinkage. Specific to the year, 0 in scenarios."
+    }
+}

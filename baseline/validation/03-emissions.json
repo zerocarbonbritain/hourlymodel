@@ -18,8 +18,7 @@
         },
         "tolerance": 0.03,
         "basis": "independent",
-        "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink.",
-        "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry)."
+        "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink."
     },
     "emissions.fuel_co2": {
         "group": "Emissions",
@@ -27,7 +26,7 @@
         "units": "MtCO2",
         "observed": {
             "values": {
-                "fuel": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": ["Gaseous fuels", "Petroleum", "Coal", "Other solid fuels"]}},
+                "fuel": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": ["Gaseous fuels", "Petroleum", "Coal", "Other solid fuels"]}, "where_not": {"Territorial Emissions Statistics category": ["Sinter production", "Iron and steel production processes", "Iron and steel - coke production"]}},
                 "waste": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": "Other emissions", "Territorial Emissions Statistics sector": "Electricity supply"}}
             },
             "formula": "fuel + waste"
@@ -42,8 +41,7 @@
         },
         "tolerance": 0.03,
         "basis": "independent",
-        "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup.",
-        "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry)."
+        "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup."
     },
     "emissions.gas_co2": {
         "group": "Emissions",
@@ -71,9 +69,10 @@
         "observed": {
             "values": {
                 "p": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": "Petroleum"}},
-                "lpg": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Petroleum gases"}}
+                "lpg": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Petroleum gases"}},
+                "coke": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other solid fuels", "Territorial Emissions Statistics category": "Oil refineries"}}
             },
-            "formula": "p + lpg"
+            "formula": "p + lpg + coke"
         },
         "model": {
             "values": {
@@ -83,7 +82,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "Petroleum including bunkers, plus LPG and refinery gases, which the inventory groups with gaseous fuels."
+        "note": "Petroleum including bunkers, plus LPG and refinery gases, which the inventory groups with gaseous fuels, and petroleum coke burned in refineries, which it groups with solid fuels."
     },
     "emissions.coal_co2": {
         "group": "Emissions",
@@ -91,12 +90,13 @@
         "units": "MtCO2",
         "observed": {
             "values": {
-                "coal": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Coal"}},
-                "solid": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other solid fuels"}},
-                "gases": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other gases"}},
+                "coal": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Coal"}, "where_not": {"Territorial Emissions Statistics category": ["Sinter production", "Iron and steel production processes", "Iron and steel - coke production"]}},
+                "solid": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other solid fuels"}, "where_not": {"Territorial Emissions Statistics category": ["Sinter production", "Iron and steel production processes", "Iron and steel - coke production"]}},
+                "gases": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other gases"}, "where_not": {"Territorial Emissions Statistics category": ["Sinter production", "Iron and steel production processes", "Iron and steel - coke production"]}},
+                "coke": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel": "Other solid fuels", "Territorial Emissions Statistics category": "Oil refineries"}},
                 "waste": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Fuel group": "Other emissions", "Territorial Emissions Statistics sector": "Electricity supply"}}
             },
-            "formula": "coal + solid + gases + waste"
+            "formula": "coal + solid + gases + waste - coke"
         },
         "model": {
             "values": {
@@ -106,8 +106,7 @@
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "Other gases are blast furnace and coke oven gas, made from coal.",
-        "issue": "Blast furnace and coke oven coal is not modelled, and the coal plus waste backup CO2 factor (0.254) averages coal and waste (open-items.md, Industry)."
+        "note": "Other gases are blast furnace and coke oven gas, made from coal. Petroleum coke in refineries is in the oil check, and sinter, process and coke production CO2 are inputs."
     },
     "emissions.electricity_co2": {
         "group": "Emissions",
