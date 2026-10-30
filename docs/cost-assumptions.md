@@ -1,6 +1,6 @@
 # Cost assumptions
 
-The cost model gives an annual cost for each technology and divides the total by electricity demand to give an LCOE. All costs are real 2024 prices. The inputs are in `costs`, `fuel_prices` and `carbon_price` in [scenarios/zerocarbonbritain.json](../scenarios/zerocarbonbritain.json), which other scenarios inherit.
+The cost model gives an annual cost for each technology and divides the total by electricity demand to give an LCOE. All costs are real 2024 prices. The inputs are in `costs`, `fuel_prices` and `carbon_price` in [scenarios/zcb_2024.json](../scenarios/zcb_2024.json), which other scenarios inherit.
 
 ## Method
 

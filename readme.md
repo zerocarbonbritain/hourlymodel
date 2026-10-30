@@ -2,7 +2,7 @@
 
 **An open-source javascript implementation of the 10-year hourly cross sectoral UK energy model behind the ZeroCarbonBritain scenario. This model can be used to explore a wide variety of scenarios. Try creating your own scenario that gets to zero carbon!** 
 
-The default scenario presented in the tool is the main ZeroCarbonBritain scenario as presented in the reports. The other scenario currently available is a baseline scenario reflecting current energy use and carbon emissions. Both scenarios can be used as starting points from which to explore different variants, either in terms of zero carbon end points or interim steps along the way.
+The default scenario presented in the tool is the ZeroCarbonBritain scenario applied to a 2024 baseline. The other scenario available is the 2024 baseline, reflecting current energy use and carbon emissions. The 2019 ZeroCarbonBritain scenario and older scenarios are kept in [scenarios/archive](scenarios/archive/). Both scenarios can be used as starting points from which to explore different variants, either in terms of zero carbon end points or interim steps along the way.
 
 ### [Launch online tool: http://openenergymonitor.org/zcem](http://openenergymonitor.org/zcem)
 
@@ -23,7 +23,7 @@ The default scenario presented in the tool is the main ZeroCarbonBritain scenari
 - Domestic, service and industry sectors space and water heating demand
 - Heating system technologies: Heat pumps, direct electric, boilers (H2, CH4, Biomass, Oil) 
 - Transport model based on passenger miles travelled, occupancy rates, vehicle efficiencies and drive train types. 
-- Simple industry model
+- Industry model: useful heat by end use with conversion efficiencies for electricity and fuels, scaled by industrial output and material efficiency
  
 **Storage and Synthetic fuels**
 

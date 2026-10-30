@@ -17,9 +17,11 @@ vm.runInThisContext(fs.readFileSync(dir+"model.js"));
 
 var args = process.argv.slice(2);
 var json_output = args.indexOf("--json") != -1;
-var scenario_name = args.filter(a => a != "--json")[0] || "baseline_2018";
+var scenario_name = args.filter(a => a != "--json")[0] || "baseline_2024";
 var scenario_path = scenario_name.endsWith(".json") ? scenario_name : dir+"scenarios/"+scenario_name+".json";
-var default_scenario = JSON.parse(fs.readFileSync(dir+"scenarios/zerocarbonbritain.json"));
+// Archived scenarios override the original ZeroCarbonBritain 2019 scenario
+var default_path = scenario_path.includes("archive/") ? "scenarios/archive/zerocarbonbritain.json" : "scenarios/zcb_2024.json";
+var default_scenario = JSON.parse(fs.readFileSync(dir+default_path));
 var overrides = JSON.parse(fs.readFileSync(scenario_path));
 
 function updateScenario(obj, changes) {
@@ -78,7 +80,7 @@ load_dataset("highresolution.csv.zip",function(result){
         console.log("Solar PV CF: " + (o.supply.solarpv_capacity_factor*100).toFixed(1) + "%");
         console.log("Space heating demand (TWh/yr): " + (o.space_heating.total_demand*GWh_to_TWhyr).toFixed(1));
         console.log("Water heating demand (TWh/yr): " + (o.water_heating.total_demand*GWh_to_TWhyr).toFixed(1));
-        console.log("Industry demand (TWh/yr): " + o.industry.total_demand.toFixed(1));
+        console.log("Industry final energy (TWh/yr): " + (o.industry.total_demand_check*GWh_to_TWhyr).toFixed(1));
         console.log("Total emissions (MtCO2e): " + o.emissions_balance.total.toFixed(1));
         console.log("Grid CO2 intensity (gCO2/kWh): " + o.emissions_balance.grid_co2_intensity.toFixed(1));
     });

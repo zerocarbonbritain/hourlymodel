@@ -9,6 +9,12 @@ Items found while building baselines that need further attention. Remove an item
 - **Baseline LCOE values the existing fleet at 2024 new-build costs** (see [docs/cost-assumptions.md](../docs/cost-assumptions.md)). Existing nuclear is costed at Sizewell C prices. Imports, hydro and biomass plant capital are not costed.
 - **Biofuel supply is flat.** It feeds the liquid fuel store, so the profile has little effect.
 
+## Industry
+
+- **High temperature process coal is mostly a reductant.** Coke and coal in blast furnaces cannot be replaced by heat. Steel, cement, ammonia and glass need material based sub models.
+- **Drying fuel efficiency (65%) has no source.** The electric to fuel ratios come from JRC-IDEES 2021, which is EU data. The sources quote net calorific values and ECUK is gross.
+- **Industry demand is flat.** Heat end uses use the flat high temperature profile and demand side response switches fuel instantly, with no heater capacity or thermal storage.
+
 ## Inputs
 
 - **DUKES 6.1 commercial ambient heat** (12.0 TWh) includes reversible air conditioning, which inflates the heat pump share.

@@ -1,6 +1,6 @@
 # Baseline build
 
-Scripted derivation of baseline scenario inputs from published statistics. It covers steps 1 to 10 of [updating-the-baseline.md](../docs/updating-the-baseline.md), one input file per step, and generates every input in `scenarios/baseline_2024.json` and `scenarios/baseline_2018.json` from the same files. Known issues are tracked in [open-items.md](open-items.md).
+Scripted derivation of baseline scenario inputs from published statistics. It covers steps 1 to 10 of [updating-the-baseline.md](../docs/updating-the-baseline.md), one input file per step, and generates every input in `scenarios/baseline_2024.json` and the archived `scenarios/archive/baseline_2018.json` from the same files. Known issues are tracked in [open-items.md](open-items.md).
 
 ## Files
 
@@ -70,7 +70,7 @@ The build stops if no rows match, unless the locator has `"allow_empty": true`, 
 
 ## Coverage
 
-The report ends with two lists: values set in the scenario that the build does not generate, and values the scenario inherits from `scenarios/zerocarbonbritain.json`. Inherited values should be things a baseline does not use, such as costs or settings for processes with zero capacity. Anything else should get an entry, even if it is an `assumption` with the default value, so a change to the ZCB scenario cannot change the baseline.
+The report ends with two lists: values set in the scenario that the build does not generate, and values the scenario inherits from the default scenario, `scenarios/zcb_2024.json`. Inherited values should be things a baseline does not use, such as costs or settings for processes with zero capacity. Anything else should get an entry, even if it is an `assumption` with the default value, so a change to the ZCB scenario cannot change the baseline.
 
 ## New edition
 

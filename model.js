@@ -545,18 +545,31 @@ var model = {
     industry: function() {
     
         o.industry = {}
-        
+
+        // Industrial output relative to the baseline year, less the savings from material efficiency
+        // (fewer tonnes) and energy efficiency (heat recovery and process improvements other than fuel
+        // switching). All three apply to every end use.
+        let demand_scale = i.industry.activity_prc * 0.01
+        demand_scale *= 1 - i.industry.material_efficiency_prc * 0.01
+        demand_scale *= 1 - i.industry.energy_efficiency_prc * 0.01
+
+        // Heat end uses are entered as useful heat. Fuel use is useful heat divided by the
+        // conversion efficiency of the electric or combustion plant. Other end uses are final energy.
+        let heat_end_uses = ["high_temp_process", "low_temp_process", "dry_sep", "other_heat"]
+        let electric_end_uses = ["motors", "compressed_air", "lighting", "refrigeration", "refinery_electric"]
+        let mixed_end_uses = heat_end_uses.concat(["other_non_heat"])
+
+        let elec_efficiency = {other_non_heat: 1}
+        let fuel_efficiency = {other_non_heat: 1}
+        for (let z of heat_end_uses) {
+            elec_efficiency[z] = i.industry[z+"_elec_efficiency"] * 0.01
+            fuel_efficiency[z] = i.industry[z+"_fuel_efficiency"] * 0.01
+        }
+
         o.industry.total_demand = 0
-        o.industry.total_demand += i.industry.high_temp_process_TWhy
-        o.industry.total_demand += i.industry.low_temp_process_TWhy
-        o.industry.total_demand += i.industry.dry_sep_TWhy
-        o.industry.total_demand += i.industry.other_heat_TWhy
-        o.industry.total_demand += i.industry.motors_TWhy
-        o.industry.total_demand += i.industry.compressed_air_TWhy
-        o.industry.total_demand += i.industry.lighting_TWhy
-        o.industry.total_demand += i.industry.refrigeration_TWhy
-        o.industry.total_demand += i.industry.refinery_electric_TWhy
-        o.industry.total_demand += i.industry.other_non_heat_TWhy
+        for (let z of mixed_end_uses.concat(electric_end_uses)) {
+            o.industry.total_demand += i.industry[z+"_TWhy"] * demand_scale
+        }
   
         d.industrial_elec_demand = []
         d.methane_for_industry = []
@@ -573,51 +586,42 @@ var model = {
         var conv_hourly = 1000 / (365.25*24)
         
         var hourly_fixed_elec_demand = 0;
-        hourly_fixed_elec_demand += i.industry.high_temp_process_TWhy * conv_hourly * i.industry.high_temp_process_fixed_elec_prc * 0.01
-        hourly_fixed_elec_demand += i.industry.low_temp_process_TWhy * conv_hourly * i.industry.low_temp_process_fixed_elec_prc * 0.01
-        hourly_fixed_elec_demand += i.industry.dry_sep_TWhy * conv_hourly * i.industry.dry_sep_fixed_elec_prc * 0.01            
-        hourly_fixed_elec_demand += i.industry.other_heat_TWhy * conv_hourly * i.industry.other_heat_fixed_elec_prc * 0.01  
-        hourly_fixed_elec_demand += i.industry.motors_TWhy * conv_hourly
-        hourly_fixed_elec_demand += i.industry.compressed_air_TWhy * conv_hourly
-        hourly_fixed_elec_demand += i.industry.lighting_TWhy * conv_hourly
-        hourly_fixed_elec_demand += i.industry.refrigeration_TWhy * conv_hourly
-        hourly_fixed_elec_demand += i.industry.refinery_electric_TWhy * conv_hourly
-        hourly_fixed_elec_demand += i.industry.other_non_heat_TWhy * conv_hourly * i.industry.other_non_heat_fixed_elec_prc * 0.01  
-
         var hourly_fixed_CH4_demand = 0;
-        hourly_fixed_CH4_demand += i.industry.high_temp_process_TWhy * conv_hourly * i.industry.high_temp_process_fixed_CH4_prc * 0.01
-        hourly_fixed_CH4_demand += i.industry.low_temp_process_TWhy * conv_hourly * i.industry.low_temp_process_fixed_CH4_prc * 0.01
-        hourly_fixed_CH4_demand += i.industry.dry_sep_TWhy * conv_hourly * i.industry.dry_sep_fixed_CH4_prc * 0.01            
-        hourly_fixed_CH4_demand += i.industry.other_heat_TWhy * conv_hourly * i.industry.other_heat_fixed_CH4_prc * 0.01  
-        hourly_fixed_CH4_demand += i.industry.other_non_heat_TWhy * conv_hourly * i.industry.other_non_heat_fixed_CH4_prc * 0.01  
-
         var hourly_fixed_H2_demand = 0;
-        hourly_fixed_H2_demand += i.industry.high_temp_process_TWhy * conv_hourly * i.industry.high_temp_process_fixed_H2_prc * 0.01
-        hourly_fixed_H2_demand += i.industry.low_temp_process_TWhy * conv_hourly * i.industry.low_temp_process_fixed_H2_prc * 0.01
-        hourly_fixed_H2_demand += i.industry.dry_sep_TWhy * conv_hourly * i.industry.dry_sep_fixed_H2_prc * 0.01            
-        hourly_fixed_H2_demand += i.industry.other_heat_TWhy * conv_hourly * i.industry.other_heat_fixed_H2_prc * 0.01  
-        hourly_fixed_H2_demand += i.industry.other_non_heat_TWhy * conv_hourly * i.industry.other_non_heat_fixed_H2_prc * 0.01  
-        
-        o.industry.total_synth_fuel_demand += i.industry.high_temp_process_TWhy * i.industry.high_temp_process_fixed_liquid_prc * 0.01
-        o.industry.total_synth_fuel_demand += i.industry.low_temp_process_TWhy * i.industry.low_temp_process_fixed_liquid_prc * 0.01
-        o.industry.total_synth_fuel_demand += i.industry.dry_sep_TWhy * i.industry.dry_sep_fixed_liquid_prc * 0.01            
-        o.industry.total_synth_fuel_demand += i.industry.other_heat_TWhy * i.industry.other_heat_fixed_liquid_prc * 0.01  
-        o.industry.total_synth_fuel_demand += i.industry.other_non_heat_TWhy * i.industry.other_non_heat_fixed_liquid_prc * 0.01  
-        o.industry.total_synth_fuel_demand *= 10000
 
-        o.industry.total_coal_demand += i.industry.high_temp_process_TWhy * i.industry.high_temp_process_fixed_coal_prc * 0.01
-        o.industry.total_coal_demand += i.industry.low_temp_process_TWhy * i.industry.low_temp_process_fixed_coal_prc * 0.01
-        o.industry.total_coal_demand += i.industry.dry_sep_TWhy * i.industry.dry_sep_fixed_coal_prc * 0.01            
-        o.industry.total_coal_demand += i.industry.other_heat_TWhy * i.industry.other_heat_fixed_coal_prc * 0.01  
-        o.industry.total_coal_demand += i.industry.other_non_heat_TWhy * i.industry.other_non_heat_fixed_coal_prc * 0.01     
+        for (let z of electric_end_uses) {
+            hourly_fixed_elec_demand += i.industry[z+"_TWhy"] * demand_scale * conv_hourly
+        }
+
+        for (let z of mixed_end_uses) {
+            let demand = i.industry[z+"_TWhy"] * demand_scale
+            hourly_fixed_elec_demand += demand * conv_hourly * i.industry[z+"_fixed_elec_prc"] * 0.01 / elec_efficiency[z]
+            hourly_fixed_CH4_demand += demand * conv_hourly * i.industry[z+"_fixed_CH4_prc"] * 0.01 / fuel_efficiency[z]
+            hourly_fixed_H2_demand += demand * conv_hourly * i.industry[z+"_fixed_H2_prc"] * 0.01 / fuel_efficiency[z]
+            o.industry.total_synth_fuel_demand += demand * i.industry[z+"_fixed_liquid_prc"] * 0.01 / fuel_efficiency[z]
+            o.industry.total_coal_demand += demand * i.industry[z+"_fixed_coal_prc"] * 0.01 / fuel_efficiency[z]
+            o.industry.total_biomass_demand += demand * i.industry[z+"_fixed_biomass_prc"] * 0.01 / fuel_efficiency[z]
+        }
+        o.industry.total_synth_fuel_demand *= 10000
         o.industry.total_coal_demand *= 10000 
-        
-        o.industry.total_biomass_demand += i.industry.high_temp_process_TWhy * i.industry.high_temp_process_fixed_biomass_prc * 0.01
-        o.industry.total_biomass_demand += i.industry.low_temp_process_TWhy * i.industry.low_temp_process_fixed_biomass_prc * 0.01
-        o.industry.total_biomass_demand += i.industry.dry_sep_TWhy * i.industry.dry_sep_fixed_biomass_prc * 0.01            
-        o.industry.total_biomass_demand += i.industry.other_heat_TWhy * i.industry.other_heat_fixed_biomass_prc * 0.01  
-        o.industry.total_biomass_demand += i.industry.other_non_heat_TWhy * i.industry.other_non_heat_fixed_biomass_prc * 0.01     
         o.industry.total_biomass_demand *= 10000    
+
+        // DSR heat demand (GW of useful heat) and the electricity needed to meet all of it
+        let DSR_CH4_heat = 0
+        let DSR_H2_heat = 0
+        let DSR_elec_full = 0
+        let DSR_CH4_fuel_full = 0
+        let DSR_H2_fuel_full = 0
+        for (let z of heat_end_uses) {
+            let heat = i.industry[z+"_TWhy"] * demand_scale * conv_hourly
+            let CH4_heat = heat * i.industry[z+"_DSR_CH4_prc"] * 0.01
+            let H2_heat = heat * i.industry[z+"_DSR_H2_prc"] * 0.01
+            DSR_CH4_heat += CH4_heat
+            DSR_H2_heat += H2_heat
+            DSR_elec_full += (CH4_heat + H2_heat) / elec_efficiency[z]
+            DSR_CH4_fuel_full += CH4_heat / fuel_efficiency[z]
+            DSR_H2_fuel_full += H2_heat / fuel_efficiency[z]
+        }
         
         for (var hour = 0; hour < i.hours; hour++)
         {
@@ -631,38 +635,22 @@ var model = {
             
             // Here we implement a mixed fixed elec/gas heat supply and an extended DSR elec/gas supply
             // The DSR supply uses electricity when there is excess renewable supply available and gas 
-            // originally produced from excess renewable supply when direct supply is not sufficient
+            // originally produced from excess renewable supply when direct supply is not sufficient.
+            // Every DSR end use takes the same fraction of its heat from electricity, so methane and
+            // hydrogen backed DSR share the available electricity.
         
-            let DSR_CH4_GW = 0;
-            DSR_CH4_GW += i.industry.high_temp_process_TWhy * conv_hourly * i.industry.high_temp_process_DSR_CH4_prc * 0.01
-            DSR_CH4_GW += i.industry.low_temp_process_TWhy * conv_hourly * i.industry.low_temp_process_DSR_CH4_prc * 0.01
-            DSR_CH4_GW += i.industry.dry_sep_TWhy * conv_hourly * i.industry.dry_sep_DSR_CH4_prc * 0.01
-            DSR_CH4_GW += i.industry.other_heat_TWhy * conv_hourly * i.industry.other_heat_DSR_CH4_prc * 0.01
-                 
-            let DSR_CH4_elec = DSR_CH4_GW                                   // 1. provide all heat demand with direct elec resistance heaters
-            if (DSR_CH4_elec>balance) DSR_CH4_elec = balance                // 2. limited to available electricity balance
-            if (DSR_CH4_elec<0) DSR_CH4_elec = 0                            // 3. -- should never happen --
-            let DSR_CH4_gas = DSR_CH4_GW - DSR_CH4_elec                     // 4. if there is not enough elec to meet demand, use gas
-
-            // ----------------------------------------------------------------------------------------------------------------------
-            
-            let DSR_H2_GW = 0;
-            DSR_H2_GW += i.industry.high_temp_process_TWhy * conv_hourly * i.industry.high_temp_process_DSR_H2_prc * 0.01
-            DSR_H2_GW += i.industry.low_temp_process_TWhy * conv_hourly * i.industry.low_temp_process_DSR_H2_prc * 0.01
-            DSR_H2_GW += i.industry.dry_sep_TWhy * conv_hourly * i.industry.dry_sep_DSR_H2_prc * 0.01
-            DSR_H2_GW += i.industry.other_heat_TWhy * conv_hourly * i.industry.other_heat_DSR_H2_prc * 0.01
-                     
-            let DSR_H2_elec = DSR_H2_GW                                     // 1. provide all heat demand with direct elec resistance heaters
-            if (DSR_H2_elec>balance) DSR_H2_elec = balance                  // 2. limited to available electricity balance
-            if (DSR_H2_elec<0) DSR_H2_elec = 0                              // 3. -- should never happen --
-            let DSR_H2_gas = DSR_H2_GW - DSR_H2_elec                        // 4. if there is not enough elec to meet demand, use gas 
+            let DSR_elec = DSR_elec_full                                    // 1. provide all DSR heat demand with electricity
+            if (DSR_elec>balance) DSR_elec = balance                        // 2. limited to available electricity balance
+            if (DSR_elec<0) DSR_elec = 0                                    // 3. -- should never happen --
+            let elec_fraction = DSR_elec_full>0 ? DSR_elec / DSR_elec_full : 0
+            let DSR_CH4_gas = DSR_CH4_fuel_full * (1 - elec_fraction)        // 4. if there is not enough elec to meet demand, use gas
+            let DSR_H2_gas = DSR_H2_fuel_full * (1 - elec_fraction)
             
             // ----------------------------------------------------------------------------------------------------------------------
             
             var industrial_elec_demand = 0;
             industrial_elec_demand += hourly_fixed_elec_demand
-            industrial_elec_demand += DSR_CH4_elec
-            industrial_elec_demand += DSR_H2_elec
+            industrial_elec_demand += DSR_elec
             d.industrial_elec_demand.push(industrial_elec_demand)
             o.industry.total_elec_demand += industrial_elec_demand
  
@@ -684,6 +672,7 @@ var model = {
             d.balance_before_BEV_storage.push(d.elec_supply_hourly[hour] - d.lac_demand[hour] - d.spacewater_elec[hour] - d.industrial_elec_demand[hour])   
         }
         
+        // Final energy
         o.industry.total_demand_check = 0;
         o.industry.total_demand_check += o.industry.total_elec_demand
         o.industry.total_demand_check += o.industry.total_methane_demand

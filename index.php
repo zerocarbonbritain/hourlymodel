@@ -125,7 +125,7 @@ function normalise_profile(profile) {
 var v = <?php echo $v; ?>;
 
 // Load default scenario
-$.ajax({url: "scenarios/zerocarbonbritain.json?v="+v, async: false, success: function(data){ i = data }});
+$.ajax({url: "scenarios/zcb_2024.json?v="+v, async: false, success: function(data){ i = data }});
 var default_scenario = JSON.parse(JSON.stringify(i));
 
 var sidenav_visible = true;
@@ -211,7 +211,7 @@ function load_page(page)
         data: {
             i: i,
             o: o,
-            selected_scenario: "zerocarbonbritain",
+            selected_scenario: "zcb_2024",
             scenario_list: {},
             live_edit: true
         },
@@ -457,7 +457,7 @@ function load_scenario(name) {
   console.log("Scenario changed to: " + name);
 
   // Load scenario data
-  if (name=='zerocarbonbritain') {
+  if (name=='zcb_2024') {
       i = Object.assign(i,JSON.parse(JSON.stringify(default_scenario)))       
   } else {
     $.ajax({url: "scenarios/"+name+".json?v="+v, async: false, success: function(data){

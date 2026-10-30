@@ -1,43 +1,106 @@
 {
+    "industry.high_temp_process_fuel_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 60,
+        "note": "Furnaces and kilns. Agora Industry (2024) table 14 gives 30 to 80% furnace efficiency. The value only sets the level of useful heat; baseline fuel use is unchanged."
+    },
+    "industry.high_temp_process_elec_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 75,
+        "note": "Electric furnaces need about 80% of the final energy of fuel fired furnaces for the same output: JRC-IDEES 2021 useful to final energy ratios for glass melting, foundries, heat treatment and ceramic kilns. 60 / 0.8 = 75."
+    },
+    "industry.low_temp_process_fuel_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 80,
+        "note": "Steam and hot water boilers including distribution losses. Agora Industry (2024) table 14 gives 89 to 97% net for the boiler alone; ECUK is on a gross basis."
+    },
+    "industry.low_temp_process_elec_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Existing electric low temperature heat is mostly resistive. JRC-IDEES 2021 rates electric heat at about 1.25 times fuel in the same process. 80 x 1.25 = 100."
+    },
+    "industry.dry_sep_fuel_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 65,
+        "note": "Fuel fired dryers. No device level source found, so this is an estimate. The value only sets the level of useful heat; baseline fuel use is unchanged."
+    },
+    "industry.dry_sep_elec_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 83,
+        "note": "Electric drying needs about 78% of the final energy of fuel fired drying: JRC-IDEES 2021 useful to final energy ratios for food, wood and other drying. 65 / 0.78 = 83."
+    },
+    "industry.other_heat_fuel_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 80,
+        "note": "Heat sold and bioenergy boilers. Taken as equal to low temperature process heat."
+    },
+    "industry.other_heat_elec_efficiency": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Taken as equal to low temperature process heat."
+    },
     "industry.high_temp_process_TWhy": {
         "type": "statistic",
         "units": "TWh/yr",
         "values": {
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - electricity"},
+            "fe": {"ref": "industry.high_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.high_temp_process_elec_efficiency"}
         },
-        "formula": "total * 0.01163",
+        "formula": "(elec * ee + (total - elec) * fe) / 100 * 0.01163",
         "round": 1,
-        "note": "ECUK U4 total industries, ktoe. 1 ktoe = 0.01163 TWh."
+        "note": "Useful heat. ECUK U4 total industries final energy, ktoe, times the conversion efficiency of each fuel. 1 ktoe = 0.01163 TWh."
     },
     "industry.high_temp_process_fixed_CH4_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - natural gas"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - electricity"},
+            "fe": {"ref": "industry.high_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.high_temp_process_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.high_temp_process_fixed_liquid_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - oil"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - electricity"},
+            "fe": {"ref": "industry.high_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.high_temp_process_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.high_temp_process_fixed_coal_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - solid fuel"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "High temperature process - electricity"},
+            "fe": {"ref": "industry.high_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.high_temp_process_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.high_temp_process_fixed_elec_prc": {
         "type": "statistic",
@@ -49,7 +112,7 @@
         },
         "formula": "100 - gas - oil - coal",
         "round": 1,
-        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is elec * ee / (elec * ee + (total - elec) * fe)."
     },
     "industry.high_temp_process_fixed_biomass_prc": {
         "type": "assumption",
@@ -67,41 +130,56 @@
         "type": "statistic",
         "units": "TWh/yr",
         "values": {
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - electricity"},
+            "fe": {"ref": "industry.low_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.low_temp_process_elec_efficiency"}
         },
-        "formula": "total * 0.01163",
+        "formula": "(elec * ee + (total - elec) * fe) / 100 * 0.01163",
         "round": 1,
-        "note": "ECUK U4 total industries, ktoe. 1 ktoe = 0.01163 TWh."
+        "note": "Useful heat. ECUK U4 total industries final energy, ktoe, times the conversion efficiency of each fuel. 1 ktoe = 0.01163 TWh."
     },
     "industry.low_temp_process_fixed_CH4_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - natural gas"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - electricity"},
+            "fe": {"ref": "industry.low_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.low_temp_process_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.low_temp_process_fixed_liquid_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - oil"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - electricity"},
+            "fe": {"ref": "industry.low_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.low_temp_process_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.low_temp_process_fixed_coal_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - solid fuel"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Low temperature process - electricity"},
+            "fe": {"ref": "industry.low_temp_process_fuel_efficiency"},
+            "ee": {"ref": "industry.low_temp_process_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.low_temp_process_fixed_elec_prc": {
         "type": "statistic",
@@ -113,7 +191,7 @@
         },
         "formula": "100 - gas - oil - coal",
         "round": 1,
-        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is elec * ee / (elec * ee + (total - elec) * fe)."
     },
     "industry.low_temp_process_fixed_biomass_prc": {
         "type": "assumption",
@@ -131,41 +209,56 @@
         "type": "statistic",
         "units": "TWh/yr",
         "values": {
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - electricity"},
+            "fe": {"ref": "industry.dry_sep_fuel_efficiency"},
+            "ee": {"ref": "industry.dry_sep_elec_efficiency"}
         },
-        "formula": "total * 0.01163",
+        "formula": "(elec * ee + (total - elec) * fe) / 100 * 0.01163",
         "round": 1,
-        "note": "ECUK U4 total industries, ktoe. 1 ktoe = 0.01163 TWh."
+        "note": "Useful heat. ECUK U4 total industries final energy, ktoe, times the conversion efficiency of each fuel. 1 ktoe = 0.01163 TWh."
     },
     "industry.dry_sep_fixed_CH4_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - natural gas"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - electricity"},
+            "fe": {"ref": "industry.dry_sep_fuel_efficiency"},
+            "ee": {"ref": "industry.dry_sep_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.dry_sep_fixed_liquid_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - oil"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - electricity"},
+            "fe": {"ref": "industry.dry_sep_fuel_efficiency"},
+            "ee": {"ref": "industry.dry_sep_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.dry_sep_fixed_coal_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "fuel": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - solid fuel"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U4", "block": "{year}", "row": [ "Total industries" ], "column": "Drying / separation - electricity"},
+            "fe": {"ref": "industry.dry_sep_fuel_efficiency"},
+            "ee": {"ref": "industry.dry_sep_elec_efficiency"}
         },
-        "formula": "fuel / total * 100",
-        "round": 1
+        "formula": "fuel * fe / (elec * ee + (total - elec) * fe) * 100",
+        "round": 1,
+        "note": "Share of useful heat."
     },
     "industry.dry_sep_fixed_elec_prc": {
         "type": "statistic",
@@ -177,7 +270,7 @@
         },
         "formula": "100 - gas - oil - coal",
         "round": 1,
-        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is electricity / total."
+        "note": "Electricity takes the remainder so the rounded shares sum to 100. Unrounded it is elec * ee / (elec * ee + (total - elec) * fe)."
     },
     "industry.dry_sep_fixed_biomass_prc": {
         "type": "assumption",
@@ -195,20 +288,25 @@
         "type": "statistic",
         "units": "TWh/yr",
         "values": {
-            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Electricity"},
+            "fe": {"ref": "industry.other_heat_fuel_efficiency"},
+            "ee": {"ref": "industry.other_heat_elec_efficiency"}
         },
-        "formula": "total * 0.01163",
+        "formula": "(elec * ee + (total - elec) * fe) / 100 * 0.01163",
         "round": 1,
-        "note": "ECUK U2 industry \"Unknown (heat)\" row: heat sold and bioenergy not allocated to an end use."
+        "note": "Useful heat. ECUK U2 industry \"Unknown (heat)\" row (heat sold and bioenergy not allocated to an end use) times the conversion efficiency of each fuel."
     },
     "industry.other_heat_fixed_elec_prc": {
         "type": "statistic",
         "units": "%",
         "values": {
             "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Electricity"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"},
+            "fe": {"ref": "industry.other_heat_fuel_efficiency"},
+            "ee": {"ref": "industry.other_heat_elec_efficiency"}
         },
-        "formula": "elec / total * 100",
+        "formula": "elec * ee / (elec * ee + (total - elec) * fe) * 100",
         "round": 1
     },
     "industry.other_heat_fixed_CH4_prc": {
@@ -217,11 +315,14 @@
         "values": {
             "gas": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Natural gas"},
             "heat": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Heat"},
-            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"}
+            "total": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Total"},
+            "elec": {"source": "ecuk_end_use", "sheet": "Table U2", "block": "All sectors detailed consumption", "row": [ "{year}", "Industry", "Unknown (heat)" ], "column": "Electricity"},
+            "fe": {"ref": "industry.other_heat_fuel_efficiency"},
+            "ee": {"ref": "industry.other_heat_elec_efficiency"}
         },
-        "formula": "(gas + heat) / total * 100",
+        "formula": "(gas + heat) * fe / (elec * ee + (total - elec) * fe) * 100",
         "round": 1,
-        "note": "Heat sold is mapped to methane, as most heat networks are gas fired."
+        "note": "Share of useful heat. Heat sold is mapped to methane, as most heat networks are gas fired."
     },
     "industry.other_heat_fixed_biomass_prc": {
         "type": "statistic",
@@ -419,5 +520,23 @@
         "units": "%",
         "value": 0,
         "note": "No hydrogen in industry today. Set explicitly so the ZCB default does not leak in."
+    },
+    "industry.activity_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Baseline year output."
+    },
+    "industry.material_efficiency_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No change from the baseline year."
+    },
+    "industry.energy_efficiency_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 0,
+        "note": "No change from the baseline year."
     }
 }
