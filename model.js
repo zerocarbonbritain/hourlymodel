@@ -1837,7 +1837,7 @@ var model = {
         // carvans_lifetime = (150000.0/carsvans_miles_per_car)
         // if (carsvans_miles_per_car>0) EE_ecar = 20000.0 * number_of_cars * 0.000000001 / carvans_lifetime
         
-        o.EE.prc_of_industry_demand = 100 * o.EE.total / o.industry.total_demand
+        o.EE.prc_of_industry_demand = 100 * o.EE.total / (o.industry.total_demand_check * 0.0001)
     },
     cost_model: function() {
 
