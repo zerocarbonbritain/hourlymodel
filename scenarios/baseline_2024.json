@@ -383,7 +383,7 @@
         "coal": 1.399,
         "biomass": 0
     },
-    "carbon_price": 0,
+    "carbon_price": 55.18,
     "retail": {
         "electricity": {
             "network_p_kWh": 3.394,
@@ -411,8 +411,7 @@
             "petrol_kWh_per_litre": 9.468,
             "diesel_kWh_per_litre": 10.511,
             "car_diesel_prc": 44.3
-        },
-        "generation_basis": "price"
+        }
     },
     "co2_factors": {
         "gas": 0.18412,
@@ -432,21 +431,22 @@
         "existing_woodland_tCO2_per_ha": 5.473,
         "landfill_biochar_MtCO2": 0
     },
-    "price_view": {
+    "generation_costs": {
+        "basis": "price",
         "price_gbp_MWh": {
             "offshore_wind": 163.44,
             "onshore_wind": 121.16,
             "solar": 108.42,
-            "hydro": 105.51,
+            "tidal": null,
+            "wave": null,
+            "geothermal": null,
             "nuclear": 71.86,
+            "hydro": 105.51,
+            "imports": 76.19,
             "gas": 85.04,
             "biomass": 131.33,
             "coal_other": 85.5,
             "oil": 114.48,
-            "imports": 76.19,
-            "tidal": null,
-            "wave": null,
-            "geothermal": null,
             "hydrogen": null,
             "storage": null
         },

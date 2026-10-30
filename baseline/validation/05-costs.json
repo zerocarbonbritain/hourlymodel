@@ -1,7 +1,7 @@
 {
     "costs.generation_resource": {
         "group": "Costs",
-        "label": "Generation cost in the unit rate, resource cost",
+        "label": "Generation cost in the unit rate, build-up for every technology",
         "units": "p/kWh",
         "observed": {
             "values": {
@@ -20,13 +20,13 @@
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the modelled resource cost per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new build costs).",
-        "issue": "The resource cost is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The price view check below rebuilds what was paid (open-items.md, Model).",
+        "note": "Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the build-up for every technology per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new-build costs).",
+        "issue": "The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).",
         "years": [2024]
     },
     "costs.generation_price": {
         "group": "Costs",
-        "label": "Generation cost in the unit rate, price view",
+        "label": "Generation cost in the unit rate, 2024 prices",
         "units": "p/kWh",
         "observed": {
             "values": {
@@ -39,7 +39,7 @@
         },
         "model": {
             "values": {
-                "a": "retail.electricity.price_view_p_kWh",
+                "a": "retail.electricity.generation_cost_p_kWh",
                 "b": "i.retail.electricity.wholesale_adjustment_p_kWh"
             },
             "formula": "a + b"
@@ -47,6 +47,28 @@
         "tolerance": 0.05,
         "basis": "input",
         "note": "Modelled generation for each technology at its 2024 capture price plus RO, CfD, FiT and capacity market payments, per kWh delivered, plus the 2024 domestic wholesale adjustment (forward purchasing and the domestic profile). Prices are observed, volumes are modelled.",
+        "years": [2024]
+    },
+    "costs.gas_build_up": {
+        "group": "Costs",
+        "label": "Gas generation, build-up against price paid",
+        "units": "£/MWh",
+        "observed": {
+            "values": {
+                "capture": {"value": 85.04, "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT (baseline/inputs/13-prices.json)"}
+            },
+            "formula": "capture"
+        },
+        "model": {
+            "values": {
+                "a": "generation_costs.by_tech.gas.lcoe"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Build-up for gas generation (its share of backup turbine capacity at new-build cost, variable O&M, and 2024 fuel and carbon prices) against the 2024 day ahead capture price for gas. The 2024 baseline costs gas at the capture price.",
+        "issue": "Fuel and carbon alone are about £93/MWh at the DUKES fleet efficiency, above the capture price, and turbine capacity at new-build cost adds about £37/MWh. The 2024 fleet is largely paid off and also earns capacity market and balancing payments (open-items.md, Model).",
         "years": [2024]
     },
     "costs.electricity_unit_rate": {
@@ -67,7 +89,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to the price view generation cost."
+        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to the generation cost."
     },
     "costs.electricity_standing": {
         "group": "Costs",

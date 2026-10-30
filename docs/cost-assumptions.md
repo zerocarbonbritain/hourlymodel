@@ -35,7 +35,7 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Methanation | 10.1 | 0, 0 | 1, 236 | 10.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
 | Power to X | 10.1 | 0, 0 | 1, 860 | 25.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
 
-`carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The baselines set `carbon_price` to 0 (see [baseline/open-items.md](../baseline/open-items.md)).
+`carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The 2024 baseline uses £55.18/tCO2, the 2024 mean UK ETS auction price (£37.18) plus Carbon Price Support. The 2018 baseline sets it to 0.
 
 ## Calibration against strike prices
 
@@ -57,12 +57,47 @@ LCOE at the DESNZ or project load factor, compared with Allocation Round 7 (AR7)
 
 The model's own load factors come from the hourly dataset and are often lower than new-build project values. For example, ZCB offshore wind runs at 43% and tidal at 24%, giving £102 and £415/MWh. Technology LCOE in the model therefore sits above strike prices where the dataset load factor is low.
 
-## Price view
+## Generation cost
 
-The price view is what consumers pay generators rather than what the fleet costs. Each technology's output is multiplied by `price_view.price_gbp_MWh`, and `price_view.other_support_gbp_bn` adds support that is not split by technology. A null price uses the resource cost above. Retail electricity prices use the price view when `retail.generation_basis` is `price`.
+The generation cost is the cost per kWh that retail electricity prices start from. `generation_costs.basis` sets how it is built:
 
-- **2024 baseline:** capture price plus support per MWh. Offshore wind £163, onshore £121, solar £108, hydro £106, nuclear £72, gas £85, bioenergy £131, oil £114 and imports £76/MWh, plus £3.0bn of Feed-in Tariff and capacity market payments. Built by `baseline/inputs/13-prices.json`, see [baseline-2024-notes.md](baseline-2024-notes.md).
-- **zcb_2024:** AR7 strike prices for wind, solar and tidal, and the Hinkley Point C strike price for nuclear, from the table above. Other plant uses resource cost.
+- `price`: a technology with a price in `generation_costs.price_gbp_MWh`, such as a CfD strike price or wholesale value plus support, is costed as output times that price. One without a price uses the build-up above.
+- `lcoe`: every technology uses the build-up.
+
+Hydro and imports have no build-up and always use their price. `generation_costs.other_support_gbp_bn` adds support that is not split by technology. Electrolysis, methanation and power to X always use the build-up. Both bases use output before curtailment.
+
+Backup turbine capacity is shared between fuels by output, and each fuel adds its own fuel and carbon cost. Backup turbines and storage run as the rest of the system needs, so scenarios cost them on the build-up. A price for them only suits a baseline, where output is observed.
+
+The build-up for every technology is also reported (`retail.electricity.resource_p_kWh`), as what the system would cost to build at today's costs.
+
+### Presets
+
+The UI has one setting for generation costs, with two price presets and the build-up. The presets are taken from the `generation_costs` block of a reference scenario:
+
+- **2024 fleet prices** (baseline_2024): capture price plus support per MWh. Offshore wind £163, onshore £121, solar £108, hydro £106, nuclear £72, gas £85, bioenergy £131, oil £114 and imports £76/MWh, plus £3.0bn of Feed-in Tariff and capacity market payments. Built by `baseline/inputs/13-prices.json`, see [baseline-2024-notes.md](baseline-2024-notes.md).
+- **New-build strike prices** (zcb_2024): AR7 strike prices for wind, solar and tidal, and the Hinkley Point C strike price for nuclear, from the table above. Other plant uses the build-up.
+
+Applied to another scenario, a preset sets only the fixed generators (wind, solar, marine, geothermal, nuclear, hydro and imports). Backup, storage and support not split by technology keep their current values. Editing a price shows the setting as custom. The build-up table shows only the components in use.
+
+| Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
+|---|---|---|---|
+| baseline_2024 | 13.6 | 11.0 | 12.2 |
+| zcb_2024 | 22.8 | 14.5 | 15.7 |
+
+Generation cost in p/kWh delivered. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with hydro and imports at zero. In the UI, the build-up setting also counts hydro and imports at their prices and adds support not split by technology.
+
+### Implied hurdle rate and capital cost
+
+For each fixed generator with a price and a build-up, the model reports the hurdle rate at which the build-up equals the price, and the construction cost that does at the input hurdle rate. At 2024 prices and 2024 output:
+
+| Technology | Price £/MWh | Build-up £/MWh | Implied hurdle | Implied capex £/kW |
+|---|---|---|---|---|
+| Offshore wind | 163 | 128 | 10.8% | 3,705 |
+| Onshore wind | 121 | 88 | 11.6% | 2,461 |
+| Solar PV | 108 | 80 | 11.2% | 886 |
+| Nuclear | 72 | 190 | 1.2% | 3,188 |
+
+Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for new build. This is a mix of older, dearer plant and Renewables Obligation returns above cost. Existing nuclear is paid as if most of its capital were written off. In zcb_2024, AR7 prices imply 5.7% for offshore wind and 7.4% for onshore wind at the model's load factors, because strike prices assume higher load factors than the weather data gives.
 
 ## Sources
 

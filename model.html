@@ -76,6 +76,36 @@ input[type='text'] {
     text-align:right;
 }
 
+.cost-table tr.total th, .cost-table tr.total td {
+    font-weight:bold;
+    border-top:2px solid #999;
+    background-color:rgba(255,255,255,0.6);
+}
+.cost-table td.muted {
+    color:#aaa;
+}
+.cost-table tr.group th {
+    text-align:center;
+    border-bottom:none;
+}
+.cost-summary {
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:10px 0 20px 0;
+}
+.cost-summary div {
+    flex:1 1 140px;
+    background-color:#fff;
+    border:1px solid #cde;
+    border-radius:4px;
+    padding:8px 12px;
+}
+.cost-summary b {
+    display:block;
+    font-size:22px;
+}
+
 .validation-table th, .validation-table td {
     padding:4px 6px;
     text-align:right;
@@ -1550,12 +1580,47 @@ input[type='text'] {
 
 <div class="box">
     <div class="box-title">
-        <img class="icon-expand" src="img/expand.png"><b>COST MODEL</b>
+        <img class="icon-expand" src="img/expand.png"><b>COST MODEL
+        <span style="float:right">{{ o.retail.electricity.unit_rate_p_kWh | toFixed(1) }} p/kWh</span>
+        </b>
     </div>
     <div class="inner" style="display:block" name="cost_model">
-    
-        <p>Levelised costs follow the DESNZ Electricity Generation Costs method. Pre-development and construction spend is phased evenly and discounted at a technology specific hurdle rate (real, pre-tax). Costs are in 2024 prices, from DESNZ Electricity Generation Costs 2025 and calibrated against CfD Allocation Round 7 strike prices.</p>
 
+        <div class="cost-summary">
+            <div>Generation cost<b>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.generation_costs.total_annual | toFixed(1) }} bn/year</div>
+            <div>Electricity unit rate<b>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>+ £{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}/yr standing</div>
+            <div>Electricity bill<b>£{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</b>{{ o.retail.electricity.household_kWh | toFixed(0) }} kWh per home</div>
+            <div v-if="has_gas">Gas unit rate<b>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.retail.gas.bill_gbp | toFixed(0) }}/year bill</div>
+        </div>
+
+        <h3>Generation cost</h3>
+        <p>Costs:
+            <select v-model="cost_preset" title="A preset sets backup and storage prices only in its own scenario">
+                <option value="baseline_2024">2024 fleet prices</option>
+                <option value="zcb_2024">New-build strike prices (AR7)</option>
+                <option value="lcoe">Build-up (levelised cost)</option>
+                <option value="custom" disabled>Custom prices</option>
+            </select>
+            <span v-if="i.generation_costs.basis == 'price'">&nbsp; Build-up for every technology: {{ o.retail.electricity.resource_p_kWh | toFixed(2) }} p/kWh</span></p>
+
+        <table class="table cost-table" style="width:100%">
+            <tr><th>Technology</th><th>Output</th><th>Price</th><th title="Technologies without a price use the build-up. Grey where a price is used instead. Hydro and imports have no build-up.">Build-up</th><th v-if="i.generation_costs.basis == 'price'" title="The hurdle rate at which the build-up equals the price. Above the new-build rate suggests an older, dearer fleet or returns above cost. Below it suggests capital that is paid off.">Implied hurdle</th><th>Annual</th></tr>
+            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th v-if="i.generation_costs.basis == 'price'">%</th><th>£bn/y</th></tr>
+            <tr v-for="(row,key) in o.generation_costs.by_tech" v-if="row.generation > 0">
+                <td>{{ key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ') }}</td>
+                <td>{{ row.generation | toFixed(1) }}</td>
+                <td><input v-if="i.generation_costs.basis == 'price' || row.lcoe === null" v-model.number="i.generation_costs.price_gbp_MWh[key]" type="text" @change="price_change(key)" autocomplete="off"/></td>
+                <td :class="{ muted: !row.uses_build_up }"><span v-if="row.lcoe !== null">{{ row.lcoe | toFixed(0) }}</span></td>
+                <td v-if="i.generation_costs.basis == 'price'"><span v-if="row.implied_hurdle !== null">{{ row.implied_hurdle | toFixed(1) }}</span></td>
+                <td>{{ row.annual | toFixed(2) }}</td>
+            </tr>
+            <tr v-if="o.generation_costs.fuel_production_annual > 0"><td>Fuel production plant</td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.fuel_production_annual | toFixed(2) }}</td></tr>
+            <tr v-if="i.generation_costs.basis == 'price' || i.generation_costs.other_support_gbp_bn"><td>Other support (FiT, capacity market)</td><td></td><td><input v-model.number="i.generation_costs.other_support_gbp_bn" type="text" @change="update_non_hourly" autocomplete="off"/></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ i.generation_costs.other_support_gbp_bn | toFixed(2) }}</td></tr>
+            <tr class="total"><td>Total, {{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh delivered</td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.total_annual | toFixed(1) }}</td></tr>
+        </table>
+
+        <h3>Build-up</h3>
+        <p>Levelised costs by the DESNZ method, in 2024 prices and calibrated to AR7 strike prices. Only components in use are shown.</p>
         <table class="table cost-table" style="width:100%">
             <tr>
                 <th rowspan="2">Component</th>
@@ -1584,7 +1649,7 @@ input[type='text'] {
                 <th>£/MWh</th>
                 <th>£bn/y</th>
             </tr>
-            <tr v-for="(row,key) in i.costs">
+            <tr v-for="(row,key) in i.costs" v-if="o.costs[key].used && o.costs[key].capacity > 0">
                 <td>{{ key }}</td>
                 <td>{{ o.costs[key].capacity | toFixed(1) }}</td>
                 <td><input v-model.number="row.hurdle_rate" type="text" @change="update_non_hourly" autocomplete="off"/></td>
@@ -1600,91 +1665,28 @@ input[type='text'] {
                 <td>{{ o.costs[key].annual | toFixed(1) }}</td>
             </tr>
         </table>
-        <p><i>Electric storage capacity is in GWh and its costs are per kWh of storage. Output is before curtailment for wind, solar and marine. Gas turbine LCOE excludes fuel and carbon.</i></p>
+        <p v-if="o.generation_costs.backup_fuel_used">Backup fuel (p/kWh): gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/>, £{{ o.fuel_cost_annual | toFixed(1) }} bn/year.
+            Carbon price <input v-model.number="i.carbon_price" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> £/tCO2 on {{ o.grid_co2_emissions | toFixed(1) }} MtCO2/yr, £{{ o.carbon_cost_annual | toFixed(1) }} bn/year.</p>
+        <p><i>Storage capacity is in GWh, with costs per kWh. Output is before curtailment.</i></p>
 
-        <table class="table" style="width:100%">
-            <tr>
-                <td>Fuel for electricity generation (p/kWh fuel): gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/></td>
-                <td>£{{ o.fuel_cost_annual | toFixed(1) }} bn/year</td>
-            </tr>
-            <tr>
-                <td>Carbon price on fossil backup (UK ETS + Carbon Price Support): <input v-model.number="i.carbon_price" type="text" @change="update_non_hourly" style="width:40px"  autocomplete="off"/> £/tCO2, {{ o.grid_co2_emissions | toFixed(1) }} MtCO2/yr</td>
-                <td>£{{ o.carbon_cost_annual | toFixed(1) }} bn/year</td>
-            </tr>
-            <tr>
-                <td>Backup generation including fuel and carbon</td>
-                <td>£{{ o.backup_LCOE | toFixed(1) }}/MWh</td>
-            </tr>
-            <tr>
-                <td>Total annual cost</td>
-                <td>£{{ o.total_annual_cost | toFixed(1) }} bn/year</td>
-            </tr>
-            <tr>
-                <td>LCOE (Electricity)</td>
-                <td>£{{ o.LCOE | toFixed(1) }}/MWh</td>
-            </tr>
-            <tr>
-                <td>Network costs</td>
-                <td>~£50/MWh *</td>      
-            </tr>
-            <tr>
-                <td>LCOE (Electricity) + Network costs</td>
-                <td>£{{ (o.LCOE+50) | toFixed(1) }}/MWh</td>      
-            </tr>
-        </table>
-        <p><i>* Detailed modelling by BEIS 'Appendix I: Electricity Networks Modelling' August 2022 suggests that while significant network investments are required for net zero scenarios the network costs are likely to stay relatively flat on a per unit basis at around £50/MWh due to higher electricity volumes.</i></p>
-
-        <h3>Price view</h3>
-        <p>The LCOE above is a resource cost: what the generation fleet would cost to build and run at today's costs. The price view is what consumers pay generators: each technology's output times a price per MWh, such as wholesale value plus support payments for a baseline or a CfD strike price for a scenario. A blank price uses the resource cost. Electrolysis, methanation and power to X always use the resource cost.</p>
-        <table class="table cost-table" style="width:100%">
-            <tr><th>Technology</th><th>Output</th><th>Price</th><th>Annual</th></tr>
-            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£bn/y</th></tr>
-            <tr v-for="(row,key) in o.price_view.by_tech" v-if="row.generation > 0 || i.price_view.price_gbp_MWh[key] !== null">
-                <td>{{ key.replace(/_/g, ' ') }}</td>
-                <td>{{ row.generation | toFixed(1) }}</td>
-                <td><input v-model.number="i.price_view.price_gbp_MWh[key]" type="text" @change="price_view_change(key)" autocomplete="off" :placeholder="row.price | toFixed(0)"/></td>
-                <td>{{ row.annual | toFixed(2) }}</td>
-            </tr>
-            <tr><td>Fuel production plant (resource cost)</td><td></td><td></td><td>{{ o.price_view.fuel_production_annual | toFixed(2) }}</td></tr>
-            <tr><td>Support not split by technology (Feed-in Tariffs, capacity market)</td><td></td><td><input v-model.number="i.price_view.other_support_gbp_bn" type="text" @change="update_non_hourly" autocomplete="off"/></td><td>{{ i.price_view.other_support_gbp_bn | toFixed(2) }}</td></tr>
-            <tr><th>Total</th><th></th><th></th><th>{{ o.price_view.total_annual | toFixed(1) }}</th></tr>
-        </table>
-        <p>Generation cost per kWh delivered: resource cost {{ o.retail.electricity.resource_p_kWh | toFixed(2) }} p/kWh, price view {{ o.retail.electricity.price_view_p_kWh | toFixed(2) }} p/kWh. Retail prices use the
-            <select v-model="i.retail.generation_basis" @change="update_non_hourly"><option value="price">price view</option><option value="cost">resource cost</option></select>,
-            plus a year specific domestic wholesale adjustment of <input v-model.number="i.retail.electricity.wholesale_adjustment_p_kWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> p/kWh for electricity and <input v-model.number="i.retail.gas.wholesale_adjustment_p_kWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> p/kWh for gas (forward purchasing and the domestic profile, 0 in scenarios).</p>
 
         <h3>Retail prices</h3>
-        <p>Domestic prices build on the modelled costs. The electricity unit rate starts from the generation cost per kWh delivered to end users (price view or resource cost, above), and gas from the gas fuel price. Network, social policy (ECO, Warm Home Discount) and supplier costs are added per kWh and per customer, then VAT. Defaults are the 2024 Ofgem price cap allowances. RO, FiT and the capacity market pay generators, so they are part of the generation cost, not added here.</p>
+        <p>Unit rates add network, policy and supplier costs (2024 Ofgem price cap) to the generation cost, then VAT. RO, FiT and the capacity market are in the generation cost.</p>
         <table class="table cost-table" style="width:100%">
-            <tr><th></th><th>Generation or wholesale</th><th>Network</th><th>Policy</th><th>Supplier</th><th>Unit rate</th><th>Standing charge</th><th>Use per customer</th><th>Bill</th><th>Households</th></tr>
-            <tr class="units"><th></th><th>p/kWh</th><th>p/kWh, £/yr</th><th>p/kWh, £/yr</th><th>p/kWh, £/yr</th><th>p/kWh</th><th>£/yr</th><th>kWh/yr</th><th>£/yr</th><th>£bn/yr</th></tr>
-            <tr>
-                <td>Electricity</td>
-                <td>{{ o.retail.electricity.generation_p_kWh | toFixed(2) }}</td>
-                <td><input v-model.number="i.retail.electricity.network_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.electricity.network_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
-                <td><input v-model.number="i.retail.electricity.policy_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.electricity.policy_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
-                <td><input v-model.number="i.retail.electricity.supplier_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.electricity.supplier_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
-                <td>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }}</td>
-                <td>{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}</td>
-                <td>{{ o.retail.electricity.household_kWh | toFixed(0) }}</td>
-                <td>{{ o.retail.electricity.bill_gbp | toFixed(0) }}</td>
-                <td>{{ o.retail.electricity.household_spend_bn | toFixed(1) }}</td>
-            </tr>
-            <tr>
-                <td>Gas</td>
-                <td>{{ o.retail.gas.wholesale_p_kWh | toFixed(2) }}</td>
-                <td><input v-model.number="i.retail.gas.network_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.gas.network_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
-                <td><input v-model.number="i.retail.gas.policy_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.gas.policy_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
-                <td><input v-model.number="i.retail.gas.supplier_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/> <input v-model.number="i.retail.gas.supplier_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td>
-                <td>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }}</td>
-                <td>{{ o.retail.gas.standing_charge_gbp | toFixed(0) }}</td>
-                <td>{{ o.retail.gas.household_kWh | toFixed(0) }}</td>
-                <td>{{ o.retail.gas.bill_gbp | toFixed(0) }}</td>
-                <td>{{ o.retail.gas.household_spend_bn | toFixed(1) }}</td>
-            </tr>
+            <tr class="group"><th></th><th colspan="2">Electricity</th><th colspan="2" v-if="has_gas">Gas</th></tr>
+            <tr class="units"><th></th><th>p/kWh</th><th>£/yr</th><th v-if="has_gas">p/kWh</th><th v-if="has_gas">£/yr</th></tr>
+            <tr><td>Generation cost<span v-if="has_gas">, gas price</span></td><td>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }}</td><td></td><td v-if="has_gas">{{ i.fuel_prices.gas | toFixed(2) }}</td><td v-if="has_gas"></td></tr>
+            <tr><td>Wholesale adjustment (forward buying and profile, 0 in scenarios)</td><td><input v-model.number="i.retail.electricity.wholesale_adjustment_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td></td><td v-if="has_gas"><input v-model.number="i.retail.gas.wholesale_adjustment_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"></td></tr>
+            <tr><td>Network</td><td><input v-model.number="i.retail.electricity.network_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td><input v-model.number="i.retail.electricity.network_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"><input v-model.number="i.retail.gas.network_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"><input v-model.number="i.retail.gas.network_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td></tr>
+            <tr><td>Policy (ECO, Warm Home Discount)</td><td><input v-model.number="i.retail.electricity.policy_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td><input v-model.number="i.retail.electricity.policy_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"><input v-model.number="i.retail.gas.policy_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"><input v-model.number="i.retail.gas.policy_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td></tr>
+            <tr><td>Supplier</td><td><input v-model.number="i.retail.electricity.supplier_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td><input v-model.number="i.retail.electricity.supplier_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"><input v-model.number="i.retail.gas.supplier_p_kWh" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="has_gas"><input v-model.number="i.retail.gas.supplier_gbp" type="text" @change="update_non_hourly" autocomplete="off"/></td></tr>
+            <tr><td>VAT <input v-model.number="i.retail.vat_prc" type="text" @change="update_non_hourly" autocomplete="off"/> %</td><td>{{ o.retail.electricity.unit_rate_p_kWh * (1 - 1 / (1 + i.retail.vat_prc * 0.01)) | toFixed(2) }}</td><td>{{ o.retail.electricity.standing_charge_gbp * (1 - 1 / (1 + i.retail.vat_prc * 0.01)) | toFixed(0) }}</td><td v-if="has_gas">{{ o.retail.gas.unit_rate_p_kWh * (1 - 1 / (1 + i.retail.vat_prc * 0.01)) | toFixed(2) }}</td><td v-if="has_gas">{{ o.retail.gas.standing_charge_gbp * (1 - 1 / (1 + i.retail.vat_prc * 0.01)) | toFixed(0) }}</td></tr>
+            <tr class="total"><td>Unit rate and standing charge</td><td>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }}</td><td>{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}</td><td v-if="has_gas">{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }}</td><td v-if="has_gas">{{ o.retail.gas.standing_charge_gbp | toFixed(0) }}</td></tr>
+            <tr><td>Modelled use per customer (kWh/yr)</td><td>{{ o.retail.electricity.household_kWh | toFixed(0) }}</td><td></td><td v-if="has_gas">{{ o.retail.gas.household_kWh | toFixed(0) }}</td><td v-if="has_gas"></td></tr>
+            <tr class="total"><td>Annual bill</td><td></td><td>{{ o.retail.electricity.bill_gbp | toFixed(0) }}</td><td v-if="has_gas"></td><td v-if="has_gas">{{ o.retail.gas.bill_gbp | toFixed(0) }}</td></tr>
+            <tr><td>All households (£bn/yr), gas in <input v-model.number="i.retail.gas.households_prc" type="text" @change="update_non_hourly" autocomplete="off"/> % of homes</td><td></td><td>{{ o.retail.electricity.household_spend_bn | toFixed(1) }}</td><td v-if="has_gas"></td><td v-if="has_gas">{{ o.retail.gas.household_spend_bn | toFixed(1) }}</td></tr>
         </table>
-        <p>VAT <input v-model.number="i.retail.vat_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Households with gas <input v-model.number="i.retail.gas.households_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Use per customer is the modelled domestic final consumption, which differs by scenario.</p>
-        <p>Road fuel at the pump, including duty and VAT: petrol <input v-model.number="i.retail.road_fuel.petrol_p_litre" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/> p/litre ({{ o.retail.road_fuel.petrol_p_kWh | toFixed(1) }} p/kWh), diesel <input v-model.number="i.retail.road_fuel.diesel_p_litre" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/> p/litre ({{ o.retail.road_fuel.diesel_p_kWh | toFixed(1) }} p/kWh), diesel share of car fuel <input v-model.number="i.retail.road_fuel.car_diesel_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Car fuel costs £{{ o.retail.road_fuel.car_fuel_spend_bn | toFixed(1) }} bn/year.</p>
+        <p>Road fuel at the pump, with duty and VAT: petrol <input v-model.number="i.retail.road_fuel.petrol_p_litre" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/> p/litre ({{ o.retail.road_fuel.petrol_p_kWh | toFixed(1) }} p/kWh), diesel <input v-model.number="i.retail.road_fuel.diesel_p_litre" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/> p/litre ({{ o.retail.road_fuel.diesel_p_kWh | toFixed(1) }} p/kWh), diesel share of car fuel <input v-model.number="i.retail.road_fuel.car_diesel_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %. Car fuel costs £{{ o.retail.road_fuel.car_fuel_spend_bn | toFixed(1) }} bn/year.</p>
 
     </div>
 </div>

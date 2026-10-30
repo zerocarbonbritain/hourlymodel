@@ -2008,63 +2008,106 @@ var model = {
             o.total_annual_cost += c.annual
         }
 
-        // Fuel burned for electricity generation, 10 year GWh to TWh/yr, priced in pence per kWh of fuel
+        // Fuel burned for electricity generation, 10 year GWh to TWh/yr, priced in pence per kWh of fuel.
+        // Carbon price in £/tCO2 on fossil backup emissions, with the CO2 factors used for grid emissions.
         let biomass_for_backup = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
-        o.fuel_cost_annual = 0.01 * 0.0001 * (
-            o.methane.ccgt_methane_from_fossil_gas * i.fuel_prices.gas +
-            o.synth_fuel.backup_from_fossil_oil * i.fuel_prices.oil +
-            o.fossil_fuels.coal_for_dispatchable * i.fuel_prices.coal +
-            biomass_for_backup * i.fuel_prices.biomass)
-        o.total_annual_cost += o.fuel_cost_annual
-
-        // Carbon price in £/tCO2 on fossil backup emissions in MtCO2/yr
-        o.carbon_cost_annual = 0.001 * o.grid_co2_emissions * i.carbon_price
-        o.total_annual_cost += o.carbon_cost_annual
+        let backup_fuel = {
+            gas: [o.methane.ccgt_methane_from_fossil_gas, i.fuel_prices.gas, i.co2_factors.gas],
+            oil: [o.synth_fuel.backup_from_fossil_oil, i.fuel_prices.oil, i.co2_factors.fuel_oil],
+            coal_other: [o.fossil_fuels.coal_for_dispatchable, i.fuel_prices.coal, i.electric_backup.coal_co2_factor],
+            biomass: [biomass_for_backup, i.fuel_prices.biomass, 0]
+        }
+        o.fuel_cost_annual = 0
+        o.carbon_cost_annual = 0
+        let backup_fuel_annual = {}
+        for (let z in backup_fuel) {
+            let [fuel, price, co2_factor] = backup_fuel[z]
+            let fuel_annual = 0.01 * 0.0001 * fuel * price
+            let co2 = fuel * co2_factor * 0.001 * 0.1   // MtCO2/yr
+            let carbon_annual = 0.001 * co2 * i.carbon_price
+            backup_fuel_annual[z] = fuel_annual + carbon_annual
+            o.fuel_cost_annual += fuel_annual
+            o.carbon_cost_annual += carbon_annual
+        }
+        o.total_annual_cost += o.fuel_cost_annual + o.carbon_cost_annual
 
         let backup = o.costs['Gas turbines']
         o.backup_LCOE = backup.generation > 0 ? 1000 * (backup.annual + o.fuel_cost_annual + o.carbon_cost_annual) / backup.generation : 0
 
         o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
 
-        // Price view: what consumers pay generators, as generation times a price per MWh for each
-        // technology (wholesale value plus support, or a contract price). A null price uses the
-        // modelled resource cost. Fuel production plant (electrolysis, methanation, power to X)
-        // always uses resource cost. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and
-        // TWh times £/MWh times 0.001 gives £bn.
-        let backup_annual = o.costs['Gas turbines'].annual + o.fuel_cost_annual + o.carbon_cost_annual
+        // Generation cost. With basis "price", a technology with a price per MWh (a strike price, or
+        // wholesale value plus support) is costed as output times that price, and one without uses the
+        // build-up above. With basis "lcoe", every technology uses the build-up. Hydro and imports have
+        // no build-up and always use their price. Backup turbine capacity is shared by output, plus each
+        // fuel's own fuel and carbon cost. Fuel production plant (electrolysis, methanation, power to X)
+        // always uses the build-up. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and TWh
+        // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
         let backup_output = o.electric_backup.total_before_grid_loss
-        let backup_resource = (gen) => backup_output > 0 ? backup_annual * gen / backup_output : 0
-        let resource = (key) => o.costs[key] ? o.costs[key].annual : 0
+        let turbine_share = (gen) => backup_output > 0 ? backup.annual * gen / backup_output : 0
+        let build_up = (key) => o.costs[key] ? o.costs[key].annual : 0
+        let eb = o.electric_backup
         let techs = {
-            offshore_wind: [o.supply.total_offshore_wind, () => resource('Offshore wind')],
-            onshore_wind: [o.supply.total_onshore_wind, () => resource('Onshore wind')],
-            solar: [o.supply.total_solarpv, () => resource('Solar PV')],
-            tidal: [o.supply.total_tidal, () => resource('Tidal')],
-            wave: [o.supply.total_wave, () => resource('Wave')],
-            geothermal: [o.supply.total_geothermal_elec, () => resource('Geothermal Electric')],
-            nuclear: [o.supply.total_nuclear, () => resource('Nuclear')],
-            hydro: [o.supply.total_hydro, () => 0],
-            imports: [o.supply.total_imports, () => 0],
-            gas: [o.electric_backup.total_methane_turbine_output, () => backup_resource(o.electric_backup.total_methane_turbine_output)],
-            biomass: [o.electric_backup.total_biomass_turbine_output, () => backup_resource(o.electric_backup.total_biomass_turbine_output)],
-            coal_other: [o.electric_backup.total_coal_turbine_output, () => backup_resource(o.electric_backup.total_coal_turbine_output)],
-            oil: [o.electric_backup.total_synth_fuel_turbine_output, () => backup_resource(o.electric_backup.total_synth_fuel_turbine_output)],
-            hydrogen: [o.electric_backup.total_hydrogen_turbine_output, () => backup_resource(o.electric_backup.total_hydrogen_turbine_output)],
-            storage: [o.electric_storage.total_discharge, () => resource('Electric Storage')]
+            offshore_wind: [o.supply.total_offshore_wind, 'Offshore wind'],
+            onshore_wind: [o.supply.total_onshore_wind, 'Onshore wind'],
+            solar: [o.supply.total_solarpv, 'Solar PV'],
+            tidal: [o.supply.total_tidal, 'Tidal'],
+            wave: [o.supply.total_wave, 'Wave'],
+            geothermal: [o.supply.total_geothermal_elec, 'Geothermal Electric'],
+            nuclear: [o.supply.total_nuclear, 'Nuclear'],
+            hydro: [o.supply.total_hydro, null],
+            imports: [o.supply.total_imports, null],
+            gas: [eb.total_methane_turbine_output, () => turbine_share(eb.total_methane_turbine_output) + backup_fuel_annual.gas],
+            biomass: [eb.total_biomass_turbine_output, () => turbine_share(eb.total_biomass_turbine_output) + backup_fuel_annual.biomass],
+            coal_other: [eb.total_coal_turbine_output, () => turbine_share(eb.total_coal_turbine_output) + backup_fuel_annual.coal_other],
+            oil: [eb.total_synth_fuel_turbine_output, () => turbine_share(eb.total_synth_fuel_turbine_output) + backup_fuel_annual.oil],
+            hydrogen: [eb.total_hydrogen_turbine_output, () => turbine_share(eb.total_hydrogen_turbine_output)],
+            storage: [o.electric_storage.total_discharge, 'Electric Storage']
         }
-        o.price_view = { by_tech: {}, total_annual: 0 }
+        let gc = i.generation_costs
+        for (let z in o.costs) o.costs[z].used = false
+        o.generation_costs = { by_tech: {}, total_annual: 0, backup_fuel_used: false }
         for (let z in techs) {
-            let generation = techs[z][0] * 0.0001
-            let price = i.price_view.price_gbp_MWh[z]
-            let annual = (price === null || price === undefined) ? techs[z][1]() : generation * price * 0.001
-            o.price_view.by_tech[z] = { generation: generation, price: generation > 0 ? 1000 * annual / generation : 0, annual: annual, priced: !(price === null || price === undefined) }
-            o.price_view.total_annual += annual
+            let [output, cost] = techs[z]
+            let generation = output * 0.0001
+            let has_build_up = cost !== null
+            let lcoe_annual = typeof cost === 'function' ? cost() : build_up(cost)
+            let price = gc.price_gbp_MWh[z]
+            let priced = price !== null && price !== undefined
+            let uses_build_up = has_build_up && (gc.basis == "lcoe" || !priced)
+            let annual = uses_build_up ? lcoe_annual : generation * (price || 0) * 0.001
+            if (uses_build_up) {
+                if (typeof cost === 'string') o.costs[cost].used = true
+                else if (generation > 0) {
+                    o.costs['Gas turbines'].used = true
+                    if (z != 'hydrogen') o.generation_costs.backup_fuel_used = true
+                }
+            }
+            let row = {
+                generation: generation,
+                lcoe: has_build_up && generation > 0 ? 1000 * lcoe_annual / generation : null,
+                price: generation > 0 ? 1000 * annual / generation : 0,
+                annual: annual,
+                uses_build_up: uses_build_up,
+                implied_hurdle: null,
+                implied_capex: null
+            }
+            // What the price implies for the build-up of a fixed generator: the hurdle rate that
+            // reproduces it, and the construction cost per kW that does at the input hurdle rate.
+            if (typeof cost === 'string' && priced && generation > 0 && o.costs[cost].capacity > 0) {
+                let target = generation * (price - i.costs[cost].variable_om) / o.costs[cost].capacity
+                row.implied_hurdle = implied_hurdle_rate(i.costs[cost], target)
+                row.implied_capex = implied_capex(i.costs[cost], target)
+            }
+            o.generation_costs.by_tech[z] = row
+            o.generation_costs.total_annual += annual
         }
-        o.price_view.fuel_production_annual = resource('H2 Electrolysis') + resource('Methanation') + resource('Power to X')
-        o.price_view.total_annual += o.price_view.fuel_production_annual + i.price_view.other_support_gbp_bn
+        for (let z of ['H2 Electrolysis', 'Methanation', 'Power to X']) o.costs[z].used = true
+        o.generation_costs.fuel_production_annual = build_up('H2 Electrolysis') + build_up('Methanation') + build_up('Power to X')
+        o.generation_costs.total_annual += o.generation_costs.fuel_production_annual + gc.other_support_gbp_bn
 
         // Retail prices. The electricity unit rate starts from the generation cost per kWh delivered
-        // to end users (price view or resource cost), and gas from the gas fuel price. Network, social policy and
+        // to end users, and gas from the gas fuel price. Network, social policy and
         // supplier costs are inputs, per kWh and per customer per year, before VAT.
         // £bn/yr over TWh/yr gives £/kWh, so 100 converts to p/kWh.
         let r = i.retail
@@ -2074,12 +2117,13 @@ var model = {
         o.retail = {}
 
         let e = r.electricity
+        // The build-up for every technology (resource cost) is kept for comparison
         let elec = {
             resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
-            price_view_p_kWh: delivered_TWh > 0 ? 100 * o.price_view.total_annual / delivered_TWh : 0
+            generation_cost_p_kWh: delivered_TWh > 0 ? 100 * o.generation_costs.total_annual / delivered_TWh : 0
         }
-        // The unit rate uses the resource cost or the price view, plus any year specific wholesale adjustment
-        elec.generation_p_kWh = (r.generation_basis == "price" ? elec.price_view_p_kWh : elec.resource_p_kWh) + e.wholesale_adjustment_p_kWh
+        // The unit rate uses the generation cost plus any year specific wholesale adjustment
+        elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
         elec.unit_rate_p_kWh = (elec.generation_p_kWh + e.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
         elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
         elec.household_kWh = households_kWh(o.final_consumption.domestic.electricity)
@@ -2136,6 +2180,27 @@ function levelised_fixed_cost(c) {
         }
     }
     return discounted_costs / discounted_operating_years
+}
+
+// Hurdle rate (%) at which levelised_fixed_cost equals target (£/kW/yr). The cost rises with the
+// rate, so bisection between -5% and 50% finds it. Null if the target is outside that range.
+function implied_hurdle_rate(c, target) {
+    let at = (rate) => levelised_fixed_cost(Object.assign({}, c, { hurdle_rate: rate }))
+    let low = -5, high = 50
+    if (target < at(low) || target > at(high)) return null
+    for (let n = 0; n < 50; n++) {
+        let mid = (low + high) / 2
+        if (at(mid) < target) low = mid; else high = mid
+    }
+    return (low + high) / 2
+}
+
+// Construction cost (£/kW) at which levelised_fixed_cost equals target, at the input hurdle rate.
+// The cost is linear in capex. A negative result means the target is below pre-development and O&M.
+function implied_capex(c, target) {
+    let without = levelised_fixed_cost(Object.assign({}, c, { capex: 0 }))
+    let per_capex = levelised_fixed_cost(Object.assign({}, c, { capex: 1000 })) - without
+    return 1000 * (target - without) / per_capex
 }
 
 // Optimal electricity store dispatch with perfect foresight over the whole dataset.

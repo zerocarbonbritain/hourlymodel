@@ -367,7 +367,15 @@
         "round": 2,
         "note": "Energy from waste CfD payments over other thermal generation."
     },
-    "price_view.price_gbp_MWh.offshore_wind": {
+    "generation_costs.basis": {
+        "type": "assumption",
+        "years": [
+            2024
+        ],
+        "value": "price",
+        "note": "Each technology with a 2024 price is costed at that price, which reproduces what was paid. Technologies without one (tidal, wave, geothermal, hydrogen turbines and storage) use the build-up. Thermal plant stays on 2024 prices, because the build-up at new-build turbine costs and 2024 fuel and carbon prices is above what the 2024 fleet was paid (see the gas check in validation)."
+    },
+    "generation_costs.price_gbp_MWh.offshore_wind": {
         "type": "statistic",
         "years": [
             2024
@@ -386,7 +394,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
     },
-    "price_view.price_gbp_MWh.onshore_wind": {
+    "generation_costs.price_gbp_MWh.onshore_wind": {
         "type": "statistic",
         "years": [
             2024
@@ -405,7 +413,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. Embedded wind captured £63.99/MWh, so this is slightly high for onshore wind."
     },
-    "price_view.price_gbp_MWh.solar": {
+    "generation_costs.price_gbp_MWh.solar": {
         "type": "statistic",
         "years": [
             2024
@@ -424,7 +432,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
     },
-    "price_view.price_gbp_MWh.hydro": {
+    "generation_costs.price_gbp_MWh.hydro": {
         "type": "statistic",
         "years": [
             2024
@@ -443,7 +451,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
     },
-    "price_view.price_gbp_MWh.nuclear": {
+    "generation_costs.price_gbp_MWh.nuclear": {
         "type": "statistic",
         "years": [
             2024
@@ -459,7 +467,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. Existing nuclear has no support contract."
     },
-    "price_view.price_gbp_MWh.gas": {
+    "generation_costs.price_gbp_MWh.gas": {
         "type": "statistic",
         "years": [
             2024
@@ -475,7 +483,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. Fuel and carbon are paid from this revenue."
     },
-    "price_view.price_gbp_MWh.biomass": {
+    "generation_costs.price_gbp_MWh.biomass": {
         "type": "statistic",
         "years": [
             2024
@@ -494,7 +502,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
     },
-    "price_view.price_gbp_MWh.coal_other": {
+    "generation_costs.price_gbp_MWh.coal_other": {
         "type": "statistic",
         "years": [
             2024
@@ -513,7 +521,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
     },
-    "price_view.price_gbp_MWh.oil": {
+    "generation_costs.price_gbp_MWh.oil": {
         "type": "statistic",
         "years": [
             2024
@@ -529,7 +537,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. "
     },
-    "price_view.price_gbp_MWh.imports": {
+    "generation_costs.price_gbp_MWh.imports": {
         "type": "statistic",
         "years": [
             2024
@@ -545,52 +553,52 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. The demand weighted price is used because imports flow when GB prices are high."
     },
-    "price_view.price_gbp_MWh.tidal": {
+    "generation_costs.price_gbp_MWh.tidal": {
         "type": "assumption",
         "years": [
             2024
         ],
         "units": "£/MWh",
         "value": null,
-        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+        "note": "No 2024 output or price series."
     },
-    "price_view.price_gbp_MWh.wave": {
+    "generation_costs.price_gbp_MWh.wave": {
         "type": "assumption",
         "years": [
             2024
         ],
         "units": "£/MWh",
         "value": null,
-        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+        "note": "No 2024 output or price series."
     },
-    "price_view.price_gbp_MWh.geothermal": {
+    "generation_costs.price_gbp_MWh.geothermal": {
         "type": "assumption",
         "years": [
             2024
         ],
         "units": "£/MWh",
         "value": null,
-        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+        "note": "No 2024 output or price series."
     },
-    "price_view.price_gbp_MWh.hydrogen": {
+    "generation_costs.price_gbp_MWh.hydrogen": {
         "type": "assumption",
         "years": [
             2024
         ],
         "units": "£/MWh",
         "value": null,
-        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+        "note": "No 2024 output or price series."
     },
-    "price_view.price_gbp_MWh.storage": {
+    "generation_costs.price_gbp_MWh.storage": {
         "type": "assumption",
         "years": [
             2024
         ],
         "units": "£/MWh",
         "value": null,
-        "note": "No 2024 output or no price series. Null uses the modelled resource cost."
+        "note": "No 2024 output or price series."
     },
-    "price_view.other_support_gbp_bn": {
+    "generation_costs.other_support_gbp_bn": {
         "type": "statistic",
         "years": [
             2024
@@ -661,15 +669,6 @@
         "formula": "df / 3100 * 100 - spot / 10 / (1 - (grid + own) / 100)",
         "round": 3,
         "note": "Domestic wholesale cost above the demand weighted spot price grossed up for losses: the 2024 caps passed through power bought forward in 2023, and the domestic profile is peakier than average demand. Specific to the year, 0 in scenarios."
-    },
-    "retail.generation_basis": {
-        "type": "assumption",
-        "years": [
-            2024
-        ],
-        "units": "",
-        "value": "price",
-        "note": "The retail unit rate starts from the price view, which reproduces what consumers paid, rather than the resource cost."
     },
     "retail.gas.wholesale_adjustment_p_kWh": {
         "type": "statistic",

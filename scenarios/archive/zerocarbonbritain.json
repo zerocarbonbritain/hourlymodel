@@ -458,10 +458,10 @@
             "petrol_kWh_per_litre": 9.468,
             "diesel_kWh_per_litre": 10.511,
             "car_diesel_prc": 44.3
-        },
-        "generation_basis": "cost"
+        }
     },
-    "price_view": {
+    "generation_costs": {
+        "basis": "lcoe",
         "price_gbp_MWh": {
             "offshore_wind": null,
             "onshore_wind": null,

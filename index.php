@@ -129,6 +129,17 @@ var v = <?php echo $v; ?>;
 $.ajax({url: "scenarios/zcb_2024.json?v="+v, async: false, success: function(data){ i = data }});
 var default_scenario = JSON.parse(JSON.stringify(i));
 
+// Generation cost presets are the generation_costs blocks of two reference scenarios:
+// 2024 fleet prices from baseline_2024 (merged onto the default) and AR7 strike prices from zcb_2024
+var fixed_generators = ["offshore_wind", "onshore_wind", "solar", "tidal", "wave", "geothermal", "nuclear", "hydro", "imports"];
+var cost_presets = { zcb_2024: JSON.parse(JSON.stringify(default_scenario.generation_costs)) };
+$.ajax({url: "scenarios/baseline_2024.json?v="+v, dataType: "json", async: false, success: function(data){
+  var costs = JSON.parse(JSON.stringify(default_scenario.generation_costs));
+  Object.assign(costs.price_gbp_MWh, data.generation_costs.price_gbp_MWh);
+  costs.other_support_gbp_bn = data.generation_costs.other_support_gbp_bn;
+  cost_presets = { baseline_2024: costs, zcb_2024: cost_presets.zcb_2024 };
+}});
+
 var sidenav_visible = true;
 var app_mounted = false;
 var app = null;
@@ -222,6 +233,41 @@ function load_page(page)
             validation_tick: 0
         },
         computed: {
+          // Retail gas columns are shown only where homes use gas
+          has_gas: function () {
+            return this.o.retail.gas.customers > 0 && this.o.retail.gas.household_kWh > 0;
+          },
+          // Generation cost preset: "lcoe" for the build-up, a reference scenario whose fixed
+          // generator prices match, or "custom". Choosing one applies it.
+          cost_preset: {
+            get: function () {
+              var gc = this.i.generation_costs;
+              if (gc.basis == "lcoe") return "lcoe";
+              for (var name in cost_presets) {
+                if (fixed_generators.every(key => gc.price_gbp_MWh[key] === cost_presets[name].price_gbp_MWh[key])) return name;
+              }
+              return "custom";
+            },
+            set: function (name) {
+              if (name == "lcoe") {
+                i.generation_costs.basis = "lcoe";
+              } else if (cost_presets[name]) {
+                // Applied to another scenario, only fixed generators take the preset. Backup turbines
+                // and storage run as that scenario needs, so they keep their current costs, as does
+                // support not split by technology.
+                var costs = JSON.parse(JSON.stringify(cost_presets[name]));
+                if (name != this.selected_scenario) {
+                  for (var key in costs.price_gbp_MWh) {
+                    if (fixed_generators.indexOf(key) == -1) costs.price_gbp_MWh[key] = i.generation_costs.price_gbp_MWh[key];
+                  }
+                  costs.other_support_gbp_bn = i.generation_costs.other_support_gbp_bn;
+                }
+                costs.basis = "price";
+                i.generation_costs = costs;
+              }
+              this.update_non_hourly();
+            }
+          },
           // Scenarios grouped by their group name, in the order listed in available.json
           scenario_groups: function () {
             var groups = {};
@@ -274,9 +320,9 @@ function load_page(page)
             model_ui();
             app.validation_tick++;
           },
-          // An emptied price box goes back to null, which uses the resource cost
-          price_view_change: function (key) {
-            if (i.price_view.price_gbp_MWh[key] === "") i.price_view.price_gbp_MWh[key] = null;
+          // An emptied price box goes back to null
+          price_change: function (key) {
+            if (i.generation_costs.price_gbp_MWh[key] === "") i.generation_costs.price_gbp_MWh[key] = null;
             this.update_non_hourly();
           },
           simulate: function () {
