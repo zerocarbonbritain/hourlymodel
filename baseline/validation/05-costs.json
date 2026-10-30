@@ -220,10 +220,10 @@
             "values": {
                 "g": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Natural gas"},
                 "u": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average variable unit price (£/kWh)"},
-                "h": {"source": "ons_households", "sheet": "5", "block": "Number of households (thousands)", "row": ["All households"], "column": "{year} Estimate"},
-                "f": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"}
+                "f": {"source": "qep_2.3.4", "sheet": "2.3.4", "block": "Table 2.3.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"},
+                "meters": {"source": "desnz_subnational_gas", "sheet": "{year}", "block": "Subnational gas consumption, Great Britain", "row": ["K03000001", "Great Britain (inc unallocated)", "All local authorities"], "column": "Number of meters (thousands): Domestic"}
             },
-            "formula": "g * 0.01163 * u + h * 1000 * 0.84 * f / 1e9"
+            "formula": "g * 0.01163 * u + meters * 1000 * f / 1e9"
         },
         "model": {
             "values": {
@@ -233,7 +233,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "Domestic gas use times the average unit price, plus the fixed cost for 84% of households (the model's assumed share with gas).",
+        "note": "Domestic gas use times the average unit price, plus the fixed cost for every domestic gas meter in Great Britain.",
         "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check) and the gas unit rate is 7% low."
     },
     "costs.gas_spend_ons": {

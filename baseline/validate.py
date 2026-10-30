@@ -19,8 +19,8 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from build import (BASE, ROOT, BuildError, evaluate, extract_values, fetch_sources, fmt,  # noqa: E402
-                   get_path)
+from build import (BASE, ROOT, BuildError, default_scenario, evaluate, extract_values,  # noqa: E402
+                   fetch_sources, get_path)
 
 # A check outside its tolerance but within twice it is a warning
 WARN_FACTOR = 2
@@ -41,8 +41,7 @@ def load_checks():
 
 def merged_scenario(scenario_path):
     """The scenario as the model sees it: the default scenario updated with its values."""
-    default = "archive/zerocarbonbritain.json" if "archive" + os.sep in scenario_path else "zcb_2024.json"
-    with open(os.path.join(ROOT, "scenarios", default)) as f:
+    with open(default_scenario(scenario_path)) as f:
         merged = json.load(f)
     with open(scenario_path) as f:
         overrides = json.load(f)
@@ -92,12 +91,7 @@ def validate(year, scenario_path):
             continue
         obs = spec["observed"]
         try:
-            published = {n: v for n, v in obs["values"].items() if "value" in v}
-            located = {n: v for n, v in obs["values"].items() if "value" not in v}
-            names = extract_values(located, sources, results, year, sheets, r["refs"])
-            for name, v in published.items():
-                names[name] = v["value"]
-                r["refs"].append("%s = %s (published: %s)" % (name, fmt(v["value"]), v["cite"]))
+            names = extract_values(obs["values"], sources, results, year, sheets, r["refs"])
             r["value"] = evaluate(obs["formula"], names)
         except (BuildError, KeyError) as e:
             r["status"] = "unavailable"

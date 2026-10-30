@@ -448,64 +448,106 @@
         "round": 3,
         "note": "Territorial emissions the model must calculate itself: fuel combustion CO2, forest and harvested wood, and municipal solid waste CO2."
     },
-    "land_use.new_natural_broadleaf_woodland": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 1475,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.gas": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Natural gas (100% mineral blend)", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Mineral natural gas, since biomethane is not in the fossil gas the model counts."
     },
-    "land_use.new_natural_coniferous_woodland": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 0,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.coal": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Coal (industrial)", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Coal used outside power generation, mostly industrial."
     },
-    "land_use.new_productive_broadleaf_woodland": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 0,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.road_fuel": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "diesel_f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Diesel (100% mineral diesel)", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}},
+            "petrol_f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Petrol (100% mineral petrol)", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}},
+            "diesel": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": ["{year-1}"], "column": "All - white diesel"},
+            "petrol": {"source": "ecuk_consumption", "sheet": "Table C8", "block": "Road transport energy use by vehicle type", "row": ["{year-1}"], "column": "All - petrol"}
+        },
+        "formula": "(diesel * diesel_f + petrol * petrol_f) / (diesel + petrol)",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Mineral diesel and petrol weighted by ECUK C8 road fuel use (the year before, as C8 runs a year behind). Also applied to rail and domestic shipping. The model separates biofuel."
     },
-    "land_use.new_productive_coniferous_woodland": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 0,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.aviation": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Aviation turbine fuel", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Mineral jet fuel."
     },
-    "land_use.short_rotation_forestry": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 0,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.heating_oil": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Burning oil", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Kerosene, the main heating oil in homes. Services also use gas oil (0.254)."
     },
-    "land_use.perrennial_grass_miscanthus": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 0,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.gas_oil": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Gas oil", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Used for industry liquid fuel and oil used in oil and gas extraction."
     },
-    "land_use.rotational_grass_ryegrass": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 0,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.fuel_oil": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Fuel oil", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Used for oil fired generation."
     },
-    "land_use.intensive_and_rough_grazing": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 11522,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.refinery": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Refinery miscellaneous", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Refinery own use, mostly refinery gas."
     },
-    "land_use.food_crops": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 2557,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
-    },
-    "land_use.feed_crops_for_livestock": {
-        "type": "assumption",
-        "units": "kha",
-        "value": 2557,
-        "note": "Kept from the 2018 baseline (ZCB land use model). Check woodland creation and agricultural land statistics if these need to be current."
+    "co2_factors.marine": {
+        "type": "statistic",
+        "years": [2024],
+        "units": "kgCO2/kWh",
+        "values": {
+            "f": {"source": "desnz_ghg_factors", "sheet": "Factors by Category", "sum": "GHG Conversion Factor 2024", "where": {"Scope": "Scope 1", "Level 1": "Fuels", "Level 3": "Marine gas oil", "UOM": "kWh (Gross CV)", "GHG/Unit": "kg CO2e of CO2 per unit"}}
+        },
+        "formula": "f",
+        "round": 5,
+        "note": "DESNZ 2024 conversion factor, kgCO2 per kWh gross, CO2 only. Marine gas oil, for international shipping. Marine fuel oil is 0.259."
     }
 }

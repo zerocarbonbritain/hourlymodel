@@ -194,35 +194,36 @@
         "smart_charging_enabled": 0,
         "smart_charge_type": "average",
         "V2G_enabled": 0,
-        "V2G_discharge_type": "average"
+        "V2G_discharge_type": "average",
+        "international_shipping_TWhy": 30.4
     },
     "industry": {
-        "high_temp_process_TWhy": 40.5,
-        "low_temp_process_TWhy": 63.5,
-        "dry_sep_TWhy": 20.4,
-        "other_heat_TWhy": 24.9,
+        "high_temp_process_TWhy": 25.7,
+        "low_temp_process_TWhy": 54.0,
+        "dry_sep_TWhy": 14.3,
+        "other_heat_TWhy": 19.9,
         "motors_TWhy": 30.8,
         "compressed_air_TWhy": 8.7,
         "lighting_TWhy": 2.6,
         "refrigeration_TWhy": 5.3,
         "refinery_electric_TWhy": 7.0,
         "other_non_heat_TWhy": 19.8,
-        "high_temp_process_fixed_elec_prc": 23.4,
-        "high_temp_process_fixed_CH4_prc": 54.4,
-        "high_temp_process_fixed_liquid_prc": 4.4,
-        "high_temp_process_fixed_coal_prc": 17.8,
+        "high_temp_process_fixed_elec_prc": 27.7,
+        "high_temp_process_fixed_CH4_prc": 51.4,
+        "high_temp_process_fixed_liquid_prc": 4.1,
+        "high_temp_process_fixed_coal_prc": 16.8,
         "high_temp_process_fixed_biomass_prc": 0,
         "high_temp_process_DSR_CH4_prc": 0,
-        "low_temp_process_fixed_elec_prc": 25.3,
-        "low_temp_process_fixed_CH4_prc": 65.4,
-        "low_temp_process_fixed_liquid_prc": 4.3,
-        "low_temp_process_fixed_coal_prc": 5.0,
+        "low_temp_process_fixed_elec_prc": 29.8,
+        "low_temp_process_fixed_CH4_prc": 61.5,
+        "low_temp_process_fixed_liquid_prc": 4.0,
+        "low_temp_process_fixed_coal_prc": 4.7,
         "low_temp_process_fixed_biomass_prc": 0,
         "low_temp_process_DSR_CH4_prc": 0,
-        "dry_sep_fixed_elec_prc": 28.9,
-        "dry_sep_fixed_CH4_prc": 59.4,
-        "dry_sep_fixed_liquid_prc": 4.7,
-        "dry_sep_fixed_coal_prc": 7.0,
+        "dry_sep_fixed_elec_prc": 34.2,
+        "dry_sep_fixed_CH4_prc": 55.0,
+        "dry_sep_fixed_liquid_prc": 4.3,
+        "dry_sep_fixed_coal_prc": 6.5,
         "dry_sep_fixed_biomass_prc": 0,
         "dry_sep_DSR_CH4_prc": 0,
         "other_heat_fixed_elec_prc": 0.0,
@@ -244,7 +245,18 @@
         "other_heat_fixed_liquid_prc": 0,
         "other_heat_fixed_coal_prc": 0,
         "other_heat_DSR_H2_prc": 0,
-        "other_non_heat_fixed_H2_prc": 0
+        "other_non_heat_fixed_H2_prc": 0,
+        "high_temp_process_fuel_efficiency": 60,
+        "high_temp_process_elec_efficiency": 75,
+        "low_temp_process_fuel_efficiency": 80,
+        "low_temp_process_elec_efficiency": 100,
+        "dry_sep_fuel_efficiency": 65,
+        "dry_sep_elec_efficiency": 83,
+        "other_heat_fuel_efficiency": 80,
+        "other_heat_elec_efficiency": 100,
+        "activity_prc": 100,
+        "material_efficiency_prc": 0,
+        "energy_efficiency_prc": 0
     },
     "electric_storage": {
         "capacity_GWh": 25,
@@ -282,7 +294,7 @@
         "prc_synth_fuel": 0.82,
         "prc_coal": 12.01,
         "coal_efficiency": 30.4,
-        "prc_imports": 9.35,
+        "prc_imports": 9.34,
         "synth_fuel_efficiency": 27.6,
         "coal_co2_factor": 0.2582,
         "capacity_limit": 100,
@@ -291,10 +303,10 @@
     "energy_industry_use": {
         "electricity_grid_loss_prc": 7.7,
         "electricity_own_use_prc": 4.3,
-        "refineries_gas_prc": 0.327,
-        "refineries_oil_prc": 5.757,
-        "oil_gas_extraction_gas_prc": 3.4,
-        "oil_gas_extraction_oil_prc": 0.465,
+        "refineries_gas_prc": 0.314,
+        "refineries_oil_prc": 5.523,
+        "oil_gas_extraction_gas_prc": 3.333,
+        "oil_gas_extraction_oil_prc": 0.455,
         "gas_losses_prc": 0.583
     },
     "fossil_fuels": {
@@ -361,5 +373,16 @@
         "coal": 1.044,
         "biomass": 0
     },
-    "carbon_price": 0
+    "carbon_price": 0,
+    "retail": {
+        "gas": {
+            "households_prc": 86.6
+        },
+        "vat_prc": 5,
+        "road_fuel": {
+            "petrol_p_litre": 125.2,
+            "diesel_p_litre": 129.98,
+            "car_diesel_prc": 52.0
+        }
+    }
 }

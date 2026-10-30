@@ -213,7 +213,8 @@
         "rail_freight_elec_demand": 1.932,
         "freight_BEV_demand": 10.143,
         "freight_H2_demand": 3.922,
-        "freight_IC_demand": 19.881
+        "freight_IC_demand": 19.881,
+        "international_shipping_TWhy": 0
     },
     "industry": {
         "activity_prc": 120,
@@ -369,6 +370,12 @@
         "coastal_and_freshwater": 692,
         "urban_areas": 1459
     },
+    "land_model": {
+        "uk_area_kha": 24728,
+        "uk_crop_biomass_prc": 100,
+        "existing_woodland_tCO2_per_ha": 0,
+        "landfill_biochar_MtCO2": 1.2936
+    },
     "emissions_balance": {
         "power_station": 0,
         "manufacture_solid_fuels": 0,
@@ -411,6 +418,17 @@
         "solarpv_lifespan": 30
     },
     "carbon_price": 68,
+    "co2_factors": {
+        "gas": 0.18412,
+        "coal": 0.31971,
+        "road_fuel": 0.24589,
+        "aviation": 0.24535,
+        "heating_oil": 0.24557,
+        "gas_oil": 0.25359,
+        "fuel_oil": 0.26709,
+        "refinery": 0.24571,
+        "marine": 0.25486
+    },
     "retail": {
         "vat_prc": 5,
         "electricity": {
@@ -433,8 +451,8 @@
         "road_fuel": {
             "petrol_p_litre": 141.48,
             "diesel_p_litre": 148.33,
-            "petrol_kWh_per_litre": 9.69,
-            "diesel_kWh_per_litre": 10.69,
+            "petrol_kWh_per_litre": 9.468,
+            "diesel_kWh_per_litre": 10.511,
             "car_diesel_prc": 44.3
         }
     },

@@ -1,4 +1,4 @@
-// Command line scenario runner. Usage: node run_scenario.js [scenario_name | path.json] [--json]
+// Command line scenario runner. Usage: node run_scenario.js [scenario_name | path.json] [--json] [--default path.json]
 // --json prints the numeric outputs in o as JSON, keeping nesting and leaving out arrays.
 var fs = require("fs");
 var vm = require('vm');
@@ -17,11 +17,13 @@ vm.runInThisContext(fs.readFileSync(dir+"model.js"));
 
 var args = process.argv.slice(2);
 var json_output = args.indexOf("--json") != -1;
-var scenario_name = args.filter(a => a != "--json")[0] || "baseline_2024";
+// --default names the scenario to merge onto, for callers that run a copy of a scenario from elsewhere
+var default_arg = args.indexOf("--default") != -1 ? args[args.indexOf("--default") + 1] : null;
+var scenario_name = args.filter((a, n) => a != "--json" && a != "--default" && args[n - 1] != "--default")[0] || "baseline_2024";
 var scenario_path = scenario_name.endsWith(".json") ? scenario_name : dir+"scenarios/"+scenario_name+".json";
 // Archived scenarios override the original ZeroCarbonBritain 2019 scenario
-var default_path = scenario_path.includes("archive/") ? "scenarios/archive/zerocarbonbritain.json" : "scenarios/zcb_2024.json";
-var default_scenario = JSON.parse(fs.readFileSync(dir+default_path));
+var default_path = default_arg || dir + (scenario_path.includes("archive/") ? "scenarios/archive/zerocarbonbritain.json" : "scenarios/zcb_2024.json");
+var default_scenario = JSON.parse(fs.readFileSync(default_path));
 var overrides = JSON.parse(fs.readFileSync(scenario_path));
 
 function updateScenario(obj, changes) {

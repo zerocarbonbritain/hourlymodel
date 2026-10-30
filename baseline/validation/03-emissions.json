@@ -18,7 +18,8 @@
         },
         "tolerance": 0.03,
         "basis": "independent",
-        "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink."
+        "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink.",
+        "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry)."
     },
     "emissions.fuel_co2": {
         "group": "Emissions",
@@ -41,7 +42,8 @@
         },
         "tolerance": 0.03,
         "basis": "independent",
-        "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup."
+        "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup.",
+        "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry)."
     },
     "emissions.gas_co2": {
         "group": "Emissions",
@@ -162,17 +164,13 @@
         },
         "model": {
             "values": {
-                "ic": "transport.fuel_totals.IC",
-                "air": "transport.modes.Aviation.IC.TWh",
-                "bio": "synth_fuel.total_biofuel_supply",
-                "liquid": "synth_fuel.total_demand"
+                "a": "emissions_balance.oil_by_use.road_rail_shipping"
             },
-            "formula": "(ic - air) * (1 - bio / liquid) * 0.2678"
+            "formula": "a"
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "Road, rail and domestic shipping fuel, net of the average biofuel share of liquid fuel, at the model's oil factor. Domestic aviation is in the aviation check.",
-        "issue": "The model uses one oil CO2 factor, 0.2678 kg/kWh, close to fuel oil. Petrol, diesel and jet fuel are about 0.24 to 0.25 kg/kWh gross (open-items.md, Model)."
+        "note": "Road, rail and domestic shipping fossil fuel at the DESNZ diesel and petrol factors. Domestic aviation is in the aviation check."
     },
     "emissions.aviation_co2": {
         "group": "Emissions",
@@ -186,16 +184,34 @@
         },
         "model": {
             "values": {
-                "air": "transport.modes.Aviation.IC.TWh",
-                "bio": "synth_fuel.total_biofuel_supply",
-                "liquid": "synth_fuel.total_demand"
+                "a": "emissions_balance.oil_by_use.aviation"
             },
-            "formula": "air * (1 - bio / liquid) * 0.2678"
+            "formula": "a"
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "The model applies the average liquid biofuel share to aviation, which overstates sustainable aviation fuel.",
-        "issue": "See domestic transport CO2: the single oil CO2 factor is high for jet fuel."
+        "note": "The model applies the average fossil share of liquid fuel to aviation, which overstates sustainable aviation fuel."
+    },
+    "emissions.shipping_co2": {
+        "group": "Emissions",
+        "label": "International shipping CO2",
+        "units": "MtCO2",
+        "observed": {
+            "values": {
+                "s": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": {"Year": "{year}", "GHG grouped": "CO2", "Territorial Emissions Statistics category": "International shipping"}}
+            },
+            "formula": "s"
+        },
+        "model": {
+            "values": {
+                "a": "emissions_balance.oil_by_use.international_shipping"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.1,
+        "basis": "independent",
+        "note": "Marine bunker fuel from DUKES 1.1 at the marine gas oil factor.",
+        "issue": "The inventory estimates international shipping bottom up from vessel activity, which gives less fuel than DUKES bunker sales. The baseline follows DUKES so the energy balance holds (open-items.md, Observed data)."
     },
     "emissions.forest_sink": {
         "group": "Emissions",
@@ -209,14 +225,14 @@
         },
         "model": {
             "values": {
-                "a": "emissions_balance.reforestation"
+                "a": "emissions_balance.existing_woodland",
+                "b": "emissions_balance.reforestation"
             },
-            "formula": "a"
+            "formula": "a + b"
         },
-        "tolerance": 0.1,
-        "basis": "independent",
-        "note": "Forest land carbon stock change and drainage. In the model this is sequestration by new woodland only; existing woodland is not credited.",
-        "issue": "The baseline represents the existing forest sink with 1,475 kha of new natural broadleaf woodland, which is not real land (open-items.md, Inputs)."
+        "tolerance": 0.02,
+        "basis": "calibrated",
+        "note": "Forest land carbon stock change and drainage, against existing woodland at its calibrated rate plus any new woodland."
     },
     "emissions.harvested_wood": {
         "group": "Emissions",
@@ -236,7 +252,8 @@
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "issue": "5.3 MtCO2 of the modelled harvested wood comes from 320 kha of hemp inherited from the ZCB scenario (open-items.md, Inputs)."
+        "note": "Timber from productive woodland at the ZCB harvest rates stored in wood products.",
+        "issue": "The model credits 95% of harvested carbon as stored. The inventory reports the net change in the wood products pool, which subtracts the decay of older products (open-items.md, Model)."
     },
     "emissions.land_sink_total": {
         "group": "Emissions",
@@ -251,14 +268,15 @@
         },
         "model": {
             "values": {
-                "a": "emissions_balance.reforestation",
-                "b": "emissions_balance.harvested_wood",
-                "c": "emissions_balance.biochar_carbon_capture"
+                "a": "emissions_balance.existing_woodland",
+                "b": "emissions_balance.reforestation",
+                "c": "emissions_balance.harvested_wood",
+                "d": "emissions_balance.biochar_carbon_capture"
             },
-            "formula": "a + b + c"
+            "formula": "a + b + c + d"
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "The part of LULUCF left to the land use model. The total is close, but see the two checks above: the components do not match, and the model adds 1.3 MtCO2 of landfill biochar that has no inventory counterpart."
+        "note": "The part of LULUCF left to the land use model."
     }
 }

@@ -183,7 +183,7 @@ This step is scripted in `baseline/inputs/10-emissions.json`.
 
 Ammonia production ceased in 2023, so `ammonia` is 0 from then.
 
-`land_use.*` areas (in thousands of hectares) come from the ZCB land use model and change little for a baseline update; check woodland creation statistics if you want them current.
+`land_use.*` areas (in thousands of hectares) and `land_model` come from `baseline/inputs/12-land.json`: Defra June survey land use and land fed to livestock, Defra bioenergy crops, and Forest Research woodland area. Existing woodland sequestration and the share of solid biomass grown on UK energy crops are calibrated to the inventory forest sink and the energy crop area. Urban, coastal and semi natural areas are still ZCB values, and mountain, heath and bog is the remainder.
 
 ## Step 11: validate the new scenario
 

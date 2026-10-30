@@ -17,13 +17,14 @@
     },
     "formula": "a / 10000"
    },
-   "note": "DUKES 1.1 total supply less non energy use, with nuclear counted as electricity generated rather than reactor heat (DUKES 5.6), as the model does. Includes ambient heat, which DUKES counts under bioenergy and waste.",
+   "note": "DUKES 1.1 total supply plus marine bunkers, less non energy use, with nuclear counted as electricity generated rather than reactor heat (DUKES 5.6), as the model does. Includes ambient heat, which DUKES counts under bioenergy and waste.",
    "issue": "",
    "status_at_build": "ok",
-   "observed": 1852.6206124999997,
-   "model_at_build": 1796.177658469997,
+   "observed": 1876.5196809999998,
+   "model_at_build": 1820.0862705741529,
    "sources": [
     "supply = 169158.49 (DUKES_1.1.xlsx, 2024!K10)",
+    "bunkers = -2054.95 (DUKES_1.1.xlsx, 2024!K8)",
     "non_energy = 4534.64 (DUKES_1.1.xlsx, 2024!K62)",
     "nuclear_fuel = 102542.6078 (DUKES_5.6.xlsx, 5.6 Annual summaries!F522)",
     "nuclear_gen = 40587.8448 (DUKES_5.6.xlsx, 5.6 Annual summaries!F523)"
@@ -46,7 +47,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1489.3868785999998,
-   "model_at_build": 1483.1450184178689,
+   "model_at_build": 1483.1417466866403,
    "sources": [
     "final = 132598.86 (DUKES_1.1.xlsx, 2024!K35)",
     "non_energy = 4534.64 (DUKES_1.1.xlsx, 2024!K62)"
@@ -114,7 +115,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 708.5083225,
-   "model_at_build": 692.8255761720975,
+   "model_at_build": 692.8223044408692,
    "sources": [
     "oil = 62697.83 (DUKES_1.1.xlsx, 2024!E35)",
     "non_energy = 4530.08 (DUKES_1.1.xlsx, 2024!E62)",
@@ -349,7 +350,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 627.2939391,
-   "model_at_build": 621.5797640027329,
+   "model_at_build": 621.5764922715045,
    "sources": [
     "t = 53937.57 (DUKES_1.1.xlsx, 2024!K50)"
    ]
@@ -371,7 +372,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 682.4019963,
-   "model_at_build": 668.1633955855274,
+   "model_at_build": 668.1712428135831,
    "sources": [
     "g = 58676.01 (DUKES_1.1.xlsx, 2024!F12)"
    ]
@@ -389,14 +390,15 @@
     },
     "formula": "a / 10000"
    },
-   "note": "Primary oils plus net petroleum products, excluding non energy use and marine bunkers. Biofuels are excluded on both sides.",
+   "note": "Primary oils plus net petroleum products and marine bunkers, excluding non energy use. Biofuels are excluded on both sides.",
    "issue": "",
    "status_at_build": "ok",
-   "observed": 727.1384194999999,
-   "model_at_build": 703.7620294859266,
+   "observed": 751.0374879999998,
+   "model_at_build": 727.6627943620266,
    "sources": [
     "crude = 55412.51 (DUKES_1.1.xlsx, 2024!D12)",
     "products = 11640.22 (DUKES_1.1.xlsx, 2024!E12)",
+    "bunkers = -2054.95 (DUKES_1.1.xlsx, 2024!E8)",
     "non_energy = 4530.08 (DUKES_1.1.xlsx, 2024!E62)"
    ]
   },
@@ -845,10 +847,10 @@
     "formula": "a - b"
    },
    "note": "Territorial plus international aviation and shipping. The model's aviation non CO2 uplift has no inventory counterpart and is left out. Non CO2 and process emissions are inputs, so this mainly tests fuel CO2 and the land sink.",
-   "issue": "",
-   "status_at_build": "ok",
+   "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry).",
+   "status_at_build": "known",
    "observed": 414.640274014361,
-   "model_at_build": 407.07983211780925,
+   "model_at_build": 399.42803290432676,
    "sources": [
     "t = 414.640274 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 2456 rows where {\"Year\": \"2024\"})"
    ]
@@ -869,10 +871,10 @@
     "formula": "a + b + c"
    },
    "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup.",
-   "issue": "",
-   "status_at_build": "ok",
+   "issue": "Most of the gap is coal, solid fuel and waste CO2 (10.5 Mt), see that check (open-items.md, Industry).",
+   "status_at_build": "known",
    "observed": 327.64136755129715,
-   "model_at_build": 322.32515109356683,
+   "model_at_build": 313.374343777054,
    "sources": [
     "fuel = 320.5730257 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 241 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": [\"Gaseous fuels\", \"Petroleum\", \"Coal\", \"Other solid fuels\"]})",
     "waste = 7.068341841 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Other emissions\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
@@ -895,7 +897,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 125.09672914784066,
-   "model_at_build": 122.8752484481785,
+   "model_at_build": 123.02368922683696,
    "sources": [
     "g = 125.0967291 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 36 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Natural Gas\"})"
    ]
@@ -917,7 +919,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 181.08339455483582,
-   "model_at_build": 188.46747149633117,
+   "model_at_build": 179.33867762314,
    "sources": [
     "p = 171.2432859 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 140 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Petroleum\"})",
     "lpg = 9.840108667 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 8 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Petroleum gases\"})"
@@ -940,7 +942,7 @@
    "issue": "Blast furnace and coke oven coal is not modelled, and the coal plus waste backup CO2 factor (0.254) averages coal and waste (open-items.md, Industry).",
    "status_at_build": "known",
    "observed": 21.461243848620775,
-   "model_at_build": 10.98243114905717,
+   "model_at_build": 11.01197692707703,
    "sources": [
     "coal = 3.593506516 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 26 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Coal\"})",
     "solid = 5.613581378 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 21 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\"})",
@@ -965,7 +967,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 36.98354548196988,
-   "model_at_build": 39.992871068453795,
+   "model_at_build": 40.02868866052658,
    "sources": [
     "e = 36.98354548 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 6 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
    ]
@@ -990,7 +992,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 153.7,
-   "model_at_build": 151.40705715477196,
+   "model_at_build": 151.54265722711557,
    "sources": [
     "g = 153.7 (DUKES_5.14.xlsx, 5.14!AD8)"
    ]
@@ -1004,18 +1006,15 @@
    "id": "emissions.domestic_transport_co2",
    "model": {
     "values": {
-     "ic": "transport.fuel_totals.IC",
-     "air": "transport.modes.Aviation.IC.TWh",
-     "bio": "synth_fuel.total_biofuel_supply",
-     "liquid": "synth_fuel.total_demand"
+     "a": "emissions_balance.oil_by_use.road_rail_shipping"
     },
-    "formula": "(ic - air) * (1 - bio / liquid) * 0.2678"
+    "formula": "a"
    },
-   "note": "Road, rail and domestic shipping fuel, net of the average biofuel share of liquid fuel, at the model's oil factor. Domestic aviation is in the aviation check.",
-   "issue": "The model uses one oil CO2 factor, 0.2678 kg/kWh, close to fuel oil. Petrol, diesel and jet fuel are about 0.24 to 0.25 kg/kWh gross (open-items.md, Model).",
-   "status_at_build": "known",
+   "note": "Road, rail and domestic shipping fossil fuel at the DESNZ diesel and petrol factors. Domestic aviation is in the aviation check.",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 107.96963824211298,
-   "model_at_build": 116.13497105567755,
+   "model_at_build": 106.79249364241697,
    "sources": [
     "t = 107.9696382 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 70 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Territorial Emissions Statistics sector\": \"Domestic transport\"})"
    ]
@@ -1029,39 +1028,60 @@
    "id": "emissions.aviation_co2",
    "model": {
     "values": {
-     "air": "transport.modes.Aviation.IC.TWh",
-     "bio": "synth_fuel.total_biofuel_supply",
-     "liquid": "synth_fuel.total_demand"
+     "a": "emissions_balance.oil_by_use.aviation"
     },
-    "formula": "air * (1 - bio / liquid) * 0.2678"
+    "formula": "a"
    },
-   "note": "The model applies the average liquid biofuel share to aviation, which overstates sustainable aviation fuel.",
-   "issue": "See domestic transport CO2: the single oil CO2 factor is high for jet fuel.",
-   "status_at_build": "known",
+   "note": "The model applies the average fossil share of liquid fuel to aviation, which overstates sustainable aviation fuel.",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 37.75651679309696,
-   "model_at_build": 40.14248653935,
+   "model_at_build": 36.83921000999224,
    "sources": [
     "a = 37.75651679 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 13 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Aviation turbine fuel\"})"
    ]
   },
   {
    "group": "Emissions",
-   "label": "Forest land carbon sink",
-   "units": "MtCO2e",
+   "label": "International shipping CO2",
+   "units": "MtCO2",
    "tolerance": 0.1,
    "basis": "independent",
-   "id": "emissions.forest_sink",
+   "id": "emissions.shipping_co2",
    "model": {
     "values": {
-     "a": "emissions_balance.reforestation"
+     "a": "emissions_balance.oil_by_use.international_shipping"
     },
     "formula": "a"
    },
-   "note": "Forest land carbon stock change and drainage. In the model this is sequestration by new woodland only; existing woodland is not credited.",
-   "issue": "The baseline represents the existing forest sink with 1,475 kha of new natural broadleaf woodland, which is not real land (open-items.md, Inputs).",
+   "note": "Marine bunker fuel from DUKES 1.1 at the marine gas oil factor.",
+   "issue": "The inventory estimates international shipping bottom up from vessel activity, which gives less fuel than DUKES bunker sales. The baseline follows DUKES so the energy balance holds (open-items.md, Observed data).",
    "status_at_build": "known",
+   "observed": 4.956388985637802,
+   "model_at_build": 5.813462184065925,
+   "sources": [
+    "s = 4.956388986 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 11 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Territorial Emissions Statistics category\": \"International shipping\"})"
+   ]
+  },
+  {
+   "group": "Emissions",
+   "label": "Forest land carbon sink",
+   "units": "MtCO2e",
+   "tolerance": 0.02,
+   "basis": "calibrated",
+   "id": "emissions.forest_sink",
+   "model": {
+    "values": {
+     "a": "emissions_balance.existing_woodland",
+     "b": "emissions_balance.reforestation"
+    },
+    "formula": "a + b"
+   },
+   "note": "Forest land carbon stock change and drainage, against existing woodland at its calibrated rate plus any new woodland.",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": -17.984511270153526,
-   "model_at_build": -12.980000000000002,
+   "model_at_build": -17.984278,
    "sources": [
     "f = -17.98451127 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 169 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4A*\"} and not {\"CRT category\": [\"*(III)*\", \"*(IV)*\"]})"
    ]
@@ -1079,11 +1099,11 @@
     },
     "formula": "a"
    },
-   "note": "",
-   "issue": "5.3 MtCO2 of the modelled harvested wood comes from 320 kha of hemp inherited from the ZCB scenario (open-items.md, Inputs).",
+   "note": "Timber from productive woodland at the ZCB harvest rates stored in wood products.",
+   "issue": "The model credits 95% of harvested carbon as stored. The inventory reports the net change in the wood products pool, which subtracts the decay of older products (open-items.md, Model).",
    "status_at_build": "known",
    "observed": -2.216628701639777,
-   "model_at_build": -8.018972166666666,
+   "model_at_build": -3.003672,
    "sources": [
     "h = -2.216628702 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 12 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4G*\"})"
    ]
@@ -1097,17 +1117,18 @@
    "id": "emissions.land_sink_total",
    "model": {
     "values": {
-     "a": "emissions_balance.reforestation",
-     "b": "emissions_balance.harvested_wood",
-     "c": "emissions_balance.biochar_carbon_capture"
+     "a": "emissions_balance.existing_woodland",
+     "b": "emissions_balance.reforestation",
+     "c": "emissions_balance.harvested_wood",
+     "d": "emissions_balance.biochar_carbon_capture"
     },
-    "formula": "a + b + c"
+    "formula": "a + b + c + d"
    },
-   "note": "The part of LULUCF left to the land use model. The total is close, but see the two checks above: the components do not match, and the model adds 1.3 MtCO2 of landfill biochar that has no inventory counterpart.",
+   "note": "The part of LULUCF left to the land use model.",
    "issue": "",
-   "status_at_build": "warn",
+   "status_at_build": "ok",
    "observed": -20.201139971793303,
-   "model_at_build": -22.347318975757577,
+   "model_at_build": -21.04831087272727,
    "sources": [
     "f = -17.98451127 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 169 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4A*\"} and not {\"CRT category\": [\"*(III)*\", \"*(IV)*\"]})",
     "h = -2.216628702 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 12 rows where {\"Year\": \"2024\", \"Territorial Emissions Statistics sector\": \"LULUCF\", \"CRT category\": \"4G*\"})"
@@ -1131,7 +1152,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 24416.79573,
-   "model_at_build": 24728.0,
+   "model_at_build": 24417.0,
    "sources": [
     "uaa = 16760080.49 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP4)",
     "share = 0.6864160505 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP5)"
@@ -1142,7 +1163,7 @@
    "label": "Land allocated by the land use model",
    "units": "kha",
    "tolerance": 0.02,
-   "basis": "independent",
+   "basis": "calibrated",
    "id": "land.allocated",
    "model": {
     "values": {
@@ -1150,11 +1171,11 @@
     },
     "formula": "a"
    },
-   "note": "All land uses in the model, including land it derives for bioenergy crops, against the UK area.",
-   "issue": "The baseline allocates more land than the UK has: inherited ZCB areas, phantom new woodland and bioenergy crops for imported biomass (open-items.md, Inputs).",
-   "status_at_build": "known",
+   "note": "All land uses in the model, including land it derives for bioenergy crops, against the UK area. Mountain, heath and bog is the remainder of the area, so this confirms the allocation adds up.",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 24416.79573,
-   "model_at_build": 29950.247854782356,
+   "model_at_build": 24416.499745260713,
    "sources": [
     "uaa = 16760080.49 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP4)",
     "share = 0.6864160505 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP5)"
@@ -1182,10 +1203,10 @@
     "formula": "a + b + c + d + e + f + g + h + i"
    },
    "note": "",
-   "issue": "Existing woodland areas are inherited from the ZCB scenario and the baseline adds 1,475 kha of new woodland (open-items.md, Inputs).",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 3286,
-   "model_at_build": 4369,
+   "model_at_build": 3286,
    "sources": [
     "w = 3286 (published: Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/))"
    ]
@@ -1207,10 +1228,10 @@
     "formula": "a + b + c + d"
    },
    "note": "",
-   "issue": "See woodland.",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 1710,
-   "model_at_build": 2861,
+   "model_at_build": 1710,
    "sources": [
     "w = 1710 (published: Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/))"
    ]
@@ -1232,10 +1253,10 @@
     "formula": "a + b + c + d"
    },
    "note": "",
-   "issue": "See woodland.",
+   "issue": "",
    "status_at_build": "ok",
    "observed": 1576,
-   "model_at_build": 1508,
+   "model_at_build": 1576,
    "sources": [
     "w = 1576 (published: Forest Research, Forestry Statistics 2025, Table 1.1, woodland area at 31 March 2025 (https://www.forestresearch.gov.uk/tools-and-resources/statistics/forestry-statistics/))"
    ]
@@ -1244,8 +1265,8 @@
    "group": "Land use",
    "label": "Croppable land",
    "units": "kha",
-   "tolerance": 0.1,
-   "basis": "independent",
+   "tolerance": 0.02,
+   "basis": "calibrated",
    "id": "land.croppable",
    "model": {
     "values": {
@@ -1259,12 +1280,35 @@
     "formula": "a + b + c + d + e + f"
    },
    "note": "Defra croppable area, including temporary grass and uncropped arable land. Model crops plus the bioenergy crop land it derives.",
-   "issue": "The land use model grows all solid biomass on UK short rotation coppice. Most biomass for power is imported (open-items.md, Inputs).",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 6167.466875779968,
-   "model_at_build": 8187.247854782355,
+   "model_at_build": 6167.499745260712,
    "sources": [
     "c = 6167466.876 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP9)"
+   ]
+  },
+  {
+   "group": "Land use",
+   "label": "Energy crops for heat and power",
+   "units": "kha",
+   "tolerance": 0.02,
+   "basis": "calibrated",
+   "id": "land.energy_crops",
+   "model": {
+    "values": {
+     "a": "land_use.short_rotation_coppice"
+    },
+    "formula": "a"
+   },
+   "note": "Short rotation coppice and miscanthus in England. The share of solid biomass grown on UK crops is set to match, the rest being imports, wastes and residues.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 12.543,
+   "model_at_build": 12.499745260711892,
+   "sources": [
+    "src = 5162 (bioenergy-crops-dataset-12feb26.ods, 1_1!R16)",
+    "miscanthus = 7381 (bioenergy-crops-dataset-12feb26.ods, 1_1!R17)"
    ]
   },
   {
@@ -1285,7 +1329,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 15252.002831797388,
-   "model_at_build": 14079,
+   "model_at_build": 14043,
    "sources": [
     "feed = 14054673.83 (Land-use-for-animal-feed-251217.ods, Land_use_area_summary!P4)",
     "common = 1197329 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP7)"
@@ -1308,7 +1352,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 10576.9716145,
-   "model_at_build": 11522,
+   "model_at_build": 10577,
    "sources": [
     "p = 9379642.615 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP19)",
     "c = 1197329 (Agricultural-land-use-uk-june25-20251211.ods, Land_use!AP7)"
@@ -1318,8 +1362,8 @@
    "group": "Land use",
    "label": "Croppable land not feeding livestock",
    "units": "kha",
-   "tolerance": 0.1,
-   "basis": "independent",
+   "tolerance": 0.02,
+   "basis": "input",
    "id": "land.crops_other",
    "model": {
     "values": {
@@ -1331,10 +1375,10 @@
     "formula": "a + b + c + d"
    },
    "note": "Food, industrial and energy crops and uncropped arable land.",
-   "issue": "See croppable land.",
-   "status_at_build": "known",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 2701.7236584825782,
-   "model_at_build": 5630.247854782355,
+   "model_at_build": 2701.4997452607117,
    "sources": [
     "c = 2701723.658 (Land-use-for-animal-feed-251217.ods, Land_use_area_summary!P8)"
    ]
@@ -1356,7 +1400,7 @@
    "issue": "The model costs generation at average new build cost. Consumers paid wholesale prices set by gas plants, forward bought in 2023, plus support for older renewables, and imports are not costed (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
-   "model_at_build": 11.336233812087949,
+   "model_at_build": 11.336370655840819,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1381,7 +1425,7 @@
    "issue": "Follows from the generation cost check.",
    "status_at_build": "known",
    "observed": 25.82700021794268,
-   "model_at_build": 19.723445502692346,
+   "model_at_build": 19.723589188632857,
    "sources": [
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
    ]
@@ -1426,7 +1470,7 @@
    "issue": "Follows from the generation cost check.",
    "status_at_build": "known",
    "observed": 1083.2274977667098,
-   "model_at_build": 881.5106470915398,
+   "model_at_build": 881.5155324135171,
    "sources": [
     "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
    ]
@@ -1537,7 +1581,7 @@
    "issue": "Follows from the generation cost check, partly offset by domestic electricity use 6% above DUKES.",
    "status_at_build": "known",
    "observed": 30.07343406773285,
-   "model_at_build": 25.56158938472259,
+   "model_at_build": 25.56173164366775,
    "sources": [
     "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
@@ -1562,7 +1606,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 26.289,
-   "model_at_build": 25.56158938472259,
+   "model_at_build": 25.56173164366775,
    "sources": [
     "s = 26289 (table_261.xlsx, 2.6.1!D62)"
    ]
@@ -1580,16 +1624,16 @@
     },
     "formula": "a"
    },
-   "note": "Domestic gas use times the average unit price, plus the fixed cost for 84% of households (the model's assumed share with gas).",
+   "note": "Domestic gas use times the average unit price, plus the fixed cost for every domestic gas meter in Great Britain.",
    "issue": "Domestic gas use is 10% below DUKES (see the domestic gas check) and the gas unit rate is 7% low.",
    "status_at_build": "known",
-   "observed": 19.224577671219556,
-   "model_at_build": 16.656489023419006,
+   "observed": 19.30038160546539,
+   "model_at_build": 16.72853684187701,
    "sources": [
     "g = 21697.75 (DUKES_1.1.xlsx, 2024!F57)",
     "u = 0.06542750544 (table_234__1_.xlsx, 2.3.4!J232)",
-    "h = 28609 (familiesandhouseholdsuk2025.xlsx, 5!E21)",
-    "f = 112.9466738 (table_234__1_.xlsx, 2.3.4!K232)"
+    "f = 112.9466738 (table_234__1_.xlsx, 2.3.4!K232)",
+    "meters = 24702.708 (Subnational_gas_consumption_statistics_2005-2024.xlsx, 2024!E7)"
    ]
   },
   {
@@ -1609,7 +1653,7 @@
    "issue": "",
    "status_at_build": "warn",
    "observed": 14.641,
-   "model_at_build": 16.656489023419006,
+   "model_at_build": 16.72853684187701,
    "sources": [
     "s = 14641 (table_261.xlsx, 2.6.1!C62)"
    ]
@@ -1631,7 +1675,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 38.183,
-   "model_at_build": 38.44367783295395,
+   "model_at_build": 39.238877589759376,
    "sources": [
     "s = 38183 (table_261.xlsx, 2.6.1!G62)"
    ]

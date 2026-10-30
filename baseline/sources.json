@@ -271,5 +271,29 @@
         "url": "https://assets.publishing.service.gov.uk/media/6942c2e19273c48f554cf539/Land-use-for-animal-feed-251217.ods",
         "file": "Land-use-for-animal-feed-251217.ods",
         "sha256": "2aba84de68bc16a28a59c40d5d99871dae29fcdc746a893a7ea76030ac2b1193"
+    },
+    "desnz_ghg_factors": {
+        "title": "DESNZ greenhouse gas reporting conversion factors 2024, flat file",
+        "edition": "2024, version 1.1",
+        "page": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2024",
+        "url": "https://assets.publishing.service.gov.uk/media/6722567c10b0d582ee8c4953/ghg-conversion-factors-2024-FlatFormat_v1_1.xlsx",
+        "file": "ghg-conversion-factors-2024-FlatFormat_v1_1.xlsx",
+        "sha256": "1b063892ad1f00c5bc73029c016e54bc4c3050a71219202b545f8aea2f9f75c4"
+    },
+    "defra_bioenergy_crops": {
+        "title": "Defra bioenergy crops in England and the UK",
+        "edition": "2008 to 2024, February 2026 (final edition)",
+        "page": "https://www.gov.uk/government/statistics/bioenergy-crops-in-england-and-the-uk-2008-2024",
+        "url": "https://assets.publishing.service.gov.uk/media/698b4bf88492b54795c1be62/bioenergy-crops-dataset-12feb26.ods",
+        "file": "bioenergy-crops-dataset-12feb26.ods",
+        "sha256": "0d39abf44048b70b9951decff8bd1b4f0d3b2b6a02753ea87b524e3a968014bd"
+    },
+    "desnz_subnational_gas": {
+        "title": "DESNZ sub-national gas consumption statistics, Great Britain",
+        "edition": "2005 to 2024, May 2026",
+        "page": "https://www.gov.uk/government/statistics/regional-and-local-authority-gas-consumption-statistics",
+        "url": "https://assets.publishing.service.gov.uk/media/69f9bf208f3213f7384ecae6/Subnational_gas_consumption_statistics_2005-2024.xlsx",
+        "file": "Subnational_gas_consumption_statistics_2005-2024.xlsx",
+        "sha256": "192c5f81f953c9ab6b5c2dc4a3ca5ddccf5e98f53d39c0ce368c3c532b209cd3"
     }
 }

@@ -39,9 +39,8 @@
             "formula": "a"
         },
         "tolerance": 0.02,
-        "basis": "independent",
-        "note": "All land uses in the model, including land it derives for bioenergy crops, against the UK area.",
-        "issue": "The baseline allocates more land than the UK has: inherited ZCB areas, phantom new woodland and bioenergy crops for imported biomass (open-items.md, Inputs)."
+        "basis": "calibrated",
+        "note": "All land uses in the model, including land it derives for bioenergy crops, against the UK area. Mountain, heath and bog is the remainder of the area, so this confirms the allocation adds up."
     },
     "land.woodland": {
         "group": "Land use",
@@ -68,8 +67,7 @@
             "formula": "a + b + c + d + e + f + g + h + i"
         },
         "tolerance": 0.05,
-        "basis": "input",
-        "issue": "Existing woodland areas are inherited from the ZCB scenario and the baseline adds 1,475 kha of new woodland (open-items.md, Inputs)."
+        "basis": "input"
     },
     "land.broadleaf": {
         "group": "Land use",
@@ -91,8 +89,7 @@
             "formula": "a + b + c + d"
         },
         "tolerance": 0.05,
-        "basis": "input",
-        "issue": "See woodland."
+        "basis": "input"
     },
     "land.conifer": {
         "group": "Land use",
@@ -114,8 +111,7 @@
             "formula": "a + b + c + d"
         },
         "tolerance": 0.05,
-        "basis": "input",
-        "issue": "See woodland."
+        "basis": "input"
     },
     "land.croppable": {
         "group": "Land use",
@@ -138,10 +134,30 @@
             },
             "formula": "a + b + c + d + e + f"
         },
-        "tolerance": 0.1,
-        "basis": "independent",
-        "note": "Defra croppable area, including temporary grass and uncropped arable land. Model crops plus the bioenergy crop land it derives.",
-        "issue": "The land use model grows all solid biomass on UK short rotation coppice. Most biomass for power is imported (open-items.md, Inputs)."
+        "tolerance": 0.02,
+        "basis": "calibrated",
+        "note": "Defra croppable area, including temporary grass and uncropped arable land. Model crops plus the bioenergy crop land it derives."
+    },
+    "land.energy_crops": {
+        "group": "Land use",
+        "label": "Energy crops for heat and power",
+        "units": "kha",
+        "observed": {
+            "values": {
+                "src": {"source": "defra_bioenergy_crops", "sheet": "1_1", "block": "1.1: Total area of crops grown", "row": ["Short rotation coppice area (England only)"], "column": "{year}"},
+                "miscanthus": {"source": "defra_bioenergy_crops", "sheet": "1_1", "block": "1.1: Total area of crops grown", "row": ["Miscanthus area (England only)"], "column": "{year}"}
+            },
+            "formula": "(src + miscanthus) / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "land_use.short_rotation_coppice"
+            },
+            "formula": "a"
+        },
+        "tolerance": 0.02,
+        "basis": "calibrated",
+        "note": "Short rotation coppice and miscanthus in England. The share of solid biomass grown on UK crops is set to match, the rest being imports, wastes and residues."
     },
     "land.livestock": {
         "group": "Land use",
@@ -205,9 +221,8 @@
             },
             "formula": "a + b + c + d"
         },
-        "tolerance": 0.1,
-        "basis": "independent",
-        "note": "Food, industrial and energy crops and uncropped arable land.",
-        "issue": "See croppable land."
+        "tolerance": 0.02,
+        "basis": "input",
+        "note": "Food, industrial and energy crops and uncropped arable land."
     }
 }

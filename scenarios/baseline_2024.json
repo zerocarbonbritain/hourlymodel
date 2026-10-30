@@ -194,7 +194,8 @@
         "smart_charging_enabled": 0,
         "smart_charge_type": "average",
         "V2G_enabled": 0,
-        "V2G_discharge_type": "average"
+        "V2G_discharge_type": "average",
+        "international_shipping_TWhy": 23.9
     },
     "industry": {
         "high_temp_process_TWhy": 21.7,
@@ -302,10 +303,10 @@
     "energy_industry_use": {
         "electricity_grid_loss_prc": 8.8,
         "electricity_own_use_prc": 3.45,
-        "refineries_gas_prc": 0.759,
-        "refineries_oil_prc": 5.18,
-        "oil_gas_extraction_gas_prc": 3.148,
-        "oil_gas_extraction_oil_prc": 0.399,
+        "refineries_gas_prc": 0.732,
+        "refineries_oil_prc": 4.995,
+        "oil_gas_extraction_gas_prc": 3.09,
+        "oil_gas_extraction_oil_prc": 0.392,
         "gas_losses_prc": 0.778
     },
     "fossil_fuels": {
@@ -315,16 +316,25 @@
         "other_coal_use": 0.1
     },
     "land_use": {
-        "new_natural_broadleaf_woodland": 1475,
+        "new_natural_broadleaf_woodland": 0,
         "new_natural_coniferous_woodland": 0,
         "new_productive_broadleaf_woodland": 0,
         "new_productive_coniferous_woodland": 0,
         "short_rotation_forestry": 0,
         "perrennial_grass_miscanthus": 0,
         "rotational_grass_ryegrass": 0,
-        "intensive_and_rough_grazing": 11522,
-        "food_crops": 2557,
-        "feed_crops_for_livestock": 2557
+        "intensive_and_rough_grazing": 10577,
+        "food_crops": 2689,
+        "feed_crops_for_livestock": 3466,
+        "existing_natural_broadleaf_woodland": 171,
+        "existing_productive_broadleaf_woodland": 1539,
+        "existing_natural_coniferous_woodland": 158,
+        "existing_productive_coniferous_woodland": 1418,
+        "annual_grass_hemp": 0,
+        "semi_natural_grassland": 155,
+        "coastal_and_freshwater": 692,
+        "urban_areas": 1459,
+        "mountain_heath_and_bog": 2080
     },
     "emissions_balance": {
         "power_station": 0.677,
@@ -389,15 +399,32 @@
             "policy_gbp": 11.16,
             "supplier_p_kWh": 0.611,
             "supplier_gbp": 93.12,
-            "households_prc": 84
+            "households_prc": 86.3
         },
         "vat_prc": 5,
         "road_fuel": {
             "petrol_p_litre": 141.48,
             "diesel_p_litre": 148.33,
-            "petrol_kWh_per_litre": 9.69,
-            "diesel_kWh_per_litre": 10.69,
+            "petrol_kWh_per_litre": 9.468,
+            "diesel_kWh_per_litre": 10.511,
             "car_diesel_prc": 44.3
         }
+    },
+    "co2_factors": {
+        "gas": 0.18412,
+        "coal": 0.31971,
+        "road_fuel": 0.24589,
+        "aviation": 0.24535,
+        "heating_oil": 0.24557,
+        "gas_oil": 0.25359,
+        "fuel_oil": 0.26709,
+        "refinery": 0.24571,
+        "marine": 0.25486
+    },
+    "land_model": {
+        "uk_area_kha": 24417,
+        "uk_crop_biomass_prc": 0.454,
+        "existing_woodland_tCO2_per_ha": 5.473,
+        "landfill_biochar_MtCO2": 0
     }
 }

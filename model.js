@@ -42,6 +42,7 @@ var model = {
         
         o.fossil_fuels = {
           oil:0,
+          oil_from_store:0,
           gas:0,
           coal:0,
           total:0,
@@ -111,6 +112,8 @@ var model = {
         
         o.transport.fuel_totals.H2 += i.transport.freight_H2_demand
         o.transport.fuel_totals.IC += i.transport.freight_IC_demand
+        // International shipping (marine bunkers) draws on the liquid fuel store but is not final consumption in DUKES
+        o.transport.fuel_totals.IC += i.transport.international_shipping_TWhy
     },
 
     // ---------------------------------------------------------------------------------------------    
@@ -1450,6 +1453,7 @@ var model = {
          }
          
          if (i.fossil_fuels.allow_use_for_backup) {
+             o.fossil_fuels.oil_from_store = o.synth_fuel.unmet_demand
              o.fossil_fuels.oil = o.synth_fuel.unmet_demand
              o.synth_fuel.unmet_demand = 0
              
@@ -1725,7 +1729,7 @@ var model = {
         fc.industry.hydrogen += o.industry.total_hydrogen_demand
 
         fc.transport.electricity += o.electric_transport.total_EV_charge + o.electric_transport.total_elec_trains_demand
-        fc.transport.liquid += o.synth_fuel.total_transport_demand
+        fc.transport.liquid += o.synth_fuel.total_transport_demand - i.transport.international_shipping_TWhy * 10000
         fc.transport.hydrogen += o.hydrogen.total_vehicle_demand
 
         fc.total = 0
@@ -1738,6 +1742,7 @@ var model = {
             }
             fc.total += fc[s].total
         }
+        fc.international_shipping = i.transport.international_shipping_TWhy * 10000
         o.final_consumption = fc
     },
 
@@ -1755,7 +1760,9 @@ var model = {
         let short_rotation_forestry_harvestable_modtyr = ((i.land_use.short_rotation_forestry * 5.08 * 0.001)/(44/12))/0.5
         let short_rotation_forestry_TWh = short_rotation_forestry_harvestable_modtyr * 0.65 * 4.72
         
-        let biomass_demand_for_heat_TWh = o.biomass.total_direct_use * 0.0001
+        // Only the share of direct use biomass grown on UK energy crops needs land.
+        // Imports, wastes and residues make up the rest.
+        let biomass_demand_for_heat_TWh = o.biomass.total_direct_use * 0.0001 * i.land_model.uk_crop_biomass_prc * 0.01
         let short_rotation_coppice_TWh = biomass_demand_for_heat_TWh - short_rotation_forestry_TWh
         
         // Work backwards to land area
@@ -1770,9 +1777,9 @@ var model = {
         o.land_use.total += o.land_use.perrennial_grass_miscanthus
         o.land_use.total += o.land_use.short_rotation_coppice
         
-        o.land_use.available = 24728.0 - o.land_use.total
+        o.land_use.available = i.land_model.uk_area_kha - o.land_use.total
         
-        o.land_use.total_prc = o.land_use.total / 24728.0
+        o.land_use.total_prc = o.land_use.total / i.land_model.uk_area_kha
         
         // ---------------------
         // Carbon sequestration        
@@ -1824,7 +1831,7 @@ var model = {
             new_productive_broadleaf_woodland: new_productive_broadleaf_woodland_harvestable_modtyr * 0.05 * 0.7,
             new_productive_coniferous_woodland: new_productive_coniferous_woodland_harvestable_modtyr * 0.05 * 0.7,
             short_rotation_forestry: short_rotation_forestry_harvestable_modtyr * 0.05 * 0.7,
-            landfill: 1.47 * 0.88
+            landfill: i.land_model.landfill_biochar_MtCO2
         }
         var total = 0
         for (var z in o.carbon_sequestration.biochar) { 
@@ -1832,7 +1839,12 @@ var model = {
         }
         o.carbon_sequestration.biochar.total = total
         
-        o.carbon_sequestration.total = o.carbon_sequestration.reforestation.total + o.carbon_sequestration.timber_products.total + o.carbon_sequestration.biochar.total
+        // Carbon sequestration: growth of existing woodland, kha times tCO2/ha gives ktCO2
+        let existing_woodland = i.land_use.existing_natural_broadleaf_woodland + i.land_use.existing_natural_coniferous_woodland
+            + i.land_use.existing_productive_broadleaf_woodland + i.land_use.existing_productive_coniferous_woodland
+        o.carbon_sequestration.existing_woodland = existing_woodland * i.land_model.existing_woodland_tCO2_per_ha * 0.001
+
+        o.carbon_sequestration.total = o.carbon_sequestration.reforestation.total + o.carbon_sequestration.timber_products.total + o.carbon_sequestration.biochar.total + o.carbon_sequestration.existing_woodland
     },
 
     // ----------------------------------------------------------------------------
@@ -1847,27 +1859,46 @@ var model = {
         o.emissions_balance.aviation_co2e = o.transport.modes.Aviation.IC.TWh * 0.30704 * (aviation_uplift-1)
         
         // Fossil fuels
-        // energy quantities are in GWh over 10 years
-        // multiply by 0.1 to give over 1 year
-        // - coal co2 factor is 0.3166 kgCO2 per kWh = 0.0003166 MtCO2 per GWh
-        // - oil co2 factor is 0.2678 kgCO2 per kWh = 0.0002678 MtCO2 per GWh
-        // - gas co2 factor is 0.1839 kgCO2 per kWh = 0.0001839 MtCO2 per GWh
-        // Coal backup may include other thermal generation (e.g. waste), with its own CO2 factor (kgCO2/kWh fuel)
+        // Energy quantities are in GWh over 10 years, so 0.1 gives one year. CO2 factors are
+        // kgCO2 per kWh (gross), so a further 0.001 gives MtCO2 per GWh.
+        // Coal backup may include other thermal generation (e.g. waste), with its own CO2 factor.
+        let f = {}
+        for (let z in i.co2_factors) f[z] = i.co2_factors[z] * 0.001
         let coal_backup_co2_factor = i.electric_backup.coal_co2_factor * 0.001
-        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable)*0.1*0.0003166
+        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable)*0.1*f.coal
         o.emissions_balance.fossil_fuel_coal += o.fossil_fuels.coal_for_dispatchable*0.1*coal_backup_co2_factor
-        o.emissions_balance.fossil_fuel_oil = o.fossil_fuels.oil*0.1*0.0002678
-        o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*0.0001839
-                        
+        o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*f.gas
+
+        // Fossil oil from the liquid fuel store is shared between its uses by their demand. Backup
+        // generation is tracked hourly, the other uses take the average fossil share of the rest.
+        let aviation = o.transport.modes.Aviation.IC.TWh * 10000
+        let shipping = i.transport.international_shipping_TWhy * 10000
+        let heating = o.heating_systems.synthfuel.fuel_demand
+        let backup = o.synth_fuel.total_demand - o.synth_fuel.total_transport_demand - o.synth_fuel.total_industrial_demand - heating
+        let other_demand = o.synth_fuel.total_demand - backup
+        let fossil_share = other_demand > 0 ? (o.fossil_fuels.oil_from_store - o.synth_fuel.backup_from_fossil_oil) / other_demand : 0
+        o.emissions_balance.oil_by_use = {
+            road_rail_shipping: (o.synth_fuel.total_transport_demand - aviation - shipping) * fossil_share * 0.1 * f.road_fuel,
+            aviation: aviation * fossil_share * 0.1 * f.aviation,
+            international_shipping: shipping * fossil_share * 0.1 * f.marine,
+            heating: heating * fossil_share * 0.1 * f.heating_oil,
+            industry: (o.synth_fuel.total_industrial_demand * fossil_share + i.fossil_fuels.other_oil_use * 10000) * 0.1 * f.gas_oil,
+            power: o.synth_fuel.backup_from_fossil_oil * 0.1 * f.fuel_oil,
+            energy_industry: (o.fossil_fuels.refineries_oil_use * f.refinery + o.fossil_fuels.oil_gas_extraction_oil_use * f.gas_oil) * 0.1
+        }
+        o.emissions_balance.fossil_fuel_oil = 0
+        for (let z in o.emissions_balance.oil_by_use) o.emissions_balance.fossil_fuel_oil += o.emissions_balance.oil_by_use[z]
+
         let grid_co2_emissions = 0;
-        grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*0.0001839
+        grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*f.gas
         grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*coal_backup_co2_factor
-        grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*0.0002678
+        grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*f.fuel_oil
         o.grid_co2_emissions = grid_co2_emissions*0.1   // MtCO2/yr
 
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
         
         o.emissions_balance.reforestation = -o.carbon_sequestration.reforestation.total
+        o.emissions_balance.existing_woodland = -o.carbon_sequestration.existing_woodland
         o.emissions_balance.harvested_wood = -o.carbon_sequestration.timber_products.total     
         o.emissions_balance.biochar_carbon_capture = -o.carbon_sequestration.biochar.total     
         o.emissions_balance.international_aviation_bunkers = o.emissions_balance.aviation_co2e
@@ -1883,6 +1914,7 @@ var model = {
         o.emissions_balance.total += o.emissions_balance.fossil_fuel_gas
 
         o.emissions_balance.total += o.emissions_balance.reforestation
+        o.emissions_balance.total += o.emissions_balance.existing_woodland
         o.emissions_balance.total += o.emissions_balance.harvested_wood
         o.emissions_balance.total += o.emissions_balance.biochar_carbon_capture
         o.emissions_balance.total += o.emissions_balance.international_aviation_bunkers

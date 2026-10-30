@@ -478,10 +478,33 @@
         "note": "Ofgem default tariff cap, direct debit, mean of the four 2024 cap periods, before VAT. Supplier costs and margins per customer."
     },
     "retail.gas.households_prc": {
-        "type": "assumption",
+        "type": "statistic",
         "units": "%",
-        "value": 84,
-        "note": "Share of households with a gas supply, about 24 million domestic gas meters in GB. Not yet taken from a cached source (see open-items.md)."
+        "values": {
+            "meters": {
+                "source": "desnz_subnational_gas",
+                "sheet": "{year}",
+                "block": "Subnational gas consumption, Great Britain",
+                "row": [
+                    "K03000001",
+                    "Great Britain (inc unallocated)",
+                    "All local authorities"
+                ],
+                "column": "Number of meters (thousands): Domestic"
+            },
+            "households": {
+                "source": "ons_households",
+                "sheet": "5",
+                "block": "Number of households (thousands)",
+                "row": [
+                    "All households"
+                ],
+                "column": "{year} Estimate"
+            }
+        },
+        "formula": "meters / households * 100",
+        "round": 1,
+        "note": "Domestic gas meters in Great Britain over UK households. Northern Ireland gas customers are not in the source, so the share is slightly low."
     },
     "retail.vat_prc": {
         "type": "assumption",
@@ -526,16 +549,76 @@
         "note": "Annual average pump price of diesel, including duty and VAT."
     },
     "retail.road_fuel.petrol_kWh_per_litre": {
-        "type": "assumption",
+        "type": "statistic",
+        "years": [
+            2024
+        ],
         "units": "kWh/litre",
-        "value": 9.69,
-        "note": "Gross calorific value of motor spirit, 47.1 GJ/t at 1,350 litres per tonne (DUKES Annex A). Not yet taken from a cached source."
+        "values": {
+            "per_litre": {
+                "source": "desnz_ghg_factors",
+                "sheet": "Factors by Category",
+                "sum": "GHG Conversion Factor 2024",
+                "where": {
+                    "Scope": "Scope 1",
+                    "Level 1": "Fuels",
+                    "Level 3": "Petrol (average biofuel blend)",
+                    "UOM": "litres",
+                    "GHG/Unit": "kg CO2e of CO2 per unit"
+                }
+            },
+            "per_kWh": {
+                "source": "desnz_ghg_factors",
+                "sheet": "Factors by Category",
+                "sum": "GHG Conversion Factor 2024",
+                "where": {
+                    "Scope": "Scope 1",
+                    "Level 1": "Fuels",
+                    "Level 3": "Petrol (average biofuel blend)",
+                    "UOM": "kWh (Gross CV)",
+                    "GHG/Unit": "kg CO2e of CO2 per unit"
+                }
+            }
+        },
+        "formula": "per_litre / per_kWh",
+        "round": 3,
+        "note": "Energy per litre (gross) of pump petrol at the average biofuel blend, from the ratio of the DESNZ 2024 CO2 factors per litre and per kWh."
     },
     "retail.road_fuel.diesel_kWh_per_litre": {
-        "type": "assumption",
+        "type": "statistic",
+        "years": [
+            2024
+        ],
         "units": "kWh/litre",
-        "value": 10.69,
-        "note": "Gross calorific value of DERV, 45.6 GJ/t at 1,185 litres per tonne (DUKES Annex A). Not yet taken from a cached source."
+        "values": {
+            "per_litre": {
+                "source": "desnz_ghg_factors",
+                "sheet": "Factors by Category",
+                "sum": "GHG Conversion Factor 2024",
+                "where": {
+                    "Scope": "Scope 1",
+                    "Level 1": "Fuels",
+                    "Level 3": "Diesel (average biofuel blend)",
+                    "UOM": "litres",
+                    "GHG/Unit": "kg CO2e of CO2 per unit"
+                }
+            },
+            "per_kWh": {
+                "source": "desnz_ghg_factors",
+                "sheet": "Factors by Category",
+                "sum": "GHG Conversion Factor 2024",
+                "where": {
+                    "Scope": "Scope 1",
+                    "Level 1": "Fuels",
+                    "Level 3": "Diesel (average biofuel blend)",
+                    "UOM": "kWh (Gross CV)",
+                    "GHG/Unit": "kg CO2e of CO2 per unit"
+                }
+            }
+        },
+        "formula": "per_litre / per_kWh",
+        "round": 3,
+        "note": "Energy per litre (gross) of pump diesel at the average biofuel blend, from the ratio of the DESNZ 2024 CO2 factors per litre and per kWh."
     },
     "retail.road_fuel.car_diesel_prc": {
         "type": "statistic",

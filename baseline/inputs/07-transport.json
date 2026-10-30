@@ -571,5 +571,15 @@
         "type": "assumption",
         "value": 0.2574,
         "note": "Same as the ZCB default scenario. Set explicitly so a change to the default does not leak into the baseline."
+    },
+    "transport.international_shipping_TWhy": {
+        "type": "statistic",
+        "units": "TWh/yr",
+        "values": {
+            "bunkers": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": [ "Marine bunkers" ], "column": "Petroleum products"}
+        },
+        "formula": "-bunkers * 0.01163",
+        "round": 1,
+        "note": "DUKES 1.1 marine bunkers (international shipping fuel), drawn from the liquid fuel store. DUKES excludes it from total supply and final consumption, and the model reports it separately. The inventory estimates shipping CO2 bottom up, which gives less CO2 than these bunkers."
     }
 }

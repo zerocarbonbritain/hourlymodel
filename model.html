@@ -1278,7 +1278,7 @@ input[type='text'] {
                 <td>{{ (o.carbon_sequestration.reforestation.short_rotation_forestry+o.carbon_sequestration.timber_products.short_rotation_forestry+o.carbon_sequestration.biochar.short_rotation_forestry) | toFixed(1) }} MtCO2e/yr</td>
             </tr>
             <tr>
-                <td>Short rotation coppice <span style="font-size:12px">(biomass heat)</span></td>
+                <td>Short rotation coppice <span style="font-size:12px">(biomass heat, <input v-model.number="i.land_model.uk_crop_biomass_prc" type="text" @change="update" style="width:40px" autocomplete="off"/>% of direct use biomass grown on UK energy crops, the rest imported or from residues)</span></td>
                 <td>{{ o.land_use.short_rotation_coppice | toFixed(0) }} kha</td>
             </tr>
             <tr>
@@ -1340,7 +1340,7 @@ input[type='text'] {
             </tr>  
             <tr>
                 <td>Total UK land area</span></td>
-                <td>24728 kha</td>
+                <td><input v-model.number="i.land_model.uk_area_kha" type="text" @change="update" style="width:70px"  autocomplete="off"/> kha</td>
             </tr>
             <tr>
                 <td>Percentage of UK land area used</span></td>
@@ -1488,6 +1488,10 @@ input[type='text'] {
             <tr>
                 <td>Land remaining or converted to wetlands</td>
                 <td><input v-model.number="i.emissions_balance.land_remaining_and_converted_to_wetlands" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            </tr>
+            <tr>
+                <td>Existing woodland (<input v-model.number="i.land_model.existing_woodland_tCO2_per_ha" type="text" @change="update" style="width:40px" autocomplete="off"/> tCO2/ha/yr)</td>
+                <td>{{ o.emissions_balance.existing_woodland | toFixed(2) }} </td>
             </tr>
             <tr>
                 <td>Reforestation</td>

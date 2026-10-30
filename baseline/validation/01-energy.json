@@ -6,11 +6,12 @@
         "observed": {
             "values": {
                 "supply": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total supply"], "column": "Total"},
+                "bunkers": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Marine bunkers"], "column": "Total"},
                 "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Total"},
                 "nuclear_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Fuel used"], "column": "Nuclear (thermal)"},
                 "nuclear_gen": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Nuclear (thermal)"}
             },
-            "formula": "(supply - non_energy) * 0.01163 - (nuclear_fuel - nuclear_gen) / 1000"
+            "formula": "(supply - bunkers - non_energy) * 0.01163 - (nuclear_fuel - nuclear_gen) / 1000"
         },
         "model": {
             "values": {
@@ -20,7 +21,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "DUKES 1.1 total supply less non energy use, with nuclear counted as electricity generated rather than reactor heat (DUKES 5.6), as the model does. Includes ambient heat, which DUKES counts under bioenergy and waste."
+        "note": "DUKES 1.1 total supply plus marine bunkers, less non energy use, with nuclear counted as electricity generated rather than reactor heat (DUKES 5.6), as the model does. Includes ambient heat, which DUKES counts under bioenergy and waste."
     },
     "energy.final_total": {
         "group": "Energy balance",
@@ -345,9 +346,10 @@
             "values": {
                 "crude": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Primary oils"},
                 "products": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Total demand"], "column": "Petroleum products"},
+                "bunkers": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Marine bunkers"], "column": "Petroleum products"},
                 "non_energy": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Non energy use"], "column": "Petroleum products"}
             },
-            "formula": "(crude + products - non_energy) * 0.01163"
+            "formula": "(crude + products - bunkers - non_energy) * 0.01163"
         },
         "model": {
             "values": {
@@ -357,7 +359,7 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "Primary oils plus net petroleum products, excluding non energy use and marine bunkers. Biofuels are excluded on both sides."
+        "note": "Primary oils plus net petroleum products and marine bunkers, excluding non energy use. Biofuels are excluded on both sides."
     },
     "energy.coal_demand": {
         "group": "Energy balance",
