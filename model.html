@@ -1604,19 +1604,20 @@ input[type='text'] {
             <span v-if="i.generation_costs.basis == 'price'">&nbsp; Build-up for every technology: {{ o.retail.electricity.resource_p_kWh | toFixed(2) }} p/kWh</span></p>
 
         <table class="table cost-table" style="width:100%">
-            <tr><th>Technology</th><th>Output</th><th>Price</th><th title="Technologies without a price use the build-up. Grey where a price is used instead. Hydro and imports have no build-up.">Build-up</th><th v-if="i.generation_costs.basis == 'price'" title="The hurdle rate at which the build-up equals the price. Above the new-build rate suggests an older, dearer fleet or returns above cost. Below it suggests capital that is paid off.">Implied hurdle</th><th>Annual</th></tr>
-            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th v-if="i.generation_costs.basis == 'price'">%</th><th>£bn/y</th></tr>
+            <tr><th>Technology</th><th>Output</th><th title="Output over capacity. Strike prices and the build-up reference costs assume project load factors, which can differ from the weather data.">Load factor</th><th>Price</th><th title="Technologies without a price use the build-up. Grey where a price is used instead. Imports have no build-up.">Build-up</th><th v-if="i.generation_costs.basis == 'price'" title="The hurdle rate at which the build-up equals the price. Above the new-build rate suggests an older, dearer fleet or returns above cost. Below it suggests capital that is paid off.">Implied hurdle</th><th>Annual</th></tr>
+            <tr class="units"><th></th><th>TWh/y</th><th>%</th><th>£/MWh</th><th>£/MWh</th><th v-if="i.generation_costs.basis == 'price'">%</th><th>£bn/y</th></tr>
             <tr v-for="(row,key) in o.generation_costs.by_tech" v-if="row.generation > 0">
                 <td>{{ key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ') }}</td>
                 <td>{{ row.generation | toFixed(1) }}</td>
+                <td><span v-if="row.load_factor !== null">{{ 100 * row.load_factor | toFixed(0) }}</span></td>
                 <td><input v-if="i.generation_costs.basis == 'price' || row.lcoe === null" v-model.number="i.generation_costs.price_gbp_MWh[key]" type="text" @change="price_change(key)" autocomplete="off"/></td>
                 <td :class="{ muted: !row.uses_build_up }"><span v-if="row.lcoe !== null">{{ row.lcoe | toFixed(0) }}</span></td>
                 <td v-if="i.generation_costs.basis == 'price'"><span v-if="row.implied_hurdle !== null">{{ row.implied_hurdle | toFixed(1) }}</span></td>
                 <td>{{ row.annual | toFixed(2) }}</td>
             </tr>
-            <tr v-if="o.generation_costs.fuel_production_annual > 0"><td>Fuel production plant</td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.fuel_production_annual | toFixed(2) }}</td></tr>
-            <tr v-if="i.generation_costs.basis == 'price' || i.generation_costs.other_support_gbp_bn"><td>Other support (FiT, capacity market)</td><td></td><td><input v-model.number="i.generation_costs.other_support_gbp_bn" type="text" @change="update_non_hourly" autocomplete="off"/></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ i.generation_costs.other_support_gbp_bn | toFixed(2) }}</td></tr>
-            <tr class="total"><td>Total, {{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh delivered</td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.total_annual | toFixed(1) }}</td></tr>
+            <tr v-if="o.generation_costs.fuel_production_annual > 0"><td>Fuel production plant</td><td></td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.fuel_production_annual | toFixed(2) }}</td></tr>
+            <tr v-if="i.generation_costs.basis == 'price' || i.generation_costs.other_support_gbp_bn"><td>Other support (FiT, capacity market)</td><td></td><td></td><td><input v-model.number="i.generation_costs.other_support_gbp_bn" type="text" @change="update_non_hourly" autocomplete="off"/></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ i.generation_costs.other_support_gbp_bn | toFixed(2) }}</td></tr>
+            <tr class="total"><td>Total, {{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh delivered</td><td></td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.total_annual | toFixed(1) }}</td></tr>
         </table>
 
         <h3>Build-up</h3>

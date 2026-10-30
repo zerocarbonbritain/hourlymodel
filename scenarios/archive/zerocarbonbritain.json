@@ -558,6 +558,16 @@
             "variable_om": 13,
             "lifespan": 60
         },
+        "Hydro": {
+            "hurdle_rate": 7.6,
+            "predev_years": 3,
+            "predev_cost": 74,
+            "build_years": 2,
+            "capex": 3961,
+            "fixed_om": 60.3,
+            "variable_om": 7.9,
+            "lifespan": 40
+        },
         "H2 Electrolysis": {
             "hurdle_rate": 10.1,
             "predev_years": 0,

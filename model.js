@@ -1992,6 +1992,7 @@ var model = {
         o.costs['Wave'] = { capacity: i.supply.wave_capacity, generation: o.supply.total_wave*0.0001 }
         o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity, generation: o.supply.total_geothermal_elec*0.0001 }
         o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity, generation: o.supply.total_nuclear*0.0001 }
+        o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: o.supply.total_hydro*0.0001 }
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
         o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement, generation: o.electric_backup.total_before_grid_loss*0.0001 }
@@ -2038,8 +2039,8 @@ var model = {
 
         // Generation cost. With basis "price", a technology with a price per MWh (a strike price, or
         // wholesale value plus support) is costed as output times that price, and one without uses the
-        // build-up above. With basis "lcoe", every technology uses the build-up. Hydro and imports have
-        // no build-up and always use their price. Backup turbine capacity is shared by output, plus each
+        // build-up above. With basis "lcoe", every technology uses the build-up. Imports have no
+        // build-up and always use their price. Backup turbine capacity is shared by output, plus each
         // fuel's own fuel and carbon cost. Fuel production plant (electrolysis, methanation, power to X)
         // always uses the build-up. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and TWh
         // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
@@ -2055,7 +2056,7 @@ var model = {
             wave: [o.supply.total_wave, 'Wave'],
             geothermal: [o.supply.total_geothermal_elec, 'Geothermal Electric'],
             nuclear: [o.supply.total_nuclear, 'Nuclear'],
-            hydro: [o.supply.total_hydro, null],
+            hydro: [o.supply.total_hydro, 'Hydro'],
             imports: [o.supply.total_imports, null],
             gas: [eb.total_methane_turbine_output, () => turbine_share(eb.total_methane_turbine_output) + backup_fuel_annual.gas],
             biomass: [eb.total_biomass_turbine_output, () => turbine_share(eb.total_biomass_turbine_output) + backup_fuel_annual.biomass],
@@ -2089,11 +2090,16 @@ var model = {
                 price: generation > 0 ? 1000 * annual / generation : 0,
                 annual: annual,
                 uses_build_up: uses_build_up,
+                load_factor: null,
                 implied_hurdle: null,
                 implied_capex: null
             }
-            // What the price implies for the build-up of a fixed generator: the hurdle rate that
-            // reproduces it, and the construction cost per kW that does at the input hurdle rate.
+            // Load factor of a fixed generator, TWh/yr over GW, and what its price implies for the
+            // build-up: the hurdle rate that reproduces it, and the construction cost per kW that
+            // does at the input hurdle rate.
+            if (typeof cost === 'string' && cost != 'Electric Storage' && o.costs[cost].capacity > 0) {
+                row.load_factor = generation / (o.costs[cost].capacity * 8.766)
+            }
             if (typeof cost === 'string' && priced && generation > 0 && o.costs[cost].capacity > 0) {
                 let target = generation * (price - i.costs[cost].variable_om) / o.costs[cost].capacity
                 row.implied_hurdle = implied_hurdle_rate(i.costs[cost], target)

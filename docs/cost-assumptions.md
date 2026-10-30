@@ -29,6 +29,7 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Wave | 11.4 | 12, 230 | 4, 4,200 | 235.4 | 0 | 25 | Tidal values, no DESNZ wave case |
 | Geothermal electric | 8.9 | 2, 60 | 5, 5,980 | 125 | 26 | 30 | DESNZ 2025 deep geothermal, 2035 NOAK |
 | Nuclear | 6.7 | 0, 0 | 10, 11,900 | 109 | 13 | 60 | Sizewell C, see below |
+| Hydro | 7.6 | 3, 74 | 2, 3,961 | 60.3 | 7.9 | 40 | Arup 2016 hydro 5-16 MW, see below |
 | Gas turbines | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT |
 | Electric storage (per kWh) | 8.9 | 0, 0 | 1, 230 | 5 | 0 | 15 | Modo Energy GB 2 hour survey, CEPA hurdle rate |
 | H2 electrolysis | 10.1 | 0, 0 | 1, 328 | 11.4 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
@@ -47,15 +48,23 @@ LCOE at the DESNZ or project load factor, compared with Allocation Round 7 (AR7)
 | Onshore wind | 30% | 72 | 72.24 (AR7) |
 | Offshore wind | 49% | 90 | 91.20 (AR7, England and Wales) |
 | Tidal | 37% | 268 | 265.00 (AR7) |
+| Hydro | 35% | 138 | No CfD. Arup 2016 gives £130 at DECC hurdle rates |
 | Nuclear | 90% | 168 | 124.7 (Hinkley Point C, £89.50 in 2012 prices) |
 | CCGT with fuel and carbon | 30% | 143 | 147 (DESNZ 2025 LCOE) |
 
 - **Solar and onshore wind** use DESNZ assumptions unchanged. DESNZ quotes £60 and £58/MWh at 12% and 37% load factors. AR7 prices match at load factors closer to GB fleet averages.
 - **Offshore wind** uses the DESNZ low hurdle rate of 7.3%. At the medium 8.9% it is £101/MWh, above the AR7 price.
-- **Tidal** uses a 10.5% hurdle rate. At the medium 11.4% it is £286/MWh.
+- **Tidal** uses the DESNZ 2025 first of a kind tidal stream costs and a 10.5% hurdle rate. At the medium 11.4% it is £286/MWh.
+- **Hydro** has no DESNZ 2025 case. Costs are the Arup 2016 medium case for 5-16 MW run of river schemes (pre-development £55/kW, construction £2,958/kW, fixed O&M £45.1/kW/yr, variable O&M £5.9/MWh, 35% net load factor), in 2014 prices and uplifted to 2024 by CPI (133.9/100). Arup gives no hurdle rate, build period or lifetime, so these are the onshore wind hurdle rate of 7.6%, 3 and 2 years, and 40 years. This gives £138/MWh at 35%, against Arup's £130 at the updated DECC hurdle rates. Hydro has no CfD, so zcb_2024 prices it at this build-up cost. Most existing UK hydro is older and larger, so new-build costs overstate the 2024 fleet. 2024 prices imply a 4.8% hurdle rate.
 - **Nuclear** uses the Sizewell C capital cost (about £38bn in 2024 prices for 3.2 GW, £11,900/kW) and its allowed return of 6.7% real. The Hinkley Point C strike price was set in 2013, before its cost overruns, and fell from £92.50 to £89.50 (2012 prices) when Sizewell C reached a final investment decision. Sizewell C costs reproduce the strike price at a hurdle rate of about 5%. Hinkley Point C is now estimated at £35bn in 2015 prices (EDF, February 2026), about £46bn in 2024 prices or £14,100/kW for 3.26 GW, with unit 1 due in 2030 after construction began in 2017. At 6.7% and a 13 year build that gives about £220/MWh. Sizewell C is used because it repeats the Hinkley design and is the more recent estimate. No scenario uses a lower nuclear cost. Nuclear O&M is taken from DESNZ 2020 and is unverified.
 
-The model's own load factors come from the hourly dataset and are often lower than new-build project values. For example, ZCB offshore wind runs at 43% and tidal at 24%, giving £102 and £415/MWh. Technology LCOE in the model therefore sits above strike prices where the dataset load factor is low.
+The model's own load factors come from the hourly dataset and are often lower than new-build project values. For example, ZCB offshore wind runs at 43% and tidal at 24%, giving £102 and £415/MWh. Technology LCOE in the model therefore sits above strike prices where the dataset load factor is low. The generation cost table shows each load factor.
+
+### Tidal: strike price and build-up
+
+In zcb_2024, tidal is £265/MWh at the AR7 price and £416/MWh on the build-up. The whole gap is load factor. The build-up reproduces the strike price at the DESNZ load factor of 37%, but the dataset tidal profile averages 23.9%, and 268 × 37 / 23.9 is about £415. A strike price is paid per MWh, so at the dataset's output it pays less than the plant costs. The price implies a 4.3% hurdle rate, against 10.5% in the build-up.
+
+Which is right depends on the load factor real arrays achieve. DESNZ assumes 37% for new projects. MeyGen, the largest operating array (6 MW), generated 10.2 GWh in 2023, about 19%. If 37% is achievable, the dataset understates tidal output and the strike price is the better cost. If arrays run nearer 24%, the build-up is. In zcb_2024 tidal is 1.0 TWh, so the difference is £0.15bn a year.
 
 ## Generation cost
 
@@ -64,7 +73,7 @@ The generation cost is the cost per kWh that retail electricity prices start fro
 - `price`: a technology with a price in `generation_costs.price_gbp_MWh`, such as a CfD strike price or wholesale value plus support, is costed as output times that price. One without a price uses the build-up above.
 - `lcoe`: every technology uses the build-up.
 
-Hydro and imports have no build-up and always use their price. `generation_costs.other_support_gbp_bn` adds support that is not split by technology. Electrolysis, methanation and power to X always use the build-up. Both bases use output before curtailment.
+Imports have no build-up and always use their price. `generation_costs.other_support_gbp_bn` adds support that is not split by technology. Electrolysis, methanation and power to X always use the build-up. Both bases use output before curtailment.
 
 Backup turbine capacity is shared between fuels by output, and each fuel adds its own fuel and carbon cost. Backup turbines and storage run as the rest of the system needs, so scenarios cost them on the build-up. A price for them only suits a baseline, where output is observed.
 
@@ -75,16 +84,16 @@ The build-up for every technology is also reported (`retail.electricity.resource
 The UI has one setting for generation costs, with two price presets and the build-up. The presets are taken from the `generation_costs` block of a reference scenario:
 
 - **2024 fleet prices** (baseline_2024): capture price plus support per MWh. Offshore wind £163, onshore £121, solar £108, hydro £106, nuclear £72, gas £85, bioenergy £131, oil £114 and imports £76/MWh, plus £3.0bn of Feed-in Tariff and capacity market payments. Built by `baseline/inputs/13-prices.json`, see [baseline-2024-notes.md](baseline-2024-notes.md).
-- **New-build strike prices** (zcb_2024): AR7 strike prices for wind, solar and tidal, and the Hinkley Point C strike price for nuclear, from the table above. Other plant uses the build-up.
+- **New-build strike prices** (zcb_2024): AR7 strike prices for wind, solar and tidal, the Hinkley Point C strike price for nuclear, and the hydro build-up at its 35% reference load factor (£138), from the table above. Other plant uses the build-up.
 
 Applied to another scenario, a preset sets only the fixed generators (wind, solar, marine, geothermal, nuclear, hydro and imports). Backup, storage and support not split by technology keep their current values. Editing a price shows the setting as custom. The build-up table shows only the components in use.
 
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
 |---|---|---|---|
-| baseline_2024 | 13.6 | 11.0 | 12.2 |
-| zcb_2024 | 22.8 | 14.5 | 15.7 |
+| baseline_2024 | 13.6 | 11.3 | 12.5 |
+| zcb_2024 | 22.8 | 14.7 | 16.0 |
 
-Generation cost in p/kWh delivered. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with hydro and imports at zero. In the UI, the build-up setting also counts hydro and imports at their prices and adds support not split by technology.
+Generation cost in p/kWh delivered. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
 
 ### Implied hurdle rate and capital cost
 
@@ -106,5 +115,8 @@ Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for 
 - DESNZ, [CfD Allocation Round 7 results](https://www.gov.uk/government/publications/contracts-for-difference-cfd-allocation-round-7-results/contracts-for-difference-allocation-round-7-results-accessible-webpage) (offshore wind) and Energy UK, [AR7 onshore results](https://www.energy-uk.org.uk/wp-content/uploads/2026/02/Energy-UK-explains-AR7-onshore-results-11-February-2026.pdf).
 - DESNZ, [Sizewell C value for money assessment](https://assets.publishing.service.gov.uk/media/687f951dfdc190fb6b84689d/szc-fid-vfm-assessment.pdf) and Centrica, [Sizewell C announcement](https://www.centrica.com/media/tfnbsmm5/centrica-2025-sizewell-c-rns-announcement-final-220725.pdf).
 - Low Carbon Contracts Company, [Hinkley Point C scheme register](https://register.lowcarboncontracts.uk/NUC-HPC-198), and New Civil Engineer, [Hinkley Point C's cost climbs to £35bn](https://www.newcivilengineer.com/latest/hinkley-point-cs-cost-climbs-to-35bn-with-confirmation-unit-1-will-power-up-in-2030-20-02-2026/).
+- Arup for DECC, [Review of renewable electricity generation cost and technical assumptions](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/566718/Arup_Renewable_Generation_Cost_Report.pdf) (2016), section 19, hydro.
+- ONS, [CPI index 00: all items, D7BT](https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7bt/mm23), annual 2014 and 2024.
+- [MeyGen](https://en.wikipedia.org/wiki/MeyGen), 2023 net output.
 - Modo Energy, [GB battery capex survey 2024](https://modoenergy.com/research/battery-energy-storage-capex-containerised-bess-development-costs-oem-balance-plant-bop-grid-connections-survey-2024) and [global battery capex September 2026](https://modoenergy.com/research/global-battery-capex-september-2026-research). £230/kWh is the 2024 median (£325/kWh) less the reported 29% fall.
 - LSEG, [UKA price update Q1 2026](https://www.lseg.com/content/dam/data-analytics/en_us/documents/reports/lseg-q1-2026-eua-and-uka-price-update.pdf).
