@@ -1621,7 +1621,13 @@ input[type='text'] {
         </table>
 
         <h3>Build-up</h3>
-        <p>Levelised costs by the DESNZ method, in 2024 prices and calibrated to AR7 strike prices. Only components in use are shown.</p>
+        <p>Annualised by
+            <select v-model="i.annualisation.method" @change="update_non_hourly">
+                <option value="desnz">the DESNZ method, technology hurdle rates</option>
+                <option value="annuity">an annuity at one discount rate</option>
+            </select>
+            <span v-if="i.annualisation.method == 'annuity'"><input v-model.number="i.annualisation.discount_rate" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> %, hurdle rates and build periods not used.</span>
+            In 2024 prices and calibrated to AR7 strike prices on the DESNZ method. Only components in use are shown.</p>
         <table class="table cost-table" style="width:100%">
             <tr>
                 <th rowspan="2">Component</th>

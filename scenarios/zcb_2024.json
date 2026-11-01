@@ -420,6 +420,10 @@
         "solarpv_lifespan": 30
     },
     "carbon_price": 68,
+    "annualisation": {
+        "method": "desnz",
+        "discount_rate": 7
+    },
     "co2_factors": {
         "gas": 0.18412,
         "coal": 0.31971,

@@ -12,11 +12,13 @@ The method is the one used by DESNZ Electricity Generation Costs and by `tools/l
 - Annual cost per kW is discounted costs over discounted operating years. This equals LCOE multiplied by annual output, so capacity that rarely runs still carries its full cost.
 - Variable O&M is charged per MWh of output. Fuel and carbon are charged on modelled fuel use and backup CO2.
 
+`annualisation.method` can instead be `annuity`, the PyPSA-Eur method: overnight cost (pre-development plus construction) times the annuity factor at one real discount rate for every technology (`annualisation.discount_rate`, 7% by default), plus fixed O&M. It has no interest during construction and no technology hurdle rates. It is a sensitivity and a basis for comparison with PyPSA results. The DESNZ method is the default. In zcb_2024 the annuity at 7% gives £82.9bn/yr against £92.7bn, with the largest falls for gas turbines, hydrogen storage and FT plant. Strike price calibration, implied hurdle rates and implied capital costs always use the DESNZ method.
+
 Costs from older sources are uplifted to 2024 prices with the deflator the source itself used: the GDP deflator (ONS YBGB) for government appraisals that state GDP deflator prices, and CPI (ONS D7BT) otherwise.
 
 Periods must be whole years. Decommissioning costs are left out (under £1/MWh for wind and solar in DESNZ 2025).
 
-`capex` includes the DESNZ infrastructure cost per kW. `fixed_om` is DESNZ fixed O&M plus insurance plus connection and use of system charges. The connection charges include generator transmission charges, which also sit within the separate £50/MWh network cost, so there is a small overlap. Strike prices include these charges, so keeping them makes the comparison like for like.
+`capex` includes the DESNZ infrastructure cost per kW. `fixed_om` is DESNZ fixed O&M plus insurance plus connection and use of system charges. The connection charges include generator transmission charges, which also sit within the network charges in retail prices, so there is a small overlap. Strike prices include these charges, so keeping them makes the comparison like for like.
 
 ## Inputs
 

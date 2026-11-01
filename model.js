@@ -2012,7 +2012,7 @@ var model = {
         // Capacity in GW (GWh for storage) and costs per kW (kWh), 0.001 gives £bn/yr
         for (var z in i.costs) {
             let c = o.costs[z]
-            c.annual = c.capacity * 0.001 * levelised_fixed_cost(i.costs[z]) + c.generation * 0.001 * i.costs[z].variable_om
+            c.annual = c.capacity * 0.001 * annual_fixed_cost(i.costs[z], i.annualisation) + c.generation * 0.001 * i.costs[z].variable_om
             c.LCOE = c.generation > 0 ? 1000 * c.annual / c.generation : 0
             o.total_annual_cost += c.annual
         }
@@ -2202,6 +2202,17 @@ function levelised_fixed_cost(c) {
         }
     }
     return discounted_costs / discounted_operating_years
+}
+
+// Annual fixed cost (£/kW/yr) by the chosen method. "desnz" is levelised_fixed_cost at each
+// technology's hurdle rate. "annuity" is the PyPSA-Eur method: overnight cost (pre-development
+// plus construction) times the annuity factor at one discount rate for all technologies, plus
+// fixed O&M, with no interest during construction.
+function annual_fixed_cost(c, a) {
+    if (!a || a.method != "annuity") return levelised_fixed_cost(c)
+    let r = a.discount_rate * 0.01
+    let annuity = r > 0 ? r / (1 - Math.pow(1 + r, -c.lifespan)) : 1 / c.lifespan
+    return (c.predev_cost + c.capex) * annuity + c.fixed_om
 }
 
 // Hurdle rate (%) at which levelised_fixed_cost equals target (£/kW/yr). The cost rises with the
