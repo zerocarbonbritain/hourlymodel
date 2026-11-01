@@ -50,7 +50,7 @@ Changes to `cost_model` and the `costs` inputs only. Dispatch is unchanged, so n
 - [x] **FT plant and stores.** Done 2026-11-01: FT £2,681/kW of H2 in (technology-data electrobiofuels, 10.1%), H2 store £2.217/kWh, CH4 £0.2465/kWh, liquid £0.0181/kWh (8.9%). Zero in the baselines, where the stores stand in for fossil supply. zcb_2024 £83.5bn to £92.7bn/yr, generation cost 16.8 to 18.7 p/kWh. Store power is not costed.
 - [x] **Single discount rate option.** Done 2026-11-01: `annualisation.method` "annuity" at `annualisation.discount_rate`. zcb_2024 £92.7bn/yr by the DESNZ method, £82.9bn at a 7% annuity.
 - [x] **Backup de-rating margin.** Done 2026-11-01: `electric_backup.derating_factor` 0.9048 (CCGT, T-4 2030/31, NESO). zcb_2024 +£0.63bn/yr (48.0 GW costed), baseline_2024 +£0.44bn/yr. No weather margin. Closed the open item "No reserve margin".
-- [ ] **Network cost by peak.** Distribution per kW of peak (about £53/kW/yr) as an option next to £50/MWh.
+- [x] **Network cost by peak.** Done 2026-11-01: `retail.electricity.network_basis` "peak" scales the 2024 network charge with peak demand over delivered electricity (option A). zcb_2024 uses it: 3.40 p/kWh, unchanged on average, about £1.7bn/yr per 10 GW of peak.
 - [ ] Rebuild the baselines and confirm the validation report is unchanged apart from cost lines.
 
 Done when every technology in the PyPSA network has a cost in the hourly model on the same basis, and zcb_2024's total cost matches the PyPSA costing of ZCB capacities (£87.8bn/yr) or the difference is explained.

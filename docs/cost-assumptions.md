@@ -128,6 +128,14 @@ Backup turbine capacity is shared between fuels by output, and each fuel adds it
 
 The build-up for every technology is also reported (`retail.electricity.resource_p_kWh`), as what the system would cost to build at today's costs.
 
+### Network cost
+
+Network charges are in retail prices only, from the 2024 Ofgem cap: 3.394 p/kWh and £116.23 per customer per year. They are not in the system cost.
+
+With `retail.electricity.network_basis` `peak` (zcb_2024), the per kWh network charge scales with peak electricity demand relative to the 2024 baseline and is recovered over delivered electricity: network p/kWh = 3.394 × (peak / 55.19 GW) × (269.39 TWh / delivered). The reference values are baseline_2024 model outputs (`balance.max_electricity_demand` and delivered electricity) and need updating when the baseline changes. Both peaks come from the same model, so its high peak (open item "Peak demand is high") partly cancels. The standing charge is per connection and does not scale. Baselines use `per_kWh`.
+
+In zcb_2024 peak demand is 95.2 GW and delivered electricity 465 TWh, both about 1.72 times 2024, so the network charge is 3.40 p/kWh (£15.8bn/yr), the same as per kWh. Each 10 GW of peak reduction saves about £1.7bn/yr. A peak based on network capacity costs, such as technology-data's distribution grid at £554/kW, is an alternative not used yet.
+
 ### Presets
 
 The UI has one setting for generation costs, with two price presets and the build-up. The presets are taken from the `generation_costs` block of a reference scenario:

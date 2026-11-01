@@ -2147,7 +2147,15 @@ var model = {
         }
         // The unit rate uses the generation cost plus any year specific wholesale adjustment
         elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
-        elec.unit_rate_p_kWh = (elec.generation_p_kWh + e.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
+        // With network_basis "peak", total network cost per kWh scales with peak electricity demand
+        // relative to the reference (the 2024 baseline), recovered over delivered electricity.
+        // The standing charge is per connection and does not scale.
+        elec.network_p_kWh = e.network_p_kWh
+        if (e.network_basis == "peak" && delivered_TWh > 0) {
+            elec.network_p_kWh *= (o.balance.max_electricity_demand / e.network_reference_peak_GW) * (e.network_reference_TWh / delivered_TWh)
+        }
+        elec.network_annual_bn = elec.network_p_kWh * 0.01 * delivered_TWh
+        elec.unit_rate_p_kWh = (elec.generation_p_kWh + elec.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
         elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
         elec.household_kWh = households_kWh(o.final_consumption.domestic.electricity)
         elec.bill_gbp = elec.unit_rate_p_kWh * 0.01 * elec.household_kWh + elec.standing_charge_gbp

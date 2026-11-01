@@ -670,5 +670,10 @@
         "units": "£/kWh/yr",
         "value": 0,
         "note": "The baseline synthetic fuel store stands in for oil supply. Its storage cost is within the oil price, so the ZCB liquid storage cost is not applied."
+    },
+    "retail.electricity.network_basis": {
+        "type": "assumption",
+        "value": "per_kWh",
+        "note": "Baselines pay network charges at the observed per kWh rate. Scenarios can scale network cost with peak demand relative to the 2024 baseline."
     }
 }

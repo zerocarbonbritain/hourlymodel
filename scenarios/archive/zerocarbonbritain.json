@@ -442,6 +442,9 @@
         "electricity": {
             "network_p_kWh": 3.394,
             "network_gbp": 116.23,
+            "network_basis": "per_kWh",
+            "network_reference_peak_GW": 55.19,
+            "network_reference_TWh": 269.39,
             "policy_p_kWh": 0.878,
             "policy_gbp": 10.76,
             "supplier_p_kWh": 3.176,
