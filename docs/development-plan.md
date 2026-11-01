@@ -55,10 +55,13 @@ Changes to `cost_model` and the `costs` inputs only. Dispatch is unchanged, so n
 
 Done when every technology in the PyPSA network has a cost in the hourly model on the same basis, and zcb_2024's total cost matches the PyPSA costing of ZCB capacities (£87.8bn/yr) or the difference is explained.
 
+Phase 1 done 2026-11-01. zcb_2024 costs £93.34bn/yr. Against the PyPSA costing of ZCB capacities (£87.8bn/yr), the difference is technology-data electrolysis (+£5.12bn) and methanation (+£0.14bn), turbine de-rating (+£0.63bn) and the GGSS plant basis for biogas (−£0.35bn), which sum to £93.33bn.
+
 ## Phase 2. Make the PyPSA reference robust
 
 In ZCB_PyPSA. Record results in docs/results.md.
 
+- [ ] **Align PyPSA costs with the hourly model.** Re-export zcb_2024 so electrolysis, methanation, anaerobic digestion, FT and the stores come from its `costs` block, replace the biogas tiers in costs.py with the plant and crop feedstock basis, and apply the turbine de-rating factor.
 - [ ] Value of lost load at £17,000/MWh in 2024 prices, and a no-shedding run (D5). Rerun ten years.
 - [ ] Rerun expansion at technology-data electrolysis and methanation costs (D1).
 - [ ] **Rules at the optimum.** Run the hourly model at the PyPSA optimal capacities. Report whether it balances (nothing unmet, stores back to their start levels), its cost against the optimum, and its dispatch against the optimised dispatch. This is the core validation measure for D3.
