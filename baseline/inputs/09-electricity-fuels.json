@@ -444,5 +444,11 @@
         "formula": "ets + cps",
         "round": 2,
         "note": "UK ETS allowance price plus Carbon Price Support paid by fossil power generation. The 2018 baseline keeps 0, as no 2018 EU ETS series is sourced."
+    },
+    "electric_backup.derating_factor": {
+        "type": "assumption",
+        "units": "fraction",
+        "value": 0.9048,
+        "note": "Capacity Market de-rating factor for CCGT, T-4 auction for delivery year 2030/31 (NESO Capacity Market Register, Capacity Market De-Rating Factors CSV, September 2026). Turbine capacity costed is the peak need divided by this factor, for plant outages."
     }
 }

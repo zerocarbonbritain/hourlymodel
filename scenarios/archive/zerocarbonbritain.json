@@ -336,6 +336,7 @@
         "prc_coal": 0,
         "coal_efficiency": 34,
         "coal_co2_factor": 0.3166,
+        "derating_factor": 1,
         "prc_imports": 0
     },
     "energy_industry_use": {

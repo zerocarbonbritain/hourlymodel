@@ -299,7 +299,8 @@
         "capacity_limit": 100,
         "prc_hydrogen": 0,
         "prc_imports": 20.61,
-        "coal_co2_factor": 0.2542
+        "coal_co2_factor": 0.2542,
+        "derating_factor": 0.9048
     },
     "energy_industry_use": {
         "electricity_grid_loss_prc": 8.8,

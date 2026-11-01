@@ -1402,7 +1402,7 @@
    "issue": "The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
-   "model_at_build": 12.45368271804849,
+   "model_at_build": 12.615768444298881,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1453,7 +1453,7 @@
    "issue": "Fuel and carbon alone are about \u00a393/MWh at the DUKES fleet efficiency, above the capture price, and turbine capacity at new-build cost adds about \u00a337/MWh. The 2024 fleet is largely paid off and also earns capacity market and balancing payments (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 85.04,
-   "model_at_build": 129.95051639498917,
+   "model_at_build": 133.3427607722077,
    "sources": [
     "capture = 85.04 (published: Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT (baseline/inputs/13-prices.json))"
    ]

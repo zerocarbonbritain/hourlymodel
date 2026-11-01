@@ -1083,6 +1083,7 @@ input[type='text'] {
         <p>Coal backup CO2 factor (coal and other thermal): <input v-model.number="i.electric_backup.coal_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/> kgCO2/kWh fuel</p>
         
         <p>Max capacity requirement date: {{ o.electric_backup.max_capacity_requirement_date }}</p>
+        <p>De-rating factor for outages <input v-model.number="i.electric_backup.derating_factor" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/>: {{ o.electric_backup.max_capacity_requirement / i.electric_backup.derating_factor | toFixed(1) }} GW of turbines costed.</p>
     </div>
 </div>
 

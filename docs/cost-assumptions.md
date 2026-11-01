@@ -34,7 +34,7 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Geothermal electric | 8.9 | 2, 60 | 5, 5,980 | 125 | 26 | 30 | DESNZ 2025 deep geothermal, 2035 NOAK |
 | Nuclear | 6.7 | 0, 0 | 10, 11,900 | 109 | 13 | 60 | Sizewell C, see below |
 | Hydro | 7.6 | 3, 74 | 2, 3,961 | 60.3 | 7.9 | 40 | Arup 2016 hydro 5-16 MW, see below |
-| Gas turbines | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT |
+| Gas turbines | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT, de-rated capacity (see below) |
 | Electric storage (per kWh) | 8.9 | 0, 0 | 1, 230 | 5 | 0 | 15 | Modo Energy GB 2 hour survey, CEPA hurdle rate |
 | H2 electrolysis (per kW electricity) | 10.1 | 0, 0 | 1, 1,564 | 62.5 | 0 | 25 | Technology-data 2030, CEPA hurdle rate, see below |
 | Methanation (per kW H2 in, HHV) | 10.1 | 0, 0 | 1, 469 | 14.1 | 0 | 20 | Technology-data 2030, CEPA hurdle rate, see below |
@@ -46,6 +46,10 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Power to X | 10.1 | 0, 0 | 1, 860 | 25.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
 
 `carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The 2024 baseline uses £55.18/tCO2, the 2024 mean UK ETS auction price (£37.18) plus Carbon Price Support. The 2018 baseline sets it to 0.
+
+### Gas turbine de-rating
+
+Backup turbine capacity is costed as the highest hourly backup need divided by `electric_backup.derating_factor`, so the fleet covers plant outages. The factor is 0.9048, the Capacity Market de-rating factor for CCGT in the T-4 auction for delivery year 2030/31 (OCGT and reciprocating engines 0.9297). No further margin is added for weather: the model sizes backup to the worst hour in ten weather years with no demand unmet, which is stricter than the 3 hour loss of load expectation in the GB reliability standard. Costed capacity is 48.0 GW in zcb_2024 (peak need 43.45 GW, +£0.63bn/yr) and 33.4 GW in baseline_2024 (30.2 GW, against 46.2 GW of fossil and bioenergy capacity in DUKES 5.7). Dispatch is unchanged.
 
 ### Electrolysis and methanation
 
@@ -135,8 +139,8 @@ Applied to another scenario, a preset sets only the fixed generators (wind, sola
 
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
 |---|---|---|---|
-| baseline_2024 | 13.6 | 11.3 | 12.5 |
-| zcb_2024 | 26.8 | 18.7 | 20.0 |
+| baseline_2024 | 13.6 | 11.3 | 12.6 |
+| zcb_2024 | 26.9 | 18.9 | 20.1 |
 
 Generation cost in p/kWh delivered. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
 
@@ -167,4 +171,5 @@ Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for 
 - PyPSA, [technology-data](https://github.com/PyPSA/technology-data) v0.15.0, `outputs/costs_2030.csv`, electrolysis, methanation, BtL, Fischer-Tropsch, electrobiofuels, hydrogen storage underground, gas storage and general liquid hydrocarbon storage (product).
 - [MeyGen](https://en.wikipedia.org/wiki/MeyGen), 2023 net output.
 - Modo Energy, [GB battery capex survey 2024](https://modoenergy.com/research/battery-energy-storage-capex-containerised-bess-development-costs-oem-balance-plant-bop-grid-connections-survey-2024) and [global battery capex September 2026](https://modoenergy.com/research/global-battery-capex-september-2026-research). £230/kWh is the 2024 median (£325/kWh) less the reported 29% fall.
+- NESO, [Capacity Market Register](https://www.neso.energy/data-portal/capacity-market-register), Capacity Market De-Rating Factors CSV (September 2026).
 - LSEG, [UKA price update Q1 2026](https://www.lseg.com/content/dam/data-analytics/en_us/documents/reports/lseg-q1-2026-eua-and-uka-price-update.pdf).

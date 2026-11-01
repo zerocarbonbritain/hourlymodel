@@ -1995,7 +1995,8 @@ var model = {
         o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: o.supply.total_hydro*0.0001 }
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
-        o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement, generation: o.electric_backup.total_before_grid_loss*0.0001 }
+        // Turbine capacity covers the peak need after de-rating for outages (capacity market de-rating factor)
+        o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement / i.electric_backup.derating_factor, generation: o.electric_backup.total_before_grid_loss*0.0001 }
         o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
         o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*0.0001 }
         // Anaerobic digestion supply is flat. Capacity in GW of methane assumes 90% plant availability.

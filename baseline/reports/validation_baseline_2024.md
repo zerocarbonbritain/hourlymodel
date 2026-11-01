@@ -83,9 +83,9 @@ Summary: 58 ok, 4 WARN, 14 known issue
 
 | Check | Observed | Model | Error | Tolerance | Basis | Status |
 |---|---|---|---|---|---|---|
-| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 12.5 | -23.9% | 10% | independent | known issue |
+| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 12.6 | -22.9% | 10% | independent | known issue |
 | Generation cost in the unit rate, 2024 prices (p/kWh) | 16.4 | 16.8 | +2.6% | 5% | input | ok |
-| Gas generation, build-up against price paid (£/MWh) | 85.0 | 130 | +52.8% | 10% | independent | known issue |
+| Gas generation, build-up against price paid (£/MWh) | 85.0 | 133 | +56.8% | 10% | independent | known issue |
 | Domestic electricity unit rate (p/kWh) | 25.8 | 25.4 | -1.5% | 5% | independent | ok |
 | Domestic electricity standing charge (£/yr) | 205 | 211 | +2.8% | 5% | input | ok |
 | Domestic electricity bill at 3,400 kWh (£/yr) | 1,083 | 1,076 | -0.7% | 5% | independent | ok |
@@ -614,7 +614,7 @@ Summary: 58 ok, 4 WARN, 14 known issue
 - ro = 30.755745 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD53:AG53)
 - fit = 7.407030899 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD54:AG54)
 - observed: `(df + cm) / 3100 * 100 + (ro + fit) / 10` = 16.4 p/kWh
-- model: `a` with a = `retail.electricity.resource_p_kWh` = 12.5 p/kWh
+- model: `a` with a = `retail.electricity.resource_p_kWh` = 12.6 p/kWh
 - note: Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the build-up for every technology per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new-build costs).
 - issue: The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).
 
@@ -634,7 +634,7 @@ Summary: 58 ok, 4 WARN, 14 known issue
 - id: `costs.gas_build_up`
 - capture = 85.04 (published: Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT (baseline/inputs/13-prices.json))
 - observed: `capture` = 85.0 £/MWh
-- model: `a` with a = `generation_costs.by_tech.gas.lcoe` = 130 £/MWh
+- model: `a` with a = `generation_costs.by_tech.gas.lcoe` = 133 £/MWh
 - note: Build-up for gas generation (its share of backup turbine capacity at new-build cost, variable O&M, and 2024 fuel and carbon prices) against the 2024 day ahead capture price for gas. The 2024 baseline costs gas at the capture price.
 - issue: Fuel and carbon alone are about £93/MWh at the DUKES fleet efficiency, above the capture price, and turbine capacity at new-build cost adds about £37/MWh. The 2024 fleet is largely paid off and also earns capacity market and balancing payments (open-items.md, Model).
 
