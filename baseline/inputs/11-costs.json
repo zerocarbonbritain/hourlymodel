@@ -646,5 +646,29 @@
         "formula": "diesel / all * 100",
         "round": 1,
         "note": "Diesel share of car fuel energy. ECUK C8 runs a year behind."
+    },
+    "costs.Methane storage.capex": {
+        "type": "assumption",
+        "units": "£/kWh",
+        "value": 0,
+        "note": "The baseline methane store stands in for the fossil gas system. Its storage cost is within the gas price, so the ZCB gas storage cost is not applied."
+    },
+    "costs.Methane storage.fixed_om": {
+        "type": "assumption",
+        "units": "£/kWh/yr",
+        "value": 0,
+        "note": "The baseline methane store stands in for the fossil gas system. Its storage cost is within the gas price, so the ZCB gas storage cost is not applied."
+    },
+    "costs.Synthetic fuel storage.capex": {
+        "type": "assumption",
+        "units": "£/kWh",
+        "value": 0,
+        "note": "The baseline synthetic fuel store stands in for oil supply. Its storage cost is within the oil price, so the ZCB liquid storage cost is not applied."
+    },
+    "costs.Synthetic fuel storage.fixed_om": {
+        "type": "assumption",
+        "units": "£/kWh/yr",
+        "value": 0,
+        "note": "The baseline synthetic fuel store stands in for oil supply. Its storage cost is within the oil price, so the ZCB liquid storage cost is not applied."
     }
 }

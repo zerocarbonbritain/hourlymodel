@@ -628,6 +628,46 @@
             "fixed_om": 0,
             "variable_om": 0,
             "lifespan": 20
+        },
+        "FT synthetic fuel": {
+            "hurdle_rate": 0,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 0,
+            "fixed_om": 0,
+            "variable_om": 0,
+            "lifespan": 25
+        },
+        "Hydrogen storage": {
+            "hurdle_rate": 0,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 0,
+            "fixed_om": 0,
+            "variable_om": 0,
+            "lifespan": 100
+        },
+        "Methane storage": {
+            "hurdle_rate": 0,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 0,
+            "fixed_om": 0,
+            "variable_om": 0,
+            "lifespan": 100
+        },
+        "Synthetic fuel storage": {
+            "hurdle_rate": 0,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 0,
+            "fixed_om": 0,
+            "variable_om": 0,
+            "lifespan": 30
         }
     }
 }

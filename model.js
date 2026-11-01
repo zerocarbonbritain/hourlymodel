@@ -2001,6 +2001,11 @@ var model = {
         // Anaerobic digestion supply is flat. Capacity in GW of methane assumes 90% plant availability.
         let biogas_methane_TWh = i.biogas.biomass_for_biogas * i.biogas.anaerobic_digestion_efficiency
         o.costs['Anaerobic digestion'] = { capacity: biogas_methane_TWh / 8.766 / 0.9, generation: biogas_methane_TWh }
+        // FT capacity is hydrogen in, output is synthetic fuel. Store capacities are GWh, costs per kWh.
+        o.costs['FT synthetic fuel'] = { capacity: i.synth_fuel.capacity_GW, generation: o.synth_fuel.total_produced*0.0001 }
+        o.costs['Hydrogen storage'] = { capacity: i.hydrogen.storage_capacity_GWh, generation: 0 }
+        o.costs['Methane storage'] = { capacity: i.methane.storage_capacity_GWh, generation: 0 }
+        o.costs['Synthetic fuel storage'] = { capacity: i.synth_fuel.store_capacity_GWh, generation: 0 }
 
         o.total_annual_cost = 0;
 
@@ -2049,7 +2054,7 @@ var model = {
         // build-up above. With basis "lcoe", every technology uses the build-up. Imports have no
         // build-up and always use their price. Backup turbine capacity is shared by output, plus each
         // fuel's own fuel and carbon cost. Fuel production (electrolysis, methanation, power to X,
-        // anaerobic digestion and crop feedstock) always uses the build-up. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and TWh
+        // anaerobic digestion, crop feedstock, FT and the fuel stores) always uses the build-up. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and TWh
         // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
         let backup_output = o.electric_backup.total_before_grid_loss
         let turbine_share = (gen) => backup_output > 0 ? backup.annual * gen / backup_output : 0
@@ -2115,8 +2120,12 @@ var model = {
             o.generation_costs.by_tech[z] = row
             o.generation_costs.total_annual += annual
         }
-        for (let z of ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion']) o.costs[z].used = true
-        o.generation_costs.fuel_production_annual = build_up('H2 Electrolysis') + build_up('Methanation') + build_up('Power to X') + build_up('Anaerobic digestion') + o.biogas_feedstock_annual
+        let fuel_production = ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion', 'FT synthetic fuel', 'Hydrogen storage', 'Methane storage', 'Synthetic fuel storage']
+        o.generation_costs.fuel_production_annual = o.biogas_feedstock_annual
+        for (let z of fuel_production) {
+            o.costs[z].used = true
+            o.generation_costs.fuel_production_annual += build_up(z)
+        }
         o.generation_costs.total_annual += o.generation_costs.fuel_production_annual + gc.other_support_gbp_bn
 
         // Retail prices. The electricity unit rate starts from the generation cost per kWh delivered

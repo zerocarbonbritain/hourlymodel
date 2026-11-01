@@ -388,5 +388,15 @@
     },
     "co2_factors": {
         "blast_furnace": 0.3291
+    },
+    "costs": {
+        "Methane storage": {
+            "capex": 0,
+            "fixed_om": 0
+        },
+        "Synthetic fuel storage": {
+            "capex": 0,
+            "fixed_om": 0
+        }
     }
 }

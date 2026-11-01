@@ -47,8 +47,7 @@ Changes to `cost_model` and the `costs` inputs only. Dispatch is unchanged, so n
   Technology-data gives methanation as €856/kW of CH4 out. At 1.282 kWh of H2 (LHV) per kWh of CH4 that is £554/kW of H2 LHV, or £468/kW of H2 HHV.
 
 - [x] **Biogas.** Done 2026-11-01: anaerobic digestion as a plant (GGSS 13 MW reference, 7.5%, 20 years, GDP deflator) with free waste feedstock and grass at the GGSS maize price. zcb_2024 £79.4bn to £83.5bn/yr, generation cost 15.9 to 16.8 p/kWh. Decided: uplift by the deflator the source used. Charging fuel production to electricity is a new open item for phase 5.
-- [ ] **FT plant.** £1,635/kW of fuel out (technology-data electrobiofuels, 10.1%).
-- [ ] **Stores.** H2 £2.22/kWh, CH4 £0.25/kWh, liquid £0.018/kWh. Together with FT and biogas about £13bn/yr at ZCB capacities.
+- [x] **FT plant and stores.** Done 2026-11-01: FT £2,681/kW of H2 in (technology-data electrobiofuels, 10.1%), H2 store £2.217/kWh, CH4 £0.2465/kWh, liquid £0.0181/kWh (8.9%). Zero in the baselines, where the stores stand in for fossil supply. zcb_2024 £83.5bn to £92.7bn/yr, generation cost 16.8 to 18.7 p/kWh. Store power is not costed.
 - [ ] **Single discount rate option.** A 7% annuity next to the DESNZ method, as a sensitivity and for comparison with PyPSA-Eur.
 - [ ] **Backup de-rating margin.** Cost turbine capacity as the modelled peak divided by a de-rating factor for plant outages (capacity market de-rating factors, NESO Electricity Capacity Report). No extra weather margin: the rules already size to the worst hour in ten years with nothing unmet, which is stricter than 3 hours LOLE. Closes the open item "No reserve margin".
 - [ ] **Network cost by peak.** Distribution per kW of peak (about £53/kW/yr) as an option next to £50/MWh.
@@ -80,6 +79,7 @@ Changes to main_loop and the cost model that alter dispatch. For each, run the P
 - [ ] **Two turbine classes**, OCGT and CCGT in merit order, with their own efficiency and cost in `electric_backup`.
 - [ ] **Battery power and energy** costed separately, with duration as an input.
 - [ ] **Demand flexibility** at modest participation: smart charging, V2G and the heat store. Propose shares from PyPSA-Eur practice (half of EVs smart charging) and PyPSA results first.
+- [ ] **Enforce the synthetic fuel store capacity** (open item).
 - [ ] Generalise the ten year assumption (the 0.0001 factors in model.js and cost_model, 87,648 in runners). Needed by phase 7 and costs little now.
 
 Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within an agreed margin at the same capacities.
@@ -95,6 +95,7 @@ Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtai
 
 Separate from the phases. Check the implications before changing anything.
 
+- [ ] Include the FT hydrogen ratio (0.61 per unit of fuel) and the costs converted with it.
 - [ ] List every H2 and methane quantity and efficiency in model.js, the scenarios, the baselines and the land model, and its current basis.
 - [ ] Work out what changes: efficiencies (electrolysis 0.80 HHV is about 0.68 LHV), store sizes and demands in TWh, emission factors per kWh, fuel prices per MWh, costs per kW of H2, and the baseline's DUKES gross energy figures.
 - [ ] Decide where conversions sit (inputs, or a factor at the boundary with the baseline statistics) and set out the effect on zcb_2024 results before applying.
@@ -104,6 +105,7 @@ Separate from the phases. Check the implications before changing anything.
 - [ ] Take marginal prices from the phase 2 cost optimal network and check cost recovery for every extendable technology.
 - [ ] Add an hourly marginal electricity price to model.js outputs, using the hour class method from the cost work handover, calibrated against the PyPSA prices.
 - [ ] Checks: electricity and fuel revenue against total system cost, offshore wind revenue against its cost, and the series valuation of the SPF penalty against resizing.
+- [ ] **Fuel prices for end users.** Once fuel production cost is split between electricity and fuels (open item), report the cost of synthetic fuel, hydrogen and methane per kWh and per litre, and compare zcb_2024 aviation and shipping fuel with 2024 jet fuel and marine gas oil prices.
 - [ ] Rerun the SPF 2.8 against 3.8 study in both models. Decide whether to finish the blog post (/var/www/trystan2/pages/en/heatpump_spf_system.html).
 
 ## Phase 6. Industry

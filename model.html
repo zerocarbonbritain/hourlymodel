@@ -1669,7 +1669,7 @@ input[type='text'] {
         <p v-if="o.generation_costs.backup_fuel_used">Backup fuel (p/kWh): gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/>, £{{ o.fuel_cost_annual | toFixed(1) }} bn/year.
             Carbon price <input v-model.number="i.carbon_price" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> £/tCO2 on {{ o.grid_co2_emissions | toFixed(1) }} MtCO2/yr, £{{ o.carbon_cost_annual | toFixed(1) }} bn/year.</p>
         <p v-if="o.biomass.grass_for_biogas > 0">Biogas crop feedstock <input v-model.number="i.biogas.crop_feedstock_gbp_MWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> £/MWh of methane, £{{ o.biogas_feedstock_annual | toFixed(1) }} bn/year. Waste feedstock is free.</p>
-        <p><i>Storage capacity is in GWh, with costs per kWh. Anaerobic digestion capacity is in GW of methane, with output in TWh of methane. Output is before curtailment.</i></p>
+        <p><i>Storage capacity is in GWh, with costs per kWh. Anaerobic digestion capacity is in GW of methane, with output in TWh of methane. FT capacity is in GW of hydrogen in, with output in TWh of synthetic fuel. Output is before curtailment.</i></p>
 
 
         <h3>Retail prices</h3>
