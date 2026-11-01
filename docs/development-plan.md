@@ -46,7 +46,7 @@ Changes to `cost_model` and the `costs` inputs only. Dispatch is unchanged, so n
 
   Technology-data gives methanation as €856/kW of CH4 out. At 1.282 kWh of H2 (LHV) per kWh of CH4 that is £554/kW of H2 LHV, or £468/kW of H2 HHV.
 
-- [ ] **Biogas.** GGSS tiers: waste £41/MWh feedstock up to 34.15 TWh, grass £82/MWh above. Check the 20 year life and the CPI 2020 value against ONS D7BT first.
+- [x] **Biogas.** Done 2026-11-01: anaerobic digestion as a plant (GGSS 13 MW reference, 7.5%, 20 years, GDP deflator) with free waste feedstock and grass at the GGSS maize price. zcb_2024 £79.4bn to £83.5bn/yr, generation cost 15.9 to 16.8 p/kWh. Decided: uplift by the deflator the source used. Charging fuel production to electricity is a new open item for phase 5.
 - [ ] **FT plant.** £1,635/kW of fuel out (technology-data electrobiofuels, 10.1%).
 - [ ] **Stores.** H2 £2.22/kWh, CH4 £0.25/kWh, liquid £0.018/kWh. Together with FT and biogas about £13bn/yr at ZCB capacities.
 - [ ] **Single discount rate option.** A 7% annuity next to the DESNZ method, as a sensitivity and for comparison with PyPSA-Eur.

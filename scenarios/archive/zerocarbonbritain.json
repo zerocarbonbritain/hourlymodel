@@ -300,7 +300,8 @@
     "biogas": {
         "biomass_for_biogas": 88,
         "anaerobic_digestion_efficiency": 0.6,
-        "co2_tons_per_gwh_methane": 118.7565226835914
+        "co2_tons_per_gwh_methane": 118.7565226835914,
+        "crop_feedstock_gbp_MWh": 0
     },
     "methane": {
         "methanation_capacity": 4.93,
@@ -617,6 +618,16 @@
             "fixed_om": 5,
             "variable_om": 0,
             "lifespan": 15
+        },
+        "Anaerobic digestion": {
+            "hurdle_rate": 0,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 0,
+            "fixed_om": 0,
+            "variable_om": 0,
+            "lifespan": 20
         }
     }
 }
