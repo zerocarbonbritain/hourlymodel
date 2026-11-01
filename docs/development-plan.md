@@ -57,39 +57,45 @@ Done when every technology in the PyPSA network has a cost in the hourly model o
 
 Phase 1 done 2026-11-01. zcb_2024 costs £93.34bn/yr. Against the PyPSA costing of ZCB capacities (£87.8bn/yr), the difference is technology-data electrolysis (+£5.12bn) and methanation (+£0.14bn), turbine de-rating (+£0.63bn) and the GGSS plant basis for biogas (−£0.35bn), which sum to £93.33bn.
 
-## Phase 2. Make the PyPSA reference robust
+## Phase 2. PyPSA tooling
 
-In ZCB_PyPSA. Record results in docs/results.md.
+In ZCB_PyPSA. Done 2026-11-01. The long runs move to phase 3b, once both models have the same plumbing.
 
-- [ ] **Align PyPSA costs with the hourly model.** Re-export zcb_2024 so electrolysis, methanation, anaerobic digestion, FT and the stores come from its `costs` block, replace the biogas tiers in costs.py with the plant and crop feedstock basis, and apply the turbine de-rating factor.
-- [ ] Value of lost load at £17,000/MWh in 2024 prices, and a no-shedding run (D5). Rerun ten years.
-- [ ] Rerun expansion at technology-data electrolysis and methanation costs (D1).
-- [ ] **Rules at the optimum.** Run the hourly model at the PyPSA optimal capacities. Report whether it balances (nothing unmet, stores back to their start levels), its cost against the optimum, and its dispatch against the optimised dispatch. This is the core validation measure for D3.
-- [ ] Limit foresight on the CH4 store: solve year by year with a fixed end level, or cap carry-over. Compare with the cyclic ten year result.
-- [ ] One year hourly against 3 hourly, to size the battery and turbine error.
-- [ ] Add components: battery power and energy costed separately, OCGT as an option next to CCGT, CO2 store for methanation, FT drawing on the H2 bus (already so in PyPSA, confirm), heat store, smart EV charging and V2G.
-- [ ] Variant `free` with onshore and offshore resource limits.
-- [ ] A target table: capacities and store sizes for each variant, with the ZCB values beside them.
+- [x] **Align PyPSA costs with the hourly model.** All costs come from the exported `costs` block, biogas uses the plant and crop feedstock basis, and turbine capital cost is divided by the de-rating factor.
+- [x] **Value of lost load** £22,985/MWh (the reliability standard's £16,940, uplifted from 2013 by the GDP deflator), and a `noshed` option.
+- [x] **Limited foresight.** The `yearly` option makes the H2, CH4 and liquid stores end each weather year at their starting level.
+- [x] **Rules at the optimum.** scripts/rules_at_optimum.py runs the hourly model at the capacities an expansion chose.
+- [ ] Reference runs at today's plumbing: ten year expansion with the value of lost load, with `noshed` and with `yearly`. Recorded as a before point, not as targets. Check that `yearly` holds each store's year-end level.
 
-Done when the target table no longer changes much with the lost load value, foresight and resolution.
+## Phase 3. Shared model plumbing
 
-## Phase 3. Hourly model structure
+Each feature goes into the PyPSA network and model.js together. For each, check that the PyPSA dispatch at fixed capacities and the hourly model's rules agree over a short window (2010 at 3 hour steps, which includes the December 2010 event and solves in about 15 s), then commit both. Ask before changing scenario values. Update baseline/open-items.md as items close.
 
-Changes to main_loop and the cost model that alter dispatch. For each, run the PyPSA dispatch at ZCB capacities with and without the change, then implement in model.js and compare with the export. Ask before changing scenario values. Update baseline/open-items.md as items close.
-
-- [ ] **FT draws on the H2 store** (open item). Run with unchanged capacities to show the effect, without retuning yet.
-- [ ] **CO2 buffer for methanation**, so methanation follows the H2 surplus.
-- [ ] **Two turbine classes**, OCGT and CCGT in merit order, with their own efficiency and cost in `electric_backup`.
-- [ ] **Battery power and energy** costed separately, with duration as an input.
-- [ ] **Demand flexibility** at modest participation: smart charging, V2G and the heat store. Propose shares from PyPSA-Eur practice (half of EVs smart charging) and PyPSA results first.
+- [ ] **FT draws on the H2 store** (open item). In zcb_2024 at PyPSA's one-year capacities, the same-hour rule leaves 43.6 TWh/yr of synthetic fuel unmet.
 - [ ] **Enforce the synthetic fuel store capacity** (open item).
+- [ ] **CO2 buffer for methanation**, so methanation follows the H2 surplus. A CO2 store in both models.
+- [ ] **Two turbine classes**, OCGT and CCGT in merit order, with their own efficiency, cost and de-rating factor (0.9297 and 0.9048).
+- [ ] **Battery power and energy** costed separately, with duration as an input. A separate inverter in PyPSA.
+- [ ] **Demand flexibility** at modest participation: smart charging, V2G and the heat store, in both models. Propose shares from PyPSA-Eur practice (half of EVs smart charging) first.
 - [ ] Generalise the ten year assumption (the 0.0001 factors in model.js and cost_model, 87,648 in runners). Needed by phase 7 and costs little now.
 
 Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within an agreed margin at the same capacities.
 
+## Phase 3b. Long runs and target table
+
+Once the plumbing is shared.
+
+- [ ] Ten year expansion with the value of lost load, with `noshed` and with `yearly`.
+- [ ] One year hourly against 3 hourly, to size the battery and turbine error.
+- [ ] Rules at the optimum for each result: whether the rules balance (nothing unmet, stores back to their start levels), their cost against the optimum, and their dispatch against the optimised dispatch. This is the core validation measure for D3.
+- [ ] Variant `free` with onshore and offshore resource limits.
+- [ ] A target table: capacities and store sizes for each run, with the ZCB values beside them, in ZCB_PyPSA/docs/results.md.
+
+Done when the target table no longer changes much with the lost load value, foresight and resolution.
+
 ## Phase 4. Retune zcb_2024 once
 
-- [ ] Propose new values for offshore wind, electrolysis, methanation, FT, turbines (by class), battery, stores and biogas, guided by the phase 2 targets, with the store criteria in docs/zcb-2024-notes.md (methane and synthetic fuel stores end near their start levels, nothing unmet). The rules decide the values (D3).
+- [ ] Propose new values for offshore wind, electrolysis, methanation, FT, turbines (by class), battery, stores and biogas, guided by the phase 3b targets, with the store criteria in docs/zcb-2024-notes.md (methane and synthetic fuel stores end near their start levels, nothing unmet). The rules decide the values (D3).
 - [ ] Apply after agreement and update docs/zcb-2024-notes.md with the before and after results.
 - [ ] Export the retuned scenario to ZCB_PyPSA and rerun replay, dispatch and expansion.
 - [ ] **Validation report.** Retuned zcb_2024 against the PyPSA optimum: total cost gap, each capacity, curtailment, backup output and store use, and the dispatch gap at equal capacities. Keep it in ZCB_PyPSA/docs/results.md and summarise it in docs/zcb-2024-notes.md.
@@ -105,7 +111,7 @@ Separate from the phases. Check the implications before changing anything.
 
 ## Phase 5. Hourly prices and cost recovery
 
-- [ ] Take marginal prices from the phase 2 cost optimal network and check cost recovery for every extendable technology.
+- [ ] Take marginal prices from the phase 3b cost optimal network and check cost recovery for every extendable technology.
 - [ ] Add an hourly marginal electricity price to model.js outputs, using the hour class method from the cost work handover, calibrated against the PyPSA prices.
 - [ ] Checks: electricity and fuel revenue against total system cost, offshore wind revenue against its cost, and the series valuation of the SPF penalty against resizing.
 - [ ] **Fuel prices for end users.** Once fuel production cost is split between electricity and fuels (open item), report the cost of synthetic fuel, hydrogen and methane per kWh and per litre, and compare zcb_2024 aviation and shipping fuel with 2024 jet fuel and marine gas oil prices.
