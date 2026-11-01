@@ -32,11 +32,20 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Hydro | 7.6 | 3, 74 | 2, 3,961 | 60.3 | 7.9 | 40 | Arup 2016 hydro 5-16 MW, see below |
 | Gas turbines | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT |
 | Electric storage (per kWh) | 8.9 | 0, 0 | 1, 230 | 5 | 0 | 15 | Modo Energy GB 2 hour survey, CEPA hurdle rate |
-| H2 electrolysis | 10.1 | 0, 0 | 1, 328 | 11.4 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
-| Methanation | 10.1 | 0, 0 | 1, 236 | 10.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
+| H2 electrolysis (per kW electricity) | 10.1 | 0, 0 | 1, 1,564 | 62.5 | 0 | 25 | Technology-data 2030, CEPA hurdle rate, see below |
+| Methanation (per kW H2 in, HHV) | 10.1 | 0, 0 | 1, 469 | 14.1 | 0 | 20 | Technology-data 2030, CEPA hurdle rate, see below |
 | Power to X | 10.1 | 0, 0 | 1, 860 | 25.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
 
 `carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The 2024 baseline uses £55.18/tCO2, the 2024 mean UK ETS auction price (£37.18) plus Carbon Price Support. The 2018 baseline sets it to 0.
+
+### Electrolysis and methanation
+
+From [PyPSA technology-data](https://github.com/PyPSA/technology-data) v0.15.0, `outputs/costs_2030.csv`, as used by PyPSA-Eur. Values are in 2025 euros and are converted to 2024 pounds by 0.829 (euro area HICP 128.75 to 126.07, then the 2024 ECB average rate of 0.8466).
+
+- **Electrolysis.** €1,886/kW of electricity (IEA, The Role of E-fuels in Decarbonising Transport, and private communications). Fixed O&M 4% of capex and 25 year life (Danish Energy Agency, Technology Data for Renewable Fuels, 86 AEC 100 MW).
+- **Methanation.** €856/kW of methane out (Agora Energiewende 2018, The Future Cost of Electricity-Based Synthetic Fuels, table 6). Fixed O&M 3% of capex (Agora, section 6.2.3.1). The 20 year life is an estimate in technology-data. The model sizes methanation by hydrogen in at HHV, so the cost is divided by 1.282 kWh of hydrogen (LHV) per kWh of methane and multiplied by 33.33/39.4 (hydrogen LHV over HHV per kg).
+
+The original ZCB values were £328/kW for electrolysis and £236/kW for methanation. Technology-data's electrolysis capex rests partly on private communications and is the least certain of the two.
 
 ## Calibration against strike prices
 
@@ -91,7 +100,7 @@ Applied to another scenario, a preset sets only the fixed generators (wind, sola
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
 |---|---|---|---|
 | baseline_2024 | 13.6 | 11.3 | 12.5 |
-| zcb_2024 | 22.8 | 14.7 | 16.0 |
+| zcb_2024 | 23.9 | 15.9 | 17.1 |
 
 Generation cost in p/kWh delivered. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
 

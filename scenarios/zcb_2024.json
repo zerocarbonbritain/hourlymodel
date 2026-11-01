@@ -573,20 +573,20 @@
             "predev_years": 0,
             "predev_cost": 0,
             "build_years": 1,
-            "capex": 327.66,
-            "fixed_om": 11.438,
+            "capex": 1563.5,
+            "fixed_om": 62.54,
             "variable_om": 0,
-            "lifespan": 30
+            "lifespan": 25
         },
         "Methanation": {
             "hurdle_rate": 10.1,
             "predev_years": 0,
             "predev_cost": 0,
             "build_years": 1,
-            "capex": 235.64,
-            "fixed_om": 10.836,
+            "capex": 468.5,
+            "fixed_om": 14.05,
             "variable_om": 0,
-            "lifespan": 30
+            "lifespan": 20
         },
         "Gas turbines": {
             "hurdle_rate": 8.9,
