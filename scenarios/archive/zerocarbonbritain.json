@@ -635,8 +635,18 @@
             "predev_years": 0,
             "predev_cost": 0,
             "build_years": 1,
-            "capex": 230,
+            "capex": 147,
             "fixed_om": 5,
+            "variable_om": 0,
+            "lifespan": 15
+        },
+        "Battery inverter": {
+            "hurdle_rate": 8.9,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 166,
+            "fixed_om": 0,
             "variable_om": 0,
             "lifespan": 15
         },

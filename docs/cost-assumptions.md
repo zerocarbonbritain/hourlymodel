@@ -36,7 +36,8 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Hydro | 7.6 | 3, 74 | 2, 3,961 | 60.3 | 7.9 | 40 | Arup 2016 hydro 5-16 MW, see below |
 | CCGT | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT, de-rated capacity (see below) |
 | OCGT | 8.9 | 2, 20 | 2, 644 | 16.4 | 5 | 25 | DESNZ 2025 OCGT 300 MW, de-rated capacity (see below) |
-| Electric storage (per kWh) | 8.9 | 0, 0 | 1, 230 | 5 | 0 | 15 | Modo Energy GB 2 hour survey, CEPA hurdle rate |
+| Electric storage (per kWh) | 8.9 | 0, 0 | 1, 147 | 5 | 0 | 15 | Modo Energy GB 2 hour survey split by technology-data, CEPA hurdle rate, see below |
+| Battery inverter (per kW) | 8.9 | 0, 0 | 1, 166 | 0 | 0 | 15 | As electric storage |
 | H2 electrolysis (per kW electricity) | 10.1 | 0, 0 | 1, 1,564 | 62.5 | 0 | 25 | Technology-data 2030, CEPA hurdle rate, see below |
 | Methanation (per kW H2 in, HHV) | 10.1 | 0, 0 | 1, 469 | 14.1 | 0 | 20 | Technology-data 2030, CEPA hurdle rate, see below |
 | Anaerobic digestion (per kW methane) | 7.5 | 0, 0 | 1, 2,437 | 0 | 32.0 | 20 | GGSS impact assessment 13 MW reference plant, see below |
@@ -54,6 +55,10 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 Methane backup runs on CCGT first, up to `electric_backup.ccgt_capacity_GW`, and OCGT meets the rest. Both are DESNZ 2025 values for 2030 commissioning, medium case. OCGT is the 300 MW unit: £600/kW construction plus £13.2m of infrastructure over 299 MW (£644/kW), fixed O&M of £11.8 plus £1.5 insurance plus £3.1/kW/yr connection and use of system charges. Efficiencies are the DESNZ values, CCGT 54% (`methane_efficiency`, 50% before 2026-11-02) and OCGT 35% (`ocgt_efficiency`). DESNZ does not state the basis. They match the LeighFisher 2016 values for DECC (about 60% and 39% LHV) converted at 89.82% for gas, so they are HHV, as in the model. The 760 MW OCGT is £626/kW at 36%. zcb_2024 keeps all backup on CCGT (`ccgt_capacity_GW` 100) until the phase 5 retune.
 
 Each class is costed at its peak output divided by its de-rating factor, so the fleet covers plant outages. OCGT runs only when CCGT is at capacity, so OCGT covers its own peak and CCGT the rest of the peak need. The factors are the Capacity Market de-rating factors in the T-4 auction for delivery year 2030/31: 0.9048 for CCGT (`ccgt_derating_factor`) and 0.9297 for OCGT and reciprocating engines (`ocgt_derating_factor`). Annual costs per de-rated kW are £151.9 for CCGT and £93.4 for OCGT. No further margin is added for weather: the model sizes backup to the worst hour in ten weather years with no demand unmet, which is stricter than the 3 hour loss of load expectation in the GB reliability standard. Costed capacity is 48.0 GW in zcb_2024 (peak need 43.45 GW, all CCGT, +£0.63bn/yr) and 33.4 GW in baseline_2024 (30.2 GW, against 46.2 GW of fossil and bioenergy capacity in DUKES 5.7). Dispatch is unchanged.
+
+### Battery energy and power
+
+Modo Energy's GB survey gives £230/kWh for a 2 hour system (the 2024 median of £325/kWh less the reported 29% fall). Technology-data v0.15.0 splits battery cost into storage at €190/kWh and the inverter at €214/kW, £157/kWh and £177/kW at the 0.829 conversion. For a 2 hour system that is £246/kWh. Both parts are scaled by 230/246 to the Modo total: £147/kWh of energy and £166/kW of inverter. A 2 hour battery costs the same as before, and longer batteries cost less per kWh. Fixed O&M of £5/kWh/yr stays on energy. Both parts use the 15 year life of the system price, not technology-data's 25 years for cells and 10 for the inverter. The inverter is sized to the larger of `electric_storage.charge_capacity_GW` and `discharge_capacity_GW`. zcb_2024 (200 GWh, 50 GW) goes from £6.67bn to £5.65bn/yr.
 
 ### Electrolysis and methanation
 

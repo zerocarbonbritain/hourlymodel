@@ -2060,7 +2060,9 @@ var model = {
         o.costs['CCGT'] = { capacity: (eb_out.max_capacity_requirement - eb_out.max_ocgt_output) / i.electric_backup.ccgt_derating_factor, generation: (eb_out.total_before_grid_loss - eb_out.total_ocgt_output)*0.0001 }
         o.costs['OCGT'] = { capacity: eb_out.max_ocgt_output / i.electric_backup.ocgt_derating_factor, generation: eb_out.total_ocgt_output*0.0001 }
         o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
+        // Battery energy per kWh, and power per kW of inverter, the larger of charge and discharge capacity
         o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*0.0001 }
+        o.costs['Battery inverter'] = { capacity: Math.max(i.electric_storage.charge_capacity_GW, i.electric_storage.discharge_capacity_GW), generation: 0 }
         // Anaerobic digestion supply is flat. Capacity in GW of methane assumes 90% plant availability.
         let biogas_methane_TWh = i.biogas.biomass_for_biogas * i.biogas.anaerobic_digestion_efficiency
         o.costs['Anaerobic digestion'] = { capacity: biogas_methane_TWh / 8.766 / 0.9, generation: biogas_methane_TWh }
@@ -2123,7 +2125,7 @@ var model = {
         // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
         let backup_output = o.electric_backup.total_before_grid_loss
         let turbine_share = (gen) => backup_output > 0 ? backup.annual * gen / backup_output : 0
-        let build_up = (key) => o.costs[key] ? o.costs[key].annual : 0
+        let build_up = (key) => Array.isArray(key) ? key.reduce((sum, k) => sum + build_up(k), 0) : (o.costs[key] ? o.costs[key].annual : 0)
         let eb = o.electric_backup
         let techs = {
             offshore_wind: [o.supply.total_offshore_wind, 'Offshore wind'],
@@ -2140,7 +2142,7 @@ var model = {
             coal_other: [eb.total_coal_turbine_output, () => turbine_share(eb.total_coal_turbine_output) + backup_fuel_annual.coal_other],
             oil: [eb.total_synth_fuel_turbine_output, () => turbine_share(eb.total_synth_fuel_turbine_output) + backup_fuel_annual.oil],
             hydrogen: [eb.total_hydrogen_turbine_output, () => turbine_share(eb.total_hydrogen_turbine_output)],
-            storage: [o.electric_storage.total_discharge, 'Electric Storage']
+            storage: [o.electric_storage.total_discharge, ['Electric Storage', 'Battery inverter']]
         }
         let gc = i.generation_costs
         for (let z in o.costs) o.costs[z].used = false
@@ -2156,6 +2158,7 @@ var model = {
             let annual = uses_build_up ? lcoe_annual : generation * (price || 0) * 0.001
             if (uses_build_up) {
                 if (typeof cost === 'string') o.costs[cost].used = true
+                else if (Array.isArray(cost)) cost.forEach(k => o.costs[k].used = true)
                 else if (generation > 0) {
                     o.costs['CCGT'].used = true
                     o.costs['OCGT'].used = true
@@ -2175,7 +2178,7 @@ var model = {
             // Load factor of a fixed generator, TWh/yr over GW, and what its price implies for the
             // build-up: the hurdle rate that reproduces it, and the construction cost per kW that
             // does at the input hurdle rate.
-            if (typeof cost === 'string' && cost != 'Electric Storage' && o.costs[cost].capacity > 0) {
+            if (typeof cost === 'string' && o.costs[cost].capacity > 0) {
                 row.load_factor = generation / (o.costs[cost].capacity * 8.766)
             }
             if (typeof cost === 'string' && priced && generation > 0 && o.costs[cost].capacity > 0) {

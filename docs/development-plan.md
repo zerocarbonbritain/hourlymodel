@@ -27,7 +27,7 @@ Earlier handovers this plan replaces as the pick-up point:
 ## Where things stand (2026-11-02)
 
 - **Baselines.** 2024 and 2018 are built from sources by baseline/build.py and validated against observed statistics. Remaining differences are in baseline/open-items.md.
-- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. zcb_2024 costs £93.37bn/yr.
+- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. Battery power is costed separately (item 4). zcb_2024 costs £92.35bn/yr.
 - **PyPSA.** Costs come from the hourly model's exported scenario. The replay matches ZCB within 0.001 GWh. A one year expansion (2002) at today's costs gives £70.7bn/yr against £93.3bn for the ZCB capacities. At those PyPSA capacities the hourly model's rules leave 43.6 TWh/yr of synthetic fuel unmet, because FT only uses hydrogen made in the same hour.
 - **Heat pump SPF study.** SPF 2.8 against 3.8 costs £2.2bn to £5.7bn/yr. The blog post draft is parked until prices exist (phase 6).
 - **Weather data.** ERA5 cutouts are downloading on a server. Postponed to phase 7.
@@ -82,7 +82,11 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
    - zcb_2024: cost unchanged at £93.37bn/yr. At 54% backup uses less methane, so the methane store ends ten years at 34.2 TWh against 25.0, and spill rises from 1.84 to 2.89 TWh/yr. Replay matches on 2010.
    - At 30 GW of CCGT, OCGT covers 13.45 GW of peak and gives 1.26 TWh in 2010 against 1.24 in PyPSA. The cost falls by £0.79bn/yr.
    - The 2010 expansion chooses 26.2 GW of CCGT and 16.9 GW of OCGT, £91.37bn/yr against £92.73bn with CCGT only.
-4. [ ] **Battery power and energy** costed separately, with duration as an input. A separate inverter cost in PyPSA.
+4. [x] **Battery power and energy** costed separately, with duration as an input. A separate inverter cost in PyPSA.
+   Done 2026-11-02. The hourly model already has separate charge, discharge and energy inputs, so the change is in costing: £147/kWh of energy and £166/kW of inverter (the larger of charge and discharge), the Modo 2 hour price split in technology-data proportions. zcb_2024 falls from £93.37bn to £92.35bn/yr (generation cost 18.65 p/kWh). In PyPSA the charge and discharge links are extendable with one inverter (charge power equals discharge power) costed on discharge, so the optimiser chooses the duration. Results on 2010:
+   - Replay and the fixed capacity dispatch are unchanged.
+   - The expansion chooses 205 GWh with a 26.2 GW inverter (7.8 hours), against 164 GWh held to 2 hours before. Total £90.11bn/yr against £91.37bn. At 3 hour steps daily cycling is smoothed, which undervalues power, so phase 4's hourly run should check the duration.
+   - Validation of baseline_2024 is unchanged in status. Its storage build-up falls from £1,076 to £917/MWh.
 5. [ ] **Industry heat by temperature band** (<100, 100 to 200, 200 to 500, >500 °C) with technologies per band.
 6. [ ] **Industry material sub-models** for steel, cement, ammonia and chemicals, and glass. They replace the fixed blast furnace fuel and address the reductant coal open item. Source the 65% drying fuel efficiency and convert the JRC-IDEES NCV values to gross.
 7. [ ] **Demand flexibility** at modest participation: smart charging, V2G, the heat store, and flexible industrial heat as heater GW plus thermal storage GWh (replacing instant fuel switching). Propose shares from PyPSA-Eur practice (half of EVs smart charging) first.

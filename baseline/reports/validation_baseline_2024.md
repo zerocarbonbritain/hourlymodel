@@ -83,18 +83,18 @@ Summary: 58 ok, 4 WARN, 14 known issue
 
 | Check | Observed | Model | Error | Tolerance | Basis | Status |
 |---|---|---|---|---|---|---|
-| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 12.6 | -22.9% | 10% | independent | known issue |
-| Generation cost in the unit rate, 2024 prices (p/kWh) | 16.4 | 16.8 | +2.6% | 5% | input | ok |
+| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 12.6 | -23.2% | 10% | independent | known issue |
+| Generation cost in the unit rate, 2024 prices (p/kWh) | 16.4 | 16.7 | +2.3% | 5% | input | ok |
 | Gas generation, build-up against price paid (£/MWh) | 85.0 | 133 | +56.8% | 10% | independent | known issue |
-| Domestic electricity unit rate (p/kWh) | 25.8 | 25.4 | -1.5% | 5% | independent | ok |
+| Domestic electricity unit rate (p/kWh) | 25.8 | 25.4 | -1.7% | 5% | independent | ok |
 | Domestic electricity standing charge (£/yr) | 205 | 211 | +2.8% | 5% | input | ok |
-| Domestic electricity bill at 3,400 kWh (£/yr) | 1,083 | 1,076 | -0.7% | 5% | independent | ok |
+| Domestic electricity bill at 3,400 kWh (£/yr) | 1,083 | 1,074 | -0.8% | 5% | independent | ok |
 | Wholesale gas cost in the domestic unit rate (p/kWh) | 3.7 | 3.7 | +0.0% | 2% | input | ok |
 | Domestic gas unit rate (p/kWh) | 6.54 | 6.29 | -3.8% | 5% | independent | ok |
 | Domestic gas standing charge (£/yr) | 113 | 109 | -3.1% | 5% | input | ok |
 | Domestic gas bill at 11,200 kWh (£/yr) | 846 | 814 | -3.7% | 5% | independent | ok |
-| Household electricity spend, DUKES use at QEP prices (£bn/yr) | 30.1 | 31.2 | +3.8% | 5% | independent | ok |
-| Household electricity spend, ONS (£bn/yr) | 26.3 | 31.2 | +18.8% | 10% | independent | known issue |
+| Household electricity spend, DUKES use at QEP prices (£bn/yr) | 30.1 | 31.2 | +3.6% | 5% | independent | ok |
+| Household electricity spend, ONS (£bn/yr) | 26.3 | 31.2 | +18.6% | 10% | independent | known issue |
 | Household gas spend, DUKES use at QEP prices (£bn/yr) | 19.3 | 17.2 | -10.9% | 5% | independent | known issue |
 | Household gas spend, ONS (£bn/yr) | 14.6 | 17.2 | +17.5% | 10% | independent | known issue |
 | Household vehicle fuel spend (£bn/yr) | 38.2 | 39.2 | +2.8% | 10% | independent | ok |
@@ -626,7 +626,7 @@ Summary: 58 ok, 4 WARN, 14 known issue
 - ro = 30.755745 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD53:AG53)
 - fit = 7.407030899 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD54:AG54)
 - observed: `(df + cm) / 3100 * 100 + (ro + fit) / 10` = 16.4 p/kWh
-- model: `a + b` with a = `retail.electricity.generation_cost_p_kWh`, b = `i.retail.electricity.wholesale_adjustment_p_kWh` = 16.8 p/kWh
+- model: `a + b` with a = `retail.electricity.generation_cost_p_kWh`, b = `i.retail.electricity.wholesale_adjustment_p_kWh` = 16.7 p/kWh
 - note: Modelled generation for each technology at its 2024 capture price plus RO, CfD, FiT and capacity market payments, per kWh delivered, plus the 2024 domestic wholesale adjustment (forward purchasing and the domestic profile). Prices are observed, volumes are modelled.
 
 ### Gas generation, build-up against price paid
@@ -659,7 +659,7 @@ Summary: 58 ok, 4 WARN, 14 known issue
 - id: `costs.electricity_bill`
 - b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)
 - observed: `b` = 1,083 £/yr
-- model: `u * 34 + s` with u = `retail.electricity.unit_rate_p_kWh`, s = `retail.electricity.standing_charge_gbp` = 1,076 £/yr
+- model: `u * 34 + s` with u = `retail.electricity.unit_rate_p_kWh`, s = `retail.electricity.standing_charge_gbp` = 1,074 £/yr
 - note: DESNZ standard bill at 3,400 kWh a year.
 
 ### Wholesale gas cost in the domestic unit rate

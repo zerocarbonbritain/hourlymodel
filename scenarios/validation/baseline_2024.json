@@ -1402,7 +1402,7 @@
    "issue": "The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
-   "model_at_build": 12.615768444298881,
+   "model_at_build": 12.558771693998436,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1428,7 +1428,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 16.358265549176576,
-   "model_at_build": 16.78794290570813,
+   "model_at_build": 16.730946155407686,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1475,7 +1475,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 25.82700021794268,
-   "model_at_build": 25.447740050993545,
+   "model_at_build": 25.387893463178074,
    "sources": [
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
    ]
@@ -1520,7 +1520,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1083.2274977667098,
-   "model_at_build": 1076.1366617337806,
+   "model_at_build": 1074.1018777480547,
    "sources": [
     "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
    ]
@@ -1631,7 +1631,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 30.07343406773285,
-   "model_at_build": 31.22903396065854,
+   "model_at_build": 31.16978173024987,
    "sources": [
     "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
@@ -1656,7 +1656,7 @@
    "issue": "ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).",
    "status_at_build": "known",
    "observed": 26.289,
-   "model_at_build": 31.22903396065854,
+   "model_at_build": 31.16978173024987,
    "sources": [
     "s = 26289 (table_261.xlsx, 2.6.1!D62)"
    ]
