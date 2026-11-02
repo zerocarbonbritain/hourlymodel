@@ -855,7 +855,10 @@ var model = {
         o.methane.store_excess = 0
         o.methane.unmet = 0
         o.methane.ccgt_methane_from_fossil_gas = 0
-                        
+        // CO2 store for methanation, in tonnes. It starts at its target.
+        o.methane.co2_store = i.methane.co2_store_target_t
+        o.methane.co2_vented = 0
+
         // Synth fuel
         o.synth_fuel = {}
         o.synth_fuel.store_SOC = i.synth_fuel.store_start_GWh
@@ -928,6 +931,7 @@ var model = {
         d.unmet_elec = []
         d.methane_SOC = []
         d.synth_fuel_store_SOC = []
+        d.co2_store = []
 
         let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
 
@@ -1155,14 +1159,30 @@ var model = {
             o.synth_fuel.store_SOC += biofuel_supply
             
             // 4. Hydrogen to Methanation
-            let co2_for_sabatier = co2_from_biogas
-            let hydrogen_for_sabatier = co2_for_sabatier * (8.064/44.009) * 39.4 * 0.001                     // 1000 tCO2, requires 7.2 GWh of H2 (HHV)
-            
-            let available_hydrogen = o.hydrogen.SOC - hydrogen_store_floor - hydrogen_from_store_to_synth_fuel  // calculate available hydrogen
-            if (hydrogen_for_sabatier>available_hydrogen) hydrogen_for_sabatier = available_hydrogen     // limit by available hydrogen
-            if (hydrogen_for_sabatier>i.methane.methanation_capacity) hydrogen_for_sabatier = i.methane.methanation_capacity // limit by methanation capacity
-            if (hydrogen_for_sabatier<0.0) hydrogen_for_sabatier = 0.0
+            // CO2 from biogas goes to the CO2 store. Methanation uses the hour's hydrogen surplus left after FT
+            // first. While the CO2 store is above its target, it tops up from the hydrogen store above its
+            // minimum level, down to the target. Both are limited by methanation capacity and the CO2 held.
+            // CO2 above the store capacity is vented. With no CO2 store, methanation uses the hour's CO2.
+            let hydrogen_per_tCO2 = (8.064/44.009) * 39.4 * 0.001                                           // 1000 tCO2, requires 7.2 GWh of H2 (HHV)
+            let co2_available = o.methane.co2_store + co2_from_biogas
+            let methanation_limit = Math.min(i.methane.methanation_capacity, co2_available * hydrogen_per_tCO2)
+            let hydrogen_for_sabatier = 0.0
+            if ((o.hydrogen.SOC>hydrogen_store_floor) && hydrogen_balance>0.0) {
+                hydrogen_for_sabatier = Math.min(hydrogen_balance, methanation_limit)
+            }
+            let co2_above_target = co2_available - hydrogen_for_sabatier / hydrogen_per_tCO2 - i.methane.co2_store_target_t
+            if (co2_above_target>0.0) {
+                // Store above the floor, less any same hour deficit already drawn from it (including FT)
+                let available = o.hydrogen.SOC + Math.min(hydrogen_balance - hydrogen_for_sabatier, 0.0) - hydrogen_store_floor
+                hydrogen_for_sabatier += Math.max(0.0, Math.min(methanation_limit - hydrogen_for_sabatier, co2_above_target * hydrogen_per_tCO2, available))
+            }
             hydrogen_balance -= hydrogen_for_sabatier                                                    // subtract from hydrogen store
+            o.methane.co2_store = co2_available - hydrogen_for_sabatier / hydrogen_per_tCO2
+            if (o.methane.co2_store>i.methane.co2_store_capacity_t) {
+                o.methane.co2_vented += o.methane.co2_store - i.methane.co2_store_capacity_t
+                o.methane.co2_store = i.methane.co2_store_capacity_t
+            }
+            d.co2_store.push(o.methane.co2_store)
             // Methanation process itself
             let methane_from_sabatier = hydrogen_for_sabatier * (889.0/1144.0)                               // 78% efficiency based on HHV kj/mol of CH4/4H2
             o.total_losses.sabatier += hydrogen_for_sabatier - methane_from_sabatier
@@ -2028,6 +2048,8 @@ var model = {
         o.costs['Hydrogen storage'] = { capacity: i.hydrogen.storage_capacity_GWh, generation: 0 }
         o.costs['Methane storage'] = { capacity: i.methane.storage_capacity_GWh, generation: 0 }
         o.costs['Synthetic fuel storage'] = { capacity: i.synth_fuel.store_capacity_GWh, generation: 0 }
+        // CO2 store capacity in Mt, cost per tonne
+        o.costs['CO2 storage'] = { capacity: i.methane.co2_store_capacity_t * 1e-6, generation: 0 }
 
         o.total_annual_cost = 0;
 
@@ -2142,7 +2164,7 @@ var model = {
             o.generation_costs.by_tech[z] = row
             o.generation_costs.total_annual += annual
         }
-        let fuel_production = ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion', 'FT synthetic fuel', 'Hydrogen storage', 'Methane storage', 'Synthetic fuel storage']
+        let fuel_production = ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion', 'FT synthetic fuel', 'Hydrogen storage', 'Methane storage', 'Synthetic fuel storage', 'CO2 storage']
         o.generation_costs.fuel_production_annual = o.biogas_feedstock_annual
         for (let z of fuel_production) {
             o.costs[z].used = true

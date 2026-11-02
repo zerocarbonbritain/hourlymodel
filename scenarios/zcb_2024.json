@@ -306,7 +306,9 @@
     "methane": {
         "methanation_capacity": 4.03,
         "SOC_start": 10000,
-        "storage_capacity_GWh": 65000
+        "storage_capacity_GWh": 65000,
+        "co2_store_capacity_t": 100000,
+        "co2_store_target_t": 50000
     },
     "synth_fuel": {
         "capacity_GW": 9.2,
@@ -677,6 +679,16 @@
             "fixed_om": 0.00113,
             "variable_om": 0,
             "lifespan": 30
+        },
+        "CO2 storage": {
+            "hurdle_rate": 8.9,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 2710,
+            "fixed_om": 27.1,
+            "variable_om": 0,
+            "lifespan": 25
         }
     }
 }

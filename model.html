@@ -1154,6 +1154,12 @@ input[type='text'] {
             <td><input v-model.number="i.methane.SOC_start" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
         </tr>
         <tr>
+            <td>CO2 storage for methanation<br><span style="font-size:12px"><i>Methanation tops up from the H2 store while above target</i></span></td>
+            <td><input v-model.number="i.methane.co2_store_capacity_t" type="text" @change="update" style="width:70px"  autocomplete="off"/> t</td>
+            <td style="text-align:right">Store target</td>
+            <td><input v-model.number="i.methane.co2_store_target_t" type="text" @change="update" style="width:70px"  autocomplete="off"/> t</td>
+        </tr>
+        <tr>
             <td>Synth Fuel<br><span style="font-size:12px"><i>Capacity given is for H2 feed to process</i></span></td>
             <td><input v-model.number="i.synth_fuel.capacity_GW" type="text" @change="update" style="width:70px"  autocomplete="off"/> GW</td>
             <td style="text-align:right">Store start</td>

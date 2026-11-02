@@ -27,7 +27,7 @@ Earlier handovers this plan replaces as the pick-up point:
 ## Where things stand (2026-11-02)
 
 - **Baselines.** 2024 and 2018 are built from sources by baseline/build.py and validated against observed statistics. Remaining differences are in baseline/open-items.md.
-- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 costs £93.34bn/yr, generation cost 18.9 p/kWh, household electricity bill £1,080. FT draws on the H2 store (phase 3, item 1), otherwise dispatch is unchanged.
+- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. FT draws on the H2 store and methanation has a CO2 store (phase 3, items 1 and 2), otherwise dispatch is unchanged. zcb_2024 costs £93.37bn/yr.
 - **PyPSA.** Costs come from the hourly model's exported scenario. The replay matches ZCB within 0.001 GWh. A one year expansion (2002) at today's costs gives £70.7bn/yr against £93.3bn for the ZCB capacities. At those PyPSA capacities the hourly model's rules leave 43.6 TWh/yr of synthetic fuel unmet, because FT only uses hydrogen made in the same hour.
 - **Heat pump SPF study.** SPF 2.8 against 3.8 costs £2.2bn to £5.7bn/yr. The blog post draft is parked until prices exist (phase 6).
 - **Weather data.** ERA5 cutouts are downloading on a server. Postponed to phase 7.
@@ -71,7 +71,12 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
    - Rules at the 2010 expansion capacities: unmet synthetic fuel falls from 8.42 to 0 TWh/yr, with 6.1 TWh/yr from the H2 store. The methane store now reaches empty and 0.01 TWh/yr of electricity is unmet.
    - A 30 TWh target holds the liquid store at the target at the end of 2010, and both models give 37.84 TWh of FT hydrogen.
    - Above the target FT still takes the whole surplus, so the liquid store drifts up (new open item).
-2. [ ] **CO2 buffer for methanation**, so methanation follows the H2 surplus. A CO2 store in both models, with a cost.
+2. [x] **CO2 buffer for methanation**, so methanation follows the H2 surplus. A CO2 store in both models, with a cost.
+   Done 2026-11-02. `methane.co2_store_capacity_t` and `methane.co2_store_target_t` (zcb_2024 100 kt and 50 kt, £0.03bn/yr, docs/cost-assumptions.md). Methanation uses the H2 surplus left after FT first, and tops up from the H2 store while the CO2 store is above its target, down to the target. CO2 above the capacity is vented. Results on 2010:
+   - zcb_2024 (4.03 GW of methanation): no change in dispatch. The CO2 flow needs 4.22 GW, so the store stays full and 0.24 Mt/yr is vented in both models. Replay matches within 0.001 on every store. Cost £93.37bn/yr.
+   - At 6 GW of methanation, both models use all the CO2 (36.98 TWh/yr of hydrogen). 60% of ZCB methanation falls in electrolysis hours (51% of hours), against 45 to 48% in PyPSA, where timing does not change the cost while the H2 store is large.
+   - The 2010 expansion builds a 1.67 Mt CO2 store and 11.4 GW of methanation, and cuts the H2 store from 3.45 to 1.44 TWh and the liquid store from 20.5 to 5.0 TWh. Total £92.73bn/yr against £93.22bn. Storing CO2 in tanks costs about a fifth of storing the matching hydrogen in salt caverns.
+   - Rules at those capacities leave 2.68 TWh/yr of synthetic fuel unmet. The H2 store is too small for the rules, a matter for phase 5.
 3. [ ] **Two turbine classes**, OCGT and CCGT in merit order, each with its own efficiency, cost and de-rating factor (0.9297 and 0.9048). PyPSA chooses the mix.
 4. [ ] **Battery power and energy** costed separately, with duration as an input. A separate inverter cost in PyPSA.
 5. [ ] **Industry heat by temperature band** (<100, 100 to 200, 200 to 500, >500 °C) with technologies per band.

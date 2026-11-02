@@ -279,7 +279,9 @@
     "methane": {
         "methanation_capacity": 0,
         "SOC_start": 0,
-        "storage_capacity_GWh": 120000
+        "storage_capacity_GWh": 120000,
+        "co2_store_capacity_t": 0,
+        "co2_store_target_t": 0
     },
     "synth_fuel": {
         "capacity_GW": 0,

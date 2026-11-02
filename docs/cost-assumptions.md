@@ -43,6 +43,7 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Hydrogen storage (per kWh) | 8.9 | 0, 0 | 1, 2.217 | 0 | 0 | 100 | Technology-data 2030 salt caverns |
 | Methane storage (per kWh) | 8.9 | 0, 0 | 1, 0.2465 | 0.0013 | 0 | 100 | Technology-data 2030 underground gas storage |
 | Synthetic fuel storage (per kWh) | 8.9 | 0, 0 | 1, 0.0181 | 0.0011 | 0 | 30 | Technology-data 2030 liquid product tanks |
+| CO2 storage (per tCO2) | 8.9 | 0, 0 | 1, 2,710 | 27.1 | 0 | 25 | Technology-data 2030 CO2 storage tank |
 | Power to X | 10.1 | 0, 0 | 1, 860 | 25.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
 
 `carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The 2024 baseline uses £55.18/tCO2, the 2024 mean UK ETS auction price (£37.18) plus Carbon Price Support. The 2018 baseline sets it to 0.
@@ -62,12 +63,13 @@ The original ZCB values were £328/kW for electrolysis and £236/kW for methanat
 
 ### FT synthetic fuel and fuel stores
 
-From technology-data v0.15.0, converted as for electrolysis. Hurdle rates follow the nearest ZCB technology: 10.1% (CEPA power to X) for FT and 8.9% (electric storage) for the stores.
+From technology-data v0.15.0, converted as for electrolysis. Hurdle rates follow the nearest ZCB technology: 10.1% (CEPA power to X) for FT and 8.9% (electric storage) for the stores, including the CO2 store.
 
 - **FT plant.** ZCB's FT takes 1.3 kWh of biomass and 0.61 kWh of hydrogen per kWh of fuel, closest to technology-data's electrobiofuels. Technology-data has no capex for electrobiofuels, so it is built as PyPSA-Eur does, from BtL plus the 0.731 share of BtL carbon not in its fuel times Fischer-Tropsch: (€3,929 × 0.383 + 0.731 × €2,139 × 0.704) / 1.322 = €1,972/kW of fuel, £1,635/kW. The model sizes FT by hydrogen in, so this is divided by 0.61, giving £2,681/kW. Fixed O&M is the electrobiofuels 2.67%, running cost is built the same way from the BtL and Fischer-Tropsch values (£2.15/MWh of fuel) and the life is the BtL 25 years. PyPSA-Eur marks electrobiofuels as experimental, and its blend (0.76 kWh of biomass and 0.94 of hydrogen per kWh of fuel) differs from ZCB's, so this is a proxy. Biomass for FT is not costed.
 - **Hydrogen storage.** Salt caverns at €2.67/kWh of working gas (Danish Energy Agency), 100 year life. The full capacity is costed, although the model keeps a 10% floor (`hydrogen.minimum_store_level`).
 - **Methane storage.** Underground gas storage at €0.297/kWh with 0.54% fixed O&M (Danish Energy Agency). Technology-data gives its 100 year life without a source. At 50 years the annual cost rises from £0.023 to £0.024/kWh.
 - **Synthetic fuel storage.** Liquid product tanks at €218/m³ with 6.25% fixed O&M and a 30 year life (Stelter and Nishida 2013, IEA), at 10 MWh/m³. The cost is on `synth_fuel.store_capacity_GWh`, which the model enforces (since 2026-11-02).
+- **CO2 storage.** Pressurised steel tanks for liquid CO2 at €3,269/tCO2 with 1% fixed O&M and a 25 year life (Lauri et al. 2014, table 3, via technology-data), £2,710/t. The annual cost is £301/t/yr. Liquefaction is costed separately in technology-data (€21/tCO2/h and 0.123 MWh of electricity per tonne) and is left out, so the CO2 store has no energy use. At zcb_2024's biogas CO2 flow (585 t/h) liquefaction would use about 0.6 TWh/yr of electricity. zcb_2024 has a 100 kt store (£0.03bn/yr), about a week of biogas CO2. The baselines have none.
 - **Store power** (compressors, injection and withdrawal) is not costed. Technology-data gives about £16/kW for gas storage charging and £5/kW for discharging.
 
 In zcb_2024 these add £9.2bn/yr: FT £3.6bn, hydrogen storage £3.9bn, methane storage £1.5bn and synthetic fuel storage £0.1bn. The hydrogen store is the largest because its 20 TWh is never more than half used.
@@ -176,7 +178,7 @@ Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for 
 - ONS, [CPI index 00: all items, D7BT](https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7bt/mm23), annual 2014, 2020 and 2024.
 - ONS, [GDP at market prices: implied deflator, YBGB](https://www.ons.gov.uk/economy/grossdomesticproductgdp/timeseries/ybgb/ukea), annual 2020 and 2024.
 - BEIS, [Green Gas Support Scheme final stage impact assessment](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1018133/green-gas-impact-assessment.pdf) (2021), paragraphs 47 and 55, Table D-2 and Annex C.
-- PyPSA, [technology-data](https://github.com/PyPSA/technology-data) v0.15.0, `outputs/costs_2030.csv`, electrolysis, methanation, BtL, Fischer-Tropsch, electrobiofuels, hydrogen storage underground, gas storage and general liquid hydrocarbon storage (product).
+- PyPSA, [technology-data](https://github.com/PyPSA/technology-data) v0.15.0, `outputs/costs_2030.csv`, electrolysis, methanation, BtL, Fischer-Tropsch, electrobiofuels, hydrogen storage underground, gas storage, general liquid hydrocarbon storage (product) and CO2 storage tank.
 - [MeyGen](https://en.wikipedia.org/wiki/MeyGen), 2023 net output.
 - Modo Energy, [GB battery capex survey 2024](https://modoenergy.com/research/battery-energy-storage-capex-containerised-bess-development-costs-oem-balance-plant-bop-grid-connections-survey-2024) and [global battery capex September 2026](https://modoenergy.com/research/global-battery-capex-september-2026-research). £230/kWh is the 2024 median (£325/kWh) less the reported 29% fall.
 - NESO, [Capacity Market Register](https://www.neso.energy/data-portal/capacity-market-register), Capacity Market De-Rating Factors CSV (September 2026).

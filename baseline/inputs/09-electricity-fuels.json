@@ -312,6 +312,18 @@
         "value": 0,
         "note": "Carried from the 2018 baseline."
     },
+    "methane.co2_store_capacity_t": {
+        "type": "assumption",
+        "units": "t",
+        "value": 0,
+        "note": "No methanation in the baseline year."
+    },
+    "methane.co2_store_target_t": {
+        "type": "assumption",
+        "units": "t",
+        "value": 0,
+        "note": "No methanation in the baseline year."
+    },
     "synth_fuel.store_target_GWh": {
         "type": "assumption",
         "units": "GWh",
