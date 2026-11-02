@@ -27,7 +27,7 @@ Earlier handovers this plan replaces as the pick-up point:
 ## Where things stand (2026-11-02)
 
 - **Baselines.** 2024 and 2018 are built from sources by baseline/build.py and validated against observed statistics. Remaining differences are in baseline/open-items.md.
-- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. FT draws on the H2 store and methanation has a CO2 store (phase 3, items 1 and 2), otherwise dispatch is unchanged. zcb_2024 costs £93.37bn/yr.
+- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. zcb_2024 costs £93.37bn/yr.
 - **PyPSA.** Costs come from the hourly model's exported scenario. The replay matches ZCB within 0.001 GWh. A one year expansion (2002) at today's costs gives £70.7bn/yr against £93.3bn for the ZCB capacities. At those PyPSA capacities the hourly model's rules leave 43.6 TWh/yr of synthetic fuel unmet, because FT only uses hydrogen made in the same hour.
 - **Heat pump SPF study.** SPF 2.8 against 3.8 costs £2.2bn to £5.7bn/yr. The blog post draft is parked until prices exist (phase 6).
 - **Weather data.** ERA5 cutouts are downloading on a server. Postponed to phase 7.
@@ -77,7 +77,11 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
    - At 6 GW of methanation, both models use all the CO2 (36.98 TWh/yr of hydrogen). 60% of ZCB methanation falls in electrolysis hours (51% of hours), against 45 to 48% in PyPSA, where timing does not change the cost while the H2 store is large.
    - The 2010 expansion builds a 1.67 Mt CO2 store and 11.4 GW of methanation, and cuts the H2 store from 3.45 to 1.44 TWh and the liquid store from 20.5 to 5.0 TWh. Total £92.73bn/yr against £93.22bn. Storing CO2 in tanks costs about a fifth of storing the matching hydrogen in salt caverns.
    - Rules at those capacities leave 2.68 TWh/yr of synthetic fuel unmet. The H2 store is too small for the rules, a matter for phase 5.
-3. [ ] **Two turbine classes**, OCGT and CCGT in merit order, each with its own efficiency, cost and de-rating factor (0.9297 and 0.9048). PyPSA chooses the mix.
+3. [x] **Two turbine classes**, OCGT and CCGT in merit order, each with its own efficiency, cost and de-rating factor (0.9297 and 0.9048). PyPSA chooses the mix.
+   Done 2026-11-02. CCGT runs first up to `electric_backup.ccgt_capacity_GW`, then OCGT. DESNZ 2025 costs, OCGT 300 MW at 35%, and CCGT moved from 50% to the DESNZ 54%. The "Gas turbines" cost is now "CCGT" and `derating_factor` is `ccgt_derating_factor`. zcb_2024 stays all CCGT. Results:
+   - zcb_2024: cost unchanged at £93.37bn/yr. At 54% backup uses less methane, so the methane store ends ten years at 34.2 TWh against 25.0, and spill rises from 1.84 to 2.89 TWh/yr. Replay matches on 2010.
+   - At 30 GW of CCGT, OCGT covers 13.45 GW of peak and gives 1.26 TWh in 2010 against 1.24 in PyPSA. The cost falls by £0.79bn/yr.
+   - The 2010 expansion chooses 26.2 GW of CCGT and 16.9 GW of OCGT, £91.37bn/yr against £92.73bn with CCGT only.
 4. [ ] **Battery power and energy** costed separately, with duration as an input. A separate inverter cost in PyPSA.
 5. [ ] **Industry heat by temperature band** (<100, 100 to 200, 200 to 500, >500 °C) with technologies per band.
 6. [ ] **Industry material sub-models** for steel, cement, ammonia and chemicals, and glass. They replace the fixed blast furnace fuel and address the reductant coal open item. Source the 65% drying fuel efficiency and convert the JRC-IDEES NCV values to gross.

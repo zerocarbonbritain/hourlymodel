@@ -1051,7 +1051,7 @@ input[type='text'] {
             <td><input v-model.number="i.electric_backup.prc_methane" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
             <td>{{ o.electric_backup.total_methane_turbine_output*0.0001 | toFixed(1) }}</td>
             <td><input v-model.number="i.electric_backup.methane_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ (o.electric_backup.total_methane_turbine_output*0.0001)/(i.electric_backup.methane_efficiency*0.01) | toFixed(1) }}</td>
+            <td>{{ ((o.electric_backup.total_methane_turbine_output-o.electric_backup.total_ocgt_output)*0.0001)/(i.electric_backup.methane_efficiency*0.01) + (o.electric_backup.total_ocgt_output*0.0001)/(i.electric_backup.ocgt_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_methane*0.01 | toFixed(1) }} GW</td>
         </tr>
         <tr>
@@ -1083,7 +1083,8 @@ input[type='text'] {
         <p>Coal backup CO2 factor (coal and other thermal): <input v-model.number="i.electric_backup.coal_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/> kgCO2/kWh fuel</p>
         
         <p>Max capacity requirement date: {{ o.electric_backup.max_capacity_requirement_date }}</p>
-        <p>De-rating factor for outages <input v-model.number="i.electric_backup.derating_factor" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/>: {{ o.electric_backup.max_capacity_requirement / i.electric_backup.derating_factor | toFixed(1) }} GW of turbines costed.</p>
+        <p>Methane backup runs on CCGT (efficiency above) up to <input v-model.number="i.electric_backup.ccgt_capacity_GW" type="text" @change="update" style="width:50px" autocomplete="off"/> GW, then OCGT at <input v-model.number="i.electric_backup.ocgt_efficiency" type="text" @change="update" style="width:50px" autocomplete="off"/> % efficiency. OCGT output {{ o.electric_backup.total_ocgt_output*0.0001 | toFixed(1) }} TWh/yr, peak {{ o.electric_backup.max_ocgt_output | toFixed(1) }} GW.</p>
+        <p>De-rating factors for outages: CCGT <input v-model.number="i.electric_backup.ccgt_derating_factor" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/>, OCGT <input v-model.number="i.electric_backup.ocgt_derating_factor" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/>: {{ o.costs['CCGT'] ? o.costs['CCGT'].capacity : 0 | toFixed(1) }} GW of CCGT and {{ o.costs['OCGT'] ? o.costs['OCGT'].capacity : 0 | toFixed(1) }} GW of OCGT costed.</p>
     </div>
 </div>
 

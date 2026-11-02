@@ -331,7 +331,9 @@
         "prc_hydrogen": 0,
         "hydrogen_efficiency": 50,
         "prc_methane": 100,
-        "methane_efficiency": 50,
+        "methane_efficiency": 54,
+        "ccgt_capacity_GW": 100,
+        "ocgt_efficiency": 35,
         "prc_biomass": 0,
         "biomass_efficiency": 32,
         "prc_synth_fuel": 0,
@@ -339,7 +341,8 @@
         "prc_coal": 0,
         "coal_efficiency": 34,
         "coal_co2_factor": 0.3166,
-        "derating_factor": 0.9048,
+        "ccgt_derating_factor": 0.9048,
+        "ocgt_derating_factor": 0.9297,
         "prc_imports": 0
     },
     "energy_industry_use": {
@@ -600,13 +603,23 @@
             "variable_om": 0,
             "lifespan": 20
         },
-        "Gas turbines": {
+        "CCGT": {
             "hurdle_rate": 8.9,
             "predev_years": 2,
             "predev_cost": 20,
             "build_years": 3,
             "capex": 1015,
             "fixed_om": 22.9,
+            "variable_om": 5,
+            "lifespan": 25
+        },
+        "OCGT": {
+            "hurdle_rate": 8.9,
+            "predev_years": 2,
+            "predev_cost": 20,
+            "build_years": 2,
+            "capex": 644,
+            "fixed_om": 16.4,
             "variable_om": 5,
             "lifespan": 25
         },

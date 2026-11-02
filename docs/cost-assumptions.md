@@ -34,7 +34,8 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Geothermal electric | 8.9 | 2, 60 | 5, 5,980 | 125 | 26 | 30 | DESNZ 2025 deep geothermal, 2035 NOAK |
 | Nuclear | 6.7 | 0, 0 | 10, 11,900 | 109 | 13 | 60 | Sizewell C, see below |
 | Hydro | 7.6 | 3, 74 | 2, 3,961 | 60.3 | 7.9 | 40 | Arup 2016 hydro 5-16 MW, see below |
-| Gas turbines | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT, de-rated capacity (see below) |
+| CCGT | 8.9 | 2, 20 | 3, 1,015 | 22.9 | 5 | 25 | DESNZ 2025 CCGT, de-rated capacity (see below) |
+| OCGT | 8.9 | 2, 20 | 2, 644 | 16.4 | 5 | 25 | DESNZ 2025 OCGT 300 MW, de-rated capacity (see below) |
 | Electric storage (per kWh) | 8.9 | 0, 0 | 1, 230 | 5 | 0 | 15 | Modo Energy GB 2 hour survey, CEPA hurdle rate |
 | H2 electrolysis (per kW electricity) | 10.1 | 0, 0 | 1, 1,564 | 62.5 | 0 | 25 | Technology-data 2030, CEPA hurdle rate, see below |
 | Methanation (per kW H2 in, HHV) | 10.1 | 0, 0 | 1, 469 | 14.1 | 0 | 20 | Technology-data 2030, CEPA hurdle rate, see below |
@@ -48,9 +49,11 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 
 `carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The 2024 baseline uses £55.18/tCO2, the 2024 mean UK ETS auction price (£37.18) plus Carbon Price Support. The 2018 baseline sets it to 0.
 
-### Gas turbine de-rating
+### Gas turbines
 
-Backup turbine capacity is costed as the highest hourly backup need divided by `electric_backup.derating_factor`, so the fleet covers plant outages. The factor is 0.9048, the Capacity Market de-rating factor for CCGT in the T-4 auction for delivery year 2030/31 (OCGT and reciprocating engines 0.9297). No further margin is added for weather: the model sizes backup to the worst hour in ten weather years with no demand unmet, which is stricter than the 3 hour loss of load expectation in the GB reliability standard. Costed capacity is 48.0 GW in zcb_2024 (peak need 43.45 GW, +£0.63bn/yr) and 33.4 GW in baseline_2024 (30.2 GW, against 46.2 GW of fossil and bioenergy capacity in DUKES 5.7). Dispatch is unchanged.
+Methane backup runs on CCGT first, up to `electric_backup.ccgt_capacity_GW`, and OCGT meets the rest. Both are DESNZ 2025 values for 2030 commissioning, medium case. OCGT is the 300 MW unit: £600/kW construction plus £13.2m of infrastructure over 299 MW (£644/kW), fixed O&M of £11.8 plus £1.5 insurance plus £3.1/kW/yr connection and use of system charges. Efficiencies are the DESNZ values, CCGT 54% (`methane_efficiency`, 50% before 2026-11-02) and OCGT 35% (`ocgt_efficiency`). DESNZ does not state the basis. They match the LeighFisher 2016 values for DECC (about 60% and 39% LHV) converted at 89.82% for gas, so they are HHV, as in the model. The 760 MW OCGT is £626/kW at 36%. zcb_2024 keeps all backup on CCGT (`ccgt_capacity_GW` 100) until the phase 5 retune.
+
+Each class is costed at its peak output divided by its de-rating factor, so the fleet covers plant outages. OCGT runs only when CCGT is at capacity, so OCGT covers its own peak and CCGT the rest of the peak need. The factors are the Capacity Market de-rating factors in the T-4 auction for delivery year 2030/31: 0.9048 for CCGT (`ccgt_derating_factor`) and 0.9297 for OCGT and reciprocating engines (`ocgt_derating_factor`). Annual costs per de-rated kW are £151.9 for CCGT and £93.4 for OCGT. No further margin is added for weather: the model sizes backup to the worst hour in ten weather years with no demand unmet, which is stricter than the 3 hour loss of load expectation in the GB reliability standard. Costed capacity is 48.0 GW in zcb_2024 (peak need 43.45 GW, all CCGT, +£0.63bn/yr) and 33.4 GW in baseline_2024 (30.2 GW, against 46.2 GW of fossil and bioenergy capacity in DUKES 5.7). Dispatch is unchanged.
 
 ### Electrolysis and methanation
 

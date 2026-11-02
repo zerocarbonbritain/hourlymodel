@@ -894,6 +894,8 @@ var model = {
         
         o.electric_backup.total_hydrogen_turbine_output = 0
         o.electric_backup.total_methane_turbine_output = 0
+        o.electric_backup.total_ocgt_output = 0
+        o.electric_backup.max_ocgt_output = 0
         o.electric_backup.total_synth_fuel_turbine_output = 0
         o.electric_backup.total_biomass_turbine_output = 0
         o.electric_backup.total_coal_turbine_output = 0
@@ -1239,6 +1241,8 @@ var model = {
             // ---------------------------------------------------------------------------- 
             let hydrogen_turbine_output = 0
             let methane_turbine_output = 0
+            let ccgt_output = 0
+            let ocgt_output = 0
             let synth_fuel_turbine_output = 0
             let biomass_turbine_output = 0
             let coal_turbine_output = 0
@@ -1275,6 +1279,10 @@ var model = {
                 biomass_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_biomass * 0.01)
                 coal_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_coal * 0.01)
 
+                // Methane backup: CCGT runs first up to its capacity (after grid loss) and OCGT meets the rest
+                ccgt_output = Math.min(methane_turbine_output, i.electric_backup.ccgt_capacity_GW / grid_loss_prc)
+                ocgt_output = methane_turbine_output - ccgt_output
+
                 // Limit by hydrogen availability (only available from H2 store)
           
               if (hydrogen_turbine_output>(o.hydrogen.SOC*i.electric_backup.hydrogen_efficiency*0.01)) {
@@ -1283,9 +1291,16 @@ var model = {
                 
                 // If methane and synth fuels are from stores only, limit by availability
                 if (!i.fossil_fuels.allow_use_for_backup) {
-                    // Limit by methane availability
-                    if (methane_turbine_output>(o.methane.SOC*i.electric_backup.methane_efficiency*0.01)) {
-                        methane_turbine_output = o.methane.SOC*i.electric_backup.methane_efficiency*0.01
+                    // Limit by methane availability, cutting OCGT first
+                    let ccgt_fuel = ccgt_output / (i.electric_backup.methane_efficiency*0.01)
+                    if (ccgt_fuel + ocgt_output / (i.electric_backup.ocgt_efficiency*0.01) > o.methane.SOC) {
+                        if (ccgt_fuel > o.methane.SOC) {
+                            ccgt_output = o.methane.SOC*i.electric_backup.methane_efficiency*0.01
+                            ocgt_output = 0
+                        } else {
+                            ocgt_output = (o.methane.SOC - ccgt_fuel)*i.electric_backup.ocgt_efficiency*0.01
+                        }
+                        methane_turbine_output = ccgt_output + ocgt_output
                     }
                     // Limit by synth fuel availability
                     if (synth_fuel_turbine_output>(o.synth_fuel.store_SOC*i.electric_backup.synth_fuel_efficiency*0.01)) {
@@ -1296,6 +1311,8 @@ var model = {
                 // Totals
                 o.electric_backup.total_hydrogen_turbine_output += hydrogen_turbine_output
                 o.electric_backup.total_methane_turbine_output += methane_turbine_output
+                o.electric_backup.total_ocgt_output += ocgt_output
+                if (ocgt_output * grid_loss_prc > o.electric_backup.max_ocgt_output) o.electric_backup.max_ocgt_output = ocgt_output * grid_loss_prc
                 o.electric_backup.total_synth_fuel_turbine_output += synth_fuel_turbine_output 
                 o.electric_backup.total_biomass_turbine_output += biomass_turbine_output
                 o.electric_backup.total_coal_turbine_output += coal_turbine_output 
@@ -1393,7 +1410,7 @@ var model = {
             let methane_production = methane_from_sabatier + methane_from_biogas + methane_from_IHTEM
             o.methane.total_produced += methane_production
             
-            let methane_to_dispatchable = methane_turbine_output / (i.electric_backup.methane_efficiency*0.01)
+            let methane_to_dispatchable = ccgt_output / (i.electric_backup.methane_efficiency*0.01) + ocgt_output / (i.electric_backup.ocgt_efficiency*0.01)
             
             if (i.fossil_fuels.allow_use_for_backup) {
                 if (methane_to_dispatchable>o.methane.SOC) {
@@ -1473,7 +1490,8 @@ var model = {
         // Electricity backup losses
         o.total_losses.elec_backup = 0
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.hydrogen_efficiency*0.01))-1.0) * o.electric_backup.total_hydrogen_turbine_output
-        o.total_losses.elec_backup += ((1.0/(i.electric_backup.methane_efficiency*0.01))-1.0) * o.electric_backup.total_methane_turbine_output
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.methane_efficiency*0.01))-1.0) * (o.electric_backup.total_methane_turbine_output - o.electric_backup.total_ocgt_output)
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.ocgt_efficiency*0.01))-1.0) * o.electric_backup.total_ocgt_output
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.synth_fuel_efficiency*0.01))-1.0) * o.electric_backup.total_synth_fuel_turbine_output
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.biomass_efficiency*0.01))-1.0) * o.electric_backup.total_biomass_turbine_output
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.coal_efficiency*0.01))-1.0) * o.electric_backup.total_coal_turbine_output
@@ -2036,8 +2054,11 @@ var model = {
         o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: o.supply.total_hydro*0.0001 }
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
-        // Turbine capacity covers the peak need after de-rating for outages (capacity market de-rating factor)
-        o.costs['Gas turbines'] = { capacity: o.electric_backup.max_capacity_requirement / i.electric_backup.derating_factor, generation: o.electric_backup.total_before_grid_loss*0.0001 }
+        // Turbine capacity covers the peak need after de-rating for outages (capacity market de-rating factors).
+        // OCGT runs only when CCGT is at capacity, so OCGT covers its own peak output and CCGT the rest.
+        let eb_out = o.electric_backup
+        o.costs['CCGT'] = { capacity: (eb_out.max_capacity_requirement - eb_out.max_ocgt_output) / i.electric_backup.ccgt_derating_factor, generation: (eb_out.total_before_grid_loss - eb_out.total_ocgt_output)*0.0001 }
+        o.costs['OCGT'] = { capacity: eb_out.max_ocgt_output / i.electric_backup.ocgt_derating_factor, generation: eb_out.total_ocgt_output*0.0001 }
         o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
         o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*0.0001 }
         // Anaerobic digestion supply is flat. Capacity in GW of methane assumes 90% plant availability.
@@ -2088,7 +2109,7 @@ var model = {
         }
         o.total_annual_cost += o.fuel_cost_annual + o.carbon_cost_annual
 
-        let backup = o.costs['Gas turbines']
+        let backup = { annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, generation: o.costs['CCGT'].generation + o.costs['OCGT'].generation }
         o.backup_LCOE = backup.generation > 0 ? 1000 * (backup.annual + o.fuel_cost_annual + o.carbon_cost_annual) / backup.generation : 0
 
         o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
@@ -2136,7 +2157,8 @@ var model = {
             if (uses_build_up) {
                 if (typeof cost === 'string') o.costs[cost].used = true
                 else if (generation > 0) {
-                    o.costs['Gas turbines'].used = true
+                    o.costs['CCGT'].used = true
+                    o.costs['OCGT'].used = true
                     if (z != 'hydrogen') o.generation_costs.backup_fuel_used = true
                 }
             }
