@@ -24,10 +24,10 @@ Earlier handovers this plan replaces as the pick-up point:
 - Record every cost source and decision in docs/cost-assumptions.md, and every PyPSA practice difference in ZCB_PyPSA/docs/pypsa-practice.md.
 - After a change to inputs, rebuild the baselines (`python3 -I baseline/build.py 2024 scenarios/baseline_2024.json --write`, the same for 2018) and validate (`python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json`). The current result is 58 ok, 4 warnings, 14 known issues.
 
-## Where things stand (2026-11-01)
+## Where things stand (2026-11-02)
 
 - **Baselines.** 2024 and 2018 are built from sources by baseline/build.py and validated against observed statistics. Remaining differences are in baseline/open-items.md.
-- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 costs £93.34bn/yr, generation cost 18.9 p/kWh, household electricity bill £1,080. Dispatch is unchanged from the start of the session.
+- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 costs £93.34bn/yr, generation cost 18.9 p/kWh, household electricity bill £1,080. FT draws on the H2 store (phase 3, item 1), otherwise dispatch is unchanged.
 - **PyPSA.** Costs come from the hourly model's exported scenario. The replay matches ZCB within 0.001 GWh. A one year expansion (2002) at today's costs gives £70.7bn/yr against £93.3bn for the ZCB capacities. At those PyPSA capacities the hourly model's rules leave 43.6 TWh/yr of synthetic fuel unmet, because FT only uses hydrogen made in the same hour.
 - **Heat pump SPF study.** SPF 2.8 against 3.8 costs £2.2bn to £5.7bn/yr. The blog post draft is parked until prices exist (phase 6).
 - **Weather data.** ERA5 cutouts are downloading on a server. Postponed to phase 7.
@@ -65,7 +65,12 @@ Earlier handovers this plan replaces as the pick-up point:
 
 For each item, add it to the PyPSA network and to model.js together. Check that the PyPSA optimised dispatch at fixed capacities and the hourly model's rules agree on 2010, then commit both. Update baseline/open-items.md as items close.
 
-1. [ ] **FT draws on the H2 store** (D6, open item). Add `synth_fuel.store_target_GWh` (default the start level). Enforce `synth_fuel.store_capacity_GWh`, which is costed but never applied (open item). In PyPSA FT already takes hydrogen from the H2 bus, so check the dispatch comparison only.
+1. [x] **FT draws on the H2 store** (D6, open item). Add `synth_fuel.store_target_GWh` (default the start level). Enforce `synth_fuel.store_capacity_GWh`, which is costed but never applied (open item). In PyPSA FT already takes hydrogen from the H2 bus, so check the dispatch comparison only.
+   Done 2026-11-02. The top-up fills the liquid store to the target and no further. FT output is also limited by the space left in the liquid store. Results on 2010:
+   - zcb_2024: replay matches within 0.001 GWh, and FT hydrogen is 37.20 TWh in both models. FT draws 0.66 TWh from the H2 store over ten years, all in 2002, so the 2010 liquid store ends at 11.84 TWh against 10.77. Cost is unchanged at £93.34bn/yr.
+   - Rules at the 2010 expansion capacities: unmet synthetic fuel falls from 8.42 to 0 TWh/yr, with 6.1 TWh/yr from the H2 store. The methane store now reaches empty and 0.01 TWh/yr of electricity is unmet.
+   - A 30 TWh target holds the liquid store at the target at the end of 2010, and both models give 37.84 TWh of FT hydrogen.
+   - Above the target FT still takes the whole surplus, so the liquid store drifts up (new open item).
 2. [ ] **CO2 buffer for methanation**, so methanation follows the H2 surplus. A CO2 store in both models, with a cost.
 3. [ ] **Two turbine classes**, OCGT and CCGT in merit order, each with its own efficiency, cost and de-rating factor (0.9297 and 0.9048). PyPSA chooses the mix.
 4. [ ] **Battery power and energy** costed separately, with duration as an input. A separate inverter cost in PyPSA.

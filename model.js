@@ -865,6 +865,8 @@ var model = {
         o.synth_fuel.unmet_demand = 0
         o.synth_fuel.total_produced = 0
         o.synth_fuel.total_biomass_used = 0
+        o.synth_fuel.total_from_h2_store = 0
+        o.synth_fuel.store_spill = 0
         o.synth_fuel.total_biofuel_supply = 0
         o.synth_fuel.backup_from_fossil_oil = 0
         o.synth_fuel.total_transport_demand = 0
@@ -1117,15 +1119,29 @@ var model = {
             hydrogen_balance -= hydrogen_for_industry
             
             // 3. Hydrogen to synthetic liquid fuels
+            // FT uses the hour's hydrogen surplus first. While the liquid store is below its target, FT tops up
+            // from the hydrogen store above its minimum level, up to the target. Both are limited by FT capacity
+            // and by the space left in the liquid store.
+            let hydrogen_store_floor = i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level
             let hourly_biomass_for_biofuel = 0.0
             let hydrogen_to_synth_fuel = 0.0
-            if ((o.hydrogen.SOC>i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level) && hydrogen_balance>0.0) {
-                hydrogen_to_synth_fuel = hydrogen_balance
-                if (hydrogen_to_synth_fuel>i.synth_fuel.capacity_GW) hydrogen_to_synth_fuel = i.synth_fuel.capacity_GW
-                hourly_biomass_for_biofuel = (hydrogen_to_synth_fuel/i.synth_fuel.FT_process_hydrogen_req)*i.synth_fuel.FT_process_biomass_req
-                hydrogen_balance -= hydrogen_to_synth_fuel
+            let hydrogen_from_store_to_synth_fuel = 0.0
+            let synth_fuel_space = (i.synth_fuel.store_capacity_GWh - o.synth_fuel.store_SOC) * i.synth_fuel.FT_process_hydrogen_req
+            let ft_limit = Math.max(0.0, Math.min(i.synth_fuel.capacity_GW, synth_fuel_space))
+            if ((o.hydrogen.SOC>hydrogen_store_floor) && hydrogen_balance>0.0) {
+                hydrogen_to_synth_fuel = Math.min(hydrogen_balance, ft_limit)
             }
-            
+            if (o.synth_fuel.store_SOC<i.synth_fuel.store_target_GWh) {
+                let shortfall = (i.synth_fuel.store_target_GWh - o.synth_fuel.store_SOC) * i.synth_fuel.FT_process_hydrogen_req
+                // Store above the floor, less any same hour deficit already drawn from it
+                let available = o.hydrogen.SOC + Math.min(hydrogen_balance - hydrogen_to_synth_fuel, 0.0) - hydrogen_store_floor
+                hydrogen_from_store_to_synth_fuel = Math.max(0.0, Math.min(ft_limit - hydrogen_to_synth_fuel, shortfall, available))
+                hydrogen_to_synth_fuel += hydrogen_from_store_to_synth_fuel
+            }
+            hourly_biomass_for_biofuel = (hydrogen_to_synth_fuel/i.synth_fuel.FT_process_hydrogen_req)*i.synth_fuel.FT_process_biomass_req
+            hydrogen_balance -= hydrogen_to_synth_fuel
+            o.synth_fuel.total_from_h2_store += hydrogen_from_store_to_synth_fuel
+
             // Production of synth fuel and losses
             let synth_fuel_produced_FT = hydrogen_to_synth_fuel / i.synth_fuel.FT_process_hydrogen_req
             o.synth_fuel.total_produced += synth_fuel_produced_FT
@@ -1142,7 +1158,7 @@ var model = {
             let co2_for_sabatier = co2_from_biogas
             let hydrogen_for_sabatier = co2_for_sabatier * (8.064/44.009) * 39.4 * 0.001                     // 1000 tCO2, requires 7.2 GWh of H2 (HHV)
             
-            let available_hydrogen = o.hydrogen.SOC-(i.hydrogen.storage_capacity_GWh*i.hydrogen.minimum_store_level)        // calculate available hydrogen
+            let available_hydrogen = o.hydrogen.SOC - hydrogen_store_floor - hydrogen_from_store_to_synth_fuel  // calculate available hydrogen
             if (hydrogen_for_sabatier>available_hydrogen) hydrogen_for_sabatier = available_hydrogen     // limit by available hydrogen
             if (hydrogen_for_sabatier>i.methane.methanation_capacity) hydrogen_for_sabatier = i.methane.methanation_capacity // limit by methanation capacity
             if (hydrogen_for_sabatier<0.0) hydrogen_for_sabatier = 0.0
@@ -1410,6 +1426,11 @@ var model = {
                 }
                 o.synth_fuel.store_SOC = 0.0
             }
+            // Biofuel supply and power to liquids can overfill the store, the excess is spilt
+            if (o.synth_fuel.store_SOC>i.synth_fuel.store_capacity_GWh) {
+                o.synth_fuel.store_spill += o.synth_fuel.store_SOC - i.synth_fuel.store_capacity_GWh
+                o.synth_fuel.store_SOC = i.synth_fuel.store_capacity_GWh
+            }
             d.synth_fuel_store_SOC.push(o.synth_fuel.store_SOC)
             
             if (o.synth_fuel.store_min_SOC>o.synth_fuel.store_SOC) o.synth_fuel.store_min_SOC = o.synth_fuel.store_SOC
@@ -1584,7 +1605,7 @@ var model = {
         console.log("Unmet synth fuel demand: "+o.synth_fuel.unmet_demand)
         o.balance.total_unmet_demand += o.electric_transport.unmet_EV_demand + o.hydrogen.unmet_demand + o.synth_fuel.unmet_demand + o.methane.unmet
         
-        o.balance.total_spill = o.methane.store_excess + o.heat.total_spill
+        o.balance.total_spill = o.methane.store_excess + o.heat.total_spill + o.synth_fuel.store_spill
         
         // -------------------------------------------------------------------------------------------------
         o.balance.total_excess = o.balance.total_excess_elec + final_store_balance

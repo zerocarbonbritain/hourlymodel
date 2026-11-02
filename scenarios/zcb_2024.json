@@ -312,6 +312,7 @@
         "capacity_GW": 9.2,
         "store_capacity_GWh": 50000,
         "store_start_GWh": 5000,
+        "store_target_GWh": 5000,
         "biofuel_supply_TWhy": 0,
         "FT_process_biomass_req": 1.3,
         "FT_process_hydrogen_req": 0.61

@@ -284,7 +284,8 @@
     "synth_fuel": {
         "capacity_GW": 0,
         "store_start_GWh": 0,
-        "biofuel_supply_TWhy": 32.0
+        "biofuel_supply_TWhy": 32.0,
+        "store_target_GWh": 0
     },
     "electric_backup": {
         "hydrogen_efficiency": 47.8,

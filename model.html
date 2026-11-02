@@ -1160,6 +1160,12 @@ input[type='text'] {
             <td><input v-model.number="i.synth_fuel.store_start_GWh" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
         </tr>
         <tr>
+            <td>Synth fuel storage<br><span style="font-size:12px"><i>FT tops up from the H2 store while below target</i></span></td>
+            <td><input v-model.number="i.synth_fuel.store_capacity_GWh" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
+            <td style="text-align:right">Store target</td>
+            <td><input v-model.number="i.synth_fuel.store_target_GWh" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh</td>
+        </tr>
+        <tr>
             <td>FT process: biomass required</td>
             <td><input v-model.number="i.synth_fuel.FT_process_biomass_req" type="text" @change="update" style="width:70px"  autocomplete="off"/> GWh/GWh fuel</td>
             <td>FT process: hydrogen required</td>

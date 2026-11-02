@@ -312,6 +312,12 @@
         "value": 0,
         "note": "Carried from the 2018 baseline."
     },
+    "synth_fuel.store_target_GWh": {
+        "type": "assumption",
+        "units": "GWh",
+        "value": 0,
+        "note": "The store start level. FT capacity is 0, so it has no effect."
+    },
     "energy_industry_use.refineries_gas_prc": {
         "type": "calibrated",
         "units": "%",
