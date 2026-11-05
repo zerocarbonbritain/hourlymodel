@@ -123,7 +123,7 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
 14. [x] **Fix the linopy warning** in `yearly_stores` (zcb_pypsa/expand.py): select with `drop=True` so both sides share coordinates. Then check that the stores hold their year-end levels.
     Done 2026-11-05. On 2009 and 2010 the warning is gone, and the objective (£68.08bn/yr) and store levels are unchanged. H2, methane and liquid stores each end both years at the same level.
 
-Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within an agreed margin on 2010.
+Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within 10% on 2010.
 
 ## Phase 4. Long runs and target table
 
