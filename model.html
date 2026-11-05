@@ -561,6 +561,7 @@ input[type='text'] {
         
         Miles travelled per transport mode:<br><br>
         
+        <p>International shipping fuel <input v-model.number="i.transport.international_shipping_TWhy" type="text" @change="update" style="width:50px" autocomplete="off"/> TWh/yr, drawn from the liquid fuel store.</p>
         <table class="table" style="width:100%">
         <tr><th v-for="(mode,key) in i.transport.modes">{{ key }}</th></tr>
         <tr><td v-for="(mode,key) in i.transport.modes"><input v-model.number="mode.miles_pp" type="text" @change="update" /></td></tr>                

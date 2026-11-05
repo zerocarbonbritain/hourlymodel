@@ -215,7 +215,7 @@
         "freight_BEV_demand": 10.143,
         "freight_H2_demand": 3.922,
         "freight_IC_demand": 19.881,
-        "international_shipping_TWhy": 0
+        "international_shipping_TWhy": 23.9
     },
     "industry": {
         "activity_prc": 120,
