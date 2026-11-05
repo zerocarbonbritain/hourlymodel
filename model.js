@@ -940,6 +940,7 @@ var model = {
         d.electricity_for_power_to_X = []
 
         d.electricity_from_dispatchable = []
+        d.ocgt_output = []
         d.excess_elec = []
         d.unmet_elec = []
         d.methane_SOC = []
@@ -1426,6 +1427,7 @@ var model = {
             o.methane.total_produced += methane_production
             
             let methane_to_dispatchable = ccgt_output / (i.electric_backup.methane_efficiency*0.01) + ocgt_output / (i.electric_backup.ocgt_efficiency*0.01)
+            d.ocgt_output.push(ocgt_output)
             
             if (i.fossil_fuels.allow_use_for_backup) {
                 if (methane_to_dispatchable>o.methane.SOC) {
@@ -2059,6 +2061,113 @@ var model = {
         
         o.EE.prc_of_industry_demand = 100 * o.EE.total / (o.industry.total_demand_check * o.GWh_to_TWhy)
     },
+    // Hourly marginal electricity price in £/MWh, from what is at the margin in each hour, valued
+    // with the fuel values in i.fuel_values. The classes follow PyPSA's price conditions, and
+    // scripts/price_check.py in ZCB_PyPSA compares them with PyPSA's prices at equal capacities.
+    hourly_prices: function() {
+        let fv = i.fuel_values
+        let eb = i.electric_backup
+        let glf = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+        let turbine_price = (efficiency, tech) => (fv.methane_gbp_MWh / (efficiency*0.01) + i.costs[tech].variable_om) / glf
+        let ccgt_price = turbine_price(eb.methane_efficiency, 'CCGT')
+        let ocgt_price = turbine_price(eb.ocgt_efficiency, 'OCGT')
+        let electrolysis_price = i.hydrogen.electrolysis_efficiency * fv.hydrogen_gbp_MWh
+        let round_trip = i.electric_storage.charge_efficiency * i.electric_storage.discharge_efficiency
+
+        // Scarcity adder. Hours within 10% of peak backup carry the annual cost of the peak turbine
+        // class, per MW of de-rated capacity over the run, in proportion to their depth.
+        let peak_tech = o.electric_backup.max_ocgt_output > 0 ? 'OCGT' : 'CCGT'
+        let derating = peak_tech == 'OCGT' ? eb.ocgt_derating_factor : eb.ccgt_derating_factor
+        let peak_cost = annual_fixed_cost(i.costs[peak_tech], i.annualisation) * 1000 * o.years / derating
+        let threshold = 0.9 * o.electric_backup.max_capacity_requirement
+        let depth_total = 0
+        for (let hour = 0; hour < i.hours; hour++) depth_total += Math.max(d.electricity_from_dispatchable[hour] - threshold, 0)
+
+        let price = new Array(i.hours)
+        let cls = new Array(i.hours)
+        for (let hour = 0; hour < i.hours; hour++) {
+            // Backup below 0.5 GW is a remainder beside the battery, which is then at the margin
+            if (d.electricity_from_dispatchable[hour] > 0.5) {
+                cls[hour] = 'backup'
+                price[hour] = d.ocgt_output[hour] > 1e-6 ? ocgt_price : ccgt_price
+                let depth = d.electricity_from_dispatchable[hour] - threshold
+                if (depth > 0) price[hour] += peak_cost * depth / depth_total
+            } else if (d.excess_elec[hour] > 1e-6) {
+                cls[hour] = 'curtail'
+                price[hour] = 0
+            } else if (d.electricity_for_electrolysis[hour] > 1e-6) {
+                cls[hour] = 'electrolysis'
+                price[hour] = electrolysis_price
+            } else if (d.elec_store_charge[hour] > 1e-6) {
+                cls[hour] = 'battery_charge'
+            } else {
+                cls[hour] = 'battery_discharge'
+            }
+        }
+        // The battery is at the margin in the remaining hours. Stored energy is worth the price of
+        // the next hour that sets one, so charging pays that less the round trip loss, and
+        // discharging earns it. Charging at the end of the run has no later hour, so it uses CCGT.
+        let next = ccgt_price
+        for (let hour = i.hours - 1; hour >= 0; hour--) {
+            if (cls[hour] == 'battery_charge') price[hour] = next * round_trip
+            else if (cls[hour] == 'battery_discharge') price[hour] = next
+            else next = cls[hour] == 'backup' ? price[hour] : price[hour] / round_trip
+        }
+        d.electricity_price = price
+
+        // Revenue and fuel sales, £bn/yr. GWh over the run times £/MWh times 1e-6 gives £bn.
+        let p = o.prices = { hours: {}, mean: {} }
+        let revenue = 0, end_use_total = 0, offshore = 0, sum = 0
+        let offshore_gw = i.supply.offshore_wind_capacity * i.supply.offshore_wind_availability * glf
+        for (let z of ['backup', 'curtail', 'electrolysis', 'battery_charge', 'battery_discharge']) p.hours[z] = 0
+        let class_sum = {}
+        for (let hour = 0; hour < i.hours; hour++) {
+            let end_use = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour]
+            revenue += end_use * price[hour]
+            end_use_total += end_use
+            offshore += offshore_gw * capacityfactors_all[hour][1] * price[hour]
+            sum += price[hour]
+            p.hours[cls[hour]]++
+            class_sum[cls[hour]] = (class_sum[cls[hour]] || 0) + price[hour]
+        }
+        for (let z in p.hours) {
+            p.mean[z] = p.hours[z] > 0 ? class_sum[z] / p.hours[z] : 0
+            p.hours[z] = 100 * p.hours[z] / i.hours
+        }
+        p.mean_gbp_MWh = sum / i.hours
+        p.end_use_weighted_gbp_MWh = end_use_total > 0 ? revenue / end_use_total : 0
+        p.electricity_revenue = revenue * 1e-6 * o.per_year
+        p.offshore_revenue = offshore * 1e-6 * o.per_year
+        p.offshore_recovery = o.costs['Offshore wind'].annual > 0 ? p.offshore_revenue / o.costs['Offshore wind'].annual : 0
+
+        // Fuel at its value. Synthetic fuel is its hydrogen and biomass plus the FT plant cost per MWh.
+        let sf = i.synth_fuel
+        let ft = o.costs['FT synthetic fuel']
+        let ft_plant = ft.generation > 0 ? 1000 * ft.annual / ft.generation : 0
+        p.fuel = {
+            hydrogen: { gbp_MWh: fv.hydrogen_gbp_MWh, TWh: (o.hydrogen.total_vehicle_demand + o.hydrogen.total_industry_demand + o.heating_systems.hydrogen.fuel_demand) * o.GWh_to_TWhy },
+            methane: { gbp_MWh: fv.methane_gbp_MWh, TWh: (o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas) * o.GWh_to_TWhy },
+            synthetic_fuel: { gbp_MWh: ft.generation > 0 ? sf.FT_process_hydrogen_req * fv.hydrogen_gbp_MWh + sf.FT_process_biomass_req * sf.biomass_gbp_MWh + ft_plant : 0,
+                TWh: (o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand) * o.GWh_to_TWhy }
+        }
+        p.fuel_sales = 0
+        for (let z in p.fuel) {
+            p.fuel[z].annual = p.fuel[z].TWh * p.fuel[z].gbp_MWh * 0.001
+            p.fuel[z].p_kWh = p.fuel[z].gbp_MWh * 0.1
+            p.fuel_sales += p.fuel[z].annual
+        }
+        // Liquid fuels per litre at the diesel energy density, against 2024 fuel prices before tax
+        let kWh_per_litre = i.retail.road_fuel.diesel_kWh_per_litre
+        p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * kWh_per_litre
+        p.jet_fuel_p_litre = fv.jet_fuel_gbp_MWh * 0.1 * kWh_per_litre
+        p.marine_gas_oil_p_litre = fv.marine_gas_oil_gbp_MWh * 0.1 * kWh_per_litre
+        p.recovery = o.total_annual_cost > 0 ? (p.electricity_revenue + p.fuel_sales) / o.total_annual_cost : 0
+
+        // Fuel users pay these values, which include the electricity used to make the fuel. Electricity
+        // users pay the rest of the generation cost.
+        o.generation_costs.fuel_users_annual = p.fuel_sales
+        o.generation_costs.electricity_annual = o.generation_costs.total_annual - o.generation_costs.fuel_users_annual
+    },
     cost_model: function() {
 
         // Generation is in GWh over the run, o.GWh_to_TWhy converts to TWh/yr
@@ -2224,6 +2333,7 @@ var model = {
             o.generation_costs.fuel_production_annual += build_up(z)
         }
         o.generation_costs.total_annual += o.generation_costs.fuel_production_annual + gc.other_support_gbp_bn
+        model.hourly_prices()
 
         // Retail prices. The electricity unit rate starts from the generation cost per kWh delivered
         // to end users, and gas from the gas fuel price. Network, social policy and
@@ -2239,7 +2349,7 @@ var model = {
         // The build-up for every technology (resource cost) is kept for comparison
         let elec = {
             resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
-            generation_cost_p_kWh: delivered_TWh > 0 ? 100 * o.generation_costs.total_annual / delivered_TWh : 0
+            generation_cost_p_kWh: delivered_TWh > 0 ? 100 * o.generation_costs.electricity_annual / delivered_TWh : 0
         }
         // The unit rate uses the generation cost plus any year specific wholesale adjustment
         elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh

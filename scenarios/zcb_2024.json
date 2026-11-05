@@ -498,6 +498,12 @@
         },
         "other_support_gbp_bn": 0
     },
+    "fuel_values": {
+        "hydrogen_gbp_MWh": 150,
+        "methane_gbp_MWh": 235,
+        "jet_fuel_gbp_MWh": 47.4,
+        "marine_gas_oil_gbp_MWh": 50.2
+    },
     "fuel_prices": {
         "gas": 0,
         "oil": 0,

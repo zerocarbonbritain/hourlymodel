@@ -683,6 +683,18 @@
         "value": 0,
         "note": "The baseline methane store stands in for the fossil gas system. Its withdrawal cost is within the gas price, so the ZCB cost is not applied."
     },
+    "fuel_values.hydrogen_gbp_MWh": {
+        "type": "assumption",
+        "units": "£/MWh",
+        "value": 0,
+        "note": "The baseline burns fossil fuel, so the ZCB fuel values do not apply and hourly prices are not reported."
+    },
+    "fuel_values.methane_gbp_MWh": {
+        "type": "assumption",
+        "units": "£/MWh",
+        "value": 0,
+        "note": "The baseline burns fossil fuel, so the ZCB fuel values do not apply and hourly prices are not reported."
+    },
     "retail.electricity.network_basis": {
         "type": "assumption",
         "value": "per_kWh",

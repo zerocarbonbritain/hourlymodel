@@ -473,5 +473,9 @@
         "Methane store discharging": {
             "capex": 0
         }
+    },
+    "fuel_values": {
+        "hydrogen_gbp_MWh": 0,
+        "methane_gbp_MWh": 0
     }
 }

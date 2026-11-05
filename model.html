@@ -1602,7 +1602,7 @@ input[type='text'] {
     <div class="inner" style="display:block" name="cost_model">
 
         <div class="cost-summary">
-            <div>Generation cost<b>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.generation_costs.total_annual | toFixed(1) }} bn/year</div>
+            <div>Generation cost<b>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.generation_costs.electricity_annual | toFixed(1) }} bn/year</div>
             <div>Electricity unit rate<b>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>+ £{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}/yr standing</div>
             <div>Electricity bill<b>£{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</b>{{ o.retail.electricity.household_kWh | toFixed(0) }} kWh per home</div>
             <div v-if="has_gas">Gas unit rate<b>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.retail.gas.bill_gbp | toFixed(0) }}/year bill</div>
@@ -1632,8 +1632,22 @@ input[type='text'] {
             </tr>
             <tr v-if="o.generation_costs.fuel_production_annual > 0"><td>Fuel production (plant, biogas crop feedstock and FT biomass)</td><td></td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.fuel_production_annual | toFixed(2) }}</td></tr>
             <tr v-if="i.generation_costs.basis == 'price' || i.generation_costs.other_support_gbp_bn"><td>Other support (FiT, capacity market)</td><td></td><td></td><td><input v-model.number="i.generation_costs.other_support_gbp_bn" type="text" @change="update_non_hourly" autocomplete="off"/></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ i.generation_costs.other_support_gbp_bn | toFixed(2) }}</td></tr>
-            <tr class="total"><td>Total, {{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh delivered</td><td></td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.total_annual | toFixed(1) }}</td></tr>
+            <tr v-if="o.generation_costs.fuel_users_annual > 0"><td>Paid by fuel users, see below</td><td></td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>-{{ o.generation_costs.fuel_users_annual | toFixed(2) }}</td></tr>
+            <tr class="total"><td>Total, {{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh delivered</td><td></td><td></td><td></td><td></td><td v-if="i.generation_costs.basis == 'price'"></td><td>{{ o.generation_costs.electricity_annual | toFixed(1) }}</td></tr>
         </table>
+
+        <div v-if="i.fuel_values.methane_gbp_MWh > 0">
+        <h3>Hourly prices and fuel values</h3>
+        <p>Fuel values: hydrogen <input v-model.number="i.fuel_values.hydrogen_gbp_MWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> and methane <input v-model.number="i.fuel_values.methane_gbp_MWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> £/MWh. Electricity averages £{{ o.prices.mean_gbp_MWh | toFixed(0) }}/MWh, or £{{ o.prices.end_use_weighted_gbp_MWh | toFixed(0) }}/MWh weighted by end use.</p>
+        <table class="table">
+            <tr><th>Fuel</th><th>TWh/yr</th><th>£/MWh</th><th>p/kWh</th><th>p/litre</th><th>£bn/yr</th></tr>
+            <tr><td>Hydrogen</td><td>{{ o.prices.fuel.hydrogen.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.hydrogen.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.hydrogen.p_kWh | toFixed(1) }}</td><td></td><td>{{ o.prices.fuel.hydrogen.annual | toFixed(2) }}</td></tr>
+            <tr><td>Methane</td><td>{{ o.prices.fuel.methane.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.methane.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.p_kWh | toFixed(1) }}</td><td></td><td>{{ o.prices.fuel.methane.annual | toFixed(2) }}</td></tr>
+            <tr><td>Synthetic fuel</td><td>{{ o.prices.fuel.synthetic_fuel.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_kWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_litre | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.annual | toFixed(2) }}</td></tr>
+        </table>
+        <p>2024 fuel before tax: jet fuel {{ o.prices.jet_fuel_p_litre | toFixed(0) }} and marine gas oil {{ o.prices.marine_gas_oil_p_litre | toFixed(0) }} p/litre, at the energy density of diesel.</p>
+        <p>Revenue at these prices: electricity end use £{{ o.prices.electricity_revenue | toFixed(1) }} bn and fuel £{{ o.prices.fuel_sales | toFixed(1) }} bn, {{ 100 * o.prices.recovery | toFixed(0) }}% of system cost. Offshore wind earns {{ 100 * o.prices.offshore_recovery | toFixed(0) }}% of its cost.</p>
+        </div>
 
         <h3>Build-up</h3>
         <p>Annualised by
