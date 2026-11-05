@@ -1,7 +1,6 @@
 function load_capacityfactor_dataset(filename,callback){
     // Load dataset as zip and decompress  - provides faster loading times
     tenyearsdatalines = []
-    hours = 0
     
     JSZipUtils.getBinaryContent(filename, function(err, data) {
         if(err) {
@@ -12,7 +11,6 @@ function load_capacityfactor_dataset(filename,callback){
             zip.file(filename.replace(".zip","")).async("string")
             .then(function (capacityfactorfile) {
                 tenyearsdatalines = capacityfactorfile.split(/\r\n|\n/);
-                hours = 87648;
                 callback(tenyearsdatalines);
             });
         });
@@ -121,7 +119,7 @@ var view = {
 function timeseries(data)
 {
     if (data==undefined) return [];
-    var datastarttime = 32*365.25*24*3600;
+    var datastarttime = (32*365.25*24 + i.start_hour)*3600;
     var len = data.length;
     var ts = [];
     for (var time=view.start; time<view.end; time+=view.interval) {

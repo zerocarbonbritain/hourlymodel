@@ -50,12 +50,6 @@ function load_dataset(filename,callback) {
 
 load_dataset("highresolution.csv.zip",function(result){
     tenyearsdatalines = result;
-    capacityfactors_all = [];
-    for (var hour = 0; hour < 87648; hour++) {
-        var capacityfactors = tenyearsdatalines[hour].split(",");
-        for (var x=0; x<capacityfactors.length; x++) capacityfactors[x] = parseFloat(capacityfactors[x]);
-        capacityfactors_all.push(capacityfactors);
-    }
     load_dataset("temperature.csv.zip",function(result) {
         temperaturelines = result;
         model.init();
@@ -74,7 +68,7 @@ load_dataset("highresolution.csv.zip",function(result){
             console.log(JSON.stringify(numbers(o)));
             return;
         }
-        var GWh_to_TWhyr = 1/(10*1000);  // 10 year totals in GWh to TWh/yr
+        var GWh_to_TWhyr = o.GWh_to_TWhy;
         console.log("Scenario: " + scenario_name);
         console.log("Electricity demand (TWh/yr): " + (o.balance.total_electricity_demand*GWh_to_TWhyr).toFixed(1));
         console.log("Onshore wind CF: " + (o.supply.onshore_wind_capacity_factor*100).toFixed(1) + "%");

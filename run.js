@@ -8,16 +8,6 @@ vm.runInThisContext(fs.readFileSync("model.js"))
 load_dataset("highresolution.csv.zip",function(result){
     tenyearsdatalines = result
 
-    // Prepare capacity factor dataset
-    capacityfactors_all = [];
-    for (var hour = 0; hour < 87648; hour++) {
-        var capacityfactors = tenyearsdatalines[hour].split(",");
-        for (var x=0; x<capacityfactors.length; x++) {
-            capacityfactors[x] = parseFloat(capacityfactors[x]);
-        }
-        capacityfactors_all.push(capacityfactors)
-    }
-    
     load_dataset("temperature.csv.zip",function(result) {
         temperaturelines = result
         run();

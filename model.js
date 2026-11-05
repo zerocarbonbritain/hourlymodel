@@ -13,7 +13,7 @@ var model = {
     init: function() {
         capacityfactors_all = [];
         for (var hour = 0; hour < i.hours; hour++) {
-            var capacityfactors = tenyearsdatalines[hour].split(",");
+            var capacityfactors = tenyearsdatalines[hour + i.start_hour].split(",");
             for (var z=0; z<capacityfactors.length; z++) {
                 capacityfactors[z] = parseFloat(capacityfactors[z]);
             }
@@ -22,6 +22,14 @@ var model = {
     },
     
     run: function() {
+
+        // Run length: i.hours from i.start_hour in the weather data (a whole number of days from
+        // midnight). Energy totals are in GWh over the run. Runs are whole weather years, and the
+        // factors below convert totals to and from annual values.
+        o.years = Math.round(i.hours / 8766)
+        o.per_year = 1 / o.years
+        o.TWhy_to_GWh = 1000 * o.years
+        o.GWh_to_TWhy = 1 / o.TWhy_to_GWh
 
         // Profiles
         if (!i.use_flat_profiles) {
@@ -280,7 +288,7 @@ var model = {
         d.water_heat_demand = []
         
         for (var hour = 0; hour < i.hours; hour++) {
-            var day = parseInt(Math.floor(hour / 24))
+            var day = parseInt(Math.floor((hour + i.start_hour) / 24))
             var temperature = parseFloat(temperaturelines[day].split(",")[1]); 
 
             let degree_hours = i.space_heating.base_temperature - temperature
@@ -335,7 +343,7 @@ var model = {
             
         }
 
-        o.space_heating.domestic_kwh = o.space_heating.total_domestic_demand*0.1*1000000 / i.households_2030
+        o.space_heating.domestic_kwh = o.space_heating.total_domestic_demand*o.per_year*1000000 / i.households_2030
         o.water_heating.domestic_kwh = i.water_heating.domestic_TWhy*1000000000 / i.households_2030
         
     },
@@ -466,7 +474,7 @@ var model = {
         }
         
         for (var hour = 0; hour < i.hours; hour++) {
-            var day = parseInt(Math.floor(hour / 24))
+            var day = parseInt(Math.floor((hour + i.start_hour) / 24))
             var outside_temperature = parseFloat(temperaturelines[day].split(",")[1]); 
             
             let space_heat_demand = d.space_heat_demand[hour]
@@ -538,7 +546,7 @@ var model = {
             
             o.heating_systems[z].efficiency = (100 * o.heating_systems[z].heat_demand / o.heating_systems[z].fuel_demand).toFixed(0)
         }
-        var datastarttime = 32*365.25*24*3600*1000;
+        var datastarttime = (32*365.25*24 + i.start_hour)*3600*1000;
         var date = new Date(datastarttime + (o.heat.max_elec_demand_time * 3600 * 1000));
         h = date.getHours();
         if (h<10) h = "0"+h
@@ -610,9 +618,9 @@ var model = {
             o.industry.total_coal_demand += demand * i.industry[z+"_fixed_coal_prc"] * 0.01 / fuel_efficiency[z]
             o.industry.total_biomass_demand += demand * i.industry[z+"_fixed_biomass_prc"] * 0.01 / fuel_efficiency[z]
         }
-        o.industry.total_synth_fuel_demand *= 10000
-        o.industry.total_coal_demand *= 10000 
-        o.industry.total_biomass_demand *= 10000    
+        o.industry.total_synth_fuel_demand *= o.TWhy_to_GWh
+        o.industry.total_coal_demand *= o.TWhy_to_GWh 
+        o.industry.total_biomass_demand *= o.TWhy_to_GWh    
 
         // DSR heat demand (GW of useful heat) and the electricity needed to meet all of it
         let DSR_CH4_heat = 0
@@ -918,7 +926,7 @@ var model = {
         let daily_transport_liquid_demand = o.transport.fuel_totals.IC * 1000.0 / 365.25
         let daily_biomass_for_biogas = i.biogas.biomass_for_biogas * 1000.0 / 365.25
         let hourly_biomass_for_biogas = daily_biomass_for_biogas / 24.0
-        let hourly_industrial_biofuel = (o.industry.total_synth_fuel_demand / 10) / (365.25*24.0)
+        let hourly_industrial_biofuel = (o.industry.total_synth_fuel_demand / o.years) / (365.25*24.0)
         
         let hourly_hydrogen_from_imports = i.hydrogen.hydrogen_from_imports * 1000.0 / (365.25*24.0)
         
@@ -1549,17 +1557,17 @@ var model = {
          
          // When creating baselines, some of the datasets dont precisely match
          // these can be used for final adjustments
-         o.fossil_fuels.gas += i.fossil_fuels.other_gas_use * 10000
-         o.fossil_fuels.oil += i.fossil_fuels.other_oil_use * 10000
-         o.fossil_fuels.coal += i.fossil_fuels.other_coal_use * 10000
+         o.fossil_fuels.gas += i.fossil_fuels.other_gas_use * o.TWhy_to_GWh
+         o.fossil_fuels.oil += i.fossil_fuels.other_oil_use * o.TWhy_to_GWh
+         o.fossil_fuels.coal += i.fossil_fuels.other_coal_use * o.TWhy_to_GWh
          // Coal and coke used in blast furnaces and coke ovens, transformation and energy industry use in DUKES
-         o.fossil_fuels.blast_furnace = i.industry.blast_furnace_coal_TWhy * 10000
+         o.fossil_fuels.blast_furnace = i.industry.blast_furnace_coal_TWhy * o.TWhy_to_GWh
          o.fossil_fuels.coal += o.fossil_fuels.blast_furnace
          o.energy_industry_use.total += o.fossil_fuels.blast_furnace
          // Add to energy_industry_use total
-         o.energy_industry_use.total += i.fossil_fuels.other_gas_use * 10000
-         o.energy_industry_use.total += i.fossil_fuels.other_oil_use * 10000
-         o.energy_industry_use.total += i.fossil_fuels.other_coal_use * 10000
+         o.energy_industry_use.total += i.fossil_fuels.other_gas_use * o.TWhy_to_GWh
+         o.energy_industry_use.total += i.fossil_fuels.other_oil_use * o.TWhy_to_GWh
+         o.energy_industry_use.total += i.fossil_fuels.other_coal_use * o.TWhy_to_GWh
            
          o.fossil_fuels.gas += o.fossil_fuels.gas_losses
          
@@ -1569,7 +1577,7 @@ var model = {
     
     final: function() {
         o.electric_storage.kwh_per_household = (i.electric_storage.capacity_GWh * 1000 * 1000) / i.households_2030;
-        o.electric_storage.cycles_per_year = (o.electric_storage.total_discharge / i.electric_storage.capacity_GWh)*0.1
+        o.electric_storage.cycles_per_year = (o.electric_storage.total_discharge / i.electric_storage.capacity_GWh)*o.per_year
         
         // -------------------------------------------------------------------------------
         // Total electricity generation before grid losses: fixed supply, imports and backup
@@ -1669,16 +1677,16 @@ var model = {
         
         // -------------------------------------------------------------------------------
         
-        o.biomass.total_direct_use = o.biomass.total_used - (i.biogas.biomass_for_biogas*10000) - o.synth_fuel.total_biomass_used - o.synth_fuel.total_biofuel_supply
+        o.biomass.total_direct_use = o.biomass.total_used - (i.biogas.biomass_for_biogas*o.TWhy_to_GWh) - o.synth_fuel.total_biomass_used - o.synth_fuel.total_biofuel_supply
         
         if (i.hydrogen.electrolysis_capacity_GW>0) {
-            o.hydrogen.electrolysis_capacity_factor = 100*(o.hydrogen.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * 87600))
+            o.hydrogen.electrolysis_capacity_factor = 100*(o.hydrogen.total_electricity_for_electrolysis / (i.hydrogen.electrolysis_capacity_GW * i.hours))
         } else {
             o.hydrogen.electrolysis_capacity_factor = 0
         }
         
         if (i.power_to_X.capacity>0) {
-            o.power_to_X.capacity_factor = 100*(o.power_to_X.total_electricity_demand / (i.power_to_X.capacity * 87600))
+            o.power_to_X.capacity_factor = 100*(o.power_to_X.total_electricity_demand / (i.power_to_X.capacity * i.hours))
         } else {
             o.power_to_X.capacity_factor = 0
         }
@@ -1702,7 +1710,7 @@ var model = {
         
         console.log("balance error: "+error.toFixed(12));
         
-        var datastarttime = 32*365.25*24*3600*1000;
+        var datastarttime = (32*365.25*24 + i.start_hour)*3600*1000;
 
         var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1784,15 +1792,15 @@ var model = {
 
         // Refinery electricity is energy industry use in DUKES. The fossil_fuels other use
         // inputs are the ECUK industry "unknown (other)" row.
-        fc.industry.electricity += o.industry.total_elec_demand - i.industry.refinery_electric_TWhy * 10000
-        fc.industry.gas += o.industry.total_methane_demand + i.fossil_fuels.other_gas_use * 10000
-        fc.industry.liquid += o.industry.total_synth_fuel_demand + i.fossil_fuels.other_oil_use * 10000
-        fc.industry.coal += o.industry.total_coal_demand + i.fossil_fuels.other_coal_use * 10000
+        fc.industry.electricity += o.industry.total_elec_demand - i.industry.refinery_electric_TWhy * o.TWhy_to_GWh
+        fc.industry.gas += o.industry.total_methane_demand + i.fossil_fuels.other_gas_use * o.TWhy_to_GWh
+        fc.industry.liquid += o.industry.total_synth_fuel_demand + i.fossil_fuels.other_oil_use * o.TWhy_to_GWh
+        fc.industry.coal += o.industry.total_coal_demand + i.fossil_fuels.other_coal_use * o.TWhy_to_GWh
         fc.industry.bioenergy += o.industry.total_biomass_demand
         fc.industry.hydrogen += o.industry.total_hydrogen_demand
 
         fc.transport.electricity += o.electric_transport.total_EV_charge + o.electric_transport.total_elec_trains_demand
-        fc.transport.liquid += o.synth_fuel.total_transport_demand - i.transport.international_shipping_TWhy * 10000
+        fc.transport.liquid += o.synth_fuel.total_transport_demand - i.transport.international_shipping_TWhy * o.TWhy_to_GWh
         fc.transport.hydrogen += o.hydrogen.total_vehicle_demand
 
         fc.total = 0
@@ -1805,7 +1813,7 @@ var model = {
             }
             fc.total += fc[s].total
         }
-        fc.international_shipping = i.transport.international_shipping_TWhy * 10000
+        fc.international_shipping = i.transport.international_shipping_TWhy * o.TWhy_to_GWh
         o.final_consumption = fc
     },
 
@@ -1817,7 +1825,7 @@ var model = {
         if (o.biomass.grass_for_biogas<0.0) o.biomass.grass_for_biogas = 0.0
 
         o.land_use.rotational_grass_ryegrass = o.biomass.grass_for_biogas / (10.5 * 0.001 * 0.95 * 4.72)
-        o.land_use.perrennial_grass_miscanthus = (o.synth_fuel.total_biomass_used * 0.0001) / (15.0 * 0.001 * 0.95 * 4.72)
+        o.land_use.perrennial_grass_miscanthus = (o.synth_fuel.total_biomass_used * o.GWh_to_TWhy) / (15.0 * 0.001 * 0.95 * 4.72)
 
         // Work forwards to TWh
         let short_rotation_forestry_harvestable_modtyr = ((i.land_use.short_rotation_forestry * 5.08 * 0.001)/(44/12))/0.5
@@ -1825,7 +1833,7 @@ var model = {
         
         // Only the share of direct use biomass grown on UK energy crops needs land.
         // Imports, wastes and residues make up the rest.
-        let biomass_demand_for_heat_TWh = o.biomass.total_direct_use * 0.0001 * i.land_model.uk_crop_biomass_prc * 0.01
+        let biomass_demand_for_heat_TWh = o.biomass.total_direct_use * o.GWh_to_TWhy * i.land_model.uk_crop_biomass_prc * 0.01
         let short_rotation_coppice_TWh = biomass_demand_for_heat_TWh - short_rotation_forestry_TWh
         
         // Work backwards to land area
@@ -1922,34 +1930,34 @@ var model = {
         o.emissions_balance.aviation_co2e = o.transport.modes.Aviation.IC.TWh * 0.30704 * (aviation_uplift-1)
         
         // Fossil fuels
-        // Energy quantities are in GWh over 10 years, so 0.1 gives one year. CO2 factors are
+        // Energy quantities are in GWh over the run, so o.per_year gives one year. CO2 factors are
         // kgCO2 per kWh (gross), so a further 0.001 gives MtCO2 per GWh.
         // Coal backup may include other thermal generation (e.g. waste), with its own CO2 factor.
         let f = {}
         for (let z in i.co2_factors) f[z] = i.co2_factors[z] * 0.001
         let coal_backup_co2_factor = i.electric_backup.coal_co2_factor * 0.001
-        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable - o.fossil_fuels.blast_furnace)*0.1*f.coal
-        o.emissions_balance.fossil_fuel_coal += o.fossil_fuels.coal_for_dispatchable*0.1*coal_backup_co2_factor
-        o.emissions_balance.blast_furnace = o.fossil_fuels.blast_furnace*0.1*f.blast_furnace
+        o.emissions_balance.fossil_fuel_coal = (o.fossil_fuels.coal - o.fossil_fuels.coal_for_dispatchable - o.fossil_fuels.blast_furnace)*o.per_year*f.coal
+        o.emissions_balance.fossil_fuel_coal += o.fossil_fuels.coal_for_dispatchable*o.per_year*coal_backup_co2_factor
+        o.emissions_balance.blast_furnace = o.fossil_fuels.blast_furnace*o.per_year*f.blast_furnace
         o.emissions_balance.fossil_fuel_coal += o.emissions_balance.blast_furnace
-        o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*0.1*f.gas
+        o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*o.per_year*f.gas
 
         // Fossil oil from the liquid fuel store is shared between its uses by their demand. Backup
         // generation is tracked hourly, the other uses take the average fossil share of the rest.
-        let aviation = o.transport.modes.Aviation.IC.TWh * 10000
-        let shipping = i.transport.international_shipping_TWhy * 10000
+        let aviation = o.transport.modes.Aviation.IC.TWh * o.TWhy_to_GWh
+        let shipping = i.transport.international_shipping_TWhy * o.TWhy_to_GWh
         let heating = o.heating_systems.synthfuel.fuel_demand
         let backup = o.synth_fuel.total_demand - o.synth_fuel.total_transport_demand - o.synth_fuel.total_industrial_demand - heating
         let other_demand = o.synth_fuel.total_demand - backup
         let fossil_share = other_demand > 0 ? (o.fossil_fuels.oil_from_store - o.synth_fuel.backup_from_fossil_oil) / other_demand : 0
         o.emissions_balance.oil_by_use = {
-            road_rail_shipping: (o.synth_fuel.total_transport_demand - aviation - shipping) * fossil_share * 0.1 * f.road_fuel,
-            aviation: aviation * fossil_share * 0.1 * f.aviation,
-            international_shipping: shipping * fossil_share * 0.1 * f.marine,
-            heating: heating * fossil_share * 0.1 * f.heating_oil,
-            industry: (o.synth_fuel.total_industrial_demand * fossil_share + i.fossil_fuels.other_oil_use * 10000) * 0.1 * f.gas_oil,
-            power: o.synth_fuel.backup_from_fossil_oil * 0.1 * f.fuel_oil,
-            energy_industry: (o.fossil_fuels.refineries_oil_use * f.refinery + o.fossil_fuels.oil_gas_extraction_oil_use * f.gas_oil) * 0.1
+            road_rail_shipping: (o.synth_fuel.total_transport_demand - aviation - shipping) * fossil_share * o.per_year * f.road_fuel,
+            aviation: aviation * fossil_share * o.per_year * f.aviation,
+            international_shipping: shipping * fossil_share * o.per_year * f.marine,
+            heating: heating * fossil_share * o.per_year * f.heating_oil,
+            industry: (o.synth_fuel.total_industrial_demand * fossil_share + i.fossil_fuels.other_oil_use * o.TWhy_to_GWh) * o.per_year * f.gas_oil,
+            power: o.synth_fuel.backup_from_fossil_oil * o.per_year * f.fuel_oil,
+            energy_industry: (o.fossil_fuels.refineries_oil_use * f.refinery + o.fossil_fuels.oil_gas_extraction_oil_use * f.gas_oil) * o.per_year
         }
         o.emissions_balance.fossil_fuel_oil = 0
         for (let z in o.emissions_balance.oil_by_use) o.emissions_balance.fossil_fuel_oil += o.emissions_balance.oil_by_use[z]
@@ -1958,7 +1966,7 @@ var model = {
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*f.gas
         grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*coal_backup_co2_factor
         grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*f.fuel_oil
-        o.grid_co2_emissions = grid_co2_emissions*0.1   // MtCO2/yr
+        o.grid_co2_emissions = grid_co2_emissions*o.per_year   // MtCO2/yr
 
         o.emissions_balance.grid_co2_intensity = 1000000 * (grid_co2_emissions / o.balance.total_electricity_demand)   // MtC02 / GWh
         
@@ -2011,7 +2019,7 @@ var model = {
         o.EE.total += o.EE.solarpv
         
         /*
-        elec_store_cycles_per_year = (total_elec_store_charge*0.1) / i.electric_storage.capacity_GWh
+        elec_store_cycles_per_year = (total_elec_store_charge*o.per_year) / i.electric_storage.capacity_GWh
         EE_liion_store = 0// (((i.electric_storage.capacity_GWh * 0.136) / 1500 * 0.8) * total_elec_store_charge)/3650
         o.total_embodied_energy += EE_liion_store
 
@@ -2037,37 +2045,37 @@ var model = {
         // carvans_lifetime = (150000.0/carsvans_miles_per_car)
         // if (carsvans_miles_per_car>0) EE_ecar = 20000.0 * number_of_cars * 0.000000001 / carvans_lifetime
         
-        o.EE.prc_of_industry_demand = 100 * o.EE.total / (o.industry.total_demand_check * 0.0001)
+        o.EE.prc_of_industry_demand = 100 * o.EE.total / (o.industry.total_demand_check * o.GWh_to_TWhy)
     },
     cost_model: function() {
 
-        // Generation is in GWh over 10 years, 0.0001 converts to TWh/yr
+        // Generation is in GWh over the run, o.GWh_to_TWhy converts to TWh/yr
         o.costs = {}
 
-        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity, generation: o.supply.total_onshore_wind*0.0001 }
-        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity, generation: o.supply.total_offshore_wind*0.0001 }
-        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity, generation: o.supply.total_solarpv*0.0001 }
-        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity, generation: o.supply.total_tidal*0.0001 }
-        o.costs['Wave'] = { capacity: i.supply.wave_capacity, generation: o.supply.total_wave*0.0001 }
-        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity, generation: o.supply.total_geothermal_elec*0.0001 }
-        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity, generation: o.supply.total_nuclear*0.0001 }
-        o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: o.supply.total_hydro*0.0001 }
+        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity, generation: o.supply.total_onshore_wind*o.GWh_to_TWhy }
+        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity, generation: o.supply.total_offshore_wind*o.GWh_to_TWhy }
+        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity, generation: o.supply.total_solarpv*o.GWh_to_TWhy }
+        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity, generation: o.supply.total_tidal*o.GWh_to_TWhy }
+        o.costs['Wave'] = { capacity: i.supply.wave_capacity, generation: o.supply.total_wave*o.GWh_to_TWhy }
+        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity, generation: o.supply.total_geothermal_elec*o.GWh_to_TWhy }
+        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity, generation: o.supply.total_nuclear*o.GWh_to_TWhy }
+        o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: o.supply.total_hydro*o.GWh_to_TWhy }
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
         // Turbine capacity covers the peak need after de-rating for outages (capacity market de-rating factors).
         // OCGT runs only when CCGT is at capacity, so OCGT covers its own peak output and CCGT the rest.
         let eb_out = o.electric_backup
-        o.costs['CCGT'] = { capacity: (eb_out.max_capacity_requirement - eb_out.max_ocgt_output) / i.electric_backup.ccgt_derating_factor, generation: (eb_out.total_before_grid_loss - eb_out.total_ocgt_output)*0.0001 }
-        o.costs['OCGT'] = { capacity: eb_out.max_ocgt_output / i.electric_backup.ocgt_derating_factor, generation: eb_out.total_ocgt_output*0.0001 }
+        o.costs['CCGT'] = { capacity: (eb_out.max_capacity_requirement - eb_out.max_ocgt_output) / i.electric_backup.ccgt_derating_factor, generation: (eb_out.total_before_grid_loss - eb_out.total_ocgt_output)*o.GWh_to_TWhy }
+        o.costs['OCGT'] = { capacity: eb_out.max_ocgt_output / i.electric_backup.ocgt_derating_factor, generation: eb_out.total_ocgt_output*o.GWh_to_TWhy }
         o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
         // Battery energy per kWh, and power per kW of inverter, the larger of charge and discharge capacity
-        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*0.0001 }
+        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*o.GWh_to_TWhy }
         o.costs['Battery inverter'] = { capacity: Math.max(i.electric_storage.charge_capacity_GW, i.electric_storage.discharge_capacity_GW), generation: 0 }
         // Anaerobic digestion supply is flat. Capacity in GW of methane assumes 90% plant availability.
         let biogas_methane_TWh = i.biogas.biomass_for_biogas * i.biogas.anaerobic_digestion_efficiency
         o.costs['Anaerobic digestion'] = { capacity: biogas_methane_TWh / 8.766 / 0.9, generation: biogas_methane_TWh }
         // FT capacity is hydrogen in, output is synthetic fuel. Store capacities are GWh, costs per kWh.
-        o.costs['FT synthetic fuel'] = { capacity: i.synth_fuel.capacity_GW, generation: o.synth_fuel.total_produced*0.0001 }
+        o.costs['FT synthetic fuel'] = { capacity: i.synth_fuel.capacity_GW, generation: o.synth_fuel.total_produced*o.GWh_to_TWhy }
         o.costs['Hydrogen storage'] = { capacity: i.hydrogen.storage_capacity_GWh, generation: 0 }
         o.costs['Methane storage'] = { capacity: i.methane.storage_capacity_GWh, generation: 0 }
         o.costs['Synthetic fuel storage'] = { capacity: i.synth_fuel.store_capacity_GWh, generation: 0 }
@@ -2088,7 +2096,7 @@ var model = {
         o.biogas_feedstock_annual = o.biomass.grass_for_biogas * i.biogas.anaerobic_digestion_efficiency * i.biogas.crop_feedstock_gbp_MWh * 0.001
         o.total_annual_cost += o.biogas_feedstock_annual
 
-        // Fuel burned for electricity generation, 10 year GWh to TWh/yr, priced in pence per kWh of fuel.
+        // Fuel burned for electricity generation, GWh over the run to TWh/yr, priced in pence per kWh of fuel.
         // Carbon price in £/tCO2 on fossil backup emissions, with the CO2 factors used for grid emissions.
         let biomass_for_backup = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
         let backup_fuel = {
@@ -2102,8 +2110,8 @@ var model = {
         let backup_fuel_annual = {}
         for (let z in backup_fuel) {
             let [fuel, price, co2_factor] = backup_fuel[z]
-            let fuel_annual = 0.01 * 0.0001 * fuel * price
-            let co2 = fuel * co2_factor * 0.001 * 0.1   // MtCO2/yr
+            let fuel_annual = 0.01 * o.GWh_to_TWhy * fuel * price
+            let co2 = fuel * co2_factor * 0.001 * o.per_year   // MtCO2/yr
             let carbon_annual = 0.001 * co2 * i.carbon_price
             backup_fuel_annual[z] = fuel_annual + carbon_annual
             o.fuel_cost_annual += fuel_annual
@@ -2114,14 +2122,14 @@ var model = {
         let backup = { annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, generation: o.costs['CCGT'].generation + o.costs['OCGT'].generation }
         o.backup_LCOE = backup.generation > 0 ? 1000 * (backup.annual + o.fuel_cost_annual + o.carbon_cost_annual) / backup.generation : 0
 
-        o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*0.0001)
+        o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*o.GWh_to_TWhy)
 
         // Generation cost. With basis "price", a technology with a price per MWh (a strike price, or
         // wholesale value plus support) is costed as output times that price, and one without uses the
         // build-up above. With basis "lcoe", every technology uses the build-up. Imports have no
         // build-up and always use their price. Backup turbine capacity is shared by output, plus each
         // fuel's own fuel and carbon cost. Fuel production (electrolysis, methanation, power to X,
-        // anaerobic digestion, crop feedstock, FT and the fuel stores) always uses the build-up. Generation is GWh over 10 years, so 0.0001 gives TWh/yr and TWh
+        // anaerobic digestion, crop feedstock, FT and the fuel stores) always uses the build-up. Generation is GWh over the run, so o.GWh_to_TWhy gives TWh/yr and TWh
         // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
         let backup_output = o.electric_backup.total_before_grid_loss
         let turbine_share = (gen) => backup_output > 0 ? backup.annual * gen / backup_output : 0
@@ -2149,7 +2157,7 @@ var model = {
         o.generation_costs = { by_tech: {}, total_annual: 0, backup_fuel_used: false }
         for (let z in techs) {
             let [output, cost] = techs[z]
-            let generation = output * 0.0001
+            let generation = output * o.GWh_to_TWhy
             let has_build_up = cost !== null
             let lcoe_annual = typeof cost === 'function' ? cost() : build_up(cost)
             let price = gc.price_gbp_MWh[z]
@@ -2203,8 +2211,8 @@ var model = {
         // £bn/yr over TWh/yr gives £/kWh, so 100 converts to p/kWh.
         let r = i.retail
         let vat = 1 + r.vat_prc * 0.01
-        let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * 0.0001
-        let households_kWh = (GWh) => GWh * 0.1 * 1000000 / i.households_2030
+        let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * o.GWh_to_TWhy
+        let households_kWh = (GWh) => GWh * o.per_year * 1000000 / i.households_2030
         o.retail = {}
 
         let e = r.electricity
@@ -2235,7 +2243,7 @@ var model = {
         gas.unit_rate_p_kWh = (gas.wholesale_p_kWh + g.network_p_kWh + g.policy_p_kWh + g.supplier_p_kWh) * vat
         gas.standing_charge_gbp = (g.network_gbp + g.policy_gbp + g.supplier_gbp) * vat
         gas.customers = i.households_2030 * g.households_prc * 0.01
-        gas.household_kWh = gas.customers > 0 ? o.final_consumption.domestic.gas * 0.1 * 1000000 / gas.customers : 0
+        gas.household_kWh = gas.customers > 0 ? o.final_consumption.domestic.gas * o.per_year * 1000000 / gas.customers : 0
         gas.bill_gbp = gas.customers > 0 ? gas.unit_rate_p_kWh * 0.01 * gas.household_kWh + gas.standing_charge_gbp : 0
         gas.household_spend_bn = gas.bill_gbp * gas.customers * 1e-9
         o.retail.gas = gas

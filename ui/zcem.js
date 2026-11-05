@@ -3,24 +3,24 @@ var plot = null;
 	
 function model_ui() {
     // Energy stacks visualisation definition
-    var scl = 1.0/10000.0;
+    var scl = o.GWh_to_TWhy;
     var units = "TWh/yr";
     
     if (i.units_mode=="kwhdperperson") {
         units = "kWh/d.p"
-        // GWh converted to kWh x 1000 x 1000, per day divide by 365 & 10 years
-        scl = (1000.0*1000.0) / (10*365.0*i.population_2030)
+        // GWh converted to kWh x 1000 x 1000, per day divide by 365 & the years in the run
+        scl = (1000.0*1000.0) / (o.years*365.0*i.population_2030)
     }
     
     if (i.units_mode=="kwhdperhousehold") {
         units = "kWh/d.h"
-        // GWh converted to kWh x 1000 x 1000, per day divide by 365 & 10 years
-        scl = (1000.0*1000.0) / (10*365.0*i.households_2030)
+        // GWh converted to kWh x 1000 x 1000, per day divide by 365 & the years in the run
+        scl = (1000.0*1000.0) / (o.years*365.0*i.households_2030)
     }
     
     if (i.units_mode=="scaleby") {
         units = "GWh/yr"
-        scl =  o.scaleby * 0.1 * 0.001 * 0.001;
+        scl =  o.scaleby * o.per_year * 0.001 * 0.001;
     }
     
     var ambient = 0;
@@ -75,8 +75,8 @@ function model_ui() {
           {"kwhd":(o.electric_transport.total_EV_demand+o.electric_transport.total_elec_trains_demand)*scl,"name":"Electric Transport","color":0},
           {"kwhd":o.hydrogen.total_vehicle_demand*scl,"name":"Hydrogen Transport","color":0},
           {"kwhd":o.hydrogen.total_industry_demand*scl,"name":"Hydrogen for Industry","color":0},
-          {"kwhd":10000*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Liquids for Transport","color":0},
-          {"kwhd":10000*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
+          {"kwhd":o.TWhy_to_GWh*(o.transport.fuel_totals.IC-o.transport.modes.Aviation.IC.TWh)*scl,"name":"Liquids for Transport","color":0},
+          {"kwhd":o.TWhy_to_GWh*o.transport.modes.Aviation.IC.TWh*scl,"name":"Aviation","color":0},
           // Industry
           {"kwhd":o.industry.total_elec_demand*scl,"name":"Industry Electric","color":0},
           {"kwhd":o.industry.total_methane_demand*scl,"name":"Industry Methane","color":0},

@@ -19,7 +19,7 @@ Earlier handovers this plan replaces as the pick-up point:
   .venv/bin/python -m scripts.expand data/zcb_2024 70128 8760 offshore ipm 3
   ```
 
-  The hourly model always runs all ten years, so the comparison uses its 2010 slice.
+  The hourly model can run 2010 alone with `hours` 8760 and `start_hour` 70128. Set `methane.SOC_start` and `synth_fuel.store_start_GWh` to the levels at the end of 2009, or fuel demand goes unmet.
 - Ask before changing scenario values, and propose numbers with sources first.
 - Record every cost source and decision in docs/cost-assumptions.md, and every PyPSA practice difference in ZCB_PyPSA/docs/pypsa-practice.md.
 - After a change to inputs, rebuild the baselines (`python3 -I baseline/build.py 2024 scenarios/baseline_2024.json --write`, the same for 2018) and validate (`python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json`). The current result is 58 ok, 4 warnings, 14 known issues.
@@ -40,7 +40,7 @@ Earlier handovers this plan replaces as the pick-up point:
 - [x] **D4. Isolated GB.** zcb_2024 stays without interconnection. An interconnected run is a comparison only.
 - [x] **D5. Lost load and reliability.** Value of lost load £22,985/MWh, plus a no-shedding run. Backup capacity is costed with a de-rating factor for outages and no weather margin.
 - [x] **D6. FT rule.** FT uses the same-hour hydrogen surplus first, and tops up from the H2 store (above its floor, within FT capacity) when the liquid store is below a target level.
-- [x] **D7. Industry.** Heat by temperature band and the material sub-models go in before the long runs, so zcb_2024 is retuned once.
+- [x] **D7. Industry.** Changed 2026-11-05: heat by temperature band and the material sub-models follow an initial release, so zcb_2024 is retuned again after them.
 - [x] **D8. Weather data.** The long runs use the current dataset. ERA5 follows in phase 7, with a rerun.
 
 ## Done
@@ -60,6 +60,10 @@ Earlier handovers this plan replaces as the pick-up point:
   - value of lost load £22,985/MWh (£16,940 from DECC 2013, uplifted by the GDP deflator);
   - `noshed` and `yearly` (limited foresight) options in scripts/expand.py;
   - scripts/rules_at_optimum.py, which runs the hourly model at an expansion's capacities.
+
+## Initial release
+
+Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Items 7, 10 and 13, the land model part of item 11, and whether phases 4 and 5 are part of the release are still to be decided.
 
 ## Phase 3. Shared model plumbing
 
@@ -87,10 +91,13 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
    - Replay and the fixed capacity dispatch are unchanged.
    - The expansion chooses 205 GWh with a 26.2 GW inverter (7.8 hours), against 164 GWh held to 2 hours before. Total £90.11bn/yr against £91.37bn. At 3 hour steps daily cycling is smoothed, which undervalues power, so phase 4's hourly run should check the duration.
    - Validation of baseline_2024 is unchanged in status. Its storage build-up falls from £1,076 to £917/MWh.
-5. [ ] **Industry heat by temperature band** (<100, 100 to 200, 200 to 500, >500 °C) with technologies per band.
-6. [ ] **Industry material sub-models** for steel, cement, ammonia and chemicals, and glass. They replace the fixed blast furnace fuel and address the reductant coal open item. Source the 65% drying fuel efficiency and convert the JRC-IDEES NCV values to gross.
+5. [ ] **After the initial release. Industry heat by temperature band** (<100, 100 to 200, 200 to 500, >500 °C) with technologies per band.
+6. [ ] **After the initial release. Industry material sub-models** for steel, cement, ammonia and chemicals, and glass. They replace the fixed blast furnace fuel and address the reductant coal open item. Source the 65% drying fuel efficiency and convert the JRC-IDEES NCV values to gross.
 7. [ ] **Demand flexibility** at modest participation: smart charging, V2G, the heat store, and flexible industrial heat as heater GW plus thermal storage GWh (replacing instant fuel switching). Propose shares from PyPSA-Eur practice (half of EVs smart charging) first.
-8. [ ] **Generalise the ten year assumption** (the 0.0001 factors in model.js and cost_model, 87,648 in runners), so the hourly model can also run 2010 alone.
+8. [x] **Generalise the ten year assumption** (the 0.0001 factors in model.js and cost_model, 87,648 in runners), so the hourly model can also run 2010 alone.
+   Done 2026-11-05. `o.years`, `o.per_year`, `o.GWh_to_TWhy` and `o.TWhy_to_GWh` replace the fixed factors in model.js, model.html and ui/zcem.js, and a new `start_hour` input sets the first hour. `o.years` rounds to whole years, so runs must be whole weather years. Results:
+   - zcb_2024, baseline_2024 and baseline_2018: every numeric output is unchanged, except electrolysis capacity factor in zcb_2024 (49.79% to 49.77%), which now divides by `i.hours` and not 87,600. The PyPSA export is byte identical.
+   - 2010 alone from the 2010 store levels: nothing unmet, offshore wind 327.41 TWh in both, electrolysis 98.19 against 98.25 TWh and excess 77.72 against 77.66 TWh in the ten year run's 2010 slice.
 9. [ ] **Cost-only items.** Biomass for FT (free at present) and store power (compressors, injection and withdrawal: technology-data gives about £16/kW charging and £5/kW discharging for gas storage).
 10. [ ] **LHV (D2).** List every H2 and methane quantity and efficiency in model.js, the scenarios, the baselines and the land model, with its basis. Work out what changes:
     - efficiencies (electrolysis 0.80 HHV is about 0.68 LHV);
@@ -104,12 +111,16 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
     - international shipping demand and fuel, about 24 TWh/yr, to match the baseline boundary;
     - land model choices: the existing woodland sink, the imported biomass share, landfill biochar.
 12. [ ] **Hourly prices.**
-    - Take marginal prices from a 2010 PyPSA expansion and check cost recovery.
+    - [x] Take marginal prices from a 2010 PyPSA expansion and check cost recovery. Done 2026-11-05 with scripts/prices.py, at 3 hour steps and before item 9:
+      - Extendable technologies without a binding limit recover their cost (ratio 1.000). Consumers pay £101.74bn/yr against a system cost of £90.11bn. The £11.63bn difference is biogas supply limit rents (£7.45bn), fixed plant (£2.93bn net) and the uncosted industrial heat link (£1.24bn).
+      - Mean prices are electricity £189/MWh (£226 weighted by load, zero in 26% of steps), hydrogen £145, methane £216 and liquid fuel £116/MWh, with biomass free. Hydrogen and methane are about twice the fuel values in the cost work handover.
+      - Fuel users pay £17.4bn/yr, and £24.1bn with industrial heat.
     - Add an hourly marginal electricity price to model.js (the hour class method in the cost work handover), calibrated against them.
     - Split fuel production cost between electricity and fuel users (open item, £20bn/yr now charged to electricity).
     - Report synthetic fuel, hydrogen and methane per kWh and per litre, with aviation and shipping fuel against 2024 jet fuel and marine gas oil prices.
 13. [ ] **Resource limits** for onshore and offshore wind, for the `free` variant.
-14. [ ] **Fix the linopy warning** in `yearly_stores` (zcb_pypsa/expand.py): select with `drop=True` so both sides share coordinates. Then check that the stores hold their year-end levels.
+14. [x] **Fix the linopy warning** in `yearly_stores` (zcb_pypsa/expand.py): select with `drop=True` so both sides share coordinates. Then check that the stores hold their year-end levels.
+    Done 2026-11-05. On 2009 and 2010 the warning is gone, and the objective (£68.08bn/yr) and store levels are unchanged. H2, methane and liquid stores each end both years at the same level.
 
 Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within an agreed margin on 2010.
 

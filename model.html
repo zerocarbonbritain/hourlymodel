@@ -326,14 +326,14 @@ input[type='text'] {
         <tr>
             <td>Electricity transmission and distribution grid losses</td>
             <td><input v-model.number="i.energy_industry_use.electricity_grid_loss_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
-            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_grid_loss_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
+            <td>{{ o.total_losses.grid*o.GWh_to_TWhy*(i.energy_industry_use.electricity_grid_loss_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
             <td></td>
             <td></td>
         </tr>     
         <tr>
             <td>Electricity industry own use</td>
             <td><input v-model.number="i.energy_industry_use.electricity_own_use_prc" type="text" @change="update" style="width:70px"  autocomplete="off"/> %</td>
-            <td>{{ o.total_losses.grid*0.0001*(i.energy_industry_use.electricity_own_use_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
+            <td>{{ o.total_losses.grid*o.GWh_to_TWhy*(i.energy_industry_use.electricity_own_use_prc/(i.energy_industry_use.electricity_grid_loss_prc+i.energy_industry_use.electricity_own_use_prc)) | toFixed(1)  }} TWh/yr</td>
             <td></td>
             <td></td>
         </tr>  
@@ -441,29 +441,29 @@ input[type='text'] {
         <tr>
             <td>Domestic</td>
             <td><input v-model.number="i.space_heating.domestic_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td>{{ o.space_heating.total_domestic_demand*0.0001 | toFixed(2) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_domestic_demand*0.0001) / 257.93))*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.total_domestic_demand*o.GWh_to_TWhy | toFixed(2) }} TWh/yr</td>
+            <td>{{ (1.0-((o.space_heating.total_domestic_demand*o.GWh_to_TWhy) / 257.93))*100 | toFixed(0) }}%</td>
             <td>{{ o.space_heating.domestic_kwh | toFixed(0) }} kWh/household</td>
         </tr>
         <tr>
             <td>Services</td>
             <td><input v-model.number="i.space_heating.services_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td>{{ o.space_heating.total_services_demand*0.0001 | toFixed(2) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_services_demand*0.0001) / 96.225))*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.total_services_demand*o.GWh_to_TWhy | toFixed(2) }} TWh/yr</td>
+            <td>{{ (1.0-((o.space_heating.total_services_demand*o.GWh_to_TWhy) / 96.225))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Industry</td>
             <td><input v-model.number="i.space_heating.industry_demand_GWK" type="text" @change="update" style="width:70px"  autocomplete="off" /> GW/K</td>
-            <td>{{ o.space_heating.total_industry_demand*0.0001 | toFixed(2) }} TWh/yr</td>
-            <td>{{ (1.0-((o.space_heating.total_industry_demand*0.0001) / 19.733))*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.total_industry_demand*o.GWh_to_TWhy | toFixed(2) }} TWh/yr</td>
+            <td>{{ (1.0-((o.space_heating.total_industry_demand*o.GWh_to_TWhy) / 19.733))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         <tr>
             <td>Combined</td>
             <td>{{ o.space_heating.demand_GWK | toFixed(3) }} GW/K</td>
-            <td>{{ o.space_heating.total_demand*0.0001 | toFixed(1) }} TWh/yr</td>     
-            <td>{{ (1.0-((o.space_heating.total_demand*0.0001)/373.9))*100 | toFixed(0) }}%</td>
+            <td>{{ o.space_heating.total_demand*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>     
+            <td>{{ (1.0-((o.space_heating.total_demand*o.GWh_to_TWhy)/373.9))*100 | toFixed(0) }}%</td>
             <td></td>
         </tr>
         </table>
@@ -921,14 +921,14 @@ input[type='text'] {
         <p><b>Total demand by fuel:</b></p>
         
         <table class="table" style="width:100%">
-            <tr><td>Electricity</td><td>{{ o.industry.total_elec_demand*0.0001 | toFixed(1) }} TWh</td></tr>
-            <tr><td>Methane</td><td>{{ o.industry.total_methane_demand*0.0001 | toFixed(1) }} TWh</td></tr>
-            <tr><td>Hydrogen</td><td>{{ o.industry.total_hydrogen_demand*0.0001 | toFixed(1) }} TWh</td></tr>
-            <tr><td>Liquid synth fuel</td><td>{{ o.industry.total_synth_fuel_demand*0.0001 | toFixed(1) }} TWh</td></tr>       
-            <tr><td>Coal</td><td>{{ o.industry.total_coal_demand*0.0001 | toFixed(1) }} TWh</td></tr>
-            <tr><td>Solid biomass</td><td>{{ o.industry.total_biomass_demand*0.0001 | toFixed(1) }} TWh</td></tr>
+            <tr><td>Electricity</td><td>{{ o.industry.total_elec_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</td></tr>
+            <tr><td>Methane</td><td>{{ o.industry.total_methane_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</td></tr>
+            <tr><td>Hydrogen</td><td>{{ o.industry.total_hydrogen_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</td></tr>
+            <tr><td>Liquid synth fuel</td><td>{{ o.industry.total_synth_fuel_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</td></tr>       
+            <tr><td>Coal</td><td>{{ o.industry.total_coal_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</td></tr>
+            <tr><td>Solid biomass</td><td>{{ o.industry.total_biomass_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</td></tr>
             <tr><th>Useful heat and other end uses</th><th>{{ o.industry.total_demand | toFixed(1) }} TWh</th></tr>
-            <tr><th>Total final energy</th><th>{{ o.industry.total_demand_check*0.0001 | toFixed(1) }} TWh</th></tr>
+            <tr><th>Total final energy</th><th>{{ o.industry.total_demand_check*o.GWh_to_TWhy | toFixed(1) }} TWh</th></tr>
         </table>
     </div>
 </div>
@@ -998,17 +998,17 @@ input[type='text'] {
       </tr>
       <tr>
         <td>Total charge</td>
-        <td>{{ o.electric_storage.total_charge*0.0001 | toFixed(3) }} <span class="unit">TWh/yr</span></td>
+        <td>{{ o.electric_storage.total_charge*o.GWh_to_TWhy | toFixed(3) }} <span class="unit">TWh/yr</span></td>
         <td></td>
       </tr>
       <tr>
         <td>Total discharge</td>
-        <td>{{ o.electric_storage.total_discharge*0.0001 | toFixed(3) }} <span class="unit">TWh/yr</span></td>
+        <td>{{ o.electric_storage.total_discharge*o.GWh_to_TWhy | toFixed(3) }} <span class="unit">TWh/yr</span></td>
         <td></td>
       </tr>
       <tr>
         <td>Storage losses</td>
-        <td>{{ o.total_losses.electric_storage*0.0001 | toFixed(3) }} <span class="unit">TWh/yr</span></td>
+        <td>{{ o.total_losses.electric_storage*o.GWh_to_TWhy | toFixed(3) }} <span class="unit">TWh/yr</span></td>
         <td></td>
       </tr>
       <tr>
@@ -1041,49 +1041,49 @@ input[type='text'] {
         <tr>
             <td>Hydrogen</td>
             <td><input v-model.number="i.electric_backup.prc_hydrogen" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ o.electric_backup.total_hydrogen_turbine_output*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.total_hydrogen_turbine_output*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td><input v-model.number="i.electric_backup.hydrogen_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ (o.electric_backup.total_hydrogen_turbine_output*0.0001)/(i.electric_backup.hydrogen_efficiency*0.01) | toFixed(1) }}</td>
+            <td>{{ (o.electric_backup.total_hydrogen_turbine_output*o.GWh_to_TWhy)/(i.electric_backup.hydrogen_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_hydrogen*0.01 | toFixed(1) }} GW</td>
         </tr>
         <tr>
             <td>Methane</td>
             <td><input v-model.number="i.electric_backup.prc_methane" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ o.electric_backup.total_methane_turbine_output*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.total_methane_turbine_output*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td><input v-model.number="i.electric_backup.methane_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ ((o.electric_backup.total_methane_turbine_output-o.electric_backup.total_ocgt_output)*0.0001)/(i.electric_backup.methane_efficiency*0.01) + (o.electric_backup.total_ocgt_output*0.0001)/(i.electric_backup.ocgt_efficiency*0.01) | toFixed(1) }}</td>
+            <td>{{ ((o.electric_backup.total_methane_turbine_output-o.electric_backup.total_ocgt_output)*o.GWh_to_TWhy)/(i.electric_backup.methane_efficiency*0.01) + (o.electric_backup.total_ocgt_output*o.GWh_to_TWhy)/(i.electric_backup.ocgt_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_methane*0.01 | toFixed(1) }} GW</td>
         </tr>
         <tr>
             <td>Biomass (Wood based)</td>
             <td><input v-model.number="i.electric_backup.prc_biomass" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ o.electric_backup.total_biomass_turbine_output*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.total_biomass_turbine_output*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td><input v-model.number="i.electric_backup.biomass_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ (o.electric_backup.total_biomass_turbine_output*0.0001)/(i.electric_backup.biomass_efficiency*0.01) | toFixed(1) }}</td>
+            <td>{{ (o.electric_backup.total_biomass_turbine_output*o.GWh_to_TWhy)/(i.electric_backup.biomass_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_biomass*0.01 | toFixed(1) }} GW</td>
         </tr>
         <tr>
             <td>Liquid synth fuel / Oil</td>
             <td><input v-model.number="i.electric_backup.prc_synth_fuel" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ o.electric_backup.total_synth_fuel_turbine_output*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.total_synth_fuel_turbine_output*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td><input v-model.number="i.electric_backup.synth_fuel_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ (o.electric_backup.total_synth_fuel_turbine_output*0.0001)/(i.electric_backup.synth_fuel_efficiency*0.01) | toFixed(1) }}</td>
+            <td>{{ (o.electric_backup.total_synth_fuel_turbine_output*o.GWh_to_TWhy)/(i.electric_backup.synth_fuel_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_synth_fuel*0.01 | toFixed(1) }} GW</td>
         </tr>
         <tr>
             <td>Coal</td>
             <td><input v-model.number="i.electric_backup.prc_coal" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ o.electric_backup.total_coal_turbine_output*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.total_coal_turbine_output*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td><input v-model.number="i.electric_backup.coal_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
-            <td>{{ (o.electric_backup.total_coal_turbine_output*0.0001)/(i.electric_backup.coal_efficiency*0.01) | toFixed(1) }}</td>
+            <td>{{ (o.electric_backup.total_coal_turbine_output*o.GWh_to_TWhy)/(i.electric_backup.coal_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_coal*0.01 | toFixed(1) }} GW</td>
         </tr>
         </table>
-        <p>Interconnector imports meet <input v-model.number="i.electric_backup.prc_imports" type="text" @change="update" style="width:50px"  autocomplete="off"/> % of the backup requirement, up to <input v-model.number="i.supply.interconnector_capacity_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GW interconnector capacity. Total imports, including any flat imports: {{ o.supply.total_imports*0.0001 | toFixed(1) }} TWh/yr</p>
+        <p>Interconnector imports meet <input v-model.number="i.electric_backup.prc_imports" type="text" @change="update" style="width:50px"  autocomplete="off"/> % of the backup requirement, up to <input v-model.number="i.supply.interconnector_capacity_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GW interconnector capacity. Total imports, including any flat imports: {{ o.supply.total_imports*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</p>
         <p>Coal backup CO2 factor (coal and other thermal): <input v-model.number="i.electric_backup.coal_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/> kgCO2/kWh fuel</p>
         
         <p>Max capacity requirement date: {{ o.electric_backup.max_capacity_requirement_date }}</p>
-        <p>Methane backup runs on CCGT (efficiency above) up to <input v-model.number="i.electric_backup.ccgt_capacity_GW" type="text" @change="update" style="width:50px" autocomplete="off"/> GW, then OCGT at <input v-model.number="i.electric_backup.ocgt_efficiency" type="text" @change="update" style="width:50px" autocomplete="off"/> % efficiency. OCGT output {{ o.electric_backup.total_ocgt_output*0.0001 | toFixed(1) }} TWh/yr, peak {{ o.electric_backup.max_ocgt_output | toFixed(1) }} GW.</p>
+        <p>Methane backup runs on CCGT (efficiency above) up to <input v-model.number="i.electric_backup.ccgt_capacity_GW" type="text" @change="update" style="width:50px" autocomplete="off"/> GW, then OCGT at <input v-model.number="i.electric_backup.ocgt_efficiency" type="text" @change="update" style="width:50px" autocomplete="off"/> % efficiency. OCGT output {{ o.electric_backup.total_ocgt_output*o.GWh_to_TWhy | toFixed(1) }} TWh/yr, peak {{ o.electric_backup.max_ocgt_output | toFixed(1) }} GW.</p>
         <p>De-rating factors for outages: CCGT <input v-model.number="i.electric_backup.ccgt_derating_factor" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/>, OCGT <input v-model.number="i.electric_backup.ocgt_derating_factor" type="text" @change="update_non_hourly" style="width:50px" autocomplete="off"/>: {{ o.costs['CCGT'] ? o.costs['CCGT'].capacity : 0 | toFixed(1) }} GW of CCGT and {{ o.costs['OCGT'] ? o.costs['OCGT'].capacity : 0 | toFixed(1) }} GW of OCGT costed.</p>
     </div>
 </div>
@@ -1212,25 +1212,25 @@ input[type='text'] {
         </tr>
         <tr>
           <td>End use total</td>
-          <td>{{ o.fossil_fuels.gas_final_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-          <td>{{ o.fossil_fuels.oil_final_demand*0.0001 | toFixed(1) }} TWh/yr</td>
-          <td>{{ o.fossil_fuels.coal_final_demand*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.gas_final_demand*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.oil_final_demand*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.coal_final_demand*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
         </tr>
         <tr>
           <td>Refineries</td>
-          <td><input v-model.number="i.energy_industry_use.refineries_gas_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil: {{ o.fossil_fuels.refineries_gas_use*0.0001 | toFixed(1) }} TWh/yr</td>
-          <td><input v-model.number="i.energy_industry_use.refineries_oil_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil: {{ o.fossil_fuels.refineries_oil_use*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.refineries_gas_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil: {{ o.fossil_fuels.refineries_gas_use*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.refineries_oil_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil: {{ o.fossil_fuels.refineries_oil_use*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
           <td></td>
         </tr>
         <tr>
           <td>Oil and gas extraction</td>
-          <td><input v-model.number="i.energy_industry_use.oil_gas_extraction_gas_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil and gas: {{ o.fossil_fuels.oil_gas_extraction_gas_use*0.0001 | toFixed(1)  }} TWh/yr</td>
-          <td><input v-model.number="i.energy_industry_use.oil_gas_extraction_oil_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil and gas: {{ o.fossil_fuels.oil_gas_extraction_oil_use*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.oil_gas_extraction_gas_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil and gas: {{ o.fossil_fuels.oil_gas_extraction_gas_use*o.GWh_to_TWhy | toFixed(1)  }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.oil_gas_extraction_oil_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of oil and gas: {{ o.fossil_fuels.oil_gas_extraction_oil_use*o.GWh_to_TWhy | toFixed(1)  }} TWh/yr</td>
           <td></td>
         </tr>
         <tr>
           <td>Losses</td>
-          <td><input v-model.number="i.energy_industry_use.gas_losses_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of gas: {{ o.fossil_fuels.gas_losses*0.0001 | toFixed(1)  }} TWh/yr</td>
+          <td><input v-model.number="i.energy_industry_use.gas_losses_prc" type="text" @change="update" style="width:50px"  autocomplete="off" /> % of gas: {{ o.fossil_fuels.gas_losses*o.GWh_to_TWhy | toFixed(1)  }} TWh/yr</td>
           <td></td>
           <td></td>
         </tr>
@@ -1242,9 +1242,9 @@ input[type='text'] {
         </tr>
         <tr>
           <td>Final total</td>
-          <td>{{ o.fossil_fuels.gas*0.0001 | toFixed(1) }} TWh/yr</td>
-          <td>{{ o.fossil_fuels.oil*0.0001 | toFixed(1) }} TWh/yr</td>
-          <td>{{ o.fossil_fuels.coal*0.0001 | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.gas*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.oil*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
+          <td>{{ o.fossil_fuels.coal*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</td>
         </tr>
         <tr>
           <td>GHG Emissions</td>
@@ -1727,17 +1727,17 @@ input[type='text'] {
         
         <div style="float:left; width:40%;">
             <p style="font-size:16px"><b>Energy</b></p>
-            <p style="font-size:16px">Total energy supply: {{ o.balance.total_supply*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:16px">Total energy demand: {{ o.balance.total_demand*0.0001 | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Total energy supply: {{ o.balance.total_supply*o.GWh_to_TWhy | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Total energy demand: {{ o.balance.total_demand*o.GWh_to_TWhy | toFixed(0) }} TWh</p>
             <p style="font-size:16px">Primary energy factor: {{ o.balance.primary_energy_factor | toFixed(2) }}</p>
-            <p style="font-size:16px">Exess energy supply: {{ o.balance.total_excess*0.0001 | toFixed(0) }} TWh</p>
-            <p style="font-size:16px">Unmet energy demand: {{ o.balance.total_unmet_demand*0.0001 | toFixed(3) }} TWh</p>
+            <p style="font-size:16px">Exess energy supply: {{ o.balance.total_excess*o.GWh_to_TWhy | toFixed(0) }} TWh</p>
+            <p style="font-size:16px">Unmet energy demand: {{ o.balance.total_unmet_demand*o.GWh_to_TWhy | toFixed(3) }} TWh</p>
             <p style="font-size:16px"><b>Electricity</b></p>
-            <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*0.0001 | toFixed(1) }} TWh</p>
-            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*0.0001 | toFixed(1) }} TWh</p>       
+            <p style="font-size:16px">Total electricity supply: {{ o.supply.total_electricity_before_grid_loss*o.GWh_to_TWhy | toFixed(1) }} TWh</p>
+            <p style="font-size:16px">Total electricity demand: {{ o.balance.total_electricity_demand*o.GWh_to_TWhy | toFixed(1) }} TWh</p>       
             <p style="font-size:16px">Over-supply factor: {{ (o.supply.total_fixed_electricity + o.supply.total_imports) / o.balance.total_electricity_demand | toFixed(2) }}</p>       
-            <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*0.0001 | toFixed(1) }} TWh ({{ (100*o.balance.total_excess_elec/o.supply.total_electricity_before_grid_loss) | toFixed(0) }}%)</p>    
-            <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*0.0001 | toFixed(1) }} TWh  ({{ (100*o.balance.total_unmet_elec/o.balance.total_electricity_demand) | toFixed(0) }}%)</p>
+            <p style="font-size:16px">Total excess electricity: {{ o.balance.total_excess_elec*o.GWh_to_TWhy | toFixed(1) }} TWh ({{ (100*o.balance.total_excess_elec/o.supply.total_electricity_before_grid_loss) | toFixed(0) }}%)</p>    
+            <p style="font-size:16px">Total unmet electricity: {{ o.balance.total_unmet_elec*o.GWh_to_TWhy | toFixed(1) }} TWh  ({{ (100*o.balance.total_unmet_elec/o.balance.total_electricity_demand) | toFixed(0) }}%)</p>
 
             <p style="font-size:16px">Grid CO2 intensity: {{ o.emissions_balance.grid_co2_intensity | toFixed(0) }} gCO2/kWh</p>
             <p style="font-size:16px"><b>Land & Emissions</b></p>
@@ -1801,20 +1801,20 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Hydrogen</td>
-            <td>{{ o.hydrogen.total_produced*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.hydrogen.total_demand*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.hydrogen.total_produced*o.GWh_to_TWhy | toFixed(1) }}</td>
+            <td>{{ o.hydrogen.total_demand*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Liquid fuel (not including industry use and losses)</td>
-            <td>{{ o.synth_fuel.total_produced*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.synth_fuel.total_demand*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.synth_fuel.total_produced*o.GWh_to_TWhy | toFixed(1) }}</td>
+            <td>{{ o.synth_fuel.total_demand*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
             <td>Methane (not including industry use and losses)</td>
-            <td>{{ o.methane.total_produced*0.0001 | toFixed(1) }}</td>
-            <td>{{ o.methane.total_demand*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.methane.total_produced*o.GWh_to_TWhy | toFixed(1) }}</td>
+            <td>{{ o.methane.total_demand*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td></td>
         </tr>
         <tr>
@@ -1855,13 +1855,13 @@ input[type='text'] {
         </tr>
         <tr>
             <td>Biomass for synth fuel (e.g SRC, miscanthus)</td>
-            <td>{{ o.synth_fuel.total_biomass_used*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.synth_fuel.total_biomass_used*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td>{{ i.land_use.perrennial_grass_miscanthus | toFixed(0) }} kha</td>
             <td></td>
         </tr>
         <tr>
             <td>Biomass direct heat (SRF & SRC)</td>
-            <td>{{ o.biomass.total_direct_use*0.0001 | toFixed(1) }}</td>
+            <td>{{ o.biomass.total_direct_use*o.GWh_to_TWhy | toFixed(1) }}</td>
             <td>{{ (i.land_use.short_rotation_coppice+(i.land_use.short_rotation_forestry*0.65)) | toFixed(0) }} kha</td>
             <td></td>
         </tr>
@@ -1913,12 +1913,12 @@ input[type='text'] {
             <tr>
                 <td>Wave</td><td v-html="auto_scale(i.supply.wave_capacity*o.scaleby,'kW')"></td>
                 <td>Methane storage</td><td v-html="auto_scale(i.methane.storage_capacity_GWh*o.scaleby,'kWh')"></td>             
-                <td>Miscanthus / SRC</td><td v-html="auto_scale(o.synth_fuel.total_biomass_used*0.1*o.scaleby,'kWh')"></td>
+                <td>Miscanthus / SRC</td><td v-html="auto_scale(o.synth_fuel.total_biomass_used*o.per_year*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
                 <td>Tidal</td><td v-html="auto_scale(i.supply.tidal_capacity*o.scaleby,'kW')"></td>
                 <td>Methane turbine</td><td v-html="auto_scale(o.electric_backup.max_capacity_requirement*i.electric_backup.prc_methane*0.01*o.scaleby,'kW')"></td>
-                <td>Biomass direct heat</td><td v-html="auto_scale(o.biomass.total_direct_use*0.1*o.scaleby,'kWh')"></td>
+                <td>Biomass direct heat</td><td v-html="auto_scale(o.biomass.total_direct_use*o.per_year*o.scaleby,'kWh')"></td>
             </tr>
             <tr>
                 <td>Nuclear</td><td v-html="auto_scale(i.supply.nuclear_capacity*o.scaleby,'kW')"></td>
@@ -1926,9 +1926,9 @@ input[type='text'] {
             </tr>
             <tr>
                 <td>Total supply</td>
-                <td v-html="auto_scale(o.balance.total_supply*o.scaleby*0.1,'kWh')"></td>
+                <td v-html="auto_scale(o.balance.total_supply*o.scaleby*o.per_year,'kWh')"></td>
                 <td>Final demand</td>
-                <td v-html="auto_scale(o.balance.total_demand*o.scaleby*0.1,'kWh')"></td>
+                <td v-html="auto_scale(o.balance.total_demand*o.scaleby*o.per_year,'kWh')"></td>
                 <td></td>
                 <td></td>                
             </tr>
