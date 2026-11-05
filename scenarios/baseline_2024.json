@@ -466,6 +466,12 @@
         "Synthetic fuel storage": {
             "capex": 0,
             "fixed_om": 0
+        },
+        "Methane store charging": {
+            "capex": 0
+        },
+        "Methane store discharging": {
+            "capex": 0
         }
     }
 }

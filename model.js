@@ -839,6 +839,7 @@ var model = {
         o.hydrogen.SOC_start = i.hydrogen.storage_capacity_GWh * 0.5
         o.hydrogen.SOC = o.hydrogen.SOC_start        
         o.hydrogen.max_SOC = 0
+        o.hydrogen.max_store_charge = 0
         o.hydrogen.min_SOC = i.hydrogen.storage_capacity_GWh
         o.hydrogen.total_produced = 0
         o.hydrogen.total_from_imports = 0
@@ -855,6 +856,8 @@ var model = {
         o.methane = {}
         o.methane.SOC = i.methane.SOC_start
         o.methane.max_SOC = 0
+        o.methane.max_store_charge = 0
+        o.methane.max_store_discharge = 0
         o.methane.min_SOC = i.methane.storage_capacity_GWh
         o.methane.store_empty_count = 0
         o.methane.store_full_count = 0
@@ -1197,12 +1200,16 @@ var model = {
             let methane_from_sabatier = hydrogen_for_sabatier * (889.0/1144.0)                               // 78% efficiency based on HHV kj/mol of CH4/4H2
             o.total_losses.sabatier += hydrogen_for_sabatier - methane_from_sabatier
             
+            let hydrogen_SOC_before = o.hydrogen.SOC
             o.hydrogen.SOC += hydrogen_balance
             
             if (o.hydrogen.SOC<0.0) {
                 o.hydrogen.unmet_demand += -1*o.hydrogen.SOC
                 o.hydrogen.SOC = 0.0
             }
+            
+            // Largest hourly flow into the store sizes the compressor
+            if (o.hydrogen.SOC-hydrogen_SOC_before>o.hydrogen.max_store_charge) o.hydrogen.max_store_charge = o.hydrogen.SOC-hydrogen_SOC_before
             
             if (o.hydrogen.SOC>o.hydrogen.max_SOC) o.hydrogen.max_SOC = o.hydrogen.SOC
             if (o.hydrogen.SOC<o.hydrogen.min_SOC) o.hydrogen.min_SOC = o.hydrogen.SOC
@@ -1431,6 +1438,7 @@ var model = {
             
             let methane_balance = methane_production - methane_demand
                     
+            let methane_SOC_before = o.methane.SOC
             o.methane.SOC += methane_balance
             if (o.methane.SOC>i.methane.storage_capacity_GWh) {
                 o.methane.store_excess += o.methane.SOC - i.methane.storage_capacity_GWh
@@ -1442,6 +1450,10 @@ var model = {
                 o.methane.SOC = 0
             }
             
+            // Largest hourly flows in and out size the store's injection and withdrawal plant
+            let methane_store_flow = o.methane.SOC - methane_SOC_before
+            if (methane_store_flow>o.methane.max_store_charge) o.methane.max_store_charge = methane_store_flow
+            if (-methane_store_flow>o.methane.max_store_discharge) o.methane.max_store_discharge = -methane_store_flow
             
             d.methane_SOC.push(o.methane.SOC)
             if ((o.methane.SOC/i.methane.storage_capacity_GWh)<0.01) o.methane.store_empty_count ++
@@ -2081,6 +2093,10 @@ var model = {
         o.costs['Synthetic fuel storage'] = { capacity: i.synth_fuel.store_capacity_GWh, generation: 0 }
         // CO2 store capacity in Mt, cost per tonne
         o.costs['CO2 storage'] = { capacity: i.methane.co2_store_capacity_t * 1e-6, generation: 0 }
+        // Store power in GW, sized by the largest hourly flow
+        o.costs['Hydrogen compressor'] = { capacity: o.hydrogen.max_store_charge, generation: 0 }
+        o.costs['Methane store charging'] = { capacity: o.methane.max_store_charge, generation: 0 }
+        o.costs['Methane store discharging'] = { capacity: o.methane.max_store_discharge, generation: 0 }
 
         o.total_annual_cost = 0;
 
@@ -2095,6 +2111,10 @@ var model = {
         // Crop feedstock for biogas, the grass above the waste share in land_use, priced per MWh of methane
         o.biogas_feedstock_annual = o.biomass.grass_for_biogas * i.biogas.anaerobic_digestion_efficiency * i.biogas.crop_feedstock_gbp_MWh * 0.001
         o.total_annual_cost += o.biogas_feedstock_annual
+
+        // Biomass for FT, priced per MWh of biomass
+        o.ft_biomass_annual = o.synth_fuel.total_biomass_used * o.GWh_to_TWhy * i.synth_fuel.biomass_gbp_MWh * 0.001
+        o.total_annual_cost += o.ft_biomass_annual
 
         // Fuel burned for electricity generation, GWh over the run to TWh/yr, priced in pence per kWh of fuel.
         // Carbon price in £/tCO2 on fossil backup emissions, with the CO2 factors used for grid emissions.
@@ -2129,11 +2149,11 @@ var model = {
         // build-up above. With basis "lcoe", every technology uses the build-up. Imports have no
         // build-up and always use their price. Backup turbine capacity is shared by output, plus each
         // fuel's own fuel and carbon cost. Fuel production (electrolysis, methanation, power to X,
-        // anaerobic digestion, crop feedstock, FT and the fuel stores) always uses the build-up. Generation is GWh over the run, so o.GWh_to_TWhy gives TWh/yr and TWh
+        // anaerobic digestion, crop feedstock, FT and its biomass, the fuel stores and their power) always uses the build-up. Generation is GWh over the run, so o.GWh_to_TWhy gives TWh/yr and TWh
         // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
         let backup_output = o.electric_backup.total_before_grid_loss
         let turbine_share = (gen) => backup_output > 0 ? backup.annual * gen / backup_output : 0
-        let build_up = (key) => Array.isArray(key) ? key.reduce((sum, k) => sum + build_up(k), 0) : (o.costs[key] ? o.costs[key].annual : 0)
+        let build_up = (key) => Array.isArray(key) ? key.reduce((sum, k) => sum + build_up(k), 0) : (o.costs[key] && o.costs[key].annual) || 0
         let eb = o.electric_backup
         let techs = {
             offshore_wind: [o.supply.total_offshore_wind, 'Offshore wind'],
@@ -2197,8 +2217,8 @@ var model = {
             o.generation_costs.by_tech[z] = row
             o.generation_costs.total_annual += annual
         }
-        let fuel_production = ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion', 'FT synthetic fuel', 'Hydrogen storage', 'Methane storage', 'Synthetic fuel storage', 'CO2 storage']
-        o.generation_costs.fuel_production_annual = o.biogas_feedstock_annual
+        let fuel_production = ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion', 'FT synthetic fuel', 'Hydrogen storage', 'Methane storage', 'Synthetic fuel storage', 'CO2 storage', 'Hydrogen compressor', 'Methane store charging', 'Methane store discharging']
+        o.generation_costs.fuel_production_annual = o.biogas_feedstock_annual + o.ft_biomass_annual
         for (let z of fuel_production) {
             o.costs[z].used = true
             o.generation_costs.fuel_production_annual += build_up(z)

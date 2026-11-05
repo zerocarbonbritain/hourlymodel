@@ -671,6 +671,18 @@
         "value": 0,
         "note": "The baseline synthetic fuel store stands in for oil supply. Its storage cost is within the oil price, so the ZCB liquid storage cost is not applied."
     },
+    "costs.Methane store charging.capex": {
+        "type": "assumption",
+        "units": "£/kW",
+        "value": 0,
+        "note": "The baseline methane store stands in for the fossil gas system. Its injection cost is within the gas price, so the ZCB cost is not applied."
+    },
+    "costs.Methane store discharging.capex": {
+        "type": "assumption",
+        "units": "£/kW",
+        "value": 0,
+        "note": "The baseline methane store stands in for the fossil gas system. Its withdrawal cost is within the gas price, so the ZCB cost is not applied."
+    },
     "retail.electricity.network_basis": {
         "type": "assumption",
         "value": "per_kWh",

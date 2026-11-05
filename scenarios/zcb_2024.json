@@ -318,7 +318,8 @@
         "store_target_GWh": 5000,
         "biofuel_supply_TWhy": 0,
         "FT_process_biomass_req": 1.3,
-        "FT_process_hydrogen_req": 0.61
+        "FT_process_hydrogen_req": 0.61,
+        "biomass_gbp_MWh": 20
     },
     "power_to_X": {
         "capacity": 0,
@@ -711,6 +712,36 @@
             "build_years": 1,
             "capex": 2710,
             "fixed_om": 27.1,
+            "variable_om": 0,
+            "lifespan": 25
+        },
+        "Hydrogen compressor": {
+            "hurdle_rate": 8.9,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 77.32,
+            "fixed_om": 3.09,
+            "variable_om": 0,
+            "lifespan": 15
+        },
+        "Methane store charging": {
+            "hurdle_rate": 8.9,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 15.89,
+            "fixed_om": 0,
+            "variable_om": 0,
+            "lifespan": 25
+        },
+        "Methane store discharging": {
+            "hurdle_rate": 8.9,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 5.3,
+            "fixed_om": 0,
             "variable_om": 0,
             "lifespan": 25
         }
