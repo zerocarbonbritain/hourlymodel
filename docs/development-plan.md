@@ -24,11 +24,11 @@ Earlier handovers this plan replaces as the pick-up point:
 - Record every cost source and decision in docs/cost-assumptions.md, and every PyPSA practice difference in ZCB_PyPSA/docs/pypsa-practice.md.
 - After a change to inputs, rebuild the baselines (`python3 -I baseline/build.py 2024 scenarios/baseline_2024.json --write`, the same for 2018) and validate (`python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json`). The current result is 58 ok, 4 warnings, 14 known issues.
 
-## Where things stand (2026-11-02)
+## Where things stand (2026-11-05)
 
 - **Baselines.** 2024 and 2018 are built from sources by baseline/build.py and validated against observed statistics. Remaining differences are in baseline/open-items.md.
-- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. Battery power is costed separately (item 4). zcb_2024 costs £92.35bn/yr.
-- **PyPSA.** Costs come from the hourly model's exported scenario. The replay matches ZCB within 0.001 GWh. A one year expansion (2002) at today's costs gives £70.7bn/yr against £93.3bn for the ZCB capacities. At those PyPSA capacities the hourly model's rules leave 43.6 TWh/yr of synthetic fuel unmet, because FT only uses hydrogen made in the same hour.
+- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. Battery power is costed separately (item 4). FT biomass and store power are now costed, international shipping is in zcb_2024, and fuel users pay for fuel at their values (items 9, 11 and 12). zcb_2024 costs £95.31bn/yr, generation cost 13.2 p/kWh, household electricity bill £890, with 1.98 TWh/yr of liquid fuel unmet until the retune.
+- **PyPSA.** Costs come from the hourly model's exported scenario. The 2010 expansion gives £95.75bn/yr, with nothing unmet, against £94.88bn for the ZCB capacities, which leave fuel unmet. At those PyPSA capacities the rules leave 5.19 TWh/yr of synthetic fuel unmet over ten years. The 2010 replay matches ZCB within 0.001 GWh on every store but liquid, which runs empty and differs by up to 93 GWh.
 - **Heat pump SPF study.** SPF 2.8 against 3.8 costs £2.2bn to £5.7bn/yr. The blog post draft is parked until prices exist (phase 6).
 - **Weather data.** ERA5 cutouts are downloading on a server. Postponed to phase 7.
 
@@ -63,7 +63,7 @@ Earlier handovers this plan replaces as the pick-up point:
 
 ## Initial release
 
-Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Items 7, 10 and 13, the land model part of item 11, and whether phases 4 and 5 are part of the release are still to be decided.
+Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Phases 4 and 5 are part of the release. Ask before starting the long runs. Items 7, 10 and 13 and the land model part of item 11 are still to be placed.
 
 ## Phase 3. Shared model plumbing
 
@@ -98,7 +98,8 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
    Done 2026-11-05. `o.years`, `o.per_year`, `o.GWh_to_TWhy` and `o.TWhy_to_GWh` replace the fixed factors in model.js, model.html and ui/zcem.js, and a new `start_hour` input sets the first hour. `o.years` rounds to whole years, so runs must be whole weather years. Results:
    - zcb_2024, baseline_2024 and baseline_2018: every numeric output is unchanged, except electrolysis capacity factor in zcb_2024 (49.79% to 49.77%), which now divides by `i.hours` and not 87,600. The PyPSA export is byte identical.
    - 2010 alone from the 2010 store levels: nothing unmet, offshore wind 327.41 TWh in both, electrolysis 98.19 against 98.25 TWh and excess 77.72 against 77.66 TWh in the ten year run's 2010 slice.
-9. [ ] **Cost-only items.** Biomass for FT (free at present) and store power (compressors, injection and withdrawal: technology-data gives about £16/kW charging and £5/kW discharging for gas storage).
+9. [x] **Cost-only items.** Biomass for FT (free at present) and store power (compressors, injection and withdrawal: technology-data gives about £16/kW charging and £5/kW discharging for gas storage).
+   Done 2026-11-05. Biomass at £20/MWh, a hydrogen compressor, and methane store charging and discharging, in docs/cost-assumptions.md. In zcb_2024 biomass costs £2.60bn/yr and store power £0.32bn/yr. In PyPSA the H2 and methane stores sit on their own buses with extendable links. The 2010 expansion chooses 8.7 GW of compressor against 20.5 GW in the rules, and every extendable technology still recovers its cost.
 10. [ ] **LHV (D2).** List every H2 and methane quantity and efficiency in model.js, the scenarios, the baselines and the land model, with its basis. Work out what changes:
     - efficiencies (electrolysis 0.80 HHV is about 0.68 LHV);
     - store sizes and demands in TWh;
@@ -108,16 +109,16 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
     
     Decide where conversions sit. Set out the effect on zcb_2024 before applying.
 11. [ ] **Scope decisions** for zcb_2024, to propose to the user:
-    - international shipping demand and fuel, about 24 TWh/yr, to match the baseline boundary;
+    - [x] international shipping demand and fuel, about 24 TWh/yr, to match the baseline boundary. Done 2026-11-05: 23.9 TWh/yr of FT liquid fuel, with an input in the UI. It leaves 1.98 TWh/yr unmet at current capacities, for phase 5. Total cost +£0.04bn/yr at fixed capacities, before biomass;
     - land model choices: the existing woodland sink, the imported biomass share, landfill biochar.
-12. [ ] **Hourly prices.**
+12. [x] **Hourly prices.**
     - [x] Take marginal prices from a 2010 PyPSA expansion and check cost recovery. Done 2026-11-05 with scripts/prices.py, at 3 hour steps and before item 9:
       - Extendable technologies without a binding limit recover their cost (ratio 1.000). Consumers pay £101.74bn/yr against a system cost of £90.11bn. The £11.63bn difference is biogas supply limit rents (£7.45bn), fixed plant (£2.93bn net) and the uncosted industrial heat link (£1.24bn).
       - Mean prices are electricity £189/MWh (£226 weighted by load, zero in 26% of steps), hydrogen £145, methane £216 and liquid fuel £116/MWh, with biomass free. Hydrogen and methane are about twice the fuel values in the cost work handover.
       - Fuel users pay £17.4bn/yr, and £24.1bn with industrial heat.
-    - Add an hourly marginal electricity price to model.js (the hour class method in the cost work handover), calibrated against them.
-    - Split fuel production cost between electricity and fuel users (open item, £20bn/yr now charged to electricity).
-    - Report synthetic fuel, hydrogen and methane per kWh and per litre, with aviation and shipping fuel against 2024 jet fuel and marine gas oil prices.
+    - [x] Add an hourly marginal electricity price to model.js (the hour class method in the cost work handover), calibrated against them. Done 2026-11-05. At equal capacities on 2010 the mean is £184.5 against £190.2/MWh in PyPSA, correlation 0.90, and revenue over cost 1.127 against 1.126. Method in docs/cost-assumptions.md.
+    - [x] Split fuel production cost between electricity and fuel users (open item, £20bn/yr now charged to electricity). Done 2026-11-05. Fuel users pay £26.65bn/yr at their values in zcb_2024.
+    - [x] Report synthetic fuel, hydrogen and methane per kWh and per litre, with aviation and shipping fuel against 2024 jet fuel and marine gas oil prices. Done 2026-11-05. Synthetic fuel is 15.4 p/kWh (161 p/litre) against 50 p/litre for jet fuel and 53 for marine gas oil.
 13. [ ] **Resource limits** for onshore and offshore wind, for the `free` variant.
 14. [x] **Fix the linopy warning** in `yearly_stores` (zcb_pypsa/expand.py): select with `drop=True` so both sides share coordinates. Then check that the stores hold their year-end levels.
     Done 2026-11-05. On 2009 and 2010 the warning is gone, and the objective (£68.08bn/yr) and store levels are unchanged. H2, methane and liquid stores each end both years at the same level.

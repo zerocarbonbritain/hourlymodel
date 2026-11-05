@@ -89,3 +89,7 @@ The industry change lowered demand again, and supply was trimmed with the same a
 | Net emissions (MtCO2e) | -6.3 | -6.3 |
 
 All electricity, heat, methane, hydrogen and synthetic fuel demand is met.
+
+## International shipping
+
+Since 2026-11-05 zcb_2024 includes international shipping at the 2024 DUKES marine bunkers figure, 23.9 TWh/yr, on FT liquid fuel, so its boundary matches the baseline. There is no demand reduction, because no source for one has been chosen. Capacities have not been retuned, so 1.98 TWh/yr of liquid fuel is unmet (see baseline/open-items.md).

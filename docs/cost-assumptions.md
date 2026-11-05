@@ -12,7 +12,7 @@ The method is the one used by DESNZ Electricity Generation Costs and by `tools/l
 - Annual cost per kW is discounted costs over discounted operating years. This equals LCOE multiplied by annual output, so capacity that rarely runs still carries its full cost.
 - Variable O&M is charged per MWh of output. Fuel and carbon are charged on modelled fuel use and backup CO2.
 
-`annualisation.method` can instead be `annuity`, the PyPSA-Eur method: overnight cost (pre-development plus construction) times the annuity factor at one real discount rate for every technology (`annualisation.discount_rate`, 7% by default), plus fixed O&M. It has no interest during construction and no technology hurdle rates. It is a sensitivity and a basis for comparison with PyPSA results. The DESNZ method is the default. In zcb_2024 the annuity at 7% gives £82.9bn/yr against £92.7bn, with the largest falls for gas turbines, hydrogen storage and FT plant. Strike price calibration, implied hurdle rates and implied capital costs always use the DESNZ method.
+`annualisation.method` can instead be `annuity`, the PyPSA-Eur method: overnight cost (pre-development plus construction) times the annuity factor at one real discount rate for every technology (`annualisation.discount_rate`, 7% by default), plus fixed O&M. It has no interest during construction and no technology hurdle rates. It is a sensitivity and a basis for comparison with PyPSA results. The DESNZ method is the default. In zcb_2024 the annuity at 7% gives £85.5bn/yr against £95.3bn, with the largest falls for gas turbines, hydrogen storage and FT plant. Strike price calibration, implied hurdle rates and implied capital costs always use the DESNZ method.
 
 Costs from older sources are uplifted to 2024 prices with the deflator the source itself used: the GDP deflator (ONS YBGB) for government appraisals that state GDP deflator prices, and CPI (ONS D7BT) otherwise.
 
@@ -46,6 +46,9 @@ DESNZ values are the medium case for 2030 commissioning unless stated.
 | Methane storage (per kWh) | 8.9 | 0, 0 | 1, 0.2465 | 0.0013 | 0 | 100 | Technology-data 2030 underground gas storage |
 | Synthetic fuel storage (per kWh) | 8.9 | 0, 0 | 1, 0.0181 | 0.0011 | 0 | 30 | Technology-data 2030 liquid product tanks |
 | CO2 storage (per tCO2) | 8.9 | 0, 0 | 1, 2,710 | 27.1 | 0 | 25 | Technology-data 2030 CO2 storage tank |
+| Hydrogen compressor (per kW H2 in, HHV) | 8.9 | 0, 0 | 1, 77.32 | 3.09 | 0 | 15 | Technology-data 2030, see below |
+| Methane store charging (per kW) | 8.9 | 0, 0 | 1, 15.89 | 0 | 0 | 25 | Technology-data 2030, see below |
+| Methane store discharging (per kW) | 8.9 | 0, 0 | 1, 5.30 | 0 | 0 | 25 | Technology-data 2030, see below |
 | Power to X | 10.1 | 0, 0 | 1, 860 | 25.8 | 0 | 30 | ZCB capex and opex, CEPA hurdle rate |
 
 `carbon_price` is £68/tCO2: the 2025 average UK ETS price (£50.16) plus Carbon Price Support (£18). Carbon Price Support is due to end in April 2028. The 2024 baseline uses £55.18/tCO2, the 2024 mean UK ETS auction price (£37.18) plus Carbon Price Support. The 2018 baseline sets it to 0.
@@ -73,16 +76,23 @@ The original ZCB values were £328/kW for electrolysis and £236/kW for methanat
 
 From technology-data v0.15.0, converted as for electrolysis. Hurdle rates follow the nearest ZCB technology: 10.1% (CEPA power to X) for FT and 8.9% (electric storage) for the stores, including the CO2 store.
 
-- **FT plant.** ZCB's FT takes 1.3 kWh of biomass and 0.61 kWh of hydrogen per kWh of fuel, closest to technology-data's electrobiofuels. Technology-data has no capex for electrobiofuels, so it is built as PyPSA-Eur does, from BtL plus the 0.731 share of BtL carbon not in its fuel times Fischer-Tropsch: (€3,929 × 0.383 + 0.731 × €2,139 × 0.704) / 1.322 = €1,972/kW of fuel, £1,635/kW. The model sizes FT by hydrogen in, so this is divided by 0.61, giving £2,681/kW. Fixed O&M is the electrobiofuels 2.67%, running cost is built the same way from the BtL and Fischer-Tropsch values (£2.15/MWh of fuel) and the life is the BtL 25 years. PyPSA-Eur marks electrobiofuels as experimental, and its blend (0.76 kWh of biomass and 0.94 of hydrogen per kWh of fuel) differs from ZCB's, so this is a proxy. Biomass for FT is not costed.
+- **FT plant.** ZCB's FT takes 1.3 kWh of biomass and 0.61 kWh of hydrogen per kWh of fuel, closest to technology-data's electrobiofuels. Technology-data has no capex for electrobiofuels, so it is built as PyPSA-Eur does, from BtL plus the 0.731 share of BtL carbon not in its fuel times Fischer-Tropsch: (€3,929 × 0.383 + 0.731 × €2,139 × 0.704) / 1.322 = €1,972/kW of fuel, £1,635/kW. The model sizes FT by hydrogen in, so this is divided by 0.61, giving £2,681/kW. Fixed O&M is the electrobiofuels 2.67%, running cost is built the same way from the BtL and Fischer-Tropsch values (£2.15/MWh of fuel) and the life is the BtL 25 years. PyPSA-Eur marks electrobiofuels as experimental, and its blend (0.76 kWh of biomass and 0.94 of hydrogen per kWh of fuel) differs from ZCB's, so this is a proxy.
 - **Hydrogen storage.** Salt caverns at €2.67/kWh of working gas (Danish Energy Agency), 100 year life. The full capacity is costed, although the model keeps a 10% floor (`hydrogen.minimum_store_level`).
 - **Methane storage.** Underground gas storage at €0.297/kWh with 0.54% fixed O&M (Danish Energy Agency). Technology-data gives its 100 year life without a source. At 50 years the annual cost rises from £0.023 to £0.024/kWh.
 - **Synthetic fuel storage.** Liquid product tanks at €218/m³ with 6.25% fixed O&M and a 30 year life (Stelter and Nishida 2013, IEA), at 10 MWh/m³. The cost is on `synth_fuel.store_capacity_GWh`, which the model enforces (since 2026-11-02).
 - **CO2 storage.** Pressurised steel tanks for liquid CO2 at €3,269/tCO2 with 1% fixed O&M and a 25 year life (Lauri et al. 2014, table 3, via technology-data), £2,710/t. The annual cost is £301/t/yr. Liquefaction is costed separately in technology-data (€21/tCO2/h and 0.123 MWh of electricity per tonne) and is left out, so the CO2 store has no energy use. At zcb_2024's biogas CO2 flow (585 t/h) liquefaction would use about 0.6 TWh/yr of electricity. zcb_2024 has a 100 kt store (£0.03bn/yr), about a week of biogas CO2. The baselines have none.
-- **Store power** (compressors, injection and withdrawal) is not costed. Technology-data gives about £16/kW for gas storage charging and £5/kW for discharging.
+- **Store power.** Each is sized by the largest hourly flow into or out of the store, after any spill. Hurdle rate 8.9% as for the stores.
+  - Hydrogen compressor: €110.26/kW of H2 with 4% fixed O&M and a 15 year life (Stöckl et al. 2021, via technology-data), £91.40/kW. Converted from LHV to HHV as for methanation (33.33/39.4), £77.32/kW. In zcb_2024 20.5 GW, £0.26bn/yr. The compressor's electricity use (0.05 MWh per MWh of H2) changes dispatch and is left out. Technology-data has no separate cost for withdrawing hydrogen.
+  - Methane store charging and discharging: €19.17 and €6.39/kW (Danish Energy Agency), £15.89 and £5.30/kW. Technology-data gives no life or fixed O&M, so these use PyPSA-Eur's default 25 years and zero. In zcb_2024 4.4 GW (£0.007bn/yr) and 91.9 GW (£0.05bn/yr).
+  - The baselines set the methane store costs to zero, as for the store itself.
 
 In zcb_2024 these add £9.2bn/yr: FT £3.6bn, hydrogen storage £3.9bn, methane storage £1.5bn and synthetic fuel storage £0.1bn. The hydrogen store is the largest because its 20 TWh is never more than half used.
 
 In the baselines the methane and synthetic fuel stores stand in for fossil gas and oil supply, whose storage cost is within the fuel prices, so the build sets their costs to zero (baseline/inputs/11-costs.json).
+
+### FT biomass
+
+Biomass for FT costs £20/MWh (`synth_fuel.biomass_gbp_MWh`). International Energy Crops offered £63/t delivered for 15% moisture miscanthus bales within 60 miles of Selby (Farmers Weekly, June 2012). At 4.44 MWh/t (NNFCC, under 16% moisture) this is £14.2/MWh, or £19.6/MWh in 2024 prices by the GDP deflator (ONS YBGB, 100/72.2 = 1.385). It is a contract price paid to a grower, and is 14 years old. Lower references are Wang et al. (2012), £40 per oven-dried tonne at the farm gate with no stated price year, and technology-data's biomass at €9.35/MWh (£7.75, IEA 2011). DESNZ's UK and Global Bioenergy Resource Model has a feedstock price section, which has not been checked. In zcb_2024 biomass costs £2.60bn/yr on 130 TWh/yr.
 
 ### Anaerobic digestion and biogas feedstock
 
@@ -144,7 +154,7 @@ Network charges are in retail prices only, from the 2024 Ofgem cap: 3.394 p/kWh 
 
 With `retail.electricity.network_basis` `peak` (zcb_2024), the per kWh network charge scales with peak electricity demand relative to the 2024 baseline and is recovered over delivered electricity: network p/kWh = 3.394 × (peak / 55.19 GW) × (269.39 TWh / delivered). The reference values are baseline_2024 model outputs (`balance.max_electricity_demand` and delivered electricity) and need updating when the baseline changes. Both peaks come from the same model, so its high peak (open item "Peak demand is high") partly cancels. The standing charge is per connection and does not scale. Baselines use `per_kWh`.
 
-In zcb_2024 peak demand is 95.2 GW and delivered electricity 465 TWh, both about 1.72 times 2024, so the network charge is 3.40 p/kWh (£15.8bn/yr), the same as per kWh. Each 10 GW of peak reduction saves about £1.7bn/yr. A peak based on network capacity costs, such as technology-data's distribution grid at £554/kW, is an alternative not used yet.
+In zcb_2024 peak demand is 95.2 GW (1.72 times 2024) and delivered electricity 477 TWh (1.77 times), so the network charge is 3.31 p/kWh (£15.8bn/yr), close to the 3.394 p/kWh of per kWh. Each 10 GW of peak reduction saves about £1.7bn/yr. A peak based on network capacity costs, such as technology-data's distribution grid at £554/kW, is an alternative not used yet.
 
 ### Presets
 
@@ -158,9 +168,42 @@ Applied to another scenario, a preset sets only the fixed generators (wind, sola
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
 |---|---|---|---|
 | baseline_2024 | 13.6 | 11.3 | 12.6 |
-| zcb_2024 | 26.9 | 18.9 | 20.1 |
+| zcb_2024 | 21.1 | 13.2 | 20.0 |
 
-Generation cost in p/kWh delivered. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
+Generation cost in p/kWh delivered, after fuel users pay their share in zcb_2024. The last column is before that share. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
+
+### Fuel users and hourly prices
+
+Fuel users pay the values below for hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. The values include the electricity used to make the fuel. In zcb_2024 fuel users pay £26.65bn/yr of £89.64bn, against £22.97bn of fuel plant and feedstock, so the generation cost is 13.2 p/kWh and the household electricity bill £890. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+
+`fuel_values` holds the values, in £/MWh, from the 2010 PyPSA expansion at 3 hour steps. They are provisional until phase 6 recalibrates them on the ten year optimum.
+
+- **Hydrogen, £150.** The mean price in that run (£149), and the electricity price in electrolysis hours divided by 0.8 (£151).
+- **Methane, £235.** The price weighted by turbine fuel use. End users' mean is £219, so methane sales are about 7% high.
+- **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This is £154/MWh in zcb_2024 (15.4 p/kWh, 161 p/litre at the diesel energy density), and PyPSA gives £145.
+
+For comparison, 2024 fuel before tax:
+
+- **Jet fuel, £47.4/MWh, 50 p/litre.** $99/barrel (IATA), at $1.278/£ (2024 average), 159 litres per barrel and 46.2 GJ/t gross at 0.8 kg/litre.
+- **Marine gas oil, £50.2/MWh, 53 p/litre.** $812/t, the Ship & Bunker average of 20 ports, at 45.6 GJ/t gross.
+
+The exchange rate and calorific values are recalled figures, not yet checked against the Bank of England and DUKES annex A. They affect only this comparison. Both per litre figures use the diesel energy density.
+
+The hourly electricity price (`d.electricity_price`, summarised in `o.prices`) follows what is at the margin:
+
+| Hour | Price |
+|---|---|
+| Backup above 0.5 GW | (methane value / efficiency + running cost) / grid loss factor, for CCGT or OCGT, plus the scarcity adder |
+| Curtailing | 0 |
+| Electrolysis | efficiency x hydrogen value |
+| Battery discharging | the next hour with a price set by the rows above, divided by round trip efficiency if that hour is not backup |
+| Battery charging | as discharging, times round trip efficiency |
+
+The scarcity adder spreads the annual cost of the peak turbine class over hours within 10% of peak backup, in proportion to depth. Backup below 0.5 GW covers 14% of hours but 1% of backup energy, with the battery discharging in 93% of them.
+
+Check against PyPSA at equal capacities, 2010 alone at 3 hour steps (`scripts/price_check.py`). Mean price £184.5 against £190.2/MWh, weighted by load £221.5 against £227.0, correlation 0.90 (0.94 without the highest 1% of prices). In PyPSA's turbine hours the means are £566.8 and £556.3. Revenue over system cost is 1.127 against 1.126.
+
+For zcb_2024 over ten years, revenue is £54.7bn from electricity and £26.7bn from fuel, 85% of system cost, and offshore wind earns 67% of its cost. This is before the phase 5 retune, on fuel values from a low wind year, so it does not yet pass the phase 6 checks.
 
 ### Implied hurdle rate and capital cost
 
@@ -188,6 +231,8 @@ Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for 
 - BEIS, [Green Gas Support Scheme final stage impact assessment](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1018133/green-gas-impact-assessment.pdf) (2021), paragraphs 47 and 55, Table D-2 and Annex C.
 - PyPSA, [technology-data](https://github.com/PyPSA/technology-data) v0.15.0, `outputs/costs_2030.csv`, electrolysis, methanation, BtL, Fischer-Tropsch, electrobiofuels, hydrogen storage underground, gas storage, general liquid hydrocarbon storage (product) and CO2 storage tank.
 - [MeyGen](https://en.wikipedia.org/wiki/MeyGen), 2023 net output.
+- Farmers Weekly, [Crops for fuel are big business at Cereals 2012](https://www.fwi.co.uk/business/crops-for-fuel-are-big-business-at-cereals-2012). NNFCC, [Miscanthus crop factsheet](https://www.nnfcc.co.uk/files/mydocs/miscanthus%20rev%20Feb%202011.pdf). Wang et al., [Economic and greenhouse gas costs of Miscanthus supply chains in the United Kingdom](https://researchonline.ljmu.ac.uk/id/eprint/4650/), GCB Bioenergy 2012.
+- IATA, [Fuel fact sheet](https://www.iata.org/en/iata-repository/pressroom/fact-sheets/fact-sheet-fuel). Ship & Bunker, [Annual average bunker price at key hubs mostly flat in 2024](https://shipandbunker.com/news/world/424013-annual-average-bunker-price-at-key-hubs-mostly-flat-in-2024).
 - Modo Energy, [GB battery capex survey 2024](https://modoenergy.com/research/battery-energy-storage-capex-containerised-bess-development-costs-oem-balance-plant-bop-grid-connections-survey-2024) and [global battery capex September 2026](https://modoenergy.com/research/global-battery-capex-september-2026-research). £230/kWh is the 2024 median (£325/kWh) less the reported 29% fall.
 - NESO, [Capacity Market Register](https://www.neso.energy/data-portal/capacity-market-register), Capacity Market De-Rating Factors CSV (September 2026).
 - LSEG, [UKA price update Q1 2026](https://www.lseg.com/content/dam/data-analytics/en_us/documents/reports/lseg-q1-2026-eua-and-uka-price-update.pdf).
