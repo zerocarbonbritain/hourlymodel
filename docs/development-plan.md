@@ -63,7 +63,7 @@ Earlier handovers this plan replaces as the pick-up point:
 
 ## Initial release
 
-Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Phases 4 and 5 are part of the release. Ask before starting the long runs. Items 7, 10 and 13 and the land model part of item 11 are still to be placed.
+Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Phases 4 and 5 are part of the release. Ask before starting the long runs. Land is reported and not enforced: a scenario uses the land it needs, and a user can reduce demand or accept biomass imports (decided 2026-11-05). scripts/expand.py prints the land spare or short for each run. The fixed 97.3 TWh/yr biogas feedstock limit in PyPSA is still in place, to be reviewed before the runs. Items 7, 10 and 13 and the land model part of item 11 are still to be placed.
 
 ## Phase 3. Shared model plumbing
 
@@ -124,6 +124,8 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
     Done 2026-11-05. On 2009 and 2010 the warning is gone, and the objective (£68.08bn/yr) and store levels are unchanged. H2, methane and liquid stores each end both years at the same level.
 
 Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within 10% on 2010.
+
+Result 2026-11-05, with shipping set to zero until the retune (ZCB_PyPSA/docs/results.md): curtailment 1.6%, battery charge 1.9%, methane store 9.1% and backup 10.2%. DSR timing causes almost all of the backup gap, and item 7 replaces that rule. Repeat with shipping after phase 5.
 
 ## Phase 4. Long runs and target table
 
