@@ -639,6 +639,9 @@ var model = {
             DSR_H2_fuel_full += H2_heat / fuel_efficiency[z]
         }
         
+        // Kept so that main_loop can give the battery first call on surplus
+        d.DSR = { elec_full: DSR_elec_full, CH4_fuel_full: DSR_CH4_fuel_full, H2_fuel_full: DSR_H2_fuel_full, elec: [] }
+
         for (var hour = 0; hour < i.hours; hour++)
         {
             // electric demand
@@ -661,6 +664,7 @@ var model = {
             let elec_fraction = DSR_elec_full>0 ? DSR_elec / DSR_elec_full : 0
             let DSR_CH4_gas = DSR_CH4_fuel_full * (1 - elec_fraction)        // 4. if there is not enough elec to meet demand, use gas
             let DSR_H2_gas = DSR_H2_fuel_full * (1 - elec_fraction)
+            d.DSR.elec.push(DSR_elec)
             
             // ----------------------------------------------------------------------------------------------------------------------
             
@@ -949,10 +953,23 @@ var model = {
 
         let grid_loss_prc = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
 
-        // Optimal store schedule, computed up front from the balance before the store
+        // Optimal store schedule, computed up front from the balance before the store. It is scheduled
+        // on the balance without DSR electricity, with surplus up to the DSR limit valued at the methane
+        // it saves against backup. Surplus in the next band, up to electrolysis capacity, is valued at the
+        // backup output of the methane its hydrogen makes. DSR then takes the surplus left in each hour.
         let elec_store_schedule = null
         if (i.electric_storage.type=="optimal" && i.electric_storage.capacity_GWh>0) {
-            elec_store_schedule = optimise_elec_store(d.balance_before_elec_store, {
+            let balance_for_store = d.balance_before_elec_store
+            let backup_efficiency = i.electric_backup.methane_efficiency * 0.01 * grid_loss_prc
+            let surplus_value = 0
+            if (d.DSR.elec_full>0) {
+                balance_for_store = balance_for_store.map((b, hour) => b + d.DSR.elec[hour])
+                let fuel_saved = (d.DSR.CH4_fuel_full + d.DSR.H2_fuel_full) / d.DSR.elec_full
+                surplus_value = Math.min(fuel_saved * backup_efficiency, 1) * i.electric_storage.backup_value
+            }
+            let electrolysis_value = i.hydrogen.electrolysis_efficiency * (889.0/1144.0) * backup_efficiency * i.electric_storage.backup_value
+            if (d.DSR.elec_full>0) electrolysis_value = Math.min(electrolysis_value, surplus_value)
+            elec_store_schedule = optimise_elec_store(balance_for_store, {
                 capacity: i.electric_storage.capacity_GWh,
                 soc_levels: i.electric_storage.soc_levels,
                 charge_max: i.electric_storage.charge_capacity_GW,
@@ -963,8 +980,31 @@ var model = {
                 peak_weight: i.electric_storage.peak_weight,
                 charge_from_backup: i.electric_storage.charge_from_backup,
                 backup_limit: i.electric_backup.capacity_limit,
+                surplus_band: d.DSR.elec_full,
+                surplus_value: surplus_value,
+                electrolysis_band: i.hydrogen.electrolysis_capacity_GW,
+                electrolysis_value: electrolysis_value,
                 initial_soc: o.electric_storage.SOC_start
             })
+            if (d.DSR.elec_full>0) {
+                for (let hour = 0; hour < i.hours; hour++) {
+                    let surplus = balance_for_store[hour] + elec_store_schedule.discharge[hour] - elec_store_schedule.charge[hour]
+                    let DSR_elec = Math.min(Math.max(surplus, 0), d.DSR.elec_full)
+                    let change = DSR_elec - d.DSR.elec[hour]
+                    let fraction_change = change / d.DSR.elec_full
+                    let CH4_change = -d.DSR.CH4_fuel_full * fraction_change
+                    let H2_change = -d.DSR.H2_fuel_full * fraction_change
+                    d.DSR.elec[hour] = DSR_elec
+                    d.industrial_elec_demand[hour] += change
+                    d.methane_for_industry[hour] += CH4_change
+                    d.hydrogen_for_industry[hour] += H2_change
+                    d.balance_before_elec_store[hour] = balance_for_store[hour] - DSR_elec
+                    o.industry.total_elec_demand += change
+                    o.industry.total_methane_demand += CH4_change
+                    o.industry.total_hydrogen_demand += H2_change
+                    o.industry.total_demand_check += change + CH4_change + H2_change
+                }
+            }
         }
 
         for (var hour = 0; hour < i.hours; hour++)
@@ -2459,8 +2499,10 @@ function implied_capex(c, target) {
 //   backup_value per GWh of deficit (backup generation)
 //   peak_weight per GW² of deficit (so the store shaves the highest peaks)
 //   10 x backup_value per GWh of deficit above the backup capacity limit
+//   surplus_value per GWh of surplus missing from the surplus_band GW that DSR could use
+//   electrolysis_value per GWh of surplus missing from the next electrolysis_band GW
 //
-// Surplus has no value. Both the hourly cost and the cost carried from the previous
+// Surplus above those bands has no value. Both the hourly cost and the cost carried from the previous
 // hour are convex in the state of charge, so each hour is a min-plus convolution of
 // two convex sequences. Merging their slopes gives this in O(soc_levels) per hour.
 // Rows are saved at checkpoints and recomputed a block at a time to recover the schedule.
@@ -2476,6 +2518,12 @@ function optimise_elec_store(balance, opts) {
     let lam = opts.peak_weight
     let Cu = 10 * Ce
     let SOC_PEN = 1e-9 * step   // tie-break, prefer a fuller store
+    let band = opts.surplus_band || 0
+    let band_value = opts.surplus_value || 0
+    let electrolysis_band = opts.electrolysis_band || 0
+    let electrolysis_value = opts.electrolysis_value || 0
+    let band_top = band + electrolysis_band
+    let empty_bands_cost = band_value * band + electrolysis_value * electrolysis_band
 
     let up_max = Math.min(K, Math.floor(opts.charge_max * ceff / step))
     let dn_max = Math.min(K, Math.floor(opts.discharge_max / deff / step))
@@ -2486,19 +2534,23 @@ function optimise_elec_store(balance, opts) {
     }
 
     function hour_cost(b) {
-        if (b >= 0) return 0
+        // Lost surplus costs what DSR or electrolysis would have saved. Each value is at most the one
+        // below it, and DSR's at most backup_value, which keeps the cost convex.
+        if (b >= band_top) return 0
+        if (b >= band) return electrolysis_value * (band_top - b)
+        if (b >= 0) return band_value * (band - b) + electrolysis_value * electrolysis_band
         let deficit = -b
-        let cost = Ce * deficit + lam * deficit * deficit
+        let cost = empty_bands_cost + Ce * deficit + lam * deficit * deficit
         if (deficit > opts.backup_limit) cost += Cu * (deficit - opts.backup_limit)
         return cost
     }
 
-    // Level changes allowed in hour t. Discharge is limited to the deficit.
+    // Level changes allowed in hour t. Discharge is limited to the deficit plus what DSR and electrolysis could use.
     // Charge is limited to the surplus unless charging from backup is allowed.
     let r = [0, 0]
     function level_range(t) {
         let net = balance[t]
-        r[0] = -Math.min(dn_max, Math.floor(Math.max(0, -net) / deff / step))
+        r[0] = -Math.min(dn_max, Math.floor(Math.max(0, band_top - net) / deff / step))
         r[1] = up_max
         if (!opts.charge_from_backup) r[1] = Math.min(up_max, Math.floor(Math.max(0, net) * ceff / step))
         return r
