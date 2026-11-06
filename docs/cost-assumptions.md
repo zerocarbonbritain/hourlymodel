@@ -205,6 +205,12 @@ Check against PyPSA at equal capacities, 2010 alone at 3 hour steps (`scripts/pr
 
 For zcb_2024 over ten years, revenue is £54.7bn from electricity and £26.7bn from fuel, 85% of system cost, and offshore wind earns 67% of its cost. This is before the phase 5 retune, on fuel values from a low wind year, so it does not yet pass the phase 6 checks.
 
+The figures above compare revenue with the build-up. The page and `o.prices` now use the selected generation costs, so the system cost follows the choice between strike prices and the build-up. `o.total_annual_cost` stays on the build-up for comparison and for the PyPSA checks.
+
+Bills do not use hourly revenue. Fuel users pay the fuel values, and electricity users pay the rest of the generation cost at one rate per kWh delivered. `o.prices.bill_top_up` is this payment above hourly revenue, a top-up similar to Contract for Difference payments, calculated for the whole system. In zcb_2024 with AR7 prices, hourly prices recover 92% of the £86.3bn system cost and 72% of offshore wind's cost, and the top-up is £7.2bn (1.5 p/kWh). On the build-up they recover 86% of £91.9bn and 64%, and the top-up is £12.7bn.
+
+Selecting strike prices assumes generators accept them at the model's load factors, which are lower than AR7 assumes. Offshore wind is paid £91/MWh against a build-up of £102/MWh.
+
 ### Implied hurdle rate and capital cost
 
 For each fixed generator with a price and a build-up, the model reports the hurdle rate at which the build-up equals the price, and the construction cost that does at the input hurdle rate. At 2024 prices and 2024 output:

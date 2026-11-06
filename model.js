@@ -2178,7 +2178,9 @@ var model = {
         p.end_use_weighted_gbp_MWh = end_use_total > 0 ? revenue / end_use_total : 0
         p.electricity_revenue = revenue * 1e-6 * o.per_year
         p.offshore_revenue = offshore * 1e-6 * o.per_year
-        p.offshore_recovery = o.costs['Offshore wind'].annual > 0 ? p.offshore_revenue / o.costs['Offshore wind'].annual : 0
+        // Recovery is against the selected generation costs: strike prices or the build-up
+        let offshore_cost = o.generation_costs.by_tech.offshore_wind.annual
+        p.offshore_recovery = offshore_cost > 0 ? p.offshore_revenue / offshore_cost : 0
 
         // Fuel at its value. Synthetic fuel is its hydrogen and biomass plus the FT plant cost per MWh.
         let sf = i.synth_fuel
@@ -2201,12 +2203,14 @@ var model = {
         p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * kWh_per_litre
         p.jet_fuel_p_litre = fv.jet_fuel_gbp_MWh * 0.1 * kWh_per_litre
         p.marine_gas_oil_p_litre = fv.marine_gas_oil_gbp_MWh * 0.1 * kWh_per_litre
-        p.recovery = o.total_annual_cost > 0 ? (p.electricity_revenue + p.fuel_sales) / o.total_annual_cost : 0
+        p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_sales) / o.generation_costs.total_annual : 0
 
         // Fuel users pay these values, which include the electricity used to make the fuel. Electricity
         // users pay the rest of the generation cost.
         o.generation_costs.fuel_users_annual = p.fuel_sales
         o.generation_costs.electricity_annual = o.generation_costs.total_annual - o.generation_costs.fuel_users_annual
+        // Electricity users' payment above hourly revenue
+        p.bill_top_up = o.generation_costs.electricity_annual - p.electricity_revenue
     },
     cost_model: function() {
 
@@ -2389,7 +2393,8 @@ var model = {
         // The build-up for every technology (resource cost) is kept for comparison
         let elec = {
             resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
-            generation_cost_p_kWh: delivered_TWh > 0 ? 100 * o.generation_costs.electricity_annual / delivered_TWh : 0
+            generation_cost_p_kWh: delivered_TWh > 0 ? 100 * o.generation_costs.electricity_annual / delivered_TWh : 0,
+            bill_top_up_p_kWh: delivered_TWh > 0 ? 100 * o.prices.bill_top_up / delivered_TWh : 0
         }
         // The unit rate uses the generation cost plus any year specific wholesale adjustment
         elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh

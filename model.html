@@ -1646,7 +1646,9 @@ input[type='text'] {
             <tr><td>Synthetic fuel</td><td>{{ o.prices.fuel.synthetic_fuel.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_kWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_litre | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.annual | toFixed(2) }}</td></tr>
         </table>
         <p>2024 fuel before tax: jet fuel {{ o.prices.jet_fuel_p_litre | toFixed(0) }} and marine gas oil {{ o.prices.marine_gas_oil_p_litre | toFixed(0) }} p/litre, at the energy density of diesel.</p>
-        <p>Revenue at these prices: electricity end use £{{ o.prices.electricity_revenue | toFixed(1) }} bn and fuel £{{ o.prices.fuel_sales | toFixed(1) }} bn, {{ 100 * o.prices.recovery | toFixed(0) }}% of system cost. Offshore wind earns {{ 100 * o.prices.offshore_recovery | toFixed(0) }}% of its cost.</p>
+        <p>Hourly marginal prices would recover £{{ o.prices.electricity_revenue | toFixed(1) }} bn from electricity end use and £{{ o.prices.fuel_sales | toFixed(1) }} bn from fuel, {{ 100 * o.prices.recovery | toFixed(0) }}% of the £{{ o.generation_costs.total_annual | toFixed(1) }} bn system cost at the generation costs above. They would recover {{ 100 * o.prices.offshore_recovery | toFixed(0) }}% of offshore wind's cost.</p>
+        <p><span v-if="o.prices.bill_top_up > 0">The remaining £{{ o.prices.bill_top_up | toFixed(1) }} bn ({{ o.retail.electricity.bill_top_up_p_kWh | toFixed(1) }} p/kWh) is recovered through electricity bills, a top-up similar to Contract for Difference payments. The model calculates it for the whole system, not for each technology.</span>
+            Fuel users pay the fuel values above. Electricity users pay the rest of the generation cost, £{{ o.generation_costs.electricity_annual | toFixed(1) }} bn, at one rate per kWh delivered.</p>
         </div>
 
         <h3>Build-up</h3>
