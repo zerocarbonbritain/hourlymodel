@@ -1,0 +1,28 @@
+{
+    "supply": {
+        "offshore_wind_capacity": 89.5
+    },
+    "hydrogen": {
+        "electrolysis_capacity_GW": 25.5,
+        "storage_capacity_GWh": 7500
+    },
+    "methane": {
+        "methanation_capacity": 7,
+        "storage_capacity_GWh": 90000
+    },
+    "synth_fuel": {
+        "capacity_GW": 11.75,
+        "store_capacity_GWh": 50000
+    },
+    "electric_storage": {
+        "capacity_GWh": 225,
+        "charge_capacity_GW": 26,
+        "discharge_capacity_GW": 26
+    },
+    "electric_backup": {
+        "ccgt_capacity_GW": 18
+    },
+    "biogas": {
+        "biomass_for_biogas": 75
+    }
+}

@@ -129,3 +129,41 @@ The before column includes the battery and DSR order change of the same date, bu
 The H2 store minimum is below its 0.8 TWh floor, because the floor limits FT and methanation only. Direct hydrogen demand is 1.1 GW, so 0.56 TWh is about 21 days of it. The low period of 2010 and 2011 comes from weather, with less surplus for electrolysis. No hydrogen demand goes unmet.
 
 The liquid store margin costs nothing in the model, because the first fill is not costed.
+
+## Phase 5 candidate
+
+[zcb_2024_retune.json](../scenarios/zcb_2024_retune.json) overrides zcb_2024 and can be selected in the UI. It is a candidate and zcb_2024 is unchanged. Values come from a search of ten year runs of the rules from the phase 4 land-limited targets. The search tests the requirements in the [development plan](development-plan.md), phase 5. It also aimed for an H2 store minimum of 0.4 TWh, which is not an agreed requirement. It found a good solution and does not show that this is the lowest cost one. Store start levels are unchanged.
+
+| Input | zcb_2024 | Candidate | `land`, `yearly` optimum |
+|---|---|---|---|
+| Offshore wind (GW) | 97.4 | 89.5 | 85.31 |
+| Electrolysis (GW) | 27 | 25.5 | 26.09 |
+| Methanation (GW) | 5 | 7 | 5.38 |
+| FT (GW) | 10 | 11.75 | 9.24 |
+| CCGT capacity (GW) | 43.73 | 18 | 22.57 |
+| OCGT output peak (GW) | 0 | 26.26 | 20.40 |
+| Battery (GWh) | 200 | 225 | 206.63 |
+| Battery charge and discharge (GW) | 26 | 26 | 26.84 |
+| H2 store (TWh) | 8 | 7.5 | 2.49 |
+| Methane store (TWh) | 65 | 90 | 47.34 |
+| Liquid store (TWh) | 50 | 50 | 22.18 |
+| Biogas feedstock (TWh/yr) | 72 | 75 | 81.43 |
+
+| Result | zcb_2024 | Candidate |
+|---|---|---|
+| Total cost (£bn/yr) | 91.91 | 89.13 |
+| Generation cost (p/kWh) | 12.25 | 11.61 |
+| Household electricity bill (£) | 857 | 836 |
+| Unmet electricity, hydrogen, fuel, methane (TWh/yr) | 0 | 0 |
+| Liquid store minimum (TWh) | 9.41 | 8.31 |
+| Liquid store end (TWh) | 25.26 | 26.05 |
+| Methane store minimum (TWh) | 8.56 | 9.01 |
+| Methane store end (TWh) | 29.47 | 30.74 |
+| H2 store minimum (TWh) | 0.56 | 0.38 |
+| Lowest combined store level (TWh) | 19.06 | 19.32 |
+| Excess electricity (TWh/yr) | 108.32 | 83.69 |
+| Methane spill (TWh/yr) | 5.42 | 1.77 |
+| Backup output (TWh/yr) | 12.27 | 13.55 |
+| Spare land (kha) | 190 | 125 |
+
+The candidate costs £2.95bn/yr more than the `land`, `yearly` optimum (£86.18bn/yr), against £5.73bn/yr for zcb_2024 on the model's own total. The H2 store minimum is about 14 days of direct hydrogen demand. Battery wear and the first fill of the stores are not costed.

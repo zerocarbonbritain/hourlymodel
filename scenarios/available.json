@@ -3,6 +3,10 @@
         "name": "ZeroCarbonBritain from 2024 baseline (Default)",
         "group": "ZeroCarbonBritain"
     },
+    "zcb_2024_retune": {
+        "name": "ZeroCarbonBritain, phase 5 retune (candidate)",
+        "group": "ZeroCarbonBritain"
+    },
     "baseline_2024": {
         "name": "2024 baseline",
         "group": "Baselines"

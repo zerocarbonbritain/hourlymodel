@@ -119,7 +119,7 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
     - [x] Add an hourly marginal electricity price to model.js (the hour class method in the cost work handover), calibrated against them. Done 2026-11-05. At equal capacities on 2010 the mean is £184.5 against £190.2/MWh in PyPSA, correlation 0.90, and revenue over cost 1.127 against 1.126. Method in docs/cost-assumptions.md.
     - [x] Split fuel production cost between electricity and fuel users (open item, £20bn/yr now charged to electricity). Done 2026-11-05. Fuel users pay £26.65bn/yr at their values in zcb_2024.
     - [x] Report synthetic fuel, hydrogen and methane per kWh and per litre, with aviation and shipping fuel against 2024 jet fuel and marine gas oil prices. Done 2026-11-05. Synthetic fuel is 15.4 p/kWh (161 p/litre) against 50 p/litre for jet fuel and 53 for marine gas oil.
-13. [ ] **Resource limits** for onshore and offshore wind, for the `free` variant.
+13. [x] **Resource limits** for onshore and offshore wind, for the `free` variant. Done 2026-11-06, see phase 4.
 14. [x] **Fix the linopy warning** in `yearly_stores` (zcb_pypsa/expand.py): select with `drop=True` so both sides share coordinates. Then check that the stores hold their year-end levels.
     Done 2026-11-05. On 2009 and 2010 the warning is gone, and the objective (£68.08bn/yr) and store levels are unchanged. H2, methane and liquid stores each end both years at the same level.
 
@@ -138,13 +138,17 @@ Letting the lower of the liquid and methane stores have first call on hydrogen s
 
 ## Phase 4. Long runs and target table
 
-- [ ] Ten year expansion with the value of lost load, with `noshed` and with `yearly`. About 40 minutes each at 3 hour steps with the machine to itself. Run one at a time, or two at most (each uses about 3.5 GB).
-- [ ] One year hourly against 3 hourly, to size the battery and turbine error.
-- [ ] Rules at the optimum for each result: whether the rules balance (nothing unmet, stores back to their start levels), their cost against the optimum, and their dispatch against the optimised dispatch. This is the core validation measure for D3.
-- [ ] Variant `free` with the resource limits.
-- [ ] A target table: capacities and store sizes for each run, with the ZCB values beside them, in ZCB_PyPSA/docs/results.md.
+- [x] Ten year expansion with the value of lost load, with `noshed` and with `yearly`. With HiPO (`highspy-extras`) and the `tol` option each takes 8 to 16 minutes at 3 hour steps and about 5 GB. The old solver had not finished after 3.7 hours.
+  Done 2026-11-06. The lost load run stalled at a gap of about 7e-4 and `yearly` solved. `noshed` stalled far from a solution (gap 0.15, £114.59bn/yr) and is not usable. Ten times the lost load value stands in for it: £80.66bn/yr with 0.002 GWh/yr unmet.
+- [x] One year hourly against 3 hourly, to size the battery and turbine error. On 2010 hourly raises the inverter 12%, battery energy 6% and cost 0.2%, and lowers turbines 0.3%.
+- [x] Rules at the optimum for each result: whether the rules balance (nothing unmet, stores back to their start levels), their cost against the optimum, and their dispatch against the optimised dispatch. This is the core validation measure for D3.
+  Done 2026-11-06. The rules do not balance at these capacities: 10.36 TWh/yr of synthetic fuel and 0.52 TWh/yr of electricity are unmet at the lost load optimum. Backup is within 4% and curtailment about 6% higher.
+- [x] Variant `free` with the resource limits: 105 GW onshore and 245 GW offshore (agreed 2026-11-06, provisional, in ZCB_PyPSA/docs/costs.md). Neither binds. £80.59bn/yr, or £82.86bn/yr with the land limit.
+- [x] Land-limited comparison, added 2026-11-06. It holds the optimum to the available land, for comparison only. £83.41bn/yr, and £86.18bn/yr with `yearly`. The `yearly` version is the fairest target for phase 5. The rules leave 2.36 TWh/yr of synthetic fuel and 0.22 TWh/yr of electricity unmet at its capacities.
+- [x] No unmet demand. scripts/verify_noshed.py fixes an expansion's capacities and removes shedding. The lost load and land-limited capacities pass with no margin. `yearly` alone needs 0.3%.
+- [x] A target table: capacities and store sizes for each run, with the ZCB values beside them, in ZCB_PyPSA/docs/results.md.
 
-Done when the target table no longer changes much with the lost load value, foresight and resolution.
+Done when the target table no longer changes much with the lost load value, foresight and resolution. The lost load value and resolution meet this. Foresight moves the liquid store from 71 to 25 TWh and the methane store from 66 to 54 TWh. Without the land limit every optimum uses far more biogas than the land allows (183 against 72 TWh/yr of feedstock, about 2,160 kha short), so use the land-limited columns as targets for the retune.
 
 ## Phase 5. Retune zcb_2024 once
 
@@ -157,9 +161,10 @@ A provisional retune was applied on 2026-11-06, ahead of the phase 4 long runs, 
 
 The H2 store stays at a 10% floor for FT and methanation, and direct hydrogen demand may draw below it (agreed 2026-11-06).
 
-- [ ] Propose new values for offshore wind, electrolysis, methanation, FT, turbines by class, battery, stores and biogas. Use the phase 4 targets as a guide and the store criteria in docs/zcb-2024-notes.md (methane and synthetic fuel stores end near their start levels, nothing unmet). The rules decide the values (D3).
-- [ ] Apply after agreement and update docs/zcb-2024-notes.md with before and after results.
-- [ ] Export the retuned scenario and rerun replay, dispatch and expansion.
+- [x] Propose new values for offshore wind, electrolysis, methanation, FT, turbines by class, battery, stores and biogas. Use the phase 4 targets as a guide and the store criteria in docs/zcb-2024-notes.md (methane and synthetic fuel stores end near their start levels, nothing unmet). The rules decide the values (D3).
+  Done 2026-11-06. The candidate is scenarios/zcb_2024_retune.json, an override on zcb_2024 that can be selected in the UI. £89.13bn/yr. See docs/zcb-2024-notes.md.
+- [ ] Apply after agreement and update docs/zcb-2024-notes.md with before and after results. On hold (decided 2026-11-06): zcb_2024 and zcb_2024_retune both stay in place, and zcb_2024 stays the default.
+- [x] Export the retuned scenario and rerun replay and dispatch. The expansion does not depend on the scenario's capacities, so the phase 4 results stand unless costs change. Replay matches within 0.002 GWh over ten years, and the 2010 dispatch test is within 2.2% on every measure.
 - [ ] **Validation report.** Retuned zcb_2024 against the PyPSA optimum: total cost gap, each capacity, curtailment, backup output, store use, and the dispatch gap at equal capacities. Keep it in ZCB_PyPSA/docs/results.md and summarise it in docs/zcb-2024-notes.md.
 
 ## Phase 6. Prices and the heat pump study
