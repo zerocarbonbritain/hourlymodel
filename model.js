@@ -2159,7 +2159,7 @@ var model = {
 
         // Revenue and fuel sales, £bn/yr. GWh over the run times £/MWh times 1e-6 gives £bn.
         let p = o.prices = { hours: {}, mean: {} }
-        let revenue = 0, end_use_total = 0, offshore = 0, sum = 0
+        let revenue = 0, end_use_total = 0, offshore = 0, sum = 0, electrolysis_power = 0, ptx_power = 0
         let offshore_gw = i.supply.offshore_wind_capacity * i.supply.offshore_wind_availability * glf
         for (let z of ['backup', 'curtail', 'electrolysis', 'battery_charge', 'battery_discharge']) p.hours[z] = 0
         let class_sum = {}
@@ -2168,6 +2168,8 @@ var model = {
             revenue += end_use * price[hour]
             end_use_total += end_use
             offshore += offshore_gw * capacityfactors_all[hour][1] * price[hour]
+            electrolysis_power += d.electricity_for_electrolysis[hour] * price[hour]
+            ptx_power += d.electricity_for_power_to_X[hour] * price[hour]
             sum += price[hour]
             p.hours[cls[hour]]++
             class_sum[cls[hour]] = (class_sum[cls[hour]] || 0) + price[hour]
@@ -2185,29 +2187,63 @@ var model = {
         let offshore_cost = o.generation_costs.by_tech.offshore_wind.annual
         p.offshore_recovery = offshore_cost > 0 ? p.offshore_revenue / offshore_cost : 0
 
-        // Fuel at its value. Synthetic fuel is its hydrogen and biomass plus the FT plant cost per MWh.
+        // Average production cost per MWh, with electricity at the hourly price. Hydrogen covers its
+        // plant, stores and electricity. Methane and synthetic fuel use hydrogen at that cost. Costs
+        // are shared over all fuel produced, so turbine methane stays with electricity users.
+        let plant = (names) => names.reduce((total, name) => total + o.costs[name].annual, 0)
         let sf = i.synth_fuel
+        let ptx = i.power_to_X
         let ft = o.costs['FT synthetic fuel']
-        let ft_plant = ft.generation > 0 ? 1000 * ft.annual / ft.generation : 0
-        p.fuel = {
-            hydrogen: { gbp_MWh: fv.hydrogen_gbp_MWh, TWh: (o.hydrogen.total_vehicle_demand + o.hydrogen.total_industry_demand + o.heating_systems.hydrogen.fuel_demand) * o.GWh_to_TWhy },
-            methane: { gbp_MWh: fv.methane_gbp_MWh, TWh: (o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas) * o.GWh_to_TWhy },
-            synthetic_fuel: { gbp_MWh: ft.generation > 0 ? sf.FT_process_hydrogen_req * fv.hydrogen_gbp_MWh + sf.FT_process_biomass_req * sf.biomass_gbp_MWh + ft_plant : 0,
-                TWh: (o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand) * o.GWh_to_TWhy }
+        let per_MWh = (annual, TWh) => TWh > 0 ? 1000 * annual / TWh : 0
+        let hydrogen_TWh = o.hydrogen.total_produced * o.GWh_to_TWhy
+        let hydrogen_cost = per_MWh(plant(['H2 Electrolysis', 'Hydrogen storage', 'Hydrogen compressor']) + electrolysis_power * 1e-6 * o.per_year, hydrogen_TWh)
+        let methanation_hydrogen_TWh = o.methane.total_hydrogen_used * o.GWh_to_TWhy
+        let ft_hydrogen_TWh = (o.hydrogen.total_demand - o.hydrogen.total_vehicle_demand - o.methane.total_hydrogen_used) * o.GWh_to_TWhy
+        // Power to X is shared between methane and liquid fuel by output
+        let ptx_annual = plant(['Power to X']) + ptx_power * 1e-6 * o.per_year
+        let ptx_output = ptx.prc_gas * ptx.gas_efficiency + ptx.prc_liquid * ptx.liquid_efficiency
+        let ptx_methane_annual = ptx_output > 0 ? ptx_annual * ptx.prc_gas * ptx.gas_efficiency / ptx_output : 0
+        let methane_annual = plant(['Anaerobic digestion', 'Methanation', 'Methane storage', 'CO2 storage', 'Methane store charging', 'Methane store discharging'])
+            + o.biogas_feedstock_annual + methanation_hydrogen_TWh * hydrogen_cost * 0.001 + ptx_methane_annual
+        let synthetic_annual = plant(['FT synthetic fuel', 'Synthetic fuel storage']) + o.ft_biomass_annual
+            + ft_hydrogen_TWh * hydrogen_cost * 0.001 + ptx_annual - ptx_methane_annual
+        let costs = {
+            hydrogen: hydrogen_cost,
+            methane: per_MWh(methane_annual, o.methane.total_produced * o.GWh_to_TWhy),
+            synthetic_fuel: per_MWh(synthetic_annual, ft.generation)
         }
+        // Marginal values, for the recovery check at marginal prices. Synthetic fuel is its hydrogen
+        // and biomass at their values plus the FT plant cost per MWh.
+        let ft_plant = per_MWh(ft.annual, ft.generation)
+        let values = {
+            hydrogen: fv.hydrogen_gbp_MWh,
+            methane: fv.methane_gbp_MWh,
+            synthetic_fuel: ft.generation > 0 ? sf.FT_process_hydrogen_req * fv.hydrogen_gbp_MWh + sf.FT_process_biomass_req * sf.biomass_gbp_MWh + ft_plant : 0
+        }
+        p.fuel = {
+            hydrogen: { TWh: (o.hydrogen.total_vehicle_demand + o.hydrogen.total_industry_demand + o.heating_systems.hydrogen.fuel_demand) * o.GWh_to_TWhy },
+            methane: { TWh: (o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas) * o.GWh_to_TWhy },
+            synthetic_fuel: { TWh: (o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand) * o.GWh_to_TWhy }
+        }
+        // Baselines burn fossil fuel. Their fuel values are zero and fuel users pay nothing here.
+        let fuel_users_pay = fv.methane_gbp_MWh > 0
         p.fuel_sales = 0
+        p.fuel_value_sales = 0
         for (let z in p.fuel) {
+            p.fuel[z].value_gbp_MWh = values[z]
+            p.fuel[z].gbp_MWh = fuel_users_pay ? costs[z] : 0
             p.fuel[z].annual = p.fuel[z].TWh * p.fuel[z].gbp_MWh * 0.001
             p.fuel_sales += p.fuel[z].annual
+            p.fuel_value_sales += p.fuel[z].TWh * values[z] * 0.001
         }
         // 2024 fuel prices before tax per litre, at the diesel energy density
         let kWh_per_litre = i.retail.road_fuel.diesel_kWh_per_litre
         p.jet_fuel_p_litre = fv.jet_fuel_gbp_MWh * 0.1 * kWh_per_litre
         p.marine_gas_oil_p_litre = fv.marine_gas_oil_gbp_MWh * 0.1 * kWh_per_litre
-        p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_sales) / o.generation_costs.total_annual : 0
+        p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_value_sales) / o.generation_costs.total_annual : 0
 
-        // Fuel users pay these values, which include the electricity used to make the fuel. Electricity
-        // users pay the rest of the generation cost.
+        // Fuel users pay production cost, which includes the electricity used to make the fuel.
+        // Electricity users pay the rest of the generation cost.
         o.generation_costs.fuel_users_annual = p.fuel_sales
         o.generation_costs.electricity_annual = o.generation_costs.total_annual - o.generation_costs.fuel_users_annual
         // Electricity users' payment above hourly revenue

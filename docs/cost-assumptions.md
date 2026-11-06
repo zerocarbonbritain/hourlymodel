@@ -175,21 +175,21 @@ Applied to another scenario, a preset sets only the fixed generators (wind, sola
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
 |---|---|---|---|
 | baseline_2024 | 13.6 | 11.3 | 12.6 |
-| zcb_2024 | 27.9 | 17.2 | 18.8 |
+| zcb_2024 | 29.5 | 18.8 | 20.4 |
 
 Generation cost after fuel users pay their share, in p/kWh of end use for zcb_2024 and p/kWh delivered for baseline_2024. In baseline_2024, thermal plant keeps 2024 prices under the second preset, and the last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
 
 ### Fuel users and hourly prices
 
-Fuel users pay the values below for hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. The values include the electricity used to make the fuel, so the rest is recovered over end use, not delivered electricity. In zcb_2024 fuel users pay £27.19bn/yr of £86.35bn, against £21.03bn of fuel plant and feedstock. Electricity users pay £59.16bn over 344 TWh, so the generation cost is 17.2 p/kWh. With network costs the unit rate is 27.35 p/kWh and the household electricity bill £1,071. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £147 for methane and £139 for synthetic fuel. Fuel users pay £21.52bn/yr of £86.35bn. Electricity users pay £64.83bn over 344 TWh of end use, so the generation cost is 18.8 p/kWh. With network costs the unit rate is 29.07 p/kWh and the household electricity bill £1,125. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
 
-Fuel prices add the fuel users' network share to the values, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £44/MWh of hydrogen, giving prices of £194/MWh for hydrogen, £257 for methane and £183 for synthetic fuel (192 p/litre). The values alone set hourly electricity prices and fuel sales in the system cost table, because network costs are outside the system cost. Turbine methane carries no share, as the share falls on fuel sold.
+Fuel prices add the fuel users' network share to production cost, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £44/MWh of hydrogen, giving prices of £165/MWh for hydrogen, £169 for methane and £166 for synthetic fuel (175 p/litre). Fuel sales in the system cost table leave out the network share, because network costs are outside the system cost.
 
-`fuel_values` holds the values, in £/MWh, from the 2010 PyPSA expansion at 3 hour steps. They are provisional until phase 6 recalibrates them on the ten year optimum.
+`fuel_values` holds marginal values, which set hourly electricity prices and not fuel prices. They are in £/MWh, from the 2010 PyPSA expansion at 3 hour steps. They are provisional until phase 6 recalibrates them on the ten year optimum.
 
 - **Hydrogen, £150.** The mean price in that run (£149), and the electricity price in electrolysis hours divided by 0.8 (£151).
-- **Methane, £235.** The price weighted by turbine fuel use. End users' mean is £219, so methane sales are about 7% high.
-- **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This is £156/MWh in zcb_2024 before the network share (15.6 p/kWh, 164 p/litre at the diesel energy density), and PyPSA gives £145.
+- **Methane, £235.** The price weighted by turbine fuel use. End users' mean is £219, about 7% lower.
+- **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This marginal value is £156/MWh in zcb_2024 (15.6 p/kWh, 164 p/litre at the diesel energy density), and PyPSA gives £145.
 
 For comparison, 2024 fuel before tax:
 
@@ -216,7 +216,7 @@ For zcb_2024 over ten years, revenue is £54.7bn from electricity and £26.7bn f
 
 The figures above compare revenue with the build-up. The page and `o.prices` now use the selected generation costs, so the system cost follows the choice between strike prices and the build-up. `o.total_annual_cost` stays on the build-up for comparison and for the PyPSA checks.
 
-Bills do not use hourly revenue. Fuel users pay the fuel values, and electricity users pay the rest of the generation cost at one rate per kWh delivered. `o.prices.bill_top_up` is this payment above hourly revenue, a top-up similar to Contract for Difference payments, calculated for the whole system. In zcb_2024 with AR7 prices, hourly prices recover 92% of the £86.3bn system cost and 72% of offshore wind's cost, and the top-up is £7.2bn (2.1 p/kWh of end use). On the build-up they recover 86% of £91.9bn and 64%, and the top-up is £12.7bn (3.7 p/kWh).
+Bills do not use hourly revenue. `o.prices.recovery` is a check at marginal prices: hourly revenue plus fuel at its marginal values (`o.prices.fuel_value_sales`), over the selected system cost. In zcb_2024 with AR7 prices this is 92% of £86.3bn, with 72% of offshore wind's cost. On the build-up it is 86% of £91.9bn and 64%. `o.prices.bill_top_up` is what electricity users pay above hourly revenue, a top-up similar to Contract for Difference payments, calculated for the whole system: £12.9bn (3.7 p/kWh of end use) with AR7 prices and £18.4bn (5.3 p/kWh) on the build-up.
 
 Selecting strike prices assumes generators accept them at the model's load factors, which are lower than AR7 assumes. Offshore wind is paid £91/MWh against a build-up of £102/MWh.
 
