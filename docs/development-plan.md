@@ -24,11 +24,11 @@ Earlier handovers this plan replaces as the pick-up point:
 - Record every cost source and decision in docs/cost-assumptions.md, and every PyPSA practice difference in ZCB_PyPSA/docs/pypsa-practice.md.
 - After a change to inputs, rebuild the baselines (`python3 -I baseline/build.py 2024 scenarios/baseline_2024.json --write`, the same for 2018) and validate (`python3 -I baseline/validate.py 2024 scenarios/baseline_2024.json`). The current result is 58 ok, 4 warnings, 14 known issues.
 
-## Where things stand (2026-11-05)
+## Where things stand (2026-11-06)
 
 - **Baselines.** 2024 and 2018 are built from sources by baseline/build.py and validated against observed statistics. Remaining differences are in baseline/open-items.md.
-- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. Battery power is costed separately (item 4). FT biomass and store power are now costed, international shipping is in zcb_2024, and fuel users pay for fuel at their values (items 9, 11 and 12). zcb_2024 costs £95.31bn/yr, generation cost 13.2 p/kWh, household electricity bill £890, with 1.98 TWh/yr of liquid fuel unmet until the retune.
-- **PyPSA.** Costs come from the hourly model's exported scenario. The 2010 expansion gives £95.75bn/yr, with nothing unmet, against £94.88bn for the ZCB capacities, which leave fuel unmet. At those PyPSA capacities the rules leave 5.19 TWh/yr of synthetic fuel unmet over ten years. The 2010 replay matches ZCB within 0.001 GWh on every store but liquid, which runs empty and differs by up to 93 GWh.
+- **Cost model.** Everything in the system now has a cost (phase 1 below). zcb_2024 cost £93.34bn/yr after phase 1, generation cost 18.9 p/kWh, household electricity bill £1,080. Phase 3 items 1 to 3 change dispatch: FT draws on the H2 store, methanation has a CO2 store, and backup has CCGT (now 54%) and OCGT classes. Battery power is costed separately (item 4). FT biomass and store power are now costed, international shipping is in zcb_2024, and fuel users pay for fuel at their values (items 9, 11 and 12). A provisional retune on 2026-11-06 (see below) brings zcb_2024 to £91.91bn/yr, generation cost 12.25 p/kWh, household electricity bill £857, with nothing unmet.
+- **PyPSA.** Costs come from the hourly model's exported scenario. The biogas feedstock limit is removed, so land is reported in both models and enforced in neither. The figures from before that change and the retune are: the 2010 expansion gives £95.75bn/yr, with nothing unmet, against £94.88bn for the ZCB capacities, which leave fuel unmet. At those PyPSA capacities the rules leave 5.19 TWh/yr of synthetic fuel unmet over ten years. The 2010 replay matches ZCB within 0.001 GWh on every store but liquid, which runs empty and differs by up to 93 GWh.
 - **Heat pump SPF study.** SPF 2.8 against 3.8 costs £2.2bn to £5.7bn/yr. The blog post draft is parked until prices exist (phase 6).
 - **Weather data.** ERA5 cutouts are downloading on a server. Postponed to phase 7.
 
@@ -63,7 +63,7 @@ Earlier handovers this plan replaces as the pick-up point:
 
 ## Initial release
 
-Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Phases 4 and 5 are part of the release. Ask before starting the long runs. Land is reported and not enforced: a scenario uses the land it needs, and a user can reduce demand or accept biomass imports (decided 2026-11-05). scripts/expand.py prints the land spare or short for each run. The fixed 97.3 TWh/yr biogas feedstock limit in PyPSA is still in place, to be reviewed before the runs. Items 7, 10 and 13 and the land model part of item 11 are still to be placed.
+Agreed 2026-11-05. Items 14, 12, 9 and 8 of phase 3 and international shipping (item 11) come first. Items 5 and 6 follow the release. Phases 4 and 5 are part of the release. Ask before starting the long runs. Land is reported and not enforced: a scenario uses the land it needs, and a user can reduce demand or accept biomass imports (decided 2026-11-05). scripts/expand.py prints the land spare or short for each run. The fixed 97.3 TWh/yr biogas feedstock limit in PyPSA was removed on 2026-11-05. Items 7, 10 and 13 and the land model part of item 11 are still to be placed.
 
 ## Phase 3. Shared model plumbing
 
@@ -109,7 +109,7 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
     
     Decide where conversions sit. Set out the effect on zcb_2024 before applying.
 11. [ ] **Scope decisions** for zcb_2024, to propose to the user:
-    - [x] international shipping demand and fuel, about 24 TWh/yr, to match the baseline boundary. Done 2026-11-05: 23.9 TWh/yr of FT liquid fuel, with an input in the UI. It leaves 1.98 TWh/yr unmet at current capacities, for phase 5. Total cost +£0.04bn/yr at fixed capacities, before biomass;
+    - [x] international shipping demand and fuel, about 24 TWh/yr, to match the baseline boundary. Done 2026-11-05: 23.9 TWh/yr of FT liquid fuel, with an input in the UI. It left 1.98 TWh/yr unmet at the capacities of that date, since closed by the provisional retune. Total cost +£0.04bn/yr at fixed capacities, before biomass;
     - land model choices: the existing woodland sink, the imported biomass share, landfill biochar.
 12. [x] **Hourly prices.**
     - [x] Take marginal prices from a 2010 PyPSA expansion and check cost recovery. Done 2026-11-05 with scripts/prices.py, at 3 hour steps and before item 9:
@@ -125,7 +125,16 @@ For each item, add it to the PyPSA network and to model.js together. Check that 
 
 Done when the PyPSA optimised dispatch and the ZCB rules agree on backup, curtailment and store use within 10% on 2010.
 
-Result 2026-11-05, with shipping set to zero until the retune (ZCB_PyPSA/docs/results.md): curtailment 1.6%, battery charge 1.9%, methane store 9.1% and backup 10.2%. DSR timing causes almost all of the backup gap, and item 7 replaces that rule. Repeat with shipping after phase 5.
+Result 2026-11-05, with shipping set to zero until the retune (ZCB_PyPSA/docs/results.md): curtailment 1.6%, battery charge 1.9%, methane store 9.1% and backup 10.2%. DSR timing caused almost all of the backup gap.
+
+Result 2026-11-06, with shipping, at the provisional retune below: curtailment 0.2%, battery charge 4.2%, electrolysis 0.1%, methanation hydrogen 0.0%, backup 0.6% and methane store end 1.3%. The test is met. It pins PyPSA's H2 and liquid store ends to the rules' levels, so it shows the rules leave little to gain in total over 2010, not that they match hour by hour. Repeat after phase 5.
+
+Two rule changes led to this result:
+
+- The battery schedule now comes before DSR. DSR takes the surplus left in each hour, and the battery can discharge into DSR.
+- The battery schedule now values surplus up to electrolysis capacity, at the backup output of the methane its hydrogen makes. Without this the rules made 29% less methanation hydrogen than PyPSA and curtailed 27% more, and an H2 store at its floor stopped methanation. Battery charge rises from about 20 to 33 TWh/yr over ten years. Battery wear is not costed.
+
+Letting the lower of the liquid and methane stores have first call on hydrogen surplus made almost no difference, so it was not kept.
 
 ## Phase 4. Long runs and target table
 
@@ -138,6 +147,15 @@ Result 2026-11-05, with shipping set to zero until the retune (ZCB_PyPSA/docs/re
 Done when the target table no longer changes much with the lost load value, foresight and resolution.
 
 ## Phase 5. Retune zcb_2024 once
+
+A provisional retune was applied on 2026-11-06, ahead of the phase 4 long runs, with results in docs/zcb-2024-notes.md. It came from a coarse search of ten year runs, so phase 4 may change it. It uses these requirements, which the final retune should keep (agreed 2026-11-06):
+
+- Unmet liquid fuel is exactly zero.
+- The lowest combined level across all stores is at least 15 TWh, about 3 times the level before the requirement.
+- Liquid fuel and methane minimums are balanced, near 8 TWh each or more.
+- Liquid fuel and methane stores end at or above their start levels.
+
+The H2 store stays at a 10% floor for FT and methanation, and direct hydrogen demand may draw below it (agreed 2026-11-06).
 
 - [ ] Propose new values for offshore wind, electrolysis, methanation, FT, turbines by class, battery, stores and biogas. Use the phase 4 targets as a guide and the store criteria in docs/zcb-2024-notes.md (methane and synthetic fuel stores end near their start levels, nothing unmet). The rules decide the values (D3).
 - [ ] Apply after agreement and update docs/zcb-2024-notes.md with before and after results.
@@ -176,4 +194,6 @@ Baseline open items that don't block the phases above. See baseline/open-items.m
 - Storage arbitrage in the baseline (needs phase 6 prices).
 - Scripted fetch for capture prices and CfD payments.
 - Biomass fuel price and 2018 carbon price series.
+- Battery wear is not costed, and matters more now that the battery charges about 33 TWh/yr in zcb_2024.
+- First fill of the fuel stores is not costed, so a higher start level gives margin at no modelled cost.
 - The peak scaled network cost uses baseline_2024 outputs (55.19 GW, 269.39 TWh) typed in as inputs. Update them when the baseline changes.

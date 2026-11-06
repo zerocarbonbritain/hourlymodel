@@ -92,4 +92,40 @@ All electricity, heat, methane, hydrogen and synthetic fuel demand is met.
 
 ## International shipping
 
-Since 2026-11-05 zcb_2024 includes international shipping at the 2024 DUKES marine bunkers figure, 23.9 TWh/yr, on FT liquid fuel, so its boundary matches the baseline. There is no demand reduction, because no source for one has been chosen. Capacities have not been retuned, so 1.98 TWh/yr of liquid fuel is unmet (see baseline/open-items.md).
+Since 2026-11-05 zcb_2024 includes international shipping at the 2024 DUKES marine bunkers figure, 23.9 TWh/yr, on FT liquid fuel, so its boundary matches the baseline. There is no demand reduction, because no source for one has been chosen. At the capacities of that date 1.98 TWh/yr of liquid fuel was unmet. The provisional retune below closes this.
+
+## Provisional retune
+
+Applied 2026-11-06, ahead of the phase 4 long runs, so it may change. The results above are from before it. Requirements are in the [development plan](development-plan.md), phase 5. Values come from a coarse search of ten year runs.
+
+| Input | Before | Now |
+|---|---|---|
+| Offshore wind (GW) | 100 | 97.4 |
+| Electrolysis (GW) | 27 | 27 |
+| H2 store (TWh) | 20 | 8 |
+| Methanation (GW) | 4.03 | 5 |
+| Methane store start (TWh) | 10 | 20 |
+| FT (GW) | 9.2 | 10 |
+| Liquid store start and target (TWh) | 5 | 20 |
+| Battery charge and discharge (GW) | 50 | 26 |
+
+| Result | Before | Now |
+|---|---|---|
+| Total cost (£bn/yr) | 95.29 | 91.91 |
+| Generation cost (p/kWh) | 13.17 | 12.25 |
+| Household electricity bill (£) | 889 | 857 |
+| Unmet liquid fuel (TWh/yr) | 2.28 | 0 |
+| Liquid store end (TWh) | 6.7 | 25.3 |
+| Liquid store minimum (TWh) | | 9.41 |
+| Methane store end (TWh) | 24.4 | 29.5 |
+| Methane store minimum (TWh) | | 8.56 |
+| H2 store minimum (TWh) | | 0.56 |
+| Lowest combined store level, 30 March 2011 (TWh) | | 19.06 |
+| Excess electricity (TWh/yr) | 124 | 108 |
+| Spare land (kha) | 241 | 190 |
+
+The before column includes the battery and DSR order change of the same date, but not the electrolysis value in the battery schedule. Both are described in the development plan, phase 3.
+
+The H2 store minimum is below its 0.8 TWh floor, because the floor limits FT and methanation only. Direct hydrogen demand is 1.1 GW, so 0.56 TWh is about 21 days of it. The low period of 2010 and 2011 comes from weather, with less surplus for electrolysis. No hydrogen demand goes unmet.
+
+The liquid store margin costs nothing in the model, because the first fill is not costed.
