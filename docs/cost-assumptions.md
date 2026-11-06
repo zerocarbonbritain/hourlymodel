@@ -150,11 +150,18 @@ The build-up for every technology is also reported (`retail.electricity.resource
 
 ### Network cost
 
-Network charges are in retail prices only, from the 2024 Ofgem cap: 3.394 p/kWh and £116.23 per customer per year. They are not in the system cost.
+Network charges start from the 2024 Ofgem cap: 3.394 p/kWh and £116.23 per customer per year. They are in retail and fuel prices, not in the system cost.
 
-With `retail.electricity.network_basis` `peak` (zcb_2024), the per kWh network charge scales with peak electricity demand relative to the 2024 baseline and is recovered over delivered electricity: network p/kWh = 3.394 × (peak / 55.19 GW) × (269.39 TWh / delivered). The reference values are baseline_2024 model outputs (`balance.max_electricity_demand` and delivered electricity) and need updating when the baseline changes. Both peaks come from the same model, so its high peak (open item "Peak demand is high") partly cancels. The standing charge is per connection and does not scale. Baselines use `per_kWh`.
+With `retail.electricity.network_basis` `peak` (zcb_2024), the network total has two parts. Baselines use `per_kWh`, with neither part.
 
-In zcb_2024 peak demand is 95.2 GW (1.72 times 2024) and delivered electricity 477 TWh (1.77 times), so the network charge is 3.31 p/kWh (£15.8bn/yr), close to the 3.394 p/kWh of per kWh. Each 10 GW of peak reduction saves about £1.7bn/yr. A peak based on network capacity costs, such as technology-data's distribution grid at £554/kW, is an alternative not used yet.
+- **Peak scaling.** £bn/yr = 3.394 p/kWh × 269.39 TWh × (peak / 55.19 GW). The reference values are baseline_2024 model outputs (`balance.max_electricity_demand` and delivered electricity) and need updating when the baseline changes. Both peaks come from the same model, so its high peak (open item "Peak demand is high") partly cancels. The peak is end use and excludes electrolysis.
+- **New transmission.** `network_investment_gbp_bn` as an annuity at `network_investment_return_prc` over `network_investment_life_years`. NESO identifies around £89bn of transmission investment beyond 2030. The return is 4.6%, within the 4.46 to 4.67% CPIH-real allowed return on capital under RIIO-T3 that NESO reports. The 40 year life is our assumption. NESO's annex gives no price base for the £89bn, and adds that it is not a full assessment, leaving out asset replacement, asset health and connection-specific works.
+
+Fuel users pay `network_fuel_share_prc` of the total, 20% in zcb_2024. This is a judgement: electrolysis is likely to sit near generation, and NESO identifies up to 10 GW of flexible demand including electrolysers that could co-locate in North Scotland and Shetland. Electricity users pay the rest over end use. Network costs are outside the system cost.
+
+In zcb_2024 peak demand is 95.2 GW (1.72 times 2024), so peak scaling gives £15.8bn/yr and new transmission £4.9bn/yr, £20.7bn in total. Fuel users pay £4.1bn and electricity users £16.6bn, 4.81 p/kWh over 344 TWh of end use. The standing charge adds £3.3bn across 28.6 million homes, giving £24.0bn. Non-domestic standing charges are not counted. Each 10 GW of peak reduction saves about £1.7bn/yr. A peak based on network capacity costs, such as technology-data's distribution grid at £554/kW, is an alternative not used yet.
+
+The 2024 equivalent is £12.5bn (£9.1bn per kWh and £3.3bn standing). TNUoS target revenue was £3.13bn in 2024 and BSUoS was £7.63 to £14.03/MWh, as reported by Drax. A published total including DUoS has not been found. Peak scaling also grows the existing transmission share, a small overlap with new transmission. Offshore connection costs are within wind capex. No figure is included for distribution beyond peak scaling, as ED3 business plans are not due until December 2026, so the total may still be low. See the open item.
 
 ### Presets
 
@@ -168,19 +175,21 @@ Applied to another scenario, a preset sets only the fixed generators (wind, sola
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
 |---|---|---|---|
 | baseline_2024 | 13.6 | 11.3 | 12.6 |
-| zcb_2024 | 21.1 | 13.2 | 20.0 |
+| zcb_2024 | 27.9 | 17.2 | 18.8 |
 
-Generation cost in p/kWh delivered, after fuel users pay their share in zcb_2024. The last column is before that share. In baseline_2024, thermal plant keeps 2024 prices under the second preset. The last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
+Generation cost after fuel users pay their share, in p/kWh of end use for zcb_2024 and p/kWh delivered for baseline_2024. In baseline_2024, thermal plant keeps 2024 prices under the second preset, and the last column is `resource_p_kWh`, with imports at zero. In the UI, the build-up setting also counts imports at their price and adds support not split by technology.
 
 ### Fuel users and hourly prices
 
-Fuel users pay the values below for hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. The values include the electricity used to make the fuel. In zcb_2024 fuel users pay £26.65bn/yr of £89.64bn, against £22.97bn of fuel plant and feedstock, so the generation cost is 13.2 p/kWh and the household electricity bill £890. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+Fuel users pay the values below for hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. The values include the electricity used to make the fuel, so the rest is recovered over end use, not delivered electricity. In zcb_2024 fuel users pay £27.19bn/yr of £86.35bn, against £21.03bn of fuel plant and feedstock. Electricity users pay £59.16bn over 344 TWh, so the generation cost is 17.2 p/kWh. With network costs the unit rate is 27.35 p/kWh and the household electricity bill £1,071. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+
+Fuel prices add the fuel users' network share to the values, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £44/MWh of hydrogen, giving prices of £194/MWh for hydrogen, £257 for methane and £183 for synthetic fuel (192 p/litre). The values alone set hourly electricity prices and fuel sales in the system cost table, because network costs are outside the system cost. Turbine methane carries no share, as the share falls on fuel sold.
 
 `fuel_values` holds the values, in £/MWh, from the 2010 PyPSA expansion at 3 hour steps. They are provisional until phase 6 recalibrates them on the ten year optimum.
 
 - **Hydrogen, £150.** The mean price in that run (£149), and the electricity price in electrolysis hours divided by 0.8 (£151).
 - **Methane, £235.** The price weighted by turbine fuel use. End users' mean is £219, so methane sales are about 7% high.
-- **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This is £154/MWh in zcb_2024 (15.4 p/kWh, 161 p/litre at the diesel energy density), and PyPSA gives £145.
+- **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This is £156/MWh in zcb_2024 before the network share (15.6 p/kWh, 164 p/litre at the diesel energy density), and PyPSA gives £145.
 
 For comparison, 2024 fuel before tax:
 
@@ -207,7 +216,7 @@ For zcb_2024 over ten years, revenue is £54.7bn from electricity and £26.7bn f
 
 The figures above compare revenue with the build-up. The page and `o.prices` now use the selected generation costs, so the system cost follows the choice between strike prices and the build-up. `o.total_annual_cost` stays on the build-up for comparison and for the PyPSA checks.
 
-Bills do not use hourly revenue. Fuel users pay the fuel values, and electricity users pay the rest of the generation cost at one rate per kWh delivered. `o.prices.bill_top_up` is this payment above hourly revenue, a top-up similar to Contract for Difference payments, calculated for the whole system. In zcb_2024 with AR7 prices, hourly prices recover 92% of the £86.3bn system cost and 72% of offshore wind's cost, and the top-up is £7.2bn (1.5 p/kWh). On the build-up they recover 86% of £91.9bn and 64%, and the top-up is £12.7bn.
+Bills do not use hourly revenue. Fuel users pay the fuel values, and electricity users pay the rest of the generation cost at one rate per kWh delivered. `o.prices.bill_top_up` is this payment above hourly revenue, a top-up similar to Contract for Difference payments, calculated for the whole system. In zcb_2024 with AR7 prices, hourly prices recover 92% of the £86.3bn system cost and 72% of offshore wind's cost, and the top-up is £7.2bn (2.1 p/kWh of end use). On the build-up they recover 86% of £91.9bn and 64%, and the top-up is £12.7bn (3.7 p/kWh).
 
 Selecting strike prices assumes generators accept them at the model's load factors, which are lower than AR7 assumes. Offshore wind is paid £91/MWh against a build-up of £102/MWh.
 
@@ -226,6 +235,8 @@ Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for 
 
 ## Sources
 
+- NESO, [Beyond 2030 update, investor annex](https://www.neso.energy/document/385581/download), August 2026 (about £89bn of transmission investment, allowed returns, co-location).
+- Drax, [Falling transmission charges](https://energy.drax.com/insights/tnuos-charges-falling) (2024 TNUoS and BSUoS).
 - DESNZ, [Electricity Generation Costs 2025](https://www.gov.uk/government/publications/electricity-generation-costs-2025), Annex A key assumptions, 2024 prices.
 - CEPA for DESNZ, [Hurdle rates for electricity generation](https://assets.publishing.service.gov.uk/media/68cd1d818c44a661b4995d9f/cepa-desnz-hurdle-rates-electricity.pdf).
 - DESNZ, [CfD Allocation Round 7 results](https://www.gov.uk/government/publications/contracts-for-difference-cfd-allocation-round-7-results/contracts-for-difference-allocation-round-7-results-accessible-webpage) (offshore wind) and Energy UK, [AR7 onshore results](https://www.energy-uk.org.uk/wp-content/uploads/2026/02/Energy-UK-explains-AR7-onshore-results-11-February-2026.pdf).

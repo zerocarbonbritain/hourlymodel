@@ -866,6 +866,7 @@ var model = {
         o.methane.store_empty_count = 0
         o.methane.store_full_count = 0
         o.methane.total_produced = 0
+        o.methane.total_hydrogen_used = 0
         o.methane.total_demand = 0
         o.methane.store_excess = 0
         o.methane.unmet = 0
@@ -1231,6 +1232,7 @@ var model = {
                 hydrogen_for_sabatier += Math.max(0.0, Math.min(methanation_limit - hydrogen_for_sabatier, co2_above_target * hydrogen_per_tCO2, available))
             }
             hydrogen_balance -= hydrogen_for_sabatier                                                    // subtract from hydrogen store
+            o.methane.total_hydrogen_used += hydrogen_for_sabatier
             o.methane.co2_store = co2_available - hydrogen_for_sabatier / hydrogen_per_tCO2
             if (o.methane.co2_store>i.methane.co2_store_capacity_t) {
                 o.methane.co2_vented += o.methane.co2_store - i.methane.co2_store_capacity_t
@@ -2176,6 +2178,7 @@ var model = {
         }
         p.mean_gbp_MWh = sum / i.hours
         p.end_use_weighted_gbp_MWh = end_use_total > 0 ? revenue / end_use_total : 0
+        p.end_use_TWh = end_use_total * o.GWh_to_TWhy
         p.electricity_revenue = revenue * 1e-6 * o.per_year
         p.offshore_revenue = offshore * 1e-6 * o.per_year
         // Recovery is against the selected generation costs: strike prices or the build-up
@@ -2195,12 +2198,10 @@ var model = {
         p.fuel_sales = 0
         for (let z in p.fuel) {
             p.fuel[z].annual = p.fuel[z].TWh * p.fuel[z].gbp_MWh * 0.001
-            p.fuel[z].p_kWh = p.fuel[z].gbp_MWh * 0.1
             p.fuel_sales += p.fuel[z].annual
         }
-        // Liquid fuels per litre at the diesel energy density, against 2024 fuel prices before tax
+        // 2024 fuel prices before tax per litre, at the diesel energy density
         let kWh_per_litre = i.retail.road_fuel.diesel_kWh_per_litre
-        p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * kWh_per_litre
         p.jet_fuel_p_litre = fv.jet_fuel_gbp_MWh * 0.1 * kWh_per_litre
         p.marine_gas_oil_p_litre = fv.marine_gas_oil_gbp_MWh * 0.1 * kWh_per_litre
         p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_sales) / o.generation_costs.total_annual : 0
@@ -2386,6 +2387,9 @@ var model = {
         let r = i.retail
         let vat = 1 + r.vat_prc * 0.01
         let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * o.GWh_to_TWhy
+        // Fuel users pay for the electricity used to make fuel, so where they pay, electricity users'
+        // costs are recovered over end use. Baselines have no fuel users and use delivered electricity.
+        let billed_TWh = o.generation_costs.fuel_users_annual > 0 ? o.prices.end_use_TWh : delivered_TWh
         let households_kWh = (GWh) => GWh * o.per_year * 1000000 / i.households_2030
         o.retail = {}
 
@@ -2393,25 +2397,52 @@ var model = {
         // The build-up for every technology (resource cost) is kept for comparison
         let elec = {
             resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
-            generation_cost_p_kWh: delivered_TWh > 0 ? 100 * o.generation_costs.electricity_annual / delivered_TWh : 0,
-            bill_top_up_p_kWh: delivered_TWh > 0 ? 100 * o.prices.bill_top_up / delivered_TWh : 0
+            generation_cost_p_kWh: billed_TWh > 0 ? 100 * o.generation_costs.electricity_annual / billed_TWh : 0,
+            bill_top_up_p_kWh: billed_TWh > 0 ? 100 * o.prices.bill_top_up / billed_TWh : 0
         }
         // The unit rate uses the generation cost plus any year specific wholesale adjustment
         elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
-        // With network_basis "peak", total network cost per kWh scales with peak electricity demand
-        // relative to the reference (the 2024 baseline), recovered over delivered electricity.
-        // The standing charge is per connection and does not scale.
+        // With network_basis "peak", the per kWh network total scales with peak electricity demand
+        // relative to the reference (the 2024 baseline), plus new investment as an annuity. Fuel users
+        // pay network_fuel_share_prc of it, and electricity users pay the rest. The standing charge is
+        // per connection and does not scale.
+        let p = o.prices
+        // Hydrogen in each fuel sold, MWh per MWh. Methane is a mix of biogas and methanation.
+        let methanation_share = o.methane.total_produced > 0 ? o.methane.total_hydrogen_used / o.methane.total_produced : 0
+        let hydrogen_content = { hydrogen: 1, methane: methanation_share, synthetic_fuel: i.synth_fuel.FT_process_hydrogen_req }
+        let hydrogen_sold_TWh = 0
+        for (let z in p.fuel) hydrogen_sold_TWh += p.fuel[z].TWh * hydrogen_content[z]
+
         elec.network_p_kWh = e.network_p_kWh
-        if (e.network_basis == "peak" && delivered_TWh > 0) {
-            elec.network_p_kWh *= (o.balance.max_electricity_demand / e.network_reference_peak_GW) * (e.network_reference_TWh / delivered_TWh)
+        elec.network_total_bn = e.network_p_kWh * 0.01 * billed_TWh
+        elec.network_investment_annual_bn = 0
+        elec.network_fuel_bn = 0
+        if (e.network_basis == "peak" && billed_TWh > 0) {
+            let rate = e.network_investment_return_prc * 0.01
+            elec.network_investment_annual_bn = e.network_investment_gbp_bn * rate / (1 - Math.pow(1 + rate, -e.network_investment_life_years))
+            elec.network_total_bn = e.network_p_kWh * 0.01 * e.network_reference_TWh * (o.balance.max_electricity_demand / e.network_reference_peak_GW) + elec.network_investment_annual_bn
+            if (hydrogen_sold_TWh > 0) elec.network_fuel_bn = elec.network_total_bn * e.network_fuel_share_prc * 0.01
+            elec.network_p_kWh = 100 * (elec.network_total_bn - elec.network_fuel_bn) / billed_TWh
         }
-        elec.network_annual_bn = elec.network_p_kWh * 0.01 * delivered_TWh
+        elec.network_annual_bn = elec.network_total_bn - elec.network_fuel_bn
         elec.unit_rate_p_kWh = (elec.generation_p_kWh + elec.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
         elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
         elec.household_kWh = households_kWh(o.final_consumption.domestic.electricity)
         elec.bill_gbp = elec.unit_rate_p_kWh * 0.01 * elec.household_kWh + elec.standing_charge_gbp
         elec.household_spend_bn = elec.bill_gbp * i.households_2030 * 1e-9
         o.retail.electricity = elec
+
+        // Fuel prices add the fuel users' network share to the values. The share follows hydrogen
+        // content, as electrolysis is what uses the network. The values alone set hourly prices.
+        let network_per_MWh_hydrogen = hydrogen_sold_TWh > 0 ? 1000 * elec.network_fuel_bn / hydrogen_sold_TWh : 0
+        for (let z in p.fuel) {
+            let fuel = p.fuel[z]
+            fuel.network_gbp_MWh = network_per_MWh_hydrogen * hydrogen_content[z]
+            fuel.price_gbp_MWh = fuel.gbp_MWh + fuel.network_gbp_MWh
+            fuel.p_kWh = fuel.price_gbp_MWh * 0.1
+            fuel.network_annual = fuel.TWh * fuel.network_gbp_MWh * 0.001
+        }
+        p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * r.road_fuel.diesel_kWh_per_litre
 
         let g = r.gas
         let gas = { wholesale_p_kWh: i.fuel_prices.gas + g.wholesale_adjustment_p_kWh }
