@@ -119,6 +119,7 @@ function normalise_profile(profile) {
 
 <script language="javascript" type="text/javascript" src="defaults.js?v=<?php echo $v; ?>"></script>
 <script language="javascript" type="text/javascript" src="model.js?v=<?php echo $v; ?>"></script>
+<script language="javascript" type="text/javascript" src="cost_model.js?v=<?php echo $v; ?>"></script>
 <script language="javascript" type="text/javascript" src="ui/vishelper.js?v=<?php echo $v; ?>"></script>
 <script language="javascript" type="text/javascript" src="ui/zcem.js?v=<?php echo $v; ?>"></script>
 

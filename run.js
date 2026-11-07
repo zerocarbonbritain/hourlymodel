@@ -4,6 +4,7 @@ var JSZip = require("jszip");
 
 vm.runInThisContext(fs.readFileSync("defaults.js"))
 vm.runInThisContext(fs.readFileSync("model.js"))
+vm.runInThisContext(fs.readFileSync("cost_model.js"))
 
 load_dataset("highresolution.csv.zip",function(result){
     tenyearsdatalines = result

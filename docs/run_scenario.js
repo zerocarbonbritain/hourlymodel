@@ -14,6 +14,7 @@ normalise_profile = function(profile) {
 
 vm.runInThisContext(fs.readFileSync(dir+"defaults.js"));
 vm.runInThisContext(fs.readFileSync(dir+"model.js"));
+vm.runInThisContext(fs.readFileSync(dir+"cost_model.js"));
 
 var args = process.argv.slice(2);
 var json_output = args.indexOf("--json") != -1;
