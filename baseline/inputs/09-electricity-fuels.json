@@ -448,8 +448,8 @@
     "fuel_prices.biomass": {
         "type": "assumption",
         "units": "p/kWh fuel",
-        "value": 0,
-        "note": "No official series for biomass fuel prices paid by generators, so biomass generation fuel cost is left out of the LCOE."
+        "value": 3.98,
+        "note": "No official series for biomass fuel prices paid by generators. Industrial wood pellets at $235/t delivered to north west Europe (Argus forward price for 2026, as used by Ember, Drax's BECCS project climbs in cost to the UK public), at $1.25/£ and 17 GJ/t, give £39.8/MWh. See docs/cost-assumptions.md."
     },
     "carbon_price": {
         "type": "statistic",

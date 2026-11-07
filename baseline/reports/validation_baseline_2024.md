@@ -83,7 +83,7 @@ Summary: 70 ok, 4 WARN, 14 known issue
 
 | Check | Observed | Model | Error | Tolerance | Basis | Status |
 |---|---|---|---|---|---|---|
-| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 12.6 | -23.2% | 10% | independent | known issue |
+| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 14.1 | -13.5% | 10% | independent | known issue |
 | Generation cost in the unit rate, 2024 prices (p/kWh) | 16.4 | 16.7 | +2.3% | 5% | input | ok |
 | Gas generation, build-up against price paid (£/MWh) | 85.0 | 133 | +56.8% | 10% | independent | known issue |
 | Domestic electricity unit rate (p/kWh) | 25.8 | 25.4 | -1.7% | 5% | independent | ok |
@@ -626,7 +626,7 @@ Summary: 70 ok, 4 WARN, 14 known issue
 - ro = 30.755745 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD53:AG53)
 - fit = 7.407030899 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD54:AG54)
 - observed: `(df + cm) / 3100 * 100 + (ro + fit) / 10` = 16.4 p/kWh
-- model: `a` with a = `retail.electricity.resource_p_kWh` = 12.6 p/kWh
+- model: `a` with a = `retail.electricity.resource_p_kWh` = 14.1 p/kWh
 - note: Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the build-up for every technology per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new-build costs).
 - issue: The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).
 

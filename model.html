@@ -1646,6 +1646,7 @@ input[type='text'] {
             <tr><td>Electricity networks</td><td>{{ o.total_cost.layers.networks | toFixed(1) }}</td><td>{{ o.total_cost.society.networks_bn | toFixed(1) }}</td></tr>
             <tr><td>Policy costs</td><td>{{ o.total_cost.layers.policy | toFixed(1) }}</td><td></td></tr>
             <tr><td>Electricity supplier costs</td><td>{{ o.total_cost.layers.supplier | toFixed(1) }}</td><td>{{ o.total_cost.society.supplier_bn | toFixed(1) }}</td></tr>
+            <tr v-if="o.total_cost.layers.heat_and_biomass"><td>Heat and biomass off the grid: wood fuel, solar thermal and geothermal heat</td><td>{{ o.total_cost.layers.heat_and_biomass | toFixed(1) }}</td><td>{{ o.total_cost.society.heat_and_biomass_bn | toFixed(1) }}</td></tr>
             <tr v-if="o.total_cost.layers.fuel_delivery"><td>Fuel delivery</td><td>{{ o.total_cost.layers.fuel_delivery | toFixed(1) }}</td><td>{{ o.total_cost.society.fuel_delivery_bn | toFixed(1) }}</td></tr>
             <tr><td>Fossil fuel for final users, before tax</td><td>{{ o.total_cost.layers.fossil_fuel | toFixed(1) }}</td><td>{{ o.total_cost.society.fossil_fuel_bn | toFixed(1) }}</td></tr>
             <tr class="total"><td>Before tax and carbon</td><td>{{ o.total_cost.before_bn | toFixed(1) }}</td><td>{{ o.total_cost.society.resource_bn | toFixed(1) }}</td></tr>
@@ -1745,7 +1746,7 @@ input[type='text'] {
         <details class="cost-part">
         <summary><h3>Retail prices and bills</h3><span>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh, £{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</span></summary>
         <div class="cost-summary">
-            <div v-if="o.retail.household" title="Average over all homes: electricity, gas and other home fuels, car fuel and electric car charging. Includes company cars. Leaves out direct biomass and coal.">Household energy and cars<b>£{{ o.retail.household.total_gbp | toFixed(0) }}/year</b>£{{ o.retail.household.car_fuel_gbp + o.retail.household.car_charging_gbp | toFixed(0) }} is cars</div>
+            <div v-if="o.retail.household" title="Average over all homes: electricity, gas and other home fuels, car fuel and electric car charging. Includes company cars. Leaves out solar thermal panels and other equipment.">Household energy and cars<b>£{{ o.retail.household.total_gbp | toFixed(0) }}/year</b>£{{ o.retail.household.car_fuel_gbp + o.retail.household.car_charging_gbp | toFixed(0) }} is cars</div>
             <div>Electricity unit rate<b>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>+ £{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}/yr standing</div>
             <div>Electricity bill<b>£{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</b>{{ o.retail.electricity.household_kWh | toFixed(0) }} kWh per home</div>
             <div v-if="has_gas">Gas unit rate<b>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.retail.gas.bill_gbp | toFixed(0) }}/year bill</div>
@@ -1778,7 +1779,7 @@ input[type='text'] {
             <tr><th>Household energy and cars, average per home</th><th>£/yr</th></tr>
             <tr><td>Electricity bill, without car charging</td><td>{{ o.retail.household.electricity_gbp | toFixed(0) }}</td></tr>
             <tr v-if="o.retail.household.gas_gbp > 0"><td>Gas bill, over all homes</td><td>{{ o.retail.household.gas_gbp | toFixed(0) }}</td></tr>
-            <tr v-if="o.retail.household.home_fuel_gbp >= 0.5"><td>Other home fuels</td><td>{{ o.retail.household.home_fuel_gbp | toFixed(0) }}</td></tr>
+            <tr v-if="o.retail.household.home_fuel_gbp >= 0.5"><td>Other home fuels, including wood</td><td>{{ o.retail.household.home_fuel_gbp | toFixed(0) }}</td></tr>
             <tr><td>Car fuel, including hydrogen</td><td>{{ o.retail.household.car_fuel_gbp | toFixed(0) }}</td></tr>
             <tr><td>Electric car charging, at the unit rate</td><td>{{ o.retail.household.car_charging_gbp | toFixed(0) }}</td></tr>
             <tr class="total"><td>Total</td><td>{{ o.retail.household.total_gbp | toFixed(0) }}</td></tr>

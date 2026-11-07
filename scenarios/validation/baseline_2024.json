@@ -1402,7 +1402,7 @@
    "issue": "The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
-   "model_at_build": 12.558771693998436,
+   "model_at_build": 14.148239420736303,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -2048,7 +2048,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1,
-   "model_at_build": 0.999978601048884,
+   "model_at_build": 0.9998635848884699,
    "sources": [
     "one = 1 (published: The stored 2024 tax should equal the tax in the live baseline run)"
    ]

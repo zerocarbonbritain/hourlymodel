@@ -620,6 +620,12 @@
         "round": 3,
         "note": "Energy per litre (gross) of pump diesel at the average biofuel blend, from the ratio of the DESNZ 2024 CO2 factors per litre and per kWh."
     },
+    "heat_and_biomass.solar_thermal_rooftop_prc": {
+        "type": "assumption",
+        "units": "%",
+        "value": 100,
+        "note": "Solar thermal in 2024 is on individual buildings. DUKES 6.1 reports it as final consumption by domestic and other users, and the UK has no large solar district heating."
+    },
     "retail.road_fuel.car_diesel_prc": {
         "type": "statistic",
         "units": "%",

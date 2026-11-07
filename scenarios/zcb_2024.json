@@ -558,6 +558,7 @@
             "co2_Mt": 40.03
         },
         "household_electricity_vat_bn": 1.53,
+        "household_biomass_vat_bn": 0.08,
         "non_domestic_electricity_ccl_p_kWh": 0.562,
         "non_domestic_electricity_ccl_bn": 0.88
     },
@@ -565,11 +566,21 @@
         "discount_rate_prc": 3.5,
         "carbon_value_gbp_tCO2e": 302
     },
+    "heat_and_biomass": {
+        "biomass_domestic_gbp_MWh": 91.1,
+        "biomass_bulk_gbp_MWh": 39.8,
+        "biomass_domestic_vat_prc": 5,
+        "geothermal_heat_gbp_MWh": 87.2,
+        "solar_thermal_rooftop_prc": 50,
+        "solar_thermal_rooftop_kWh_m2": 435,
+        "solar_thermal_large_kWh_m2": 470,
+        "solar_thermal_kWth_per_m2": 0.7
+    },
     "fuel_prices": {
         "gas": 3.499,
         "oil": 5.245,
         "coal": 1.399,
-        "biomass": 0
+        "biomass": 3.98
     },
     "costs": {
         "Onshore wind": {
@@ -811,6 +822,26 @@
             "fixed_om": 0,
             "variable_om": 0,
             "lifespan": 25
+        },
+        "Solar thermal rooftop": {
+            "hurdle_rate": 7.6,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 3316,
+            "fixed_om": 10.0,
+            "variable_om": 0,
+            "lifespan": 25
+        },
+        "Solar thermal large-scale": {
+            "hurdle_rate": 7.6,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 1,
+            "capex": 339,
+            "fixed_om": 0,
+            "variable_om": 0.2,
+            "lifespan": 30
         }
     }
 }

@@ -382,11 +382,14 @@
         "capacity": 0
     },
     "include_ambient_heat": 1,
+    "heat_and_biomass": {
+        "solar_thermal_rooftop_prc": 100
+    },
     "fuel_prices": {
         "gas": 3.499,
         "oil": 5.245,
         "coal": 1.399,
-        "biomass": 0
+        "biomass": 3.98
     },
     "carbon_price": 55.18,
     "retail": {
