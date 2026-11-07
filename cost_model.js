@@ -1,194 +1,154 @@
-// ---------------------------------------------------
-// ZeroCarbonBritain hourly energy model v3, cost model
-// Load after model.js. Adds hourly prices, costs, retail prices
-// and the 2024 fossil fuel reference to the model object.
-// ---------------------------------------------------
+// ---------------------------------------------------------------------------------------------
+// ZeroCarbonBritain hourly energy model v3: cost model
+//
+// Load this file after model.js. It adds the cost steps to the model object. model.run() and
+// model.update_non_hourly() call model.cost_model() once the energy flows are known.
+//
+// THE QUESTION THIS FILE ANSWERS
+//
+// The hourly model works out how much energy flows through each part of the system. This file
+// works out what those flows cost, and who pays. It builds the cost in the same order as the
+// real system:
+//
+//   1. Build-up        What each technology costs to build and run, per year.
+//   2. System cost     What generators and fuel plants are paid: a price per MWh or the build-up.
+//   3. Hourly prices   What electricity is worth in each hour, from what is at the margin.
+//   4. Fuel costs      What hydrogen, methane and synthetic fuel cost to make at those prices.
+//   5. Retail          What electricity users and fuel users pay after networks, policy and VAT.
+//   6. Fossil fuel     What the UK paid for fossil fuel in 2024, as a fixed point of comparison.
+//   7. Total cost      The headline cost, before and after tax.
+//
+// UNITS
+//
+// Each conversion below follows from these definitions. 1 TWh is 1,000,000 MWh. 1 GW is
+// 1,000,000 kW. £1bn is £1,000 million.
+//
+//   TWh/yr x £/MWh x 0.001   = £bn/yr     (TWh x £/MWh gives £ million)
+//   GW x £/kW/yr x 0.001     = £bn/yr     (GW x £/kW gives £ million)
+//   TWh/yr x p/kWh x 0.01    = £bn/yr     (1 TWh is 1e9 kWh, and 100p is £1)
+//   GWh x £/MWh x 1e-6       = £bn        (1 GWh is 1,000 MWh)
+//   £bn/yr / TWh/yr x 100    = p/kWh
+//   £bn/yr / TWh/yr x 1000   = £/MWh
+//   £/MWh x 0.1              = p/kWh
+//
+// The model runs over several weather years, so most flows are totals in GWh over the whole run.
+// o.GWh_to_TWhy converts a total to TWh per year, and o.per_year converts other totals to per year.
+// All money is in 2024 prices.
+//
+// INPUTS AND OUTPUTS
+//
+//   i   Scenario inputs (from scenarios/*.json)
+//   o   Results, shown on the page and read by the validation checks
+//   d   Hourly series, one value per hour
+//
+// WHAT THE COSTS LEAVE OUT
+//
+// The cost covers energy supply and networks. It leaves out heat pumps, boilers, building retrofit,
+// vehicles and other equipment on the demand side, so it is not yet the full cost to society of a
+// scenario. baseline/open-items.md lists this and the other known limits under "Cost model".
+// docs/cost-assumptions.md records the source of each cost.
+// ---------------------------------------------------------------------------------------------
 
 Object.assign(model, {
-    // Hourly marginal electricity price in £/MWh, from what is at the margin in each hour, valued
-    // with the fuel values in i.fuel_values. The classes follow PyPSA's price conditions, and
-    // scripts/price_check.py in ZCB_PyPSA compares them with PyPSA's prices at equal capacities.
-    hourly_prices: function() {
-        let fv = i.fuel_values
-        let eb = i.electric_backup
-        let glf = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
-        let turbine_price = (efficiency, tech) => (fv.methane_gbp_MWh / (efficiency*0.01) + i.costs[tech].variable_om) / glf
-        let ccgt_price = turbine_price(eb.methane_efficiency, 'CCGT')
-        let ocgt_price = turbine_price(eb.ocgt_efficiency, 'OCGT')
-        let electrolysis_price = i.hydrogen.electrolysis_efficiency * fv.hydrogen_gbp_MWh
-        let round_trip = i.electric_storage.charge_efficiency * i.electric_storage.discharge_efficiency
 
-        // Scarcity adder. Hours within 10% of peak backup carry the annual cost of the peak turbine
-        // class, per MW of de-rated capacity over the run, in proportion to their depth.
-        let peak_tech = o.electric_backup.max_ocgt_output > 0 ? 'OCGT' : 'CCGT'
-        let derating = peak_tech == 'OCGT' ? eb.ocgt_derating_factor : eb.ccgt_derating_factor
-        let peak_cost = annual_fixed_cost(i.costs[peak_tech], i.annualisation) * 1000 * o.years / derating
-        let threshold = 0.9 * o.electric_backup.max_capacity_requirement
-        let depth_total = 0
-        for (let hour = 0; hour < i.hours; hour++) depth_total += Math.max(d.electricity_from_dispatchable[hour] - threshold, 0)
-
-        let price = new Array(i.hours)
-        let cls = new Array(i.hours)
-        for (let hour = 0; hour < i.hours; hour++) {
-            // Backup below 0.5 GW is a remainder beside the battery, which is then at the margin
-            if (d.electricity_from_dispatchable[hour] > 0.5) {
-                cls[hour] = 'backup'
-                price[hour] = d.ocgt_output[hour] > 1e-6 ? ocgt_price : ccgt_price
-                let depth = d.electricity_from_dispatchable[hour] - threshold
-                if (depth > 0) price[hour] += peak_cost * depth / depth_total
-            } else if (d.excess_elec[hour] > 1e-6) {
-                cls[hour] = 'curtail'
-                price[hour] = 0
-            } else if (d.electricity_for_electrolysis[hour] > 1e-6) {
-                cls[hour] = 'electrolysis'
-                price[hour] = electrolysis_price
-            } else if (d.elec_store_charge[hour] > 1e-6) {
-                cls[hour] = 'battery_charge'
-            } else {
-                cls[hour] = 'battery_discharge'
-            }
-        }
-        // The battery is at the margin in the remaining hours. Stored energy is worth the price of
-        // the next hour that sets one, so charging pays that less the round trip loss, and
-        // discharging earns it. Charging at the end of the run has no later hour, so it uses CCGT.
-        let next = ccgt_price
-        for (let hour = i.hours - 1; hour >= 0; hour--) {
-            if (cls[hour] == 'battery_charge') price[hour] = next * round_trip
-            else if (cls[hour] == 'battery_discharge') price[hour] = next
-            else next = cls[hour] == 'backup' ? price[hour] : price[hour] / round_trip
-        }
-        d.electricity_price = price
-
-        // Revenue and fuel sales, £bn/yr. GWh over the run times £/MWh times 1e-6 gives £bn.
-        let p = o.prices = { hours: {}, mean: {} }
-        let revenue = 0, end_use_total = 0, offshore = 0, sum = 0, electrolysis_power = 0, ptx_power = 0
-        let offshore_gw = i.supply.offshore_wind_capacity * i.supply.offshore_wind_availability * glf
-        for (let z of ['backup', 'curtail', 'electrolysis', 'battery_charge', 'battery_discharge']) p.hours[z] = 0
-        let class_sum = {}
-        for (let hour = 0; hour < i.hours; hour++) {
-            let end_use = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour]
-            revenue += end_use * price[hour]
-            end_use_total += end_use
-            offshore += offshore_gw * capacityfactors_all[hour][1] * price[hour]
-            electrolysis_power += d.electricity_for_electrolysis[hour] * price[hour]
-            ptx_power += d.electricity_for_power_to_X[hour] * price[hour]
-            sum += price[hour]
-            p.hours[cls[hour]]++
-            class_sum[cls[hour]] = (class_sum[cls[hour]] || 0) + price[hour]
-        }
-        for (let z in p.hours) {
-            p.mean[z] = p.hours[z] > 0 ? class_sum[z] / p.hours[z] : 0
-            p.hours[z] = 100 * p.hours[z] / i.hours
-        }
-        p.mean_gbp_MWh = sum / i.hours
-        p.end_use_weighted_gbp_MWh = end_use_total > 0 ? revenue / end_use_total : 0
-        p.end_use_TWh = end_use_total * o.GWh_to_TWhy
-        p.electricity_revenue = revenue * 1e-6 * o.per_year
-        p.offshore_revenue = offshore * 1e-6 * o.per_year
-        // Recovery is against the selected generation costs: strike prices or the build-up
-        let offshore_cost = o.generation_costs.by_tech.offshore_wind.annual
-        p.offshore_recovery = offshore_cost > 0 ? p.offshore_revenue / offshore_cost : 0
-
-        // Average production cost per MWh, with electricity at the hourly price. Hydrogen covers its
-        // plant, stores and electricity. Methane and synthetic fuel use hydrogen at that cost. Costs
-        // are shared over all fuel produced, so turbine methane stays with electricity users.
-        let plant = (names) => names.reduce((total, name) => total + o.costs[name].annual, 0)
-        let sf = i.synth_fuel
-        let ptx = i.power_to_X
-        let ft = o.costs['FT synthetic fuel']
-        let per_MWh = (annual, TWh) => TWh > 0 ? 1000 * annual / TWh : 0
-        let hydrogen_TWh = o.hydrogen.total_produced * o.GWh_to_TWhy
-        let hydrogen_cost = per_MWh(plant(['H2 Electrolysis', 'Hydrogen storage', 'Hydrogen compressor']) + electrolysis_power * 1e-6 * o.per_year, hydrogen_TWh)
-        let methanation_hydrogen_TWh = o.methane.total_hydrogen_used * o.GWh_to_TWhy
-        let ft_hydrogen_TWh = (o.hydrogen.total_demand - o.hydrogen.total_vehicle_demand - o.methane.total_hydrogen_used) * o.GWh_to_TWhy
-        // Power to X is shared between methane and liquid fuel by output
-        let ptx_annual = plant(['Power to X']) + ptx_power * 1e-6 * o.per_year
-        let ptx_output = ptx.prc_gas * ptx.gas_efficiency + ptx.prc_liquid * ptx.liquid_efficiency
-        let ptx_methane_annual = ptx_output > 0 ? ptx_annual * ptx.prc_gas * ptx.gas_efficiency / ptx_output : 0
-        let methane_annual = plant(['Anaerobic digestion', 'Methanation', 'Methane storage', 'CO2 storage', 'Methane store charging', 'Methane store discharging'])
-            + o.biogas_feedstock_annual + methanation_hydrogen_TWh * hydrogen_cost * 0.001 + ptx_methane_annual
-        let synthetic_annual = plant(['FT synthetic fuel', 'Synthetic fuel storage']) + o.ft_biomass_annual
-            + ft_hydrogen_TWh * hydrogen_cost * 0.001 + ptx_annual - ptx_methane_annual
-        let costs = {
-            hydrogen: hydrogen_cost,
-            methane: per_MWh(methane_annual, o.methane.total_produced * o.GWh_to_TWhy),
-            synthetic_fuel: per_MWh(synthetic_annual, ft.generation)
-        }
-        // Marginal values, for the recovery check at marginal prices. Synthetic fuel is its hydrogen
-        // and biomass at their values plus the FT plant cost per MWh.
-        let ft_plant = per_MWh(ft.annual, ft.generation)
-        let values = {
-            hydrogen: fv.hydrogen_gbp_MWh,
-            methane: fv.methane_gbp_MWh,
-            synthetic_fuel: ft.generation > 0 ? sf.FT_process_hydrogen_req * fv.hydrogen_gbp_MWh + sf.FT_process_biomass_req * sf.biomass_gbp_MWh + ft_plant : 0
-        }
-        p.fuel = {
-            hydrogen: { TWh: (o.hydrogen.total_vehicle_demand + o.hydrogen.total_industry_demand + o.heating_systems.hydrogen.fuel_demand) * o.GWh_to_TWhy },
-            methane: { TWh: (o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas) * o.GWh_to_TWhy },
-            synthetic_fuel: { TWh: (o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand) * o.GWh_to_TWhy }
-        }
-        // Baselines burn fossil fuel. Their fuel values are zero and fuel users pay nothing here.
-        let fuel_users_pay = fv.methane_gbp_MWh > 0
-        p.fuel_sales = 0
-        p.fuel_value_sales = 0
-        for (let z in p.fuel) {
-            p.fuel[z].value_gbp_MWh = values[z]
-            p.fuel[z].gbp_MWh = fuel_users_pay ? costs[z] : 0
-            p.fuel[z].annual = p.fuel[z].TWh * p.fuel[z].gbp_MWh * 0.001
-            p.fuel_sales += p.fuel[z].annual
-            p.fuel_value_sales += p.fuel[z].TWh * values[z] * 0.001
-        }
-        p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_value_sales) / o.generation_costs.total_annual : 0
-
-        // Fuel users pay production cost, which includes the electricity used to make the fuel.
-        // Electricity users pay the rest of the generation cost.
-        o.generation_costs.fuel_users_annual = p.fuel_sales
-        o.generation_costs.electricity_annual = o.generation_costs.total_annual - o.generation_costs.fuel_users_annual
-        // Electricity users' payment above hourly revenue
-        p.bill_top_up = o.generation_costs.electricity_annual - p.electricity_revenue
-    },
+    // Run every step in order. Each step reads the results of the steps before it.
     cost_model: function() {
+        let backup = model.build_up_costs()
+        model.generation_costs(backup)
 
-        // Generation is in GWh over the run, o.GWh_to_TWhy converts to TWh/yr
+        let price_classes = model.hourly_prices()
+        let electricity_for_fuel = model.price_summary(price_classes)
+        model.fuel_production_costs(electricity_for_fuel)
+
+        o.retail = {}
+        let hydrogen = model.hydrogen_in_fuel_sold()
+        model.electricity_retail(hydrogen)
+        model.fuel_prices(hydrogen)
+        model.gas_retail()
+        model.road_fuel_retail()
+
+        model.fossil_reference()
+        model.total_cost()
+    },
+
+    // -----------------------------------------------------------------------------------------
+    // 1. Build-up: what each technology costs to build and run
+    //
+    // This is the cost from first principles. Each technology has a capacity and an output, and
+    // i.costs gives its capital cost, running costs and life. The annual cost is:
+    //
+    //   annual cost = capacity x annual fixed cost + output x variable O&M
+    //
+    // The annual fixed cost turns the capital cost into an equal yearly payment, like a mortgage
+    // (see levelised_fixed_cost below). Dividing the annual cost by output gives the levelised
+    // cost of energy (LCOE).
+    //
+    // Returns the backup turbine and fuel costs, which the next step shares between fuels.
+    // -----------------------------------------------------------------------------------------
+    build_up_costs: function() {
+        let to_TWh = o.GWh_to_TWhy
+        let supply = o.supply
+        let backup_output = o.electric_backup
+        let backup_input = i.electric_backup
+
+        // Capacity and output of each technology. Capacity is in GW, or GWh for stores, to match
+        // costs per kW or per kWh. Output is in TWh/yr. Plants that make fuel have zero output
+        // here, which leaves variable O&M out and gives no LCOE.
         o.costs = {}
-
-        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity, generation: o.supply.total_onshore_wind*o.GWh_to_TWhy }
-        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity, generation: o.supply.total_offshore_wind*o.GWh_to_TWhy }
-        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity, generation: o.supply.total_solarpv*o.GWh_to_TWhy }
-        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity, generation: o.supply.total_tidal*o.GWh_to_TWhy }
-        o.costs['Wave'] = { capacity: i.supply.wave_capacity, generation: o.supply.total_wave*o.GWh_to_TWhy }
-        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity, generation: o.supply.total_geothermal_elec*o.GWh_to_TWhy }
-        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity, generation: o.supply.total_nuclear*o.GWh_to_TWhy }
-        o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: o.supply.total_hydro*o.GWh_to_TWhy }
+        o.costs['Onshore wind'] = { capacity: i.supply.onshore_wind_capacity, generation: supply.total_onshore_wind * to_TWh }
+        o.costs['Offshore wind'] = { capacity: i.supply.offshore_wind_capacity, generation: supply.total_offshore_wind * to_TWh }
+        o.costs['Solar PV'] = { capacity: i.supply.solarpv_capacity, generation: supply.total_solarpv * to_TWh }
+        o.costs['Tidal'] = { capacity: i.supply.tidal_capacity, generation: supply.total_tidal * to_TWh }
+        o.costs['Wave'] = { capacity: i.supply.wave_capacity, generation: supply.total_wave * to_TWh }
+        o.costs['Geothermal Electric'] = { capacity: i.supply.geothermal_elec_capacity, generation: supply.total_geothermal_elec * to_TWh }
+        o.costs['Nuclear'] = { capacity: i.supply.nuclear_capacity, generation: supply.total_nuclear * to_TWh }
+        o.costs['Hydro'] = { capacity: i.supply.hydro_capacity, generation: supply.total_hydro * to_TWh }
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
-        // Turbine capacity covers the peak need after de-rating for outages (capacity market de-rating factors).
-        // OCGT runs only when CCGT is at capacity, so OCGT covers its own peak output and CCGT the rest.
-        let eb_out = o.electric_backup
-        o.costs['CCGT'] = { capacity: (eb_out.max_capacity_requirement - eb_out.max_ocgt_output) / i.electric_backup.ccgt_derating_factor, generation: (eb_out.total_before_grid_loss - eb_out.total_ocgt_output)*o.GWh_to_TWhy }
-        o.costs['OCGT'] = { capacity: eb_out.max_ocgt_output / i.electric_backup.ocgt_derating_factor, generation: eb_out.total_ocgt_output*o.GWh_to_TWhy }
+
+        // Backup turbines are sized by the hour of highest need. Some plant is always out of
+        // action, so the fleet has to be larger than that peak. A de-rating factor of 0.9 means
+        // 1 GW of plant counts as 0.9 GW of reliable capacity, so capacity is the peak divided by
+        // the factor. OCGT runs only when CCGT is full, so OCGT covers its own peak output and
+        // CCGT covers the rest of the peak.
+        o.costs['CCGT'] = {
+            capacity: (backup_output.max_capacity_requirement - backup_output.max_ocgt_output) / backup_input.ccgt_derating_factor,
+            generation: (backup_output.total_before_grid_loss - backup_output.total_ocgt_output) * to_TWh
+        }
+        o.costs['OCGT'] = {
+            capacity: backup_output.max_ocgt_output / backup_input.ocgt_derating_factor,
+            generation: backup_output.total_ocgt_output * to_TWh
+        }
         o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
-        // Battery energy per kWh, and power per kW of inverter, the larger of charge and discharge capacity
-        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge*o.GWh_to_TWhy }
+
+        // A battery has two costs: cells for the energy it holds (per kWh) and an inverter for
+        // the power it moves (per kW). One inverter handles both directions, so it is sized by
+        // the larger of charge and discharge capacity.
+        o.costs['Electric Storage'] = { capacity: i.electric_storage.capacity_GWh, generation: o.electric_storage.total_discharge * to_TWh }
         o.costs['Battery inverter'] = { capacity: Math.max(i.electric_storage.charge_capacity_GW, i.electric_storage.discharge_capacity_GW), generation: 0 }
-        // Anaerobic digestion supply is flat. Capacity in GW of methane assumes 90% plant availability.
+
+        // Anaerobic digestion runs at a flat rate. Average GW is TWh/yr divided by 8.766 thousand
+        // hours in a year. Plants run 90% of the time, so capacity is the average divided by 0.9.
         let biogas_methane_TWh = i.biogas.biomass_for_biogas * i.biogas.anaerobic_digestion_efficiency
         o.costs['Anaerobic digestion'] = { capacity: biogas_methane_TWh / 8.766 / 0.9, generation: biogas_methane_TWh }
-        // FT capacity is hydrogen in, output is synthetic fuel. Store capacities are GWh, costs per kWh.
-        o.costs['FT synthetic fuel'] = { capacity: i.synth_fuel.capacity_GW, generation: o.synth_fuel.total_produced*o.GWh_to_TWhy }
+
+        // FT capacity is measured as hydrogen in, and its output is synthetic fuel out.
+        o.costs['FT synthetic fuel'] = { capacity: i.synth_fuel.capacity_GW, generation: o.synth_fuel.total_produced * to_TWh }
+
+        // Fuel stores in GWh, with costs per kWh. The CO2 store is in Mt, with its cost per tonne.
         o.costs['Hydrogen storage'] = { capacity: i.hydrogen.storage_capacity_GWh, generation: 0 }
         o.costs['Methane storage'] = { capacity: i.methane.storage_capacity_GWh, generation: 0 }
         o.costs['Synthetic fuel storage'] = { capacity: i.synth_fuel.store_capacity_GWh, generation: 0 }
-        // CO2 store capacity in Mt, cost per tonne
         o.costs['CO2 storage'] = { capacity: i.methane.co2_store_capacity_t * 1e-6, generation: 0 }
-        // Store power in GW, sized by the largest hourly flow
+
+        // Compressors and pumps that move fuel in and out of stores, sized by the largest hourly flow
         o.costs['Hydrogen compressor'] = { capacity: o.hydrogen.max_store_charge, generation: 0 }
         o.costs['Methane store charging'] = { capacity: o.methane.max_store_charge, generation: 0 }
         o.costs['Methane store discharging'] = { capacity: o.methane.max_store_discharge, generation: 0 }
 
+        // Annual cost and LCOE of each technology. o.total_annual_cost adds up the build-up for
+        // the whole system, as a comparison with the costs actually paid in the next step.
         o.total_annual_cost = 0;
-
-        // Capacity in GW (GWh for storage) and costs per kW (kWh), 0.001 gives £bn/yr
         for (var z in i.costs) {
             let c = o.costs[z]
             c.annual = c.capacity * 0.001 * annual_fixed_cost(i.costs[z], i.annualisation) + c.generation * 0.001 * i.costs[z].variable_om
@@ -196,17 +156,19 @@ Object.assign(model, {
             o.total_annual_cost += c.annual
         }
 
-        // Crop feedstock for biogas, the grass above the waste share in land_use, priced per MWh of methane
+        // Feedstocks. Crop feedstock for biogas is the grass above the waste share in land_use,
+        // priced per MWh of methane. Waste feedstock is free. FT biomass is priced per MWh of
+        // biomass.
         o.biogas_feedstock_annual = o.biomass.grass_for_biogas * i.biogas.anaerobic_digestion_efficiency * i.biogas.crop_feedstock_gbp_MWh * 0.001
         o.total_annual_cost += o.biogas_feedstock_annual
-
-        // Biomass for FT, priced per MWh of biomass
-        o.ft_biomass_annual = o.synth_fuel.total_biomass_used * o.GWh_to_TWhy * i.synth_fuel.biomass_gbp_MWh * 0.001
+        o.ft_biomass_annual = o.synth_fuel.total_biomass_used * to_TWh * i.synth_fuel.biomass_gbp_MWh * 0.001
         o.total_annual_cost += o.ft_biomass_annual
 
-        // Fuel burned for electricity generation, GWh over the run to TWh/yr, priced in pence per kWh of fuel.
-        // Carbon price in £/tCO2 on fossil backup emissions, with the CO2 factors used for grid emissions.
-        let biomass_for_backup = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
+        // Fuel and carbon for backup turbines. Each entry is the fuel burned (GWh over the run),
+        // its price (p/kWh) and its CO2 factor (t/MWh). GWh x t/MWh gives thousands of tonnes, so
+        // 0.001 gives Mt. Mt x £/t gives £ million, so 0.001 gives £bn. Synthetic methane has no
+        // entry here, as its cost is in fuel production.
+        let biomass_for_backup = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency * 0.01)
         let backup_fuel = {
             gas: [o.methane.ccgt_methane_from_fossil_gas, i.fuel_prices.gas, i.co2_factors.gas],
             oil: [o.synth_fuel.backup_from_fossil_oil, i.fuel_prices.oil, i.co2_factors.fuel_oil],
@@ -228,22 +190,45 @@ Object.assign(model, {
         o.backup_fuel_burned = Object.values(backup_fuel).some(([fuel]) => fuel > 0)
         o.total_annual_cost += o.fuel_cost_annual + o.carbon_cost_annual
 
-        let backup = { annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, generation: o.costs['CCGT'].generation + o.costs['OCGT'].generation }
-        o.backup_LCOE = backup.generation > 0 ? 1000 * (backup.annual + o.fuel_cost_annual + o.carbon_cost_annual) / backup.generation : 0
+        // Summary figures: the LCOE of backup, and of all electricity demand
+        let turbines = { annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, generation: o.costs['CCGT'].generation + o.costs['OCGT'].generation }
+        o.backup_LCOE = turbines.generation > 0 ? 1000 * (turbines.annual + o.fuel_cost_annual + o.carbon_cost_annual) / turbines.generation : 0
+        o.LCOE = 1000 * o.total_annual_cost / (o.balance.total_electricity_demand * o.GWh_to_TWhy)
 
-        o.LCOE = 1000*o.total_annual_cost / (o.balance.total_electricity_demand*o.GWh_to_TWhy)
+        return { turbines_annual: turbines.annual, fuel_annual: backup_fuel_annual }
+    },
 
-        // Generation cost. With basis "price", a technology with a price per MWh (a strike price, or
-        // wholesale value plus support) is costed as output times that price, and one without uses the
-        // build-up above. With basis "lcoe", every technology uses the build-up. Imports have no
-        // build-up and always use their price. Backup turbine capacity is shared by output, plus each
-        // fuel's own fuel and carbon cost. Fuel production (electrolysis, methanation, power to X,
-        // anaerobic digestion, crop feedstock, FT and its biomass, the fuel stores and their power) always uses the build-up. Generation is GWh over the run, so o.GWh_to_TWhy gives TWh/yr and TWh
-        // times £/MWh times 0.001 gives £bn. Build-up rows that enter the total are marked used.
-        let backup_output = o.electric_backup.total_before_grid_loss
-        let turbine_share = (gen) => backup_output > 0 ? backup.annual * gen / backup_output : 0
-        let build_up = (key) => Array.isArray(key) ? key.reduce((sum, k) => sum + build_up(k), 0) : (o.costs[key] && o.costs[key].annual) || 0
+    // -----------------------------------------------------------------------------------------
+    // 2. System cost: what generators and fuel plants are paid
+    //
+    // Generators are not always paid what they cost to build. An offshore wind farm may hold a
+    // Contract for Difference at a strike price, and a 2024 gas plant earns the market price. So
+    // each technology has two possible costs:
+    //
+    //   price      output x a price per MWh (a strike price, or market value plus support)
+    //   build-up   the annual cost from step 1
+    //
+    // With basis "price", a technology with a price uses it, and one without uses the build-up.
+    // With basis "lcoe", every technology uses the build-up. Imports have no build-up, so they
+    // always use their price. Fuel production always uses the build-up.
+    //
+    // Output here is before curtailment. Plant has to be paid for in full, even when its output
+    // is not used, so the cost of building more than demand needs stays in the system cost.
+    // -----------------------------------------------------------------------------------------
+    generation_costs: function(backup) {
+        let basis_inputs = i.generation_costs
         let eb = o.electric_backup
+
+        // All fuels share the backup turbine fleet, so each pays for it in proportion to its
+        // output, and also pays for its own fuel and carbon.
+        let backup_total_output = eb.total_before_grid_loss
+        let turbine_share = (output) => backup_total_output > 0 ? backup.turbines_annual * output / backup_total_output : 0
+
+        // Build-up of one technology, or the sum of a list of technologies
+        let build_up = (key) => Array.isArray(key) ? key.reduce((sum, k) => sum + build_up(k), 0) : (o.costs[key] && o.costs[key].annual) || 0
+
+        // Each row is [output in GWh over the run, where its build-up comes from]. The second item
+        // is a name in o.costs, a list of names, a function for backup fuels, or null for none.
         let techs = {
             offshore_wind: [o.supply.total_offshore_wind, 'Offshore wind'],
             onshore_wind: [o.supply.total_onshore_wind, 'Onshore wind'],
@@ -254,25 +239,30 @@ Object.assign(model, {
             nuclear: [o.supply.total_nuclear, 'Nuclear'],
             hydro: [o.supply.total_hydro, 'Hydro'],
             imports: [o.supply.total_imports, null],
-            gas: [eb.total_methane_turbine_output, () => turbine_share(eb.total_methane_turbine_output) + backup_fuel_annual.gas],
-            biomass: [eb.total_biomass_turbine_output, () => turbine_share(eb.total_biomass_turbine_output) + backup_fuel_annual.biomass],
-            coal_other: [eb.total_coal_turbine_output, () => turbine_share(eb.total_coal_turbine_output) + backup_fuel_annual.coal_other],
-            oil: [eb.total_synth_fuel_turbine_output, () => turbine_share(eb.total_synth_fuel_turbine_output) + backup_fuel_annual.oil],
+            gas: [eb.total_methane_turbine_output, () => turbine_share(eb.total_methane_turbine_output) + backup.fuel_annual.gas],
+            biomass: [eb.total_biomass_turbine_output, () => turbine_share(eb.total_biomass_turbine_output) + backup.fuel_annual.biomass],
+            coal_other: [eb.total_coal_turbine_output, () => turbine_share(eb.total_coal_turbine_output) + backup.fuel_annual.coal_other],
+            oil: [eb.total_synth_fuel_turbine_output, () => turbine_share(eb.total_synth_fuel_turbine_output) + backup.fuel_annual.oil],
             hydrogen: [eb.total_hydrogen_turbine_output, () => turbine_share(eb.total_hydrogen_turbine_output)],
             storage: [o.electric_storage.total_discharge, ['Electric Storage', 'Battery inverter']]
         }
-        let gc = i.generation_costs
+
+        // "used" marks the build-up rows that enter the total, which are the rows the page shows
         for (let z in o.costs) o.costs[z].used = false
         o.generation_costs = { by_tech: {}, total_annual: 0, backup_fuel_used: false }
+
         for (let z in techs) {
             let [output, cost] = techs[z]
             let generation = output * o.GWh_to_TWhy
             let has_build_up = cost !== null
             let lcoe_annual = typeof cost === 'function' ? cost() : build_up(cost)
-            let price = gc.price_gbp_MWh[z]
+            let price = basis_inputs.price_gbp_MWh[z]
             let priced = price !== null && price !== undefined
-            let uses_build_up = has_build_up && (gc.basis == "lcoe" || !priced)
+
+            // The choice between price and build-up
+            let uses_build_up = has_build_up && (basis_inputs.basis == "lcoe" || !priced)
             let annual = uses_build_up ? lcoe_annual : generation * (price || 0) * 0.001
+
             if (uses_build_up) {
                 if (typeof cost === 'string') o.costs[cost].used = true
                 else if (Array.isArray(cost)) cost.forEach(k => o.costs[k].used = true)
@@ -282,6 +272,7 @@ Object.assign(model, {
                     if (z != 'hydrogen') o.generation_costs.backup_fuel_used = true
                 }
             }
+
             let row = {
                 generation: generation,
                 lcoe: has_build_up && generation > 0 ? 1000 * lcoe_annual / generation : null,
@@ -292,62 +283,314 @@ Object.assign(model, {
                 implied_hurdle: null,
                 implied_capex: null
             }
-            // Load factor of a fixed generator, TWh/yr over GW, and what its price implies for the
-            // build-up: the hurdle rate that reproduces it, and the construction cost per kW that
-            // does at the input hurdle rate.
+
+            // Load factor of a fixed generator: TWh/yr over GW x 8.766 thousand hours
             if (typeof cost === 'string' && o.costs[cost].capacity > 0) {
                 row.load_factor = generation / (o.costs[cost].capacity * 8.766)
             }
+
+            // A check on the price: what would the build-up need for it to equal this price? The
+            // target is the money per kW left after variable O&M. The implied hurdle rate is the
+            // return that reproduces it, and the implied capex is the construction cost that does.
             if (typeof cost === 'string' && priced && generation > 0 && o.costs[cost].capacity > 0) {
                 let target = generation * (price - i.costs[cost].variable_om) / o.costs[cost].capacity
                 row.implied_hurdle = implied_hurdle_rate(i.costs[cost], target)
                 row.implied_capex = implied_capex(i.costs[cost], target)
             }
+
             o.generation_costs.by_tech[z] = row
             o.generation_costs.total_annual += annual
         }
+
+        // Fuel production: plant, stores and their power, and feedstocks. The electricity these
+        // plants use is already in the cost of the generators above.
         let fuel_production = ['H2 Electrolysis', 'Methanation', 'Power to X', 'Anaerobic digestion', 'FT synthetic fuel', 'Hydrogen storage', 'Methane storage', 'Synthetic fuel storage', 'CO2 storage', 'Hydrogen compressor', 'Methane store charging', 'Methane store discharging']
         o.generation_costs.fuel_production_annual = o.biogas_feedstock_annual + o.ft_biomass_annual
         for (let z of fuel_production) {
             o.costs[z].used = true
             o.generation_costs.fuel_production_annual += build_up(z)
         }
-        o.generation_costs.total_annual += o.generation_costs.fuel_production_annual + gc.other_support_gbp_bn
-        model.hourly_prices()
 
-        // Retail prices. The electricity unit rate starts from the generation cost per kWh delivered
-        // to end users, and gas from the gas fuel price. Network, social policy and
-        // supplier costs are inputs, per kWh and per customer per year, before VAT.
-        // £bn/yr over TWh/yr gives £/kWh, so 100 converts to p/kWh.
+        // The system cost is everything so far. Networks are added at the retail step.
+        o.generation_costs.total_annual += o.generation_costs.fuel_production_annual + basis_inputs.other_support_gbp_bn
+    },
+
+    // -----------------------------------------------------------------------------------------
+    // 3. Hourly prices: what electricity is worth in each hour
+    //
+    // The price in an hour is what one more MWh would cost, or what one less MWh would save. That
+    // depends on what is at the margin:
+    //
+    //   backup              a turbine is running, so one more MWh burns more fuel
+    //   curtail             power is being thrown away, so one more MWh costs nothing
+    //   electrolysis        one more MWh for demand means one less MWh of hydrogen
+    //   battery_charge      the battery is charging, so it sets the price from later hours
+    //   battery_discharge   the battery is discharging, so it sets the price from later hours
+    //
+    // i.fuel_values gives the value of fuel at the margin, which is not the same as what fuel costs
+    // to make. These values are inputs from a PyPSA optimisation, and scripts/price_check.py in
+    // ZCB_PyPSA compares the resulting prices with PyPSA at equal capacities.
+    //
+    // Sets d.electricity_price, and returns the class of each hour.
+    // -----------------------------------------------------------------------------------------
+    hourly_prices: function() {
+        let fv = i.fuel_values
+        let eb = i.electric_backup
+
+        // Prices are per MWh reaching the user, so a turbine's cost is divided by the share of
+        // its output that survives grid losses and own use.
+        let glf = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+
+        // A turbine MWh costs the fuel it burns (fuel value / efficiency) plus variable O&M
+        let turbine_price = (efficiency, tech) => (fv.methane_gbp_MWh / (efficiency*0.01) + i.costs[tech].variable_om) / glf
+        let ccgt_price = turbine_price(eb.methane_efficiency, 'CCGT')
+        let ocgt_price = turbine_price(eb.ocgt_efficiency, 'OCGT')
+
+        // A MWh of electricity makes a fraction of a MWh of hydrogen. It is worth that fraction
+        // of the hydrogen value.
+        let electrolysis_price = i.hydrogen.electrolysis_efficiency * fv.hydrogen_gbp_MWh
+        let round_trip = i.electric_storage.charge_efficiency * i.electric_storage.discharge_efficiency
+
+        // Scarcity adder. The last turbine in the fleet runs for only a few hours, so fuel alone
+        // never pays for it. The hours within 10% of peak backup carry its annual cost, shared in
+        // proportion to how far each hour is above that threshold. peak_cost is £ per MW of
+        // reliable capacity over the whole run: £/kW/yr x 1000 x years, divided by de-rating.
+        let peak_tech = o.electric_backup.max_ocgt_output > 0 ? 'OCGT' : 'CCGT'
+        let derating = peak_tech == 'OCGT' ? eb.ocgt_derating_factor : eb.ccgt_derating_factor
+        let peak_cost = annual_fixed_cost(i.costs[peak_tech], i.annualisation) * 1000 * o.years / derating
+        let threshold = 0.9 * o.electric_backup.max_capacity_requirement
+        let depth_total = 0
+        for (let hour = 0; hour < i.hours; hour++) depth_total += Math.max(d.electricity_from_dispatchable[hour] - threshold, 0)
+
+        // First pass: find the class of each hour, and the price of every class but the battery
+        let price = new Array(i.hours)
+        let cls = new Array(i.hours)
+        for (let hour = 0; hour < i.hours; hour++) {
+            // Backup below 0.5 GW is a remainder beside the battery, which is then at the margin
+            if (d.electricity_from_dispatchable[hour] > 0.5) {
+                cls[hour] = 'backup'
+                price[hour] = d.ocgt_output[hour] > 1e-6 ? ocgt_price : ccgt_price
+                let depth = d.electricity_from_dispatchable[hour] - threshold
+                if (depth > 0) price[hour] += peak_cost * depth / depth_total
+            } else if (d.excess_elec[hour] > 1e-6) {
+                cls[hour] = 'curtail'
+                price[hour] = 0
+            } else if (d.electricity_for_electrolysis[hour] > 1e-6) {
+                cls[hour] = 'electrolysis'
+                price[hour] = electrolysis_price
+            } else if (d.elec_store_charge[hour] > 1e-6) {
+                cls[hour] = 'battery_charge'
+            } else {
+                cls[hour] = 'battery_discharge'
+            }
+        }
+
+        // Second pass, backwards through time, for the battery hours. Stored energy is worth the
+        // price of the next hour that sets one. Discharging earns that price. Charging pays that
+        // price less the round trip loss. In a later hour with surplus power, a MWh charged at the
+        // price there delivers only the round trip share, so a stored MWh is worth the price
+        // divided by the round trip loss. Charging at the end of the run has no later hour, so it
+        // uses the CCGT price.
+        let next = ccgt_price
+        for (let hour = i.hours - 1; hour >= 0; hour--) {
+            if (cls[hour] == 'battery_charge') price[hour] = next * round_trip
+            else if (cls[hour] == 'battery_discharge') price[hour] = next
+            else next = cls[hour] == 'backup' ? price[hour] : price[hour] / round_trip
+        }
+
+        d.electricity_price = price
+        return cls
+    },
+
+    // Summarise hourly prices: revenue from electricity users, hours and mean price by class, and
+    // what offshore wind would earn at these prices. Hours are GW, so GW x £/MWh adds up as
+    // GWh x £/MWh, and 1e-6 gives £bn.
+    //
+    // Returns the electricity bill of the fuel plants, in GWh x £/MWh, for the next step.
+    price_summary: function(cls) {
+        let price = d.electricity_price
+        let glf = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+        let p = o.prices = { hours: {}, mean: {} }
+        let revenue = 0, end_use_total = 0, offshore = 0, sum = 0, electrolysis_power = 0, ptx_power = 0
+        let offshore_gw = i.supply.offshore_wind_capacity * i.supply.offshore_wind_availability * glf
+        for (let z of ['backup', 'curtail', 'electrolysis', 'battery_charge', 'battery_discharge']) p.hours[z] = 0
+        let class_sum = {}
+        for (let hour = 0; hour < i.hours; hour++) {
+            // End use is electricity reaching final users. It leaves out electrolysis, power to X
+            // and battery charging, which turn electricity into something else.
+            let end_use = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour]
+            revenue += end_use * price[hour]
+            end_use_total += end_use
+            offshore += offshore_gw * capacityfactors_all[hour][1] * price[hour]
+            electrolysis_power += d.electricity_for_electrolysis[hour] * price[hour]
+            ptx_power += d.electricity_for_power_to_X[hour] * price[hour]
+            sum += price[hour]
+            p.hours[cls[hour]]++
+            class_sum[cls[hour]] = (class_sum[cls[hour]] || 0) + price[hour]
+        }
+        for (let z in p.hours) {
+            p.mean[z] = p.hours[z] > 0 ? class_sum[z] / p.hours[z] : 0
+            p.hours[z] = 100 * p.hours[z] / i.hours
+        }
+        p.mean_gbp_MWh = sum / i.hours
+        p.end_use_weighted_gbp_MWh = end_use_total > 0 ? revenue / end_use_total : 0
+        p.end_use_TWh = end_use_total * o.GWh_to_TWhy
+        p.electricity_revenue = revenue * 1e-6 * o.per_year
+        p.offshore_revenue = offshore * 1e-6 * o.per_year
+
+        // How much of offshore wind's selected cost (strike price or build-up) hourly prices recover.
+        // Low recovery shows why support such as a CfD is needed.
+        let offshore_cost = o.generation_costs.by_tech.offshore_wind.annual
+        p.offshore_recovery = offshore_cost > 0 ? p.offshore_revenue / offshore_cost : 0
+
+        return { electrolysis_power, ptx_power }
+    },
+
+    // -----------------------------------------------------------------------------------------
+    // 4. Fuel costs: what hydrogen, methane and synthetic fuel cost to make
+    //
+    // Fuel is costed in a chain, as each fuel feeds the next:
+    //
+    //   electricity at hourly prices + electrolysers and stores = hydrogen
+    //   hydrogen + biogas + methanation plant and stores        = methane
+    //   hydrogen + biomass + FT plant and stores                = synthetic fuel
+    //
+    // Cost per MWh is annual cost divided by all fuel produced. Fuel burned in turbines, or spilled
+    // from a full store, is not sold to fuel users, so that share stays with electricity users.
+    //
+    // This step also splits the system cost between fuel users and electricity users.
+    // -----------------------------------------------------------------------------------------
+    fuel_production_costs: function(electricity_for_fuel) {
+        let p = o.prices
+        let fv = i.fuel_values
+        let sf = i.synth_fuel
+        let ptx = i.power_to_X
+        let ft = o.costs['FT synthetic fuel']
+        let to_TWh = o.GWh_to_TWhy
+
+        let plant = (names) => names.reduce((total, name) => total + o.costs[name].annual, 0)
+        let per_MWh = (annual, TWh) => TWh > 0 ? 1000 * annual / TWh : 0
+
+        // Hydrogen: plant, stores and the electricity bill, over all hydrogen produced
+        let hydrogen_TWh = o.hydrogen.total_produced * to_TWh
+        let hydrogen_cost = per_MWh(plant(['H2 Electrolysis', 'Hydrogen storage', 'Hydrogen compressor']) + electricity_for_fuel.electrolysis_power * 1e-6 * o.per_year, hydrogen_TWh)
+
+        // Where hydrogen goes. o.hydrogen.total_demand is vehicles, FT and methanation, so FT is
+        // what is left after the other two.
+        let methanation_hydrogen_TWh = o.methane.total_hydrogen_used * to_TWh
+        let ft_hydrogen_TWh = (o.hydrogen.total_demand - o.hydrogen.total_vehicle_demand - o.methane.total_hydrogen_used) * to_TWh
+
+        // Power to X makes methane and liquid fuel directly from electricity. Its cost is shared
+        // by the output of each.
+        let ptx_annual = plant(['Power to X']) + electricity_for_fuel.ptx_power * 1e-6 * o.per_year
+        let ptx_output = ptx.prc_gas * ptx.gas_efficiency + ptx.prc_liquid * ptx.liquid_efficiency
+        let ptx_methane_annual = ptx_output > 0 ? ptx_annual * ptx.prc_gas * ptx.gas_efficiency / ptx_output : 0
+
+        // Methane and synthetic fuel: plant, stores and feedstock, with hydrogen at its cost above
+        let methane_annual = plant(['Anaerobic digestion', 'Methanation', 'Methane storage', 'CO2 storage', 'Methane store charging', 'Methane store discharging'])
+            + o.biogas_feedstock_annual + methanation_hydrogen_TWh * hydrogen_cost * 0.001 + ptx_methane_annual
+        let synthetic_annual = plant(['FT synthetic fuel', 'Synthetic fuel storage']) + o.ft_biomass_annual
+            + ft_hydrogen_TWh * hydrogen_cost * 0.001 + ptx_annual - ptx_methane_annual
+
+        let costs = {
+            hydrogen: hydrogen_cost,
+            methane: per_MWh(methane_annual, o.methane.total_produced * to_TWh),
+            synthetic_fuel: per_MWh(synthetic_annual, ft.generation)
+        }
+
+        // Marginal values, used only to check how much of the system cost marginal prices would
+        // recover. Synthetic fuel has no input value, so it is its hydrogen and biomass at their
+        // values, plus the FT plant cost per MWh.
+        let ft_plant = per_MWh(ft.annual, ft.generation)
+        let values = {
+            hydrogen: fv.hydrogen_gbp_MWh,
+            methane: fv.methane_gbp_MWh,
+            synthetic_fuel: ft.generation > 0 ? sf.FT_process_hydrogen_req * fv.hydrogen_gbp_MWh + sf.FT_process_biomass_req * sf.biomass_gbp_MWh + ft_plant : 0
+        }
+
+        // Fuel sold to final users, TWh/yr. This is less than fuel produced, as it leaves out
+        // fuel used to make other fuels, fuel burned in turbines and fuel spilled.
+        p.fuel = {
+            hydrogen: { TWh: (o.hydrogen.total_vehicle_demand + o.hydrogen.total_industry_demand + o.heating_systems.hydrogen.fuel_demand) * to_TWh },
+            methane: { TWh: (o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas) * to_TWh },
+            synthetic_fuel: { TWh: (o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand) * to_TWh }
+        }
+
+        // Baselines burn fossil fuel, which is outside the system cost. Their fuel values are
+        // zero, so fuel users pay nothing at this step. See fossil_reference for fossil fuel bills.
+        let fuel_users_pay = fv.methane_gbp_MWh > 0
+        p.fuel_sales = 0
+        p.fuel_value_sales = 0
+        for (let z in p.fuel) {
+            p.fuel[z].value_gbp_MWh = values[z]
+            p.fuel[z].gbp_MWh = fuel_users_pay ? costs[z] : 0
+            p.fuel[z].annual = p.fuel[z].TWh * p.fuel[z].gbp_MWh * 0.001
+            p.fuel_sales += p.fuel[z].annual
+            p.fuel_value_sales += p.fuel[z].TWh * values[z] * 0.001
+        }
+
+        // Share of the system cost that would be recovered at marginal prices alone
+        p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_value_sales) / o.generation_costs.total_annual : 0
+
+        // Who pays. Fuel users pay production cost, which includes the electricity used to make
+        // their fuel. Electricity users pay the rest of the system cost. Their payment above
+        // hourly revenue is a top-up, similar to Contract for Difference payments.
+        o.generation_costs.fuel_users_annual = p.fuel_sales
+        o.generation_costs.electricity_annual = o.generation_costs.total_annual - o.generation_costs.fuel_users_annual
+        p.bill_top_up = o.generation_costs.electricity_annual - p.electricity_revenue
+    },
+
+    // -----------------------------------------------------------------------------------------
+    // 5. Retail: what users pay after networks, policy costs, supplier costs and VAT
+    // -----------------------------------------------------------------------------------------
+
+    // Hydrogen in each fuel sold, in MWh per MWh of fuel, and the total. Fuel users share network
+    // costs by hydrogen content, as electrolysis is the part of fuel production that uses the
+    // network. Methane is a mix of biogas and methanation, so its content is the methanation share.
+    hydrogen_in_fuel_sold: function() {
+        let methanation_share = o.methane.total_produced > 0 ? o.methane.total_hydrogen_used / o.methane.total_produced : 0
+        let content = { hydrogen: 1, methane: methanation_share, synthetic_fuel: i.synth_fuel.FT_process_hydrogen_req }
+        let sold_TWh = 0
+        for (let z in o.prices.fuel) sold_TWh += o.prices.fuel[z].TWh * content[z]
+        return { content, sold_TWh }
+    },
+
+    // The electricity unit rate and bill. The unit rate adds layers, as on a real bill:
+    //
+    //   generation + network + policy + supplier, all per kWh, then VAT
+    //
+    // Network, policy and supplier costs also have a part per customer, which is the standing
+    // charge. These inputs come from the 2024 Ofgem price cap.
+    electricity_retail: function(hydrogen) {
         let r = i.retail
-        let vat = 1 + r.vat_prc * 0.01
-        let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * o.GWh_to_TWhy
-        // Fuel users pay for the electricity used to make fuel, so where they pay, electricity users'
-        // costs are recovered over end use. Baselines have no fuel users and use delivered electricity.
-        let billed_TWh = o.generation_costs.fuel_users_annual > 0 ? o.prices.end_use_TWh : delivered_TWh
-        let households_kWh = (GWh) => GWh * o.per_year * 1000000 / i.households_2030
-        o.retail = {}
-
         let e = r.electricity
-        // The build-up for every technology (resource cost) is kept for comparison
+        let vat = 1 + r.vat_prc * 0.01
+
+        // The kWh that carry the cost. Where fuel users pay for the electricity in their fuel,
+        // electricity users' costs are shared over end use. Baselines have no fuel users, so they
+        // use delivered electricity, which is nearly the same thing.
+        let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * o.GWh_to_TWhy
+        let billed_TWh = o.generation_costs.fuel_users_annual > 0 ? o.prices.end_use_TWh : delivered_TWh
+
         let elec = {
+            // The build-up for every technology is kept for comparison
             resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
             generation_cost_p_kWh: billed_TWh > 0 ? 100 * o.generation_costs.electricity_annual / billed_TWh : 0,
             bill_top_up_p_kWh: billed_TWh > 0 ? 100 * o.prices.bill_top_up / billed_TWh : 0
         }
-        // The unit rate uses the generation cost plus any year specific wholesale adjustment
-        elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
-        // With network_basis "peak", the per kWh network total scales with peak electricity demand
-        // relative to the reference (the 2024 baseline), plus new investment as an annuity. Fuel users
-        // pay network_fuel_share_prc of it, and electricity users pay the rest. The standing charge is
-        // per connection and does not scale.
-        let p = o.prices
-        // Hydrogen in each fuel sold, MWh per MWh. Methane is a mix of biogas and methanation.
-        let methanation_share = o.methane.total_produced > 0 ? o.methane.total_hydrogen_used / o.methane.total_produced : 0
-        let hydrogen_content = { hydrogen: 1, methane: methanation_share, synthetic_fuel: i.synth_fuel.FT_process_hydrogen_req }
-        let hydrogen_sold_TWh = 0
-        for (let z in p.fuel) hydrogen_sold_TWh += p.fuel[z].TWh * hydrogen_content[z]
 
+        // The wholesale adjustment covers year specific costs such as power bought forward. It is
+        // zero in scenarios.
+        elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
+
+        // Network cost. With basis "per_kWh" it is the Ofgem rate times the energy billed. With
+        // basis "peak", wires are sized for the highest demand and not for total energy, so:
+        //
+        //   network total = 2024 network total x (peak demand / 2024 peak) + new transmission
+        //
+        // Peak demand is end use, without electrolysis. New transmission is an annuity on the
+        // investment, like a mortgage. Fuel users pay a share, and electricity users pay the rest
+        // per kWh. The standing charge is per connection, so it does not scale.
         elec.network_p_kWh = e.network_p_kWh
         elec.network_total_bn = e.network_p_kWh * 0.01 * billed_TWh
         elec.network_investment_annual_bn = 0
@@ -356,30 +599,43 @@ Object.assign(model, {
             let rate = e.network_investment_return_prc * 0.01
             elec.network_investment_annual_bn = e.network_investment_gbp_bn * rate / (1 - Math.pow(1 + rate, -e.network_investment_life_years))
             elec.network_total_bn = e.network_p_kWh * 0.01 * e.network_reference_TWh * (o.balance.max_electricity_demand / e.network_reference_peak_GW) + elec.network_investment_annual_bn
-            if (hydrogen_sold_TWh > 0) elec.network_fuel_bn = elec.network_total_bn * e.network_fuel_share_prc * 0.01
+            if (hydrogen.sold_TWh > 0) elec.network_fuel_bn = elec.network_total_bn * e.network_fuel_share_prc * 0.01
             elec.network_p_kWh = 100 * (elec.network_total_bn - elec.network_fuel_bn) / billed_TWh
         }
         elec.network_annual_bn = elec.network_total_bn - elec.network_fuel_bn
+
+        // Unit rate, standing charge and the household bill. Domestic electricity includes heat
+        // pumps and leaves out electric vehicles, which are in transport.
         elec.unit_rate_p_kWh = (elec.generation_p_kWh + elec.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
         elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
-        elec.household_kWh = households_kWh(o.final_consumption.domestic.electricity)
+        elec.household_kWh = o.final_consumption.domestic.electricity * o.per_year * 1000000 / i.households_2030
         elec.bill_gbp = elec.unit_rate_p_kWh * 0.01 * elec.household_kWh + elec.standing_charge_gbp
         elec.household_spend_bn = elec.bill_gbp * i.households_2030 * 1e-9
         o.retail.electricity = elec
+    },
 
-        // Fuel prices add the fuel users' network share to the values. The share follows hydrogen
-        // content, as electrolysis is what uses the network. The values alone set hourly prices.
-        let network_per_MWh_hydrogen = hydrogen_sold_TWh > 0 ? 1000 * elec.network_fuel_bn / hydrogen_sold_TWh : 0
+    // Fuel prices: production cost plus the fuel users' share of network costs. This price leaves
+    // out fuel delivery, such as gas pipes and tankers, and carries no duty or VAT.
+    fuel_prices: function(hydrogen) {
+        let p = o.prices
+        let network_per_MWh_hydrogen = hydrogen.sold_TWh > 0 ? 1000 * o.retail.electricity.network_fuel_bn / hydrogen.sold_TWh : 0
         for (let z in p.fuel) {
             let fuel = p.fuel[z]
-            fuel.network_gbp_MWh = network_per_MWh_hydrogen * hydrogen_content[z]
+            fuel.network_gbp_MWh = network_per_MWh_hydrogen * hydrogen.content[z]
             fuel.price_gbp_MWh = fuel.gbp_MWh + fuel.network_gbp_MWh
             fuel.p_kWh = fuel.price_gbp_MWh * 0.1
             fuel.network_annual = fuel.TWh * fuel.network_gbp_MWh * 0.001
         }
-        p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * r.road_fuel.diesel_kWh_per_litre
+        // Per litre at the energy density of diesel, to compare with road fuel
+        p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * i.retail.road_fuel.diesel_kWh_per_litre
+    },
 
-        let g = r.gas
+    // The household gas bill, with the same layers as electricity. It starts from the gas price
+    // paid by power stations, plus an adjustment for the domestic demand profile. Scenarios
+    // without gas homes have no customers, so their bill is zero.
+    gas_retail: function() {
+        let g = i.retail.gas
+        let vat = 1 + i.retail.vat_prc * 0.01
         let gas = { wholesale_p_kWh: i.fuel_prices.gas + g.wholesale_adjustment_p_kWh }
         gas.unit_rate_p_kWh = (gas.wholesale_p_kWh + g.network_p_kWh + g.policy_p_kWh + g.supplier_p_kWh) * vat
         gas.standing_charge_gbp = (g.network_gbp + g.policy_gbp + g.supplier_gbp) * vat
@@ -388,34 +644,50 @@ Object.assign(model, {
         gas.bill_gbp = gas.customers > 0 ? gas.unit_rate_p_kWh * 0.01 * gas.household_kWh + gas.standing_charge_gbp : 0
         gas.household_spend_bn = gas.bill_gbp * gas.customers * 1e-9
         o.retail.gas = gas
+    },
 
-        // Road fuel at the pump, including duty and VAT, blended by the car diesel share
-        let f = r.road_fuel
+    // Fuel for combustion engine cars. Pump prices include duty and VAT, so dividing by energy
+    // per litre gives p/kWh. Petrol has less energy per litre than diesel. Where fuel users pay
+    // for synthetic fuel, cars pay its price with VAT and no duty. Baselines pay pump prices.
+    road_fuel_retail: function() {
+        let f = i.retail.road_fuel
         let diesel = f.car_diesel_prc * 0.01
+        let synthetic = o.prices.fuel.synthetic_fuel
         let road = {
             petrol_p_kWh: f.petrol_p_litre / f.petrol_kWh_per_litre,
             diesel_p_kWh: f.diesel_p_litre / f.diesel_kWh_per_litre
         }
         road.fossil_car_p_kWh = road.petrol_p_kWh * (1 - diesel) + road.diesel_p_kWh * diesel
-        // Synthetic fuel users pay its price with VAT and no duty. Baselines burn fossil fuel at pump prices.
-        let synthetic_car_fuel = i.fossil_reference && p.fuel.synthetic_fuel.gbp_MWh > 0
-        road.car_p_kWh = synthetic_car_fuel ? p.fuel.synthetic_fuel.p_kWh * (1 + i.fossil_reference.road_vat_prc * 0.01) : road.fossil_car_p_kWh
+        let synthetic_car_fuel = i.fossil_reference && synthetic.gbp_MWh > 0
+        road.car_p_kWh = synthetic_car_fuel ? synthetic.p_kWh * (1 + i.fossil_reference.road_vat_prc * 0.01) : road.fossil_car_p_kWh
         road.car_fuel_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.car_p_kWh * 0.01
         o.retail.road_fuel = road
-        model.fossil_reference()
     },
-    // 2024 fossil fuel prices and bills at fixed 2024 volumes, the same in every scenario.
-    // Prices are in £/MWh of fuel and bills in £bn/yr. Tax is what users pay and cannot reclaim.
+
+    // -----------------------------------------------------------------------------------------
+    // 6. Fossil fuel reference: what the UK paid for fossil fuel in 2024
+    //
+    // A fixed point of comparison, the same in every scenario. Each row has a volume (TWh/yr), a
+    // price before tax and a tax (both £/MWh). Tax means what users pay and cannot reclaim, so
+    // VAT that businesses reclaim is left out.
+    //
+    // Prices arrive in the units they are published in. p/litre / kWh per litre gives p/kWh, and
+    // p/kWh x 10 gives £/MWh.
+    // -----------------------------------------------------------------------------------------
     fossil_reference: function() {
         let fr = i.fossil_reference
         if (!fr) return
         let rf = i.retail.road_fuel
+        let p_litre_to_gbp_MWh = 10
+
         let row = (label, TWh, before, tax) => ({
             label, TWh, before, tax, after: before + tax,
             before_bn: TWh * before * 0.001,
             after_bn: TWh * (before + tax) * 0.001
         })
-        // Pence per litre at the pump, split into before tax, duty and VAT
+
+        // Split a pump price (p/litre). VAT applies to the price including duty, so remove VAT
+        // first and then duty.
         let pump_split = (pump_p_litre, kWh_per_litre) => {
             let ex_vat = pump_p_litre / (1 + fr.road_vat_prc * 0.01)
             return {
@@ -426,7 +698,7 @@ Object.assign(model, {
                 pump_p_kWh: pump_p_litre / kWh_per_litre
             }
         }
-        // Synthetic fuel at the energy density of diesel, with and without road fuel duty
+        // Build a pump price for synthetic fuel, at the energy density of diesel, in the same order
         let synthetic_pump = (duty) => {
             let before = o.prices.fuel.synthetic_fuel.p_litre
             let vat = (before + duty) * fr.road_vat_prc * 0.01
@@ -434,18 +706,21 @@ Object.assign(model, {
         }
         let petrol = pump_split(rf.petrol_p_litre, rf.petrol_kWh_per_litre)
         let diesel = pump_split(rf.diesel_p_litre, rf.diesel_kWh_per_litre)
-        let per_litre_to_MWh = 10
-        let petrol_before = petrol.before / rf.petrol_kWh_per_litre * per_litre_to_MWh
-        let diesel_before = diesel.before / rf.diesel_kWh_per_litre * per_litre_to_MWh
+
+        // Road fuel. Cars pay duty and VAT, blended by the car diesel share. Other road transport
+        // is mostly businesses, which pay duty and reclaim VAT.
+        let petrol_before = petrol.before / rf.petrol_kWh_per_litre * p_litre_to_gbp_MWh
+        let diesel_before = diesel.before / rf.diesel_kWh_per_litre * p_litre_to_gbp_MWh
         let diesel_share = rf.car_diesel_prc * 0.01
         let car_before = petrol_before * (1 - diesel_share) + diesel_before * diesel_share
         let car_after = o.retail.road_fuel.fossil_car_p_kWh * 10
 
-        let heating_before = fr.burning_oil.p_litre / (1 + fr.burning_oil.vat_prc * 0.01) / fr.burning_oil.kWh_per_litre * per_litre_to_MWh
-        let heating_after = fr.burning_oil.p_litre / fr.burning_oil.kWh_per_litre * per_litre_to_MWh
+        // Heating oil has VAT and no duty. Industry gas oil has a rebated duty, and VAT is reclaimed.
+        let heating_before = fr.burning_oil.p_litre / (1 + fr.burning_oil.vat_prc * 0.01) / fr.burning_oil.kWh_per_litre * p_litre_to_gbp_MWh
+        let heating_after = fr.burning_oil.p_litre / fr.burning_oil.kWh_per_litre * p_litre_to_gbp_MWh
         let gas_oil_ex_vat = fr.gas_oil.p_litre / (1 + fr.gas_oil.vat_prc * 0.01)
-        let industry_before = (gas_oil_ex_vat - fr.gas_oil.duty_p_litre) / fr.gas_oil.kWh_per_litre * per_litre_to_MWh
-        let industry_tax = fr.gas_oil.duty_p_litre / fr.gas_oil.kWh_per_litre * per_litre_to_MWh
+        let industry_before = (gas_oil_ex_vat - fr.gas_oil.duty_p_litre) / fr.gas_oil.kWh_per_litre * p_litre_to_gbp_MWh
+        let industry_tax = fr.gas_oil.duty_p_litre / fr.gas_oil.kWh_per_litre * p_litre_to_gbp_MWh
 
         // Household gas from commodity to delivered, with the standing charge spread over use
         let hg = fr.household_gas
@@ -460,9 +735,11 @@ Object.assign(model, {
         gas.delivered = gas.before_vat + gas.vat
         gas.bill_gbp = gas.delivered * 0.01 * household_kWh
 
+        // The bill for final users. Refinery and extraction fuel is left out, as it is in the
+        // price of the products.
         let rows = {
             cars_and_vans: row("Cars and vans, petrol and diesel", fr.TWh.cars_and_vans, car_before, car_after - car_before),
-            other_transport: row("Other road, rail and domestic shipping, at diesel", fr.TWh.other_transport, diesel_before, diesel.duty / rf.diesel_kWh_per_litre * per_litre_to_MWh),
+            other_transport: row("Other road, rail and domestic shipping, at diesel", fr.TWh.other_transport, diesel_before, diesel.duty / rf.diesel_kWh_per_litre * p_litre_to_gbp_MWh),
             aviation: row("Aviation, jet fuel", fr.TWh.aviation, fr.jet_fuel_gbp_MWh, 0),
             international_shipping: row("International shipping, marine gas oil", fr.TWh.international_shipping, fr.marine_gas_oil_gbp_MWh, 0),
             heating_oil: row("Heating oil", fr.TWh.heating_oil, heating_before, heating_after - heating_before),
@@ -477,13 +754,16 @@ Object.assign(model, {
             final.before_bn += rows[z].before_bn
             final.after_bn += rows[z].after_bn
         }
-        // Power station fuel, with the carbon price paid in 2024 as its tax
+
+        // Power station fuel is shown separately, as electricity bills already pay for it. Its tax
+        // is the carbon price paid in 2024. Mt x £/t gives £ million, and over TWh gives £/MWh.
         let power_TWh = fr.TWh.power_gas + fr.TWh.power_oil + fr.TWh.power_coal
         let power_fuel_bn = (fr.TWh.power_gas * fr.power.gas_p_kWh + fr.TWh.power_oil * fr.power.oil_p_kWh + fr.TWh.power_coal * fr.power.coal_p_kWh) * 0.01
         let power = row("Power station fuel, tax is the carbon price", power_TWh, 1000 * power_fuel_bn / power_TWh, fr.power.co2_Mt * fr.power.carbon_price / power_TWh)
         let total = { TWh: final.TWh + power.TWh, before_bn: final.before_bn + power.before_bn, after_bn: final.after_bn + power.after_bn }
 
-        // Price as a multiple of the 2024 bulk fossil fuel it replaces, on energy and before tax
+        // Fuel price as a multiple of the 2024 bulk fossil fuel it replaces, on energy and before
+        // tax. Fuel prices have no delivery cost, so bulk prices are the like for like comparison.
         let fuel = o.prices.fuel
         fuel.methane.times_gas = fuel.methane.price_gbp_MWh / (fr.power.gas_p_kWh * 10)
         fuel.synthetic_fuel.times_jet_fuel = fuel.synthetic_fuel.price_gbp_MWh / fr.jet_fuel_gbp_MWh
@@ -493,12 +773,28 @@ Object.assign(model, {
             rows, final, power, total, household_gas: gas,
             pump: { petrol, diesel, synthetic_no_duty: synthetic_pump(0), synthetic_same_duty: synthetic_pump(fr.road_duty_p_litre) }
         }
+    },
 
-        // Headline cost: system cost and networks, with fossil fuel for final users where they burn it.
-        // Tax is VAT on household electricity and synthetic car fuel, and the taxes in the fossil reference.
+    // -----------------------------------------------------------------------------------------
+    // 7. Total cost: the headline figures
+    //
+    //   before tax = system cost + networks + final users' fossil fuel, where they burn it
+    //   after tax  = before tax + VAT on household electricity and synthetic car fuel, or the
+    //                taxes on fossil fuel
+    //
+    // The fossil bill uses fixed 2024 volumes, so it only applies to baseline_2024. Electricity
+    // policy, supplier and standing charges are left out. See baseline/open-items.md.
+    // -----------------------------------------------------------------------------------------
+    total_cost: function() {
+        let fr = i.fossil_reference
+        if (!fr) return
+        let final = o.fossil_reference.final
         let elec = o.retail.electricity
-        let burns_fossil = o.generation_costs.fuel_users_annual == 0
+
+        // Spend including VAT x rate / (100 + rate) gives the VAT within it
         let vat_share = (spend, vat_prc) => spend * vat_prc / (100 + vat_prc)
+
+        let burns_fossil = o.generation_costs.fuel_users_annual == 0
         let before_bn = o.generation_costs.total_annual + elec.network_total_bn
         let tax_bn = vat_share(elec.household_spend_bn, i.retail.vat_prc)
         if (burns_fossil) {
@@ -507,8 +803,16 @@ Object.assign(model, {
         } else {
             tax_bn += vat_share(o.retail.road_fuel.car_fuel_spend_bn, fr.road_vat_prc)
         }
+
+        // Scenarios use very different amounts of energy, so also divide by final energy. This
+        // counts heat pump ambient heat, solar thermal and geothermal heat, and the electricity
+        // into electric vehicles.
         let energy_TWh = (o.final_consumption.total + o.final_consumption.international_shipping) * o.GWh_to_TWhy
+
+        // The tax gap is the 2024 tax take less this scenario's. Household electricity VAT is
+        // stored, as a scenario cannot see the 2024 bill.
         let tax_2024_bn = final.after_bn - final.before_bn + fr.household_electricity_vat_bn
+
         o.total_cost = {
             before_bn, tax_bn, after_bn: before_bn + tax_bn,
             energy_TWh,
@@ -521,11 +825,22 @@ Object.assign(model, {
     }
 })
 
-// Annual cost per kW of capacity (£/kW/yr) that recovers pre-development, construction
-// and fixed O&M costs over the operating life. Follows the DESNZ levelised cost method
-// used in tools/lcoe/lcoe_lib.js: spend is phased evenly over the pre-development and
-// construction years and discounted at the hurdle rate from the start of pre-development.
-// Multiplying by capacity gives the same total as LCOE multiplied by generation.
+// ---------------------------------------------------------------------------------------------
+// Turning a capital cost into a yearly cost
+//
+// A wind farm is paid for up front and earns over decades. Comparing it with a gas plant needs one
+// yearly figure for each. The discount rate (hurdle rate) makes money now worth more than money
+// later. At 7%, £1 in ten years is worth about 51p today, which is what investors need to be
+// paid to wait. A higher rate makes capital heavy technologies dearer.
+// ---------------------------------------------------------------------------------------------
+
+// Annual cost per kW of capacity (£/kW/yr), by the DESNZ levelised cost method used in
+// tools/lcoe/lcoe_lib.js. Add up all spending in today's money, and divide by the operating years
+// in today's money. The result is the flat yearly payment that exactly pays back the spending at
+// the hurdle rate. Multiplying by capacity gives the same total as LCOE multiplied by generation.
+//
+// Spending is even across the pre-development years, then even across the construction years, and
+// fixed O&M is paid in each operating year.
 function levelised_fixed_cost(c) {
     let rate = c.hurdle_rate * 0.01
     let construction_start = c.predev_years
@@ -550,7 +865,7 @@ function levelised_fixed_cost(c) {
 }
 
 // Annual fixed cost (£/kW/yr) by the chosen method. "desnz" is levelised_fixed_cost at each
-// technology's hurdle rate. "annuity" is the PyPSA-Eur method: overnight cost (pre-development
+// technology's own hurdle rate. "annuity" is the PyPSA-Eur method: overnight cost (pre-development
 // plus construction) times the annuity factor at one discount rate for all technologies, plus
 // fixed O&M, with no interest during construction.
 function annual_fixed_cost(c, a) {
@@ -561,7 +876,8 @@ function annual_fixed_cost(c, a) {
 }
 
 // Hurdle rate (%) at which levelised_fixed_cost equals target (£/kW/yr). The cost rises with the
-// rate, so bisection between -5% and 50% finds it. Null if the target is outside that range.
+// rate, so repeatedly halving the range between -5% and 50% finds it (bisection). Null if the
+// target is outside that range.
 function implied_hurdle_rate(c, target) {
     let at = (rate) => levelised_fixed_cost(Object.assign({}, c, { hurdle_rate: rate }))
     let low = -5, high = 50
@@ -574,7 +890,8 @@ function implied_hurdle_rate(c, target) {
 }
 
 // Construction cost (£/kW) at which levelised_fixed_cost equals target, at the input hurdle rate.
-// The cost is linear in capex. A negative result means the target is below pre-development and O&M.
+// The cost is a straight line in capex, so two points give the answer. A negative result means the
+// target is below pre-development and O&M alone.
 function implied_capex(c, target) {
     let without = levelised_fixed_cost(Object.assign({}, c, { capex: 0 }))
     let per_capex = levelised_fixed_cost(Object.assign({}, c, { capex: 1000 })) - without
