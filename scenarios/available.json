@@ -7,6 +7,10 @@
         "name": "ZeroCarbonBritain, phase 5 retune (candidate)",
         "group": "ZeroCarbonBritain"
     },
+    "zcb_2024_high_demand": {
+        "name": "ZeroCarbonBritain supply with 2024 demand levels",
+        "group": "ZeroCarbonBritain"
+    },
     "baseline_2024": {
         "name": "2024 baseline",
         "group": "Baselines"

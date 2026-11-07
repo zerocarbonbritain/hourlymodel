@@ -1,0 +1,136 @@
+{
+    "supply": {
+        "offshore_wind_capacity": 144,
+        "onshore_wind_capacity": 67,
+        "solarpv_capacity": 192,
+        "solarthermal_capacity": 44
+    },
+    "LAC": {
+        "domestic": {
+            "lighting_and_appliances_TWhy": 70.11,
+            "cooking_TWhy": 14.6
+        },
+        "services": {
+            "lighting_and_appliances_TWhy": 61.61,
+            "catering_TWhy": 18.86,
+            "cooling_TWhy": 11.15
+        }
+    },
+    "space_heating": {
+        "domestic_demand_GWK": 4.183,
+        "services_demand_GWK": 2.148,
+        "industry_demand_GWK": 0.297,
+        "base_temperature": 15.3
+    },
+    "water_heating": {
+        "domestic_TWhy": 57.61,
+        "services_TWhy": 15.76
+    },
+    "transport": {
+        "modes": {
+            "Walking": {
+                "miles_pp": 230
+            },
+            "Cycling": {
+                "miles_pp": 53
+            },
+            "Ebikes": {
+                "miles_pp": 0,
+                "load_factor": 1,
+                "mechanical_kwhppkm_full": 0.0081
+            },
+            "Rail": {
+                "miles_pp": 683,
+                "load_factor": 0.324,
+                "mechanical_kwhppkm_full": 0.027
+            },
+            "Bus": {
+                "miles_pp": 256,
+                "load_factor": 0.1432,
+                "mechanical_kwhppkm_full": 0.0163
+            },
+            "Motorbike": {
+                "miles_pp": 46,
+                "load_factor": 1.071,
+                "mechanical_kwhppkm_full": 0.054
+            },
+            "Cars & Vans": {
+                "miles_pp": 6049,
+                "load_factor": 0.3288,
+                "mechanical_kwhppkm_full": 0.031
+            },
+            "Aviation": {
+                "miles_pp": 3116,
+                "load_factor": 0.85,
+                "mechanical_kwhppkm_full": 0.07
+            }
+        },
+        "rail_freight_elec_demand": 5.649,
+        "freight_BEV_demand": 29.66,
+        "freight_H2_demand": 11.468,
+        "freight_IC_demand": 58.135,
+        "electric_car_battery_capacity": 713,
+        "electric_car_max_charge_rate": 101.9
+    },
+    "industry": {
+        "activity_prc": 100,
+        "material_efficiency_prc": 0,
+        "energy_efficiency_prc": 0
+    },
+    "electric_storage": {
+        "capacity_GWh": 230,
+        "charge_capacity_GW": 28,
+        "discharge_capacity_GW": 28
+    },
+    "hydrogen": {
+        "electrolysis_capacity_GW": 55,
+        "storage_capacity_GWh": 10000
+    },
+    "biogas": {
+        "biomass_for_biogas": 110
+    },
+    "methane": {
+        "methanation_capacity": 7.64,
+        "storage_capacity_GWh": 100000,
+        "SOC_start": 30000
+    },
+    "synth_fuel": {
+        "capacity_GW": 26,
+        "store_capacity_GWh": 100000,
+        "store_start_GWh": 43000,
+        "store_target_GWh": 43000
+    },
+    "land_use": {
+        "annual_grass_hemp": 0,
+        "coastal_and_freshwater": 692,
+        "existing_natural_broadleaf_woodland": 171,
+        "existing_natural_coniferous_woodland": 158,
+        "existing_productive_broadleaf_woodland": 1539,
+        "existing_productive_coniferous_woodland": 1418,
+        "feed_crops_for_livestock": 3466,
+        "food_crops": 2689,
+        "intensive_and_rough_grazing": 10577,
+        "mountain_heath_and_bog": 2080,
+        "new_natural_broadleaf_woodland": 0,
+        "new_natural_coniferous_woodland": 0,
+        "new_productive_broadleaf_woodland": 0,
+        "new_productive_coniferous_woodland": 0,
+        "perrennial_grass_miscanthus": 0,
+        "rotational_grass_ryegrass": 0,
+        "semi_natural_grassland": 155,
+        "short_rotation_forestry": 0,
+        "urban_areas": 1459
+    },
+    "land_model": {
+        "uk_area_kha": 24417
+    },
+    "emissions_balance": {
+        "agriculture_total": 40.762,
+        "biomass_burning": 0.614,
+        "land_remaining_and_converted_to_grassland": -0.179,
+        "land_remaining_and_converted_to_cropland": 12.784,
+        "land_remaining_and_converted_to_settlements": 3.723,
+        "land_remaining_and_converted_to_wetlands": 2.699,
+        "land_use_n2o": 0.846
+    }
+}
