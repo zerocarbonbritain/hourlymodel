@@ -574,7 +574,8 @@
         "solar_thermal_rooftop_prc": 50,
         "solar_thermal_rooftop_kWh_m2": 435,
         "solar_thermal_large_kWh_m2": 470,
-        "solar_thermal_kWth_per_m2": 0.7
+        "solar_thermal_kWth_per_m2": 0.7,
+        "heat_network_load_factor": 0.34
     },
     "fuel_prices": {
         "gas": 3.499,
@@ -828,7 +829,7 @@
             "predev_years": 0,
             "predev_cost": 0,
             "build_years": 1,
-            "capex": 3316,
+            "capex": 1620,
             "fixed_om": 10.0,
             "variable_om": 0,
             "lifespan": 25
@@ -842,6 +843,16 @@
             "fixed_om": 0,
             "variable_om": 0.2,
             "lifespan": 30
+        },
+        "Heat network": {
+            "hurdle_rate": 7.6,
+            "predev_years": 0,
+            "predev_cost": 0,
+            "build_years": 2,
+            "capex": 1785,
+            "fixed_om": 0.82,
+            "variable_om": 1.65,
+            "lifespan": 45
         }
     }
 }

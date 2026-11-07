@@ -49,8 +49,9 @@
 // docs/cost-assumptions.md records the source of each cost.
 // ---------------------------------------------------------------------------------------------
 
-// Solar thermal rows in i.costs. They make heat, so they stay out of electricity system totals.
+// Heat rows in i.costs. They make or deliver heat, so they stay out of electricity system totals.
 const SOLAR_THERMAL = ['Solar thermal rooftop', 'Solar thermal large-scale']
+const HEAT_ROWS = SOLAR_THERMAL.concat(['Heat network'])
 
 Object.assign(model, {
 
@@ -160,6 +161,11 @@ Object.assign(model, {
         o.costs['Solar thermal rooftop'] = { capacity: thermal_GW(solar_TWh * rooftop_share, hb && hb.solar_thermal_rooftop_kWh_m2), generation: solar_TWh * rooftop_share }
         o.costs['Solar thermal large-scale'] = { capacity: thermal_GW(solar_TWh * (1 - rooftop_share), hb && hb.solar_thermal_large_kWh_m2), generation: solar_TWh * (1 - rooftop_share) }
 
+        // Heat networks carry heat from large solar arrays and deep geothermal to buildings.
+        // Capacity is peak heat in GW: average heat (TWh / 8.766) over the network load factor.
+        let network_TWh = solar_TWh * (1 - rooftop_share) + supply.total_geothermal_heat * to_TWh
+        o.costs['Heat network'] = { capacity: hb ? network_TWh / 8.766 / hb.heat_network_load_factor : 0, generation: network_TWh }
+
         // Compressors and pumps that move fuel in and out of stores, sized by the largest hourly flow
         o.costs['Hydrogen compressor'] = { capacity: o.hydrogen.max_store_charge, generation: 0 }
         o.costs['Methane store charging'] = { capacity: o.methane.max_store_charge, generation: 0 }
@@ -167,13 +173,13 @@ Object.assign(model, {
 
         // Annual cost and LCOE of each technology. o.total_annual_cost adds up the build-up for
         // the electricity and fuel system, as a comparison with the costs actually paid in the next
-        // step. Solar thermal makes heat, so it is left out of that total.
+        // step. Heat rows are left out of that total.
         o.total_annual_cost = 0;
         for (var z in i.costs) {
             let c = o.costs[z]
             c.annual = c.capacity * 0.001 * annual_fixed_cost(i.costs[z], i.annualisation) + c.generation * 0.001 * i.costs[z].variable_om
             c.LCOE = c.generation > 0 ? 1000 * c.annual / c.generation : 0
-            if (!SOLAR_THERMAL.includes(z)) o.total_annual_cost += c.annual
+            if (!HEAT_ROWS.includes(z)) o.total_annual_cost += c.annual
         }
 
         // Feedstocks. Crop feedstock for biogas is the grass above the waste share in land_use,
@@ -331,9 +337,9 @@ Object.assign(model, {
             o.generation_costs.fuel_production_annual += build_up(z)
         }
 
-        // Solar thermal is paid for by heat users, not on electricity bills, so it is in the
-        // build-up table but not in the system cost. See heat_and_biomass.
-        for (let z of SOLAR_THERMAL) o.costs[z].used = true
+        // Solar thermal and heat networks are paid for by heat users, not on electricity bills, so
+        // they are in the build-up table but not in the system cost. See heat_and_biomass.
+        for (let z of HEAT_ROWS) o.costs[z].used = true
 
         // The system cost is everything so far. Networks are added at the retail step.
         o.generation_costs.total_annual += o.generation_costs.fuel_production_annual + basis_inputs.other_support_gbp_bn
@@ -926,9 +932,10 @@ Object.assign(model, {
     //                 industry at the bulk pellet price, £/MWh of fuel
     //   solar thermal rooftop panels and large arrays, at their build-up cost
     //   geothermal    deep geothermal heat at its levelised cost of heat, £/MWh of heat
+    //   heat network  pipes from large solar arrays and geothermal to buildings, at build-up cost
     //
     // The cost is the same in both totals, except that the cost to society leaves out VAT and
-    // values solar thermal at the social discount rate.
+    // values solar thermal and heat networks at the social discount rate.
     heat_and_biomass: function() {
         let hb = i.heat_and_biomass
         if (!hb) return
@@ -941,9 +948,10 @@ Object.assign(model, {
         let biomass_bn = domestic_before_vat_bn + bulk_TWh * hb.biomass_bulk_gbp_MWh * 0.001
         let geothermal_bn = o.supply.total_geothermal_heat * to_TWh * hb.geothermal_heat_gbp_MWh * 0.001
         let solar_thermal_bn = SOLAR_THERMAL.reduce((sum, z) => sum + o.costs[z].annual, 0)
+        let heat_network_bn = o.costs['Heat network'].annual
         o.heat_and_biomass = {
-            domestic_TWh, bulk_TWh, domestic_bn, biomass_bn, geothermal_bn, solar_thermal_bn,
-            before_bn: biomass_bn + geothermal_bn + solar_thermal_bn,
+            domestic_TWh, bulk_TWh, domestic_bn, biomass_bn, geothermal_bn, solar_thermal_bn, heat_network_bn,
+            before_bn: biomass_bn + geothermal_bn + solar_thermal_bn + heat_network_bn,
             vat_bn: domestic_bn - domestic_before_vat_bn
         }
     },
@@ -1090,11 +1098,11 @@ Object.assign(model, {
         let society = i.society
 
         // Build-up for every technology at the social discount rate. This uses the same method as
-        // private costs, so construction time still counts. Solar thermal is heat, so it is kept
-        // separate, as in the build-up total.
+        // private costs, so construction time still counts. Heat rows are kept separate, as in the
+        // build-up total.
         let social = (z) => o.costs[z].capacity * 0.001 * levelised_fixed_cost(Object.assign({}, i.costs[z], { hurdle_rate: society.discount_rate_prc })) + o.costs[z].generation * 0.001 * i.costs[z].variable_om
         let at_social_rate = 0
-        for (let z in i.costs) if (!SOLAR_THERMAL.includes(z)) at_social_rate += social(z)
+        for (let z in i.costs) if (!HEAT_ROWS.includes(z)) at_social_rate += social(z)
 
         // Feedstocks and backup fuel are real resources. Imports have no build-up, so they use
         // their price. The build-up carbon cost is a transfer, so it is left out.
@@ -1105,10 +1113,10 @@ Object.assign(model, {
 
         // Networks, suppliers, fuel delivery, heat, biomass and fossil fuel before tax are real
         // resources. Fossil fuel prices are market prices, which is the cost of buying the fuel from
-        // abroad. Solar thermal follows the same discount rate as the rest of supply.
+        // abroad. Solar thermal and heat networks follow the same discount rate as the rest of supply.
         let heat = o.heat_and_biomass
-        let heat_bn = heat.biomass_bn + heat.geothermal_bn + SOLAR_THERMAL.reduce((sum, z) => sum + social(z), 0)
-        let heat_at_hurdle_bn = heat.biomass_bn + heat.geothermal_bn + heat.solar_thermal_bn
+        let heat_bn = heat.biomass_bn + heat.geothermal_bn + HEAT_ROWS.reduce((sum, z) => sum + social(z), 0)
+        let heat_at_hurdle_bn = heat.biomass_bn + heat.geothermal_bn + heat.solar_thermal_bn + heat.heat_network_bn
         let other_resources = layers.networks + layers.supplier + layers.fuel_delivery + layers.fossil_fuel
         let resource_bn = supply_bn + heat_bn + other_resources
 

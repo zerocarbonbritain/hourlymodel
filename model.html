@@ -1646,7 +1646,7 @@ input[type='text'] {
             <tr><td>Electricity networks</td><td>{{ o.total_cost.layers.networks | toFixed(1) }}</td><td>{{ o.total_cost.society.networks_bn | toFixed(1) }}</td></tr>
             <tr><td>Policy costs</td><td>{{ o.total_cost.layers.policy | toFixed(1) }}</td><td></td></tr>
             <tr><td>Electricity supplier costs</td><td>{{ o.total_cost.layers.supplier | toFixed(1) }}</td><td>{{ o.total_cost.society.supplier_bn | toFixed(1) }}</td></tr>
-            <tr v-if="o.total_cost.layers.heat_and_biomass"><td>Heat and biomass off the grid: wood fuel, solar thermal and geothermal heat</td><td>{{ o.total_cost.layers.heat_and_biomass | toFixed(1) }}</td><td>{{ o.total_cost.society.heat_and_biomass_bn | toFixed(1) }}</td></tr>
+            <tr v-if="o.total_cost.layers.heat_and_biomass"><td>Heat and biomass off the grid: wood fuel, solar thermal, geothermal heat and heat networks</td><td>{{ o.total_cost.layers.heat_and_biomass | toFixed(1) }}</td><td>{{ o.total_cost.society.heat_and_biomass_bn | toFixed(1) }}</td></tr>
             <tr v-if="o.total_cost.layers.fuel_delivery"><td>Fuel delivery</td><td>{{ o.total_cost.layers.fuel_delivery | toFixed(1) }}</td><td>{{ o.total_cost.society.fuel_delivery_bn | toFixed(1) }}</td></tr>
             <tr><td>Fossil fuel for final users, before tax</td><td>{{ o.total_cost.layers.fossil_fuel | toFixed(1) }}</td><td>{{ o.total_cost.society.fossil_fuel_bn | toFixed(1) }}</td></tr>
             <tr class="total"><td>Before tax and carbon</td><td>{{ o.total_cost.before_bn | toFixed(1) }}</td><td>{{ o.total_cost.society.resource_bn | toFixed(1) }}</td></tr>
@@ -1847,7 +1847,7 @@ input[type='text'] {
             <tr v-if="o.synth_fuel.total_biomass_used > 0"><td>FT biomass <input v-model.number="i.synth_fuel.biomass_gbp_MWh" type="text" @change="update_non_hourly" autocomplete="off"/> £/MWh of biomass</td><td>{{ o.ft_biomass_annual | toFixed(1) }}</td></tr>
             <tr v-if="o.biomass.grass_for_biogas > 0"><td>Biogas crop feedstock <input v-model.number="i.biogas.crop_feedstock_gbp_MWh" type="text" @change="update_non_hourly" autocomplete="off"/> £/MWh of methane (waste feedstock is free)</td><td>{{ o.biogas_feedstock_annual | toFixed(1) }}</td></tr>
         </table>
-        <p><i>Storage capacity is in GWh, with costs per kWh. Anaerobic digestion capacity is in GW of methane, with output in TWh of methane. FT capacity is in GW of hydrogen in, with output in TWh of synthetic fuel. Output is before curtailment.</i></p>
+        <p><i>Storage capacity is in GWh, with costs per kWh. Anaerobic digestion capacity is in GW of methane, with output in TWh of methane. FT capacity is in GW of hydrogen in, with output in TWh of synthetic fuel. Heat network capacity is in GW of peak heat, with output in TWh of heat delivered from large solar arrays and geothermal. Output is before curtailment.</i></p>
         </details>
 
     </div>
