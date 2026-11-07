@@ -1629,11 +1629,31 @@ input[type='text'] {
     <div class="inner" style="display:block" name="cost_model">
 
         <div class="cost-summary">
-            <div v-if="o.total_cost" title="System cost and electricity networks, plus this scenario's fossil fuel for final users at 2024 prices. Tax is VAT on household electricity and synthetic car fuel, and fossil fuel duty, VAT and Climate Change Levy. Retail policy and supplier costs for electricity are left out.">Total cost<b>£{{ o.total_cost.after_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.before_bn | toFixed(1) }} bn before tax</div>
-            <div v-if="o.total_cost" title="Total cost divided by final energy demand, including international shipping. Heat pump ambient heat, solar thermal and geothermal heat are counted as energy. Electric vehicles count electricity in, so a scenario with more of them shows a higher cost per kWh for the same travel.">Cost per kWh of energy<b>{{ o.total_cost.after_p_kWh | toFixed(1) }} p/kWh</b>{{ o.total_cost.before_p_kWh | toFixed(1) }} p before tax, {{ o.total_cost.energy_TWh | toFixed(0) }} TWh/year</div>
-            <div v-if="o.total_cost" title="Tax raised in 2024 less tax in this scenario, in the taxes counted in total cost. The carbon price in 2024 generation prices is not counted as tax here.">Tax gap against 2024<b>£{{ o.total_cost.tax_gap_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.tax_bn | toFixed(1) }} bn tax, £{{ o.total_cost.tax_2024_bn | toFixed(1) }} bn in 2024</div>
+            <div v-if="o.total_cost" title="What users pay: system cost, networks, policy and supplier costs, this scenario's fossil fuel, and tax. Leaves out demand side equipment.">Cost to consumers<b>£{{ o.total_cost.after_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.before_bn | toFixed(1) }} bn before tax</div>
+            <div v-if="o.total_cost" title="Real resources and emissions damage, leaving out tax, carbon prices and policy transfers. The range runs between capital at the social discount rate and at private hurdle rates. The social rate removes investor returns and also the risk they pay for, so the true cost lies between. Leaves out demand side equipment.">Cost to society<b>£{{ o.total_cost.society.range_low_bn | toFixed(0) }} to £{{ o.total_cost.society.range_high_bn | toFixed(0) }} bn/year</b>£{{ o.total_cost.society.carbon_bn | toFixed(1) }} bn is carbon</div>
+            <div v-if="o.total_cost" title="Cost to consumers divided by final energy demand, including international shipping. Heat pump ambient heat, solar thermal and geothermal heat are counted as energy. Electric vehicles count electricity in, so a scenario with more of them shows a higher cost per kWh for the same travel.">Cost per kWh of energy<b>{{ o.total_cost.after_p_kWh | toFixed(1) }} p/kWh</b>{{ o.total_cost.before_p_kWh | toFixed(1) }} p before tax, {{ o.total_cost.energy_TWh | toFixed(0) }} TWh/year</div>
+            <div v-if="o.total_cost" title="Tax raised in 2024 less tax in this scenario: fuel duty, VAT and Climate Change Levy. The carbon price in 2024 generation prices is not counted as tax here.">Tax gap against 2024<b>£{{ o.total_cost.tax_gap_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.tax_bn | toFixed(1) }} bn tax, £{{ o.total_cost.tax_2024_bn | toFixed(1) }} bn in 2024</div>
             <div>Generation cost<b>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.generation_costs.electricity_annual | toFixed(1) }} bn/year</div>
         </div>
+
+        <details class="cost-part" v-if="o.total_cost" open>
+        <summary><h3>Total cost</h3><span>Consumers £{{ o.total_cost.after_bn | toFixed(0) }} bn, society £{{ o.total_cost.society.range_low_bn | toFixed(0) }} to £{{ o.total_cost.society.range_high_bn | toFixed(0) }} bn</span></summary>
+        <table class="table cost-table" style="width:100%">
+            <tr><th>Layer</th><th title="What is paid, with strike prices, market prices and tax">Consumers</th><th title="Real resources and emissions damage">Society</th></tr>
+            <tr class="units"><th></th><th>£bn/y</th><th>£bn/y</th></tr>
+            <tr><td>Energy supply: price paid for consumers, build-up at the social discount rate for society</td><td>{{ o.total_cost.layers.system | toFixed(1) }}</td><td>{{ o.total_cost.society.supply_bn | toFixed(1) }}</td></tr>
+            <tr v-if="o.total_cost.layers.wholesale_adjustment"><td>Wholesale adjustment for 2024</td><td>{{ o.total_cost.layers.wholesale_adjustment | toFixed(1) }}</td><td></td></tr>
+            <tr><td>Electricity networks</td><td>{{ o.total_cost.layers.networks | toFixed(1) }}</td><td>{{ o.total_cost.society.networks_bn | toFixed(1) }}</td></tr>
+            <tr><td>Policy costs</td><td>{{ o.total_cost.layers.policy | toFixed(1) }}</td><td></td></tr>
+            <tr><td>Electricity supplier costs</td><td>{{ o.total_cost.layers.supplier | toFixed(1) }}</td><td>{{ o.total_cost.society.supplier_bn | toFixed(1) }}</td></tr>
+            <tr><td>Fossil fuel for final users, before tax</td><td>{{ o.total_cost.layers.fossil_fuel | toFixed(1) }}</td><td>{{ o.total_cost.society.fossil_fuel_bn | toFixed(1) }}</td></tr>
+            <tr class="total"><td>Before tax and carbon</td><td>{{ o.total_cost.before_bn | toFixed(1) }}</td><td>{{ o.total_cost.society.resource_bn | toFixed(1) }}</td></tr>
+            <tr><td>Tax</td><td>{{ o.total_cost.tax_bn | toFixed(1) }}</td><td></td></tr>
+            <tr><td>Carbon value <input v-model.number="i.society.carbon_value_gbp_tCO2e" type="text" @change="update_non_hourly" autocomplete="off"/> £/tCO2e on {{ o.total_cost.society.carbon_MtCO2e | toFixed(1) }} MtCO2e/yr</td><td></td><td>{{ o.total_cost.society.carbon_bn | toFixed(1) }}</td></tr>
+            <tr class="total"><td>Total</td><td>{{ o.total_cost.after_bn | toFixed(1) }}</td><td>{{ o.total_cost.society.total_bn | toFixed(1) }}</td></tr>
+        </table>
+        <p>The Society column discounts capital at <input v-model.number="i.society.discount_rate_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> % (Green Book). At private hurdle rates its total is £{{ o.total_cost.society.total_at_hurdle_bn | toFixed(1) }} bn/year. The card shows both as a range, as the social rate removes investor returns and also the risk they pay for. Network, supplier, import and fossil fuel prices keep their own returns at either rate. Carbon covers energy emissions and aviation's non-CO2 warming. Neither total includes heat pumps, retrofit, vehicles or other demand side equipment.</p>
+        </details>
 
         <p>Generation costs:
             <select v-model="cost_preset" title="A preset sets backup and storage prices only in its own scenario">

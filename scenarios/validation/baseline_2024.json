@@ -1982,6 +1982,33 @@
   },
   {
    "group": "Costs",
+   "label": "Electricity users' spend before VAT, DUKES use at QEP prices",
+   "units": "\u00a3bn/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "costs.consumer_electricity",
+   "model": {
+    "values": {
+     "a": "total_cost.electricity_bn"
+    },
+    "formula": "a"
+   },
+   "note": "Tests the retail layers in the cost to consumers. Household spend without 5% VAT, plus all other use at the average non-domestic price without VAT or Climate Change Levy.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 74.24371058392231,
+   "model_at_build": 70.88198435566656,
+   "sources": [
+    "all = 23298.55 (DUKES_1.1.xlsx, 2024!I35)",
+    "dom = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
+    "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
+    "h = 28609 (familiesandhouseholdsuk2025.xlsx, 5!E21)",
+    "f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)",
+    "n = 25.72905985 (table_341.xlsx, 3.4.1 (Annual excl CCL)!I28)"
+   ]
+  },
+  {
+   "group": "Costs",
    "label": "Fossil reference, 2024 tax against this run",
    "units": "ratio",
    "tolerance": 0.01,

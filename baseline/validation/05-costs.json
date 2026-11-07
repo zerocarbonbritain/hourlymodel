@@ -532,6 +532,29 @@
         "basis": "input",
         "note": "The bill uses live volumes and the reference uses stored volumes, at the same prices."
     },
+    "costs.consumer_electricity": {
+        "group": "Costs",
+        "label": "Electricity users' spend before VAT, DUKES use at QEP prices",
+        "units": "£bn/yr",
+        "observed": {
+            "values": {
+                "all": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Final consumption"], "column": "Electricity"},
+                "dom": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Electricity"},
+                "u": {"source": "qep_2.2.4", "sheet": "2.2.4", "block": "Table 2.2.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average variable unit price (£/kWh)"},
+                "h": {"source": "ons_households", "sheet": "5", "block": "Number of households (thousands)", "row": ["All households"], "column": "{year} Estimate"},
+                "f": {"source": "qep_2.2.4", "sheet": "2.2.4", "block": "Table 2.2.4", "row": ["{year}", "United Kingdom", "United Kingdom"], "column": "Overall: Average fixed cost (£/year)"},
+                "n": {"source": "qep_3.4.1", "sheet": "3.4.1 (Annual excl CCL)", "block": "Table 3.4.1", "row": ["{year}"], "column": "Electricity: Average (Pence per kWh)"}
+            },
+            "formula": "(dom * 0.01163 * u + h * 1000 * f / 1e9) / 1.05 + (all - dom) * 0.01163 * n * 0.01"
+        },
+        "model": {
+            "values": {"a": "total_cost.electricity_bn"},
+            "formula": "a"
+        },
+        "tolerance": 0.05,
+        "basis": "independent",
+        "note": "Tests the retail layers in the cost to consumers. Household spend without 5% VAT, plus all other use at the average non-domestic price without VAT or Climate Change Levy."
+    },
     "costs.fossil_ref_tax": {
         "group": "Costs",
         "label": "Fossil reference, 2024 tax against this run",

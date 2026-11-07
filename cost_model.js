@@ -16,7 +16,7 @@
 //   4. Fuel costs      What hydrogen, methane and synthetic fuel cost to make at those prices.
 //   5. Retail          What electricity users and fuel users pay after networks, policy and VAT.
 //   6. Fossil fuel     What the UK paid for fossil fuel in 2024, and this scenario's fossil bill.
-//   7. Total cost      The headline cost, before and after tax.
+//   7. Total cost      The cost to consumers, and the cost to society.
 //
 // UNITS
 //
@@ -43,9 +43,9 @@
 //
 // WHAT THE COSTS LEAVE OUT
 //
-// The cost covers energy supply and networks. It leaves out heat pumps, boilers, building retrofit,
-// vehicles and other equipment on the demand side, so it is not yet the full cost to society of a
-// scenario. baseline/open-items.md lists this and the other known limits under "Cost model".
+// The cost covers energy supply, networks and retail. It leaves out heat pumps, boilers, building
+// retrofit, vehicles and other equipment on the demand side, so neither total is yet the full cost
+// of a scenario. baseline/open-items.md lists this and the other known limits under "Cost model".
 // docs/cost-assumptions.md records the source of each cost.
 // ---------------------------------------------------------------------------------------------
 
@@ -599,6 +599,7 @@ Object.assign(model, {
         let billed_TWh = o.generation_costs.fuel_users_annual > 0 ? o.prices.end_use_TWh : delivered_TWh
 
         let elec = {
+            billed_TWh,
             // The build-up for every technology is kept for comparison
             resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
             generation_cost_p_kWh: billed_TWh > 0 ? 100 * o.generation_costs.electricity_annual / billed_TWh : 0,
@@ -861,11 +862,22 @@ Object.assign(model, {
     // -----------------------------------------------------------------------------------------
     // 7. Total cost: the headline figures
     //
-    //   before tax = system cost + networks + this scenario's fossil bill
-    //   after tax  = before tax + VAT on household electricity and synthetic car fuel + taxes on
-    //                fossil fuel
+    // The same energy system has two different costs, as they answer different questions.
     //
-    // Electricity policy, supplier and standing charges are left out. See baseline/open-items.md.
+    // Cost to consumers: what is paid. It follows the money on bills and at the pump, so it uses
+    // strike prices and market prices, and includes every retail layer and tax.
+    //
+    // Cost to society: what the system uses up. It counts real resources and the damage from
+    // emissions. Money that only moves between people in the UK is left out:
+    //
+    //   Tax, duty and carbon prices   These are paid to the government. The damage from carbon
+    //                                 is counted directly with a carbon value instead.
+    //   Strike prices and rents       The build-up gives what a technology costs to provide.
+    //   Investor returns above the    Capital is annualised at the Green Book social discount
+    //   social discount rate          rate and not at private hurdle rates.
+    //   Policy costs                  ECO and the Warm Home Discount are mainly transfers.
+    //
+    // Neither view yet includes demand side equipment. See baseline/open-items.md.
     // -----------------------------------------------------------------------------------------
     total_cost: function() {
         let fr = i.fossil_reference
@@ -873,14 +885,35 @@ Object.assign(model, {
         let bill = o.fossil_bill.final
         let reference = o.fossil_reference.final
         let elec = o.retail.electricity
+        let e = i.retail.electricity
+        let generation_costs = o.generation_costs
 
-        // Spend including VAT x rate / (100 + rate) gives the VAT within it
+        // A retail layer has a part per kWh and a part per home. p/kWh x TWh x 0.01 gives £bn, and
+        // £ x homes x 1e-9 gives £bn. Non-domestic standing charges are not modelled.
+        let per_home_bn = (gbp) => gbp * i.households_2030 * 1e-9
+        let per_kWh_bn = (p_kWh) => p_kWh * 0.01 * elec.billed_TWh
+
+        // Layers paid by consumers before tax. Together they rebuild every bill: electricity users
+        // pay the system cost less fuel sales, and fuel users pay fuel sales.
+        let layers = {
+            system: generation_costs.total_annual,
+            wholesale_adjustment: per_kWh_bn(e.wholesale_adjustment_p_kWh),
+            networks: elec.network_total_bn + per_home_bn(e.network_gbp),
+            policy: per_kWh_bn(e.policy_p_kWh) + per_home_bn(e.policy_gbp),
+            supplier: per_kWh_bn(e.supplier_p_kWh) + per_home_bn(e.supplier_gbp),
+            fossil_fuel: bill.before_bn
+        }
+        let before_bn = 0
+        for (let z in layers) before_bn += layers[z]
+
+        // Spend including VAT x rate / (100 + rate) gives the VAT within it. Businesses reclaim VAT.
         let vat_share = (spend, vat_prc) => spend * vat_prc / (100 + vat_prc)
-
-        let before_bn = o.generation_costs.total_annual + elec.network_total_bn + bill.before_bn
         let tax_bn = vat_share(elec.household_spend_bn, i.retail.vat_prc)
             + vat_share(o.retail.road_fuel.synthetic_car_spend_bn, fr.road_vat_prc)
             + bill.after_bn - bill.before_bn
+
+        // What electricity users pay before VAT, which the validation compares with observed spend
+        let electricity_bn = before_bn - bill.before_bn - o.prices.fuel_sales - elec.network_fuel_bn
 
         // Scenarios use very different amounts of energy, so also divide by final energy. This
         // counts heat pump ambient heat, solar thermal and geothermal heat, and the electricity
@@ -892,6 +925,7 @@ Object.assign(model, {
         let tax_2024_bn = reference.after_bn - reference.before_bn + fr.household_electricity_vat_bn
 
         o.total_cost = {
+            layers, electricity_bn,
             before_bn, tax_bn, after_bn: before_bn + tax_bn,
             energy_TWh,
             before_p_kWh: 100 * before_bn / energy_TWh,
@@ -900,6 +934,57 @@ Object.assign(model, {
             // Rounded so the baseline shows 0.0 and not -0.0
             tax_gap_bn: Math.round((tax_2024_bn - tax_bn) * 10) / 10
         }
+        model.society_cost(layers)
+    },
+
+    // Cost to society: real resources plus the damage from emissions.
+    society_cost: function(layers) {
+        let society = i.society
+
+        // Build-up for every technology at the social discount rate. This uses the same method as
+        // private costs, so construction time still counts.
+        let at_social_rate = 0
+        for (let z in i.costs) {
+            let c = o.costs[z]
+            let fixed = levelised_fixed_cost(Object.assign({}, i.costs[z], { hurdle_rate: society.discount_rate_prc }))
+            at_social_rate += c.capacity * 0.001 * fixed + c.generation * 0.001 * i.costs[z].variable_om
+        }
+
+        // Feedstocks and backup fuel are real resources. Imports have no build-up, so they use
+        // their price. The build-up carbon cost is a transfer, so it is left out.
+        let imports = o.generation_costs.by_tech.imports.annual
+        let other_supply = o.biogas_feedstock_annual + o.ft_biomass_annual + o.fuel_cost_annual + imports
+        let supply_bn = at_social_rate + other_supply
+        let supply_at_hurdle_bn = o.total_annual_cost - o.carbon_cost_annual + imports
+
+        // Networks, suppliers and fossil fuel before tax are real resources. Fossil fuel prices
+        // are market prices, which is the cost of buying the fuel from abroad.
+        let resource_excluding_supply = layers.networks + layers.supplier + layers.fossil_fuel
+        let resource_bn = supply_bn + resource_excluding_supply
+
+        // Emissions from energy, valued at the carbon value. These are fossil fuel emissions plus
+        // the extra warming from aviation above its CO2 (the uplift also applies to synthetic jet
+        // fuel). Land use and other non-energy emissions are outside this cost boundary.
+        let eb = o.emissions_balance
+        let carbon_MtCO2e = eb.fossil_fuel_coal + eb.fossil_fuel_gas + eb.fossil_fuel_oil + eb.international_aviation_bunkers
+        let carbon_bn = carbon_MtCO2e * society.carbon_value_gbp_tCO2e * 0.001
+
+        o.total_cost.society = {
+            supply_bn, supply_at_hurdle_bn,
+            networks_bn: layers.networks,
+            supplier_bn: layers.supplier,
+            fossil_fuel_bn: layers.fossil_fuel,
+            resource_bn,
+            carbon_MtCO2e, carbon_bn,
+            total_bn: resource_bn + carbon_bn,
+            total_at_hurdle_bn: supply_at_hurdle_bn + resource_excluding_supply + carbon_bn
+        }
+
+        // The social rate leaves out investor returns, but also the risk they pay for, such as
+        // cost overruns. Hurdle rates include both. The true cost lies between, so show a range.
+        let s = o.total_cost.society
+        s.range_low_bn = Math.min(s.total_bn, s.total_at_hurdle_bn)
+        s.range_high_bn = Math.max(s.total_bn, s.total_at_hurdle_bn)
     }
 })
 

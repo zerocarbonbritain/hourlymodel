@@ -31,13 +31,15 @@ Items found while building and validating baselines that need further attention.
 Found in a review of cost_model.js on 2026-11-07. Figures are zcb_2024 and baseline_2024.
 
 - **Demand side costs are missing.** Total cost covers energy supply and networks. It leaves out building retrofit, heat pumps, boilers, heat networks, vehicles and modal shift. zcb_2024 relies on these to cut final energy from 1,507 to 689 TWh, so its comparison with the baseline is favourable and total cost is not yet a cost to society.
-- **Total cost mixes cost layers.** Baseline fossil fuel is at delivered prices with supplier margins, but electricity has only generation and network costs. Adding policy, supplier and standing charges and the wholesale adjustment gives £70.9bn for baseline electricity against £45.6bn in total cost. DUKES use at QEP prices gives about £69bn, so these layers do apply to non-domestic users at about this level. On that basis, before tax totals are about £143bn and £127bn, against £118bn and £107bn on the card.
+- **Baseline biomass fuel is free in the cost to society.** Consumers pay for it through the biomass generation price, but the build-up has no biomass fuel price (see above), so the baseline's cost to society is low. A price is needed for fuel_prices.biomass.
+- **Non-domestic standing charges are missing** from the cost to consumers.
+- **The social discount rate reaches energy supply only.** Network, supplier, import and fossil fuel prices keep their private returns in the cost to society, including £24.0bn/yr of networks in zcb_2024 and £12.5bn/yr in the baseline. This slightly overstates zcb_2024. The rate also has no optimism bias adjustment, so the total is shown as a range.
+- **Generator network charges overlap with retail network charges.** Generator `fixed_om` and strike prices include connection and use of system charges, which also sit in retail network charges. The overlap has not been sized.
 - **Fuel prices have no delivery cost.** Methane, hydrogen and synthetic fuel have no gas network, pipeline, tanker or forecourt cost. At the 2024 gap between non-domestic and bulk gas (£19/MWh), methane delivery alone is about £0.8bn/yr. Hydrogen delivery is likely to cost more per MWh.
 - **Some heat and biomass has no cost.** Solar thermal (24.8 TWh) and geothermal heat (15.8 TWh) have no capital cost. Direct biomass use has no fuel cost (30.8 and 49.8 TWh of final bioenergy).
 - **Electricity Climate Change Levy is missing.** QEP 3.4.1 and 3.4.2 show 0.56 p/kWh on non-domestic electricity. This is about £0.9bn/yr in the 2024 tax take. The reference counts it on gas only.
 - **Electric vehicle charging is outside household figures.** The household bill leaves out EVs. In zcb_2024, car electricity is 42 TWh, about £12bn/yr at the unit rate and £0.6bn of VAT, against £39bn/yr of baseline car fuel. A household total across bills and cars would compare scenarios fairly.
 - **Spilled methane falls on electricity users.** 5.4 TWh/yr spills from the full store. Its cost of about £0.8bn/yr (0.23 p/kWh) stays with electricity users, as does £3.3bn/yr of turbine methane, which is correct.
-- **Society and consumer views are not separate.** Strike prices and hurdle rates include private returns, and baseline prices include market rents. For society, tax and these returns are partly transfers. For consumers, they are costs. Before tax total cost is not a resource cost. `o.total_annual_cost` is closer to one.
 
 ## Industry
 

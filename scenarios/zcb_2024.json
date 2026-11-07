@@ -559,6 +559,10 @@
         },
         "household_electricity_vat_bn": 1.48
     },
+    "society": {
+        "discount_rate_prc": 3.5,
+        "carbon_value_gbp_tCO2e": 302
+    },
     "fuel_prices": {
         "gas": 3.499,
         "oil": 5.245,
