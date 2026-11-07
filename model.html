@@ -1629,7 +1629,7 @@ input[type='text'] {
     <div class="inner" style="display:block" name="cost_model">
 
         <div class="cost-summary">
-            <div v-if="o.total_cost" title="System cost and electricity networks, plus fossil fuel for final users where they burn it. Tax is VAT on household electricity and car fuel, and fossil fuel duty, VAT and Climate Change Levy. Retail policy and supplier costs for electricity are left out.">Total cost<b>£{{ o.total_cost.after_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.before_bn | toFixed(1) }} bn before tax</div>
+            <div v-if="o.total_cost" title="System cost and electricity networks, plus this scenario's fossil fuel for final users at 2024 prices. Tax is VAT on household electricity and synthetic car fuel, and fossil fuel duty, VAT and Climate Change Levy. Retail policy and supplier costs for electricity are left out.">Total cost<b>£{{ o.total_cost.after_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.before_bn | toFixed(1) }} bn before tax</div>
             <div v-if="o.total_cost" title="Total cost divided by final energy demand, including international shipping. Heat pump ambient heat, solar thermal and geothermal heat are counted as energy. Electric vehicles count electricity in, so a scenario with more of them shows a higher cost per kWh for the same travel.">Cost per kWh of energy<b>{{ o.total_cost.after_p_kWh | toFixed(1) }} p/kWh</b>{{ o.total_cost.before_p_kWh | toFixed(1) }} p before tax, {{ o.total_cost.energy_TWh | toFixed(0) }} TWh/year</div>
             <div v-if="o.total_cost" title="Tax raised in 2024 less tax in this scenario, in the taxes counted in total cost. The carbon price in 2024 generation prices is not counted as tax here.">Tax gap against 2024<b>£{{ o.total_cost.tax_gap_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.tax_bn | toFixed(1) }} bn tax, £{{ o.total_cost.tax_2024_bn | toFixed(1) }} bn in 2024</div>
             <div>Generation cost<b>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.generation_costs.electricity_annual | toFixed(1) }} bn/year</div>
@@ -1664,7 +1664,7 @@ input[type='text'] {
         </table>
         </details>
 
-        <div v-if="i.fuel_values.methane_gbp_MWh > 0">
+        <div v-if="o.prices.fuel_sales > 0">
         <details class="cost-part" open>
         <summary><h3>Who pays</h3><span>Electricity users £{{ o.generation_costs.electricity_annual | toFixed(1) }} bn/year</span></summary>
         <table class="table cost-table" style="width:100%">
@@ -1681,14 +1681,15 @@ input[type='text'] {
 
         <details class="cost-part">
         <summary><h3>2024 fossil fuel reference</h3><span>£{{ o.fossil_reference.total.before_bn | toFixed(0) }} bn before tax, £{{ o.fossil_reference.total.after_bn | toFixed(0) }} bn after</span></summary>
-        <p>What the UK paid for fossil fuel in 2024, at 2024 prices and baseline_2024 volumes. These figures are the same in every scenario.</p>
+        <p>What the UK paid for fossil fuel in 2024, at 2024 prices and baseline_2024 volumes, with the same prices applied to this scenario's own fossil fuel. The scenario columns enter total cost. Its power station fuel is in the system cost.</p>
         <table class="table cost-table" style="width:100%">
-            <tr><th>Use</th><th>Volume</th><th>Before tax</th><th title="Duty, Climate Change Levy, VAT and the carbon price paid in 2024. VAT that businesses reclaim is left out.">Tax</th><th>After tax</th><th>Before tax</th><th>After tax</th></tr>
-            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th>£/MWh</th><th>£bn/y</th><th>£bn/y</th></tr>
-            <tr v-for="row in o.fossil_reference.rows"><td>{{ row.label }}</td><td>{{ row.TWh | toFixed(0) }}</td><td>{{ row.before | toFixed(0) }}</td><td>{{ row.tax | toFixed(0) }}</td><td>{{ row.after | toFixed(0) }}</td><td>{{ row.before_bn | toFixed(1) }}</td><td>{{ row.after_bn | toFixed(1) }}</td></tr>
-            <tr class="total"><td>Final users</td><td>{{ o.fossil_reference.final.TWh | toFixed(0) }}</td><td></td><td></td><td></td><td>{{ o.fossil_reference.final.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.final.after_bn | toFixed(1) }}</td></tr>
-            <tr><td>{{ o.fossil_reference.power.label }}</td><td>{{ o.fossil_reference.power.TWh | toFixed(0) }}</td><td>{{ o.fossil_reference.power.before | toFixed(0) }}</td><td>{{ o.fossil_reference.power.tax | toFixed(0) }}</td><td>{{ o.fossil_reference.power.after | toFixed(0) }}</td><td>{{ o.fossil_reference.power.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.power.after_bn | toFixed(1) }}</td></tr>
-            <tr class="total"><td>All fossil fuel</td><td>{{ o.fossil_reference.total.TWh | toFixed(0) }}</td><td></td><td></td><td></td><td>{{ o.fossil_reference.total.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.total.after_bn | toFixed(1) }}</td></tr>
+            <tr class="group"><th></th><th colspan="6">2024</th><th colspan="3">This scenario, at 2024 prices</th></tr>
+            <tr><th>Use</th><th>Volume</th><th>Before tax</th><th title="Duty, Climate Change Levy, VAT and the carbon price paid in 2024. VAT that businesses reclaim is left out.">Tax</th><th>After tax</th><th>Before tax</th><th>After tax</th><th>Volume</th><th>Before tax</th><th>After tax</th></tr>
+            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th>£/MWh</th><th>£bn/y</th><th>£bn/y</th><th>TWh/y</th><th>£bn/y</th><th>£bn/y</th></tr>
+            <tr v-for="(row, key) in o.fossil_reference.rows"><td>{{ row.label }}</td><td>{{ row.TWh | toFixed(0) }}</td><td>{{ row.before | toFixed(0) }}</td><td>{{ row.tax | toFixed(0) }}</td><td>{{ row.after | toFixed(0) }}</td><td>{{ row.before_bn | toFixed(1) }}</td><td>{{ row.after_bn | toFixed(1) }}</td><td>{{ o.fossil_bill.rows[key].TWh | toFixed(0) }}</td><td>{{ o.fossil_bill.rows[key].before_bn | toFixed(1) }}</td><td>{{ o.fossil_bill.rows[key].after_bn | toFixed(1) }}</td></tr>
+            <tr class="total"><td>Final users</td><td>{{ o.fossil_reference.final.TWh | toFixed(0) }}</td><td></td><td></td><td></td><td>{{ o.fossil_reference.final.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.final.after_bn | toFixed(1) }}</td><td>{{ o.fossil_bill.final.TWh | toFixed(0) }}</td><td>{{ o.fossil_bill.final.before_bn | toFixed(1) }}</td><td>{{ o.fossil_bill.final.after_bn | toFixed(1) }}</td></tr>
+            <tr><td>{{ o.fossil_reference.power.label }}</td><td>{{ o.fossil_reference.power.TWh | toFixed(0) }}</td><td>{{ o.fossil_reference.power.before | toFixed(0) }}</td><td>{{ o.fossil_reference.power.tax | toFixed(0) }}</td><td>{{ o.fossil_reference.power.after | toFixed(0) }}</td><td>{{ o.fossil_reference.power.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.power.after_bn | toFixed(1) }}</td><td></td><td></td><td></td></tr>
+            <tr class="total"><td>All fossil fuel</td><td>{{ o.fossil_reference.total.TWh | toFixed(0) }}</td><td></td><td></td><td></td><td>{{ o.fossil_reference.total.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.total.after_bn | toFixed(1) }}</td><td></td><td></td><td></td></tr>
         </table>
         <p>Power station fuel is already in electricity bills, so compare final users with fuel bills. Fuel used by refineries and extraction is in product prices and is left out. Road fuel includes 32 TWh of biofuel. Carbon is the £{{ i.fossil_reference.power.carbon_price | toFixed(2) }}/tCO2 paid by power stations. UK ETS costs for industry and aviation are not included.</p>
         <table class="table cost-table" style="width:100%; margin-top:20px">
@@ -1704,7 +1705,7 @@ input[type='text'] {
         </table>
         </details>
 
-        <div v-if="i.fuel_values.methane_gbp_MWh > 0">
+        <div v-if="o.prices.fuel_sales > 0">
         <details class="cost-part">
         <summary><h3>Fuel and hourly electricity prices</h3><span>Electricity £{{ o.prices.mean_gbp_MWh | toFixed(0) }}/MWh mean</span></summary>
         <table class="table cost-table" style="width:100%">

@@ -15,7 +15,7 @@
 //   3. Hourly prices   What electricity is worth in each hour, from what is at the margin.
 //   4. Fuel costs      What hydrogen, methane and synthetic fuel cost to make at those prices.
 //   5. Retail          What electricity users and fuel users pay after networks, policy and VAT.
-//   6. Fossil fuel     What the UK paid for fossil fuel in 2024, as a fixed point of comparison.
+//   6. Fossil fuel     What the UK paid for fossil fuel in 2024, and this scenario's fossil bill.
 //   7. Total cost      The headline cost, before and after tax.
 //
 // UNITS
@@ -58,16 +58,18 @@ Object.assign(model, {
 
         let price_classes = model.hourly_prices()
         let electricity_for_fuel = model.price_summary(price_classes)
-        model.fuel_production_costs(electricity_for_fuel)
+        let fossil_share = model.fossil_share_of_fuel_sold()
+        model.fuel_production_costs(electricity_for_fuel, fossil_share)
 
         o.retail = {}
         let hydrogen = model.hydrogen_in_fuel_sold()
         model.electricity_retail(hydrogen)
         model.fuel_prices(hydrogen)
         model.gas_retail()
-        model.road_fuel_retail()
+        model.road_fuel_retail(fossil_share)
 
         model.fossil_reference()
+        model.fossil_bill(fossil_share)
         model.total_cost()
     },
 
@@ -460,7 +462,32 @@ Object.assign(model, {
     //
     // This step also splits the system cost between fuel users and electricity users.
     // -----------------------------------------------------------------------------------------
-    fuel_production_costs: function(electricity_for_fuel) {
+
+    // Final users' demand for gas and liquid fuel, GWh over the run. It can be met by synthetic
+    // fuel, or by fossil fuel where the scenario allows it.
+    final_fuel_demand: function() {
+        return {
+            methane: o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas,
+            synthetic_fuel: o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand
+        }
+    },
+
+    // The share of final users' fuel that is bought on the fossil fuel market, from 0 to 1. The
+    // dispatch in model.js burns fossil fuel when the fuel stores run out, and records how much.
+    // Fossil fuel for turbines is costed in step 1, so it is taken out here. Biofuel is bought on
+    // the same market and blended into road fuel, so it counts with liquid fossil fuel.
+    fossil_share_of_fuel_sold: function() {
+        let demand = model.final_fuel_demand()
+        let ff = o.fossil_fuels
+        let bought_gas = ff.gas_final_demand - o.methane.ccgt_methane_from_fossil_gas
+        let bought_liquid = ff.oil_from_store - o.synth_fuel.backup_from_fossil_oil + o.synth_fuel.total_biofuel_supply
+        return {
+            gas: demand.methane > 0 ? Math.min(1, bought_gas / demand.methane) : 0,
+            liquid: demand.synthetic_fuel > 0 ? Math.min(1, bought_liquid / demand.synthetic_fuel) : 0
+        }
+    },
+
+    fuel_production_costs: function(electricity_for_fuel, fossil_share) {
         let p = o.prices
         let fv = i.fuel_values
         let sf = i.synth_fuel
@@ -508,22 +535,21 @@ Object.assign(model, {
             synthetic_fuel: ft.generation > 0 ? sf.FT_process_hydrogen_req * fv.hydrogen_gbp_MWh + sf.FT_process_biomass_req * sf.biomass_gbp_MWh + ft_plant : 0
         }
 
-        // Fuel sold to final users, TWh/yr. This is less than fuel produced, as it leaves out
-        // fuel used to make other fuels, fuel burned in turbines and fuel spilled.
+        // Synthetic fuel sold to final users, TWh/yr. This is less than fuel produced, as it leaves
+        // out fuel used to make other fuels, fuel burned in turbines and fuel spilled. It also
+        // leaves out demand met by fossil fuel, which is costed in fossil_bill. A scenario that
+        // makes no fuel has a production cost of zero, so its fuel users pay nothing at this step.
+        let demand = model.final_fuel_demand()
         p.fuel = {
             hydrogen: { TWh: (o.hydrogen.total_vehicle_demand + o.hydrogen.total_industry_demand + o.heating_systems.hydrogen.fuel_demand) * to_TWh },
-            methane: { TWh: (o.industry.total_methane_demand + o.heating_systems.methane.fuel_demand + o.LAC.total_gas) * to_TWh },
-            synthetic_fuel: { TWh: (o.synth_fuel.total_transport_demand + o.synth_fuel.total_industrial_demand + o.heating_systems.synthfuel.fuel_demand) * to_TWh }
+            methane: { TWh: demand.methane * to_TWh * (1 - fossil_share.gas) },
+            synthetic_fuel: { TWh: demand.synthetic_fuel * to_TWh * (1 - fossil_share.liquid) }
         }
-
-        // Baselines burn fossil fuel, which is outside the system cost. Their fuel values are
-        // zero, so fuel users pay nothing at this step. See fossil_reference for fossil fuel bills.
-        let fuel_users_pay = fv.methane_gbp_MWh > 0
         p.fuel_sales = 0
         p.fuel_value_sales = 0
         for (let z in p.fuel) {
             p.fuel[z].value_gbp_MWh = values[z]
-            p.fuel[z].gbp_MWh = fuel_users_pay ? costs[z] : 0
+            p.fuel[z].gbp_MWh = costs[z]
             p.fuel[z].annual = p.fuel[z].TWh * p.fuel[z].gbp_MWh * 0.001
             p.fuel_sales += p.fuel[z].annual
             p.fuel_value_sales += p.fuel[z].TWh * values[z] * 0.001
@@ -647,9 +673,9 @@ Object.assign(model, {
     },
 
     // Fuel for combustion engine cars. Pump prices include duty and VAT, so dividing by energy
-    // per litre gives p/kWh. Petrol has less energy per litre than diesel. Where fuel users pay
-    // for synthetic fuel, cars pay its price with VAT and no duty. Baselines pay pump prices.
-    road_fuel_retail: function() {
+    // per litre gives p/kWh. Petrol has less energy per litre than diesel. Fossil fuel and biofuel
+    // pay pump prices, and synthetic fuel pays its price with VAT and no duty.
+    road_fuel_retail: function(fossil_share) {
         let f = i.retail.road_fuel
         let diesel = f.car_diesel_prc * 0.01
         let synthetic = o.prices.fuel.synthetic_fuel
@@ -658,18 +684,20 @@ Object.assign(model, {
             diesel_p_kWh: f.diesel_p_litre / f.diesel_kWh_per_litre
         }
         road.fossil_car_p_kWh = road.petrol_p_kWh * (1 - diesel) + road.diesel_p_kWh * diesel
-        let synthetic_car_fuel = i.fossil_reference && synthetic.gbp_MWh > 0
-        road.car_p_kWh = synthetic_car_fuel ? synthetic.p_kWh * (1 + i.fossil_reference.road_vat_prc * 0.01) : road.fossil_car_p_kWh
+        let road_vat = i.fossil_reference ? 1 + i.fossil_reference.road_vat_prc * 0.01 : 1
+        road.synthetic_car_p_kWh = synthetic.p_kWh * road_vat
+        road.car_p_kWh = road.fossil_car_p_kWh * fossil_share.liquid + road.synthetic_car_p_kWh * (1 - fossil_share.liquid)
         road.car_fuel_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.car_p_kWh * 0.01
+        road.synthetic_car_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.synthetic_car_p_kWh * (1 - fossil_share.liquid) * 0.01
         o.retail.road_fuel = road
     },
 
     // -----------------------------------------------------------------------------------------
-    // 6. Fossil fuel reference: what the UK paid for fossil fuel in 2024
+    // 6. Fossil fuel: the 2024 reference, and this scenario's bill
     //
-    // A fixed point of comparison, the same in every scenario. Each row has a volume (TWh/yr), a
-    // price before tax and a tax (both £/MWh). Tax means what users pay and cannot reclaim, so
-    // VAT that businesses reclaim is left out.
+    // The reference is a fixed point of comparison, the same in every scenario. Each row has a
+    // volume (TWh/yr), a price before tax and a tax (both £/MWh). Tax means what users pay and
+    // cannot reclaim, so VAT that businesses reclaim is left out.
     //
     // Prices arrive in the units they are published in. p/litre / kWh per litre gives p/kWh, and
     // p/kWh x 10 gives £/MWh.
@@ -775,34 +803,84 @@ Object.assign(model, {
         }
     },
 
+    // This scenario's fossil bill for final users: its own volumes at the 2024 prices and taxes
+    // above. In baseline_2024 this equals the reference, and in zcb_2024 it is zero. A scenario in
+    // between pays for what it burns. Biofuel is priced as road fuel. Power station fuel is in the
+    // system cost, so it is not in this bill.
+    fossil_bill: function(share) {
+        let fr = i.fossil_reference
+        if (!fr) return
+        let to_TWh = o.GWh_to_TWhy
+        let fc = o.final_consumption
+        let ff = o.fossil_fuels
+        let reference = o.fossil_reference.rows
+
+        // All liquid and gas demand by use, TWh/yr. Other use inputs are always fossil fuel.
+        let cars = o.transport.modes["Cars & Vans"].IC.TWh
+        let aviation = o.transport.modes.Aviation.IC.TWh
+        let shipping = fc.international_shipping * to_TWh
+        let other_transport = fc.transport.liquid * to_TWh - cars - aviation
+        let other_oil = i.fossil_fuels.other_oil_use
+        let other_gas = i.fossil_fuels.other_gas_use
+
+        let volumes = {
+            cars_and_vans: cars * share.liquid,
+            other_transport: other_transport * share.liquid,
+            aviation: aviation * share.liquid,
+            international_shipping: shipping * share.liquid,
+            heating_oil: (fc.domestic.liquid + fc.services.liquid) * to_TWh * share.liquid,
+            industry_oil: (fc.industry.liquid * to_TWh - other_oil) * share.liquid + other_oil,
+            household_gas: fc.domestic.gas * to_TWh * share.gas,
+            other_gas: ((fc.services.gas + fc.industry.gas) * to_TWh - other_gas) * share.gas + other_gas,
+            other_coal: (ff.coal - ff.coal_for_dispatchable) * to_TWh
+        }
+
+        let rows = {}
+        let final = { TWh: 0, before_bn: 0, after_bn: 0 }
+        for (let z in volumes) {
+            let TWh = volumes[z]
+            rows[z] = { TWh, before_bn: TWh * reference[z].before * 0.001, after_bn: TWh * reference[z].after * 0.001 }
+        }
+
+        // Household gas is rebuilt, as its standing charge is per home and does not follow volume.
+        // A home stays on the gas network while it uses any gas, so homes follow the input share.
+        let hg = fr.household_gas
+        let unit_before_vat = o.fossil_reference.household_gas.unit_before_vat
+        let customers = i.households_2030 * i.retail.gas.households_prc * 0.01 * (share.gas > 0 ? 1 : 0)
+        rows.household_gas.before_bn = rows.household_gas.TWh * unit_before_vat * 0.01 + customers * hg.standing_gbp * 1e-9
+        rows.household_gas.after_bn = rows.household_gas.before_bn * (1 + hg.vat_prc * 0.01)
+
+        for (let z in rows) {
+            final.TWh += rows[z].TWh
+            final.before_bn += rows[z].before_bn
+            final.after_bn += rows[z].after_bn
+        }
+        o.fossil_bill = { share, rows, final }
+    },
+
     // -----------------------------------------------------------------------------------------
     // 7. Total cost: the headline figures
     //
-    //   before tax = system cost + networks + final users' fossil fuel, where they burn it
-    //   after tax  = before tax + VAT on household electricity and synthetic car fuel, or the
-    //                taxes on fossil fuel
+    //   before tax = system cost + networks + this scenario's fossil bill
+    //   after tax  = before tax + VAT on household electricity and synthetic car fuel + taxes on
+    //                fossil fuel
     //
-    // The fossil bill uses fixed 2024 volumes, so it only applies to baseline_2024. Electricity
-    // policy, supplier and standing charges are left out. See baseline/open-items.md.
+    // Electricity policy, supplier and standing charges are left out. See baseline/open-items.md.
     // -----------------------------------------------------------------------------------------
     total_cost: function() {
         let fr = i.fossil_reference
         if (!fr) return
-        let final = o.fossil_reference.final
+        let bill = o.fossil_bill.final
+        let reference = o.fossil_reference.final
         let elec = o.retail.electricity
 
         // Spend including VAT x rate / (100 + rate) gives the VAT within it
         let vat_share = (spend, vat_prc) => spend * vat_prc / (100 + vat_prc)
 
-        let burns_fossil = o.generation_costs.fuel_users_annual == 0
-        let before_bn = o.generation_costs.total_annual + elec.network_total_bn
+        let before_bn = o.generation_costs.total_annual + elec.network_total_bn + bill.before_bn
         let tax_bn = vat_share(elec.household_spend_bn, i.retail.vat_prc)
-        if (burns_fossil) {
-            before_bn += final.before_bn
-            tax_bn += final.after_bn - final.before_bn
-        } else {
-            tax_bn += vat_share(o.retail.road_fuel.car_fuel_spend_bn, fr.road_vat_prc)
-        }
+            + vat_share(o.retail.road_fuel.synthetic_car_spend_bn, fr.road_vat_prc)
+            + bill.after_bn - bill.before_bn
 
         // Scenarios use very different amounts of energy, so also divide by final energy. This
         // counts heat pump ambient heat, solar thermal and geothermal heat, and the electricity
@@ -811,7 +889,7 @@ Object.assign(model, {
 
         // The tax gap is the 2024 tax take less this scenario's. Household electricity VAT is
         // stored, as a scenario cannot see the 2024 bill.
-        let tax_2024_bn = final.after_bn - final.before_bn + fr.household_electricity_vat_bn
+        let tax_2024_bn = reference.after_bn - reference.before_bn + fr.household_electricity_vat_bn
 
         o.total_cost = {
             before_bn, tax_bn, after_bn: before_bn + tax_bn,

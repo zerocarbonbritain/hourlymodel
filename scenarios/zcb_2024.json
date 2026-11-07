@@ -560,9 +560,9 @@
         "household_electricity_vat_bn": 1.48
     },
     "fuel_prices": {
-        "gas": 0,
-        "oil": 0,
-        "coal": 0,
+        "gas": 3.499,
+        "oil": 5.245,
+        "coal": 1.399,
         "biomass": 0
     },
     "costs": {

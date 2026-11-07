@@ -195,6 +195,8 @@ Fuel prices add the fuel users' network share to production cost, shared by hydr
 
 `fossil_reference` in zcb_2024 holds 2024 fossil prices, taxes and volumes. baseline_2024 merges onto zcb_2024, so every scenario shows the same reference. It does not change the system cost or dispatch.
 
+`fossil_bill` applies those prices and taxes to the scenario's own fossil fuel for final users. The fossil share of final gas and liquid demand comes from the dispatch: fossil fuel drawn when fuel stores run out, less fossil fuel for turbines, which is costed in the build-up. Biofuel counts with liquid fossil fuel, as it is bought on the same market and is priced as road fuel. Fuel users pay production cost only on the remaining share. All prices stay at 2024 levels, so a scenario for another year compares volumes and system choices at 2024 fossil prices. `fuel_prices` in zcb_2024 hold the 2024 prices from QEP 3.2.1 (3.499, 5.245 and 1.399 p/kWh). They have no effect until a variant burns fossil fuel in turbines. Fossil fuel for final users carries only the carbon costs paid in 2024, so a variant with fossil fuel can look cheaper than one without.
+
 Volumes are baseline_2024 model outputs, fixed in TWh/yr. Validation compares them with a live baseline run. Refinery and extraction fuel is left out, as it is in product prices. Road fuel includes 32 TWh of biofuel, priced as fossil fuel.
 
 Prices and taxes:
@@ -213,7 +215,7 @@ UK ETS costs for industry and aviation also applied in 2024. They are left out, 
 
 The result is £72bn/yr before tax and £105bn after for final users, and £79bn and £113bn with power station fuel. Power station fuel is in electricity bills, so it should not be added to them. Road fuel duty in the reference comes to £23.8bn.
 
-The total cost card is the system cost plus electricity networks, including the fuel users' share. Where final users burn fossil fuel, as in the baselines, it adds the final users' fossil bill from this reference. Power station fuel is already in the system cost. Tax is VAT on household electricity, VAT on synthetic car fuel in scenarios, and the taxes on final users' fossil fuel in baselines. Electricity policy, supplier and standing charges are left out (see Cost model in baseline/open-items.md). The carbon cost in baseline generation prices stays in the before tax figure. The fossil bill uses fixed 2024 volumes, so this total is only meaningful for baseline_2024 among scenarios that burn fossil fuel.
+The total cost card is the system cost plus electricity networks, including the fuel users' share. It also adds the scenario's fossil bill for final users. Power station fuel is already in the system cost. Tax is VAT on household electricity, VAT on synthetic car fuel, and the taxes on the fossil bill. Electricity policy, supplier and standing charges are left out (see Cost model in baseline/open-items.md). The carbon cost in baseline generation prices stays in the before tax figure.
 
 The cost per kWh card divides total cost by final energy demand, including international shipping. This is `final_consumption`, so it counts heat pump ambient heat, solar thermal and geothermal heat as energy (161 TWh in zcb_2024 and 16 TWh in baseline_2024). Boilers count fuel in, and electric vehicles count electricity in, so a scenario with more electric vehicles shows a higher cost per kWh for the same travel.
 
@@ -221,7 +223,7 @@ The tax gap card is 2024 tax less the scenario's tax, using the taxes counted in
 
 The fuel table shows each fuel price, with its network share, as a multiple of the bulk price it replaces, on energy and with no carbon price. The network share is electricity network cost for electrolysis and not fuel delivery, so bulk fossil prices are the like for like comparison. In zcb_2024 methane is 4.8 times power station gas (£34.99/MWh), and synthetic fuel 3.5 times jet fuel and 3.3 times marine gas oil. Hydrogen has no comparison, as it has no direct 2024 fossil equivalent.
 
-The pump price comparison puts synthetic fuel at the diesel energy density, at 175 p/litre before tax. It is 210 p/litre with VAT and no duty, or 273 p/litre with road duty and VAT, against 148 p/litre for diesel. Fossil prices before tax include refining, distribution and retail margin. The synthetic price leaves out distribution and retail margin. In zcb_2024, car fuel spend prices synthetic fuel with VAT and no duty. Baselines use pump prices.
+The pump price comparison puts synthetic fuel at the diesel energy density, at 175 p/litre before tax. It is 210 p/litre with VAT and no duty, or 273 p/litre with road duty and VAT, against 148 p/litre for diesel. Fossil prices before tax include refining, distribution and retail margin. The synthetic price leaves out distribution and retail margin. Car fuel spend prices synthetic fuel with VAT and no duty, and its fossil and biofuel share at pump prices.
 
 The exchange rate and calorific values for jet fuel and marine gas oil are recalled figures, not yet checked against the Bank of England and DUKES annex A. They affect only this reference.
 

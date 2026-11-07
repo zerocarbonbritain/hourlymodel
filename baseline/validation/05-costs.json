@@ -513,6 +513,25 @@
         "basis": "input",
         "note": "Commodity to delivered in the reference against the retail gas calculation."
     },
+    "costs.fossil_bill_final": {
+        "group": "Costs",
+        "label": "Fossil bill for this run against the 2024 reference",
+        "units": "ratio",
+        "observed": {
+            "values": {"one": {"value": 1, "cite": "In the 2024 baseline, the scenario bill should equal the reference"}},
+            "formula": "one"
+        },
+        "model": {
+            "values": {
+                "bill": "fossil_bill.final.after_bn",
+                "reference": "fossil_reference.final.after_bn"
+            },
+            "formula": "bill / reference"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "The bill uses live volumes and the reference uses stored volumes, at the same prices."
+    },
     "costs.fossil_ref_tax": {
         "group": "Costs",
         "label": "Fossil reference, 2024 tax against this run",

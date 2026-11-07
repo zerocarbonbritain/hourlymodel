@@ -28,13 +28,10 @@ Items found while building and validating baselines that need further attention.
 
 ## Cost model
 
-Found in a review of cost_model.js on 2026-11-07. None of these are fixed. Figures are zcb_2024 and baseline_2024.
+Found in a review of cost_model.js on 2026-11-07. Figures are zcb_2024 and baseline_2024.
 
 - **Demand side costs are missing.** Total cost covers energy supply and networks. It leaves out building retrofit, heat pumps, boilers, heat networks, vehicles and modal shift. zcb_2024 relies on these to cut final energy from 1,507 to 689 TWh, so its comparison with the baseline is favourable and total cost is not yet a cost to society.
 - **Total cost mixes cost layers.** Baseline fossil fuel is at delivered prices with supplier margins, but electricity has only generation and network costs. Adding policy, supplier and standing charges and the wholesale adjustment gives £70.9bn for baseline electricity against £45.6bn in total cost. DUKES use at QEP prices gives about £69bn, so these layers do apply to non-domestic users at about this level. On that basis, before tax totals are about £143bn and £127bn, against £118bn and £107bn on the card.
-- **Fossil volumes are fixed at 2024.** Total cost adds the fixed 2024 bill to any scenario with zero fuel values, so it cannot cost a scenario between 2024 and zcb_2024. Tracking costs over time needs fossil fuel priced at the scenario's own volumes.
-- **Fossil fuel in a synthetic fuel scenario is free.** With `allow_use_for_backup` on and fuel values above zero, fossil oil and gas that meet unmet demand have no cost outside backup turbines.
-- **"Fuel users pay" is tested three ways.** `fv.methane_gbp_MWh > 0`, `fuel_users_annual > 0` and `synthetic.gbp_MWh > 0` should be one flag, or fuel volumes at each price in the fix above.
 - **Fuel prices have no delivery cost.** Methane, hydrogen and synthetic fuel have no gas network, pipeline, tanker or forecourt cost. At the 2024 gap between non-domestic and bulk gas (£19/MWh), methane delivery alone is about £0.8bn/yr. Hydrogen delivery is likely to cost more per MWh.
 - **Some heat and biomass has no cost.** Solar thermal (24.8 TWh) and geothermal heat (15.8 TWh) have no capital cost. Direct biomass use has no fuel cost (30.8 and 49.8 TWh of final bioenergy).
 - **Electricity Climate Change Levy is missing.** QEP 3.4.1 and 3.4.2 show 0.56 p/kWh on non-domestic electricity. This is about £0.9bn/yr in the 2024 tax take. The reference counts it on gas only.
