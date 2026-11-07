@@ -2009,6 +2009,29 @@
   },
   {
    "group": "Costs",
+   "label": "Climate Change Levy on non-domestic electricity",
+   "units": "p/kWh",
+   "tolerance": 0.01,
+   "basis": "input",
+   "id": "costs.electricity_ccl",
+   "model": {
+    "values": {
+     "a": "i.fossil_reference.non_domestic_electricity_ccl_p_kWh"
+    },
+    "formula": "a"
+   },
+   "note": "Average levy paid, below the headline rate as some users have reliefs.",
+   "issue": "",
+   "status_at_build": "ok",
+   "observed": 0.5622226880715218,
+   "model_at_build": 0.562,
+   "sources": [
+    "inc = 26.29128253 (table_341.xlsx, 3.4.2 (Annual inc CCL)!I28)",
+    "exc = 25.72905985 (table_341.xlsx, 3.4.1 (Annual excl CCL)!I28)"
+   ]
+  },
+  {
+   "group": "Costs",
    "label": "Fossil reference, 2024 tax against this run",
    "units": "ratio",
    "tolerance": 0.01,
@@ -2025,7 +2048,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1,
-   "model_at_build": 0.9998605875125174,
+   "model_at_build": 0.999978601048884,
    "sources": [
     "one = 1 (published: The stored 2024 tax should equal the tax in the live baseline run)"
    ]

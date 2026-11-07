@@ -555,6 +555,25 @@
         "basis": "independent",
         "note": "Tests the retail layers in the cost to consumers. Household spend without 5% VAT, plus all other use at the average non-domestic price without VAT or Climate Change Levy."
     },
+    "costs.electricity_ccl": {
+        "group": "Costs",
+        "label": "Climate Change Levy on non-domestic electricity",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "inc": {"source": "qep_3.4.1", "sheet": "3.4.2 (Annual inc CCL)", "block": "Table 3.4.2", "row": ["{year}"], "column": "Electricity: Average (Pence per kWh)"},
+                "exc": {"source": "qep_3.4.1", "sheet": "3.4.1 (Annual excl CCL)", "block": "Table 3.4.1", "row": ["{year}"], "column": "Electricity: Average (Pence per kWh)"}
+            },
+            "formula": "inc - exc"
+        },
+        "model": {
+            "values": {"a": "i.fossil_reference.non_domestic_electricity_ccl_p_kWh"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Average levy paid, below the headline rate as some users have reliefs."
+    },
     "costs.fossil_ref_tax": {
         "group": "Costs",
         "label": "Fossil reference, 2024 tax against this run",

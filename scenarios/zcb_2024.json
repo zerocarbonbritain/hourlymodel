@@ -557,7 +557,9 @@
             "carbon_price": 55.18,
             "co2_Mt": 40.03
         },
-        "household_electricity_vat_bn": 1.48
+        "household_electricity_vat_bn": 1.53,
+        "non_domestic_electricity_ccl_p_kWh": 0.562,
+        "non_domestic_electricity_ccl_bn": 0.88
     },
     "society": {
         "discount_rate_prc": 3.5,

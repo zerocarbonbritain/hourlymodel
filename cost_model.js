@@ -70,6 +70,7 @@ Object.assign(model, {
 
         model.fossil_reference()
         model.fossil_bill(fossil_share)
+        model.household_energy(fossil_share)
         model.total_cost()
     },
 
@@ -457,8 +458,9 @@ Object.assign(model, {
     //   hydrogen + biogas + methanation plant and stores        = methane
     //   hydrogen + biomass + FT plant and stores                = synthetic fuel
     //
-    // Cost per MWh is annual cost divided by all fuel produced. Fuel burned in turbines, or spilled
-    // from a full store, is not sold to fuel users, so that share stays with electricity users.
+    // Cost per MWh is annual cost divided by fuel used, which is fuel produced less fuel spilled
+    // from a full store. Spilled fuel was made for users of that fuel, so they carry its cost. Fuel
+    // burned in turbines is not sold to fuel users, so that share stays with electricity users.
     //
     // This step also splits the system cost between fuel users and electricity users.
     // -----------------------------------------------------------------------------------------
@@ -521,8 +523,8 @@ Object.assign(model, {
 
         let costs = {
             hydrogen: hydrogen_cost,
-            methane: per_MWh(methane_annual, o.methane.total_produced * to_TWh),
-            synthetic_fuel: per_MWh(synthetic_annual, ft.generation)
+            methane: per_MWh(methane_annual, (o.methane.total_produced - o.methane.store_excess) * to_TWh),
+            synthetic_fuel: per_MWh(synthetic_annual, ft.generation - o.synth_fuel.store_spill * to_TWh)
         }
 
         // Marginal values, used only to check how much of the system cost marginal prices would
@@ -641,20 +643,56 @@ Object.assign(model, {
         o.retail.electricity = elec
     },
 
-    // Fuel prices: production cost plus the fuel users' share of network costs. This price leaves
-    // out fuel delivery, such as gas pipes and tankers, and carries no duty or VAT.
+    // What it costs to get fuel from the plant to the user, £/MWh. Each figure is the gap between a
+    // delivered 2024 price and a bulk 2024 price, both before tax:
+    //
+    //   gas      delivered non-domestic gas less the price paid by power stations
+    //   road     diesel before tax, which includes distribution and retail margin, less marine
+    //            gas oil, which is a bulk price for a similar fuel
+    //
+    // Aviation and shipping buy in bulk, so synthetic fuel pays the road figure only on its other
+    // uses. Hydrogen has no 2024 market, so it uses the gas figure, which is likely to be low.
+    fuel_delivery: function() {
+        let fr = i.fossil_reference
+        if (!fr) return { gas: 0, road: 0, road_share: 0 }
+        let rf = i.retail.road_fuel
+        let diesel_before = (rf.diesel_p_litre / (1 + fr.road_vat_prc * 0.01) - fr.road_duty_p_litre) / rf.diesel_kWh_per_litre * 10
+        let demand_TWh = model.final_fuel_demand().synthetic_fuel * o.GWh_to_TWhy
+        let bulk_TWh = o.transport.modes.Aviation.IC.TWh + o.final_consumption.international_shipping * o.GWh_to_TWhy
+        return {
+            gas: (fr.non_domestic_gas.p_kWh - fr.power.gas_p_kWh) * 10,
+            road: diesel_before - fr.marine_gas_oil_gbp_MWh,
+            road_share: demand_TWh > 0 ? (demand_TWh - bulk_TWh) / demand_TWh : 0
+        }
+    },
+
+    // Fuel prices: production cost, plus the fuel users' share of network costs, plus delivery. The
+    // price carries no duty or VAT.
     fuel_prices: function(hydrogen) {
         let p = o.prices
+        let delivery = model.fuel_delivery()
+        let delivery_gbp_MWh = {
+            hydrogen: delivery.gas,
+            methane: delivery.gas,
+            synthetic_fuel: delivery.road * delivery.road_share
+        }
         let network_per_MWh_hydrogen = hydrogen.sold_TWh > 0 ? 1000 * o.retail.electricity.network_fuel_bn / hydrogen.sold_TWh : 0
+        p.fuel_delivery_bn = 0
         for (let z in p.fuel) {
             let fuel = p.fuel[z]
             fuel.network_gbp_MWh = network_per_MWh_hydrogen * hydrogen.content[z]
-            fuel.price_gbp_MWh = fuel.gbp_MWh + fuel.network_gbp_MWh
+            fuel.delivery_gbp_MWh = fuel.TWh > 0 ? delivery_gbp_MWh[z] : 0
+            fuel.price_gbp_MWh = fuel.gbp_MWh + fuel.network_gbp_MWh + fuel.delivery_gbp_MWh
             fuel.p_kWh = fuel.price_gbp_MWh * 0.1
             fuel.network_annual = fuel.TWh * fuel.network_gbp_MWh * 0.001
+            fuel.delivery_annual = fuel.TWh * fuel.delivery_gbp_MWh * 0.001
+            p.fuel_delivery_bn += fuel.delivery_annual
         }
-        // Per litre at the energy density of diesel, to compare with road fuel
-        p.fuel.synthetic_fuel.p_litre = p.fuel.synthetic_fuel.p_kWh * i.retail.road_fuel.diesel_kWh_per_litre
+        // Synthetic fuel at the pump pays the road delivery cost in full. Per litre is at the
+        // energy density of diesel, to compare with road fuel.
+        let synthetic = p.fuel.synthetic_fuel
+        synthetic.road_p_kWh = synthetic.TWh > 0 ? (synthetic.gbp_MWh + synthetic.network_gbp_MWh + delivery.road) * 0.1 : 0
+        synthetic.p_litre = synthetic.road_p_kWh * i.retail.road_fuel.diesel_kWh_per_litre
     },
 
     // The household gas bill, with the same layers as electricity. It starts from the gas price
@@ -686,7 +724,7 @@ Object.assign(model, {
         }
         road.fossil_car_p_kWh = road.petrol_p_kWh * (1 - diesel) + road.diesel_p_kWh * diesel
         let road_vat = i.fossil_reference ? 1 + i.fossil_reference.road_vat_prc * 0.01 : 1
-        road.synthetic_car_p_kWh = synthetic.p_kWh * road_vat
+        road.synthetic_car_p_kWh = synthetic.road_p_kWh * road_vat
         road.car_p_kWh = road.fossil_car_p_kWh * fossil_share.liquid + road.synthetic_car_p_kWh * (1 - fossil_share.liquid)
         road.car_fuel_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.car_p_kWh * 0.01
         road.synthetic_car_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.synthetic_car_p_kWh * (1 - fossil_share.liquid) * 0.01
@@ -792,11 +830,13 @@ Object.assign(model, {
         let total = { TWh: final.TWh + power.TWh, before_bn: final.before_bn + power.before_bn, after_bn: final.after_bn + power.after_bn }
 
         // Fuel price as a multiple of the 2024 bulk fossil fuel it replaces, on energy and before
-        // tax. Fuel prices have no delivery cost, so bulk prices are the like for like comparison.
+        // tax. Bulk prices have no delivery cost, so delivery is left out for a like for like
+        // comparison.
         let fuel = o.prices.fuel
-        fuel.methane.times_gas = fuel.methane.price_gbp_MWh / (fr.power.gas_p_kWh * 10)
-        fuel.synthetic_fuel.times_jet_fuel = fuel.synthetic_fuel.price_gbp_MWh / fr.jet_fuel_gbp_MWh
-        fuel.synthetic_fuel.times_marine_gas_oil = fuel.synthetic_fuel.price_gbp_MWh / fr.marine_gas_oil_gbp_MWh
+        let bulk_price = (z) => fuel[z].price_gbp_MWh - fuel[z].delivery_gbp_MWh
+        fuel.methane.times_gas = bulk_price('methane') / (fr.power.gas_p_kWh * 10)
+        fuel.synthetic_fuel.times_jet_fuel = bulk_price('synthetic_fuel') / fr.jet_fuel_gbp_MWh
+        fuel.synthetic_fuel.times_marine_gas_oil = bulk_price('synthetic_fuel') / fr.marine_gas_oil_gbp_MWh
 
         o.fossil_reference = {
             rows, final, power, total, household_gas: gas,
@@ -859,6 +899,54 @@ Object.assign(model, {
         o.fossil_bill = { share, rows, final }
     },
 
+    // Household energy across bills and cars, £ per home per year. The electricity bill leaves out
+    // electric cars, so comparing it alone hides what replaces petrol and diesel. Each figure is an
+    // average over all homes. Company cars are included, as the volumes do not separate them, and
+    // direct biomass and coal have no price yet.
+    household_energy: function(share) {
+        let fr = i.fossil_reference
+        if (!fr) return
+        let homes = i.households_2030
+        let to_TWh = o.GWh_to_TWhy
+        let elec = o.retail.electricity
+        let gas = o.retail.gas
+        let fuel = o.prices.fuel
+        let cars = o.transport.modes["Cars & Vans"]
+        let domestic = o.final_consumption.domestic
+        let vat = 1 + i.retail.vat_prc * 0.01
+        let road_vat = 1 + fr.road_vat_prc * 0.01
+
+        // Charging at the electricity unit rate, which includes VAT. Hydrogen pays road VAT and no
+        // duty, as synthetic fuel does.
+        let ev_bn = cars.EV.TWh * elec.unit_rate_p_kWh * 0.01
+        let hydrogen_car_bn = cars.H2.TWh * fuel.hydrogen.p_kWh * road_vat * 0.01
+
+        // Fuel in the home that is not on a gas bill, TWh/yr x p/kWh x 0.01. Heating oil pays its
+        // 2024 price where it is fossil. Synthetic fuels pay their price and the home VAT rate.
+        let heating_oil_p_kWh = o.fossil_reference.rows.heating_oil.after * 0.1
+        let home_oil_bn = domestic.liquid * to_TWh * share.liquid * heating_oil_p_kWh * 0.01
+        let home_synthetic_bn = (
+            domestic.liquid * to_TWh * (1 - share.liquid) * fuel.synthetic_fuel.p_kWh
+            + (gas.customers > 0 ? 0 : domestic.gas * to_TWh * (1 - share.gas) * fuel.methane.p_kWh)
+            + domestic.hydrogen * to_TWh * fuel.hydrogen.p_kWh
+        ) * vat * 0.01
+
+        let per_home = (bn) => bn * 1e9 / homes
+        let household = {
+            electricity_gbp: elec.bill_gbp,
+            gas_gbp: per_home(gas.household_spend_bn),
+            home_fuel_gbp: per_home(home_oil_bn + home_synthetic_bn),
+            car_fuel_gbp: per_home(o.retail.road_fuel.car_fuel_spend_bn + hydrogen_car_bn),
+            car_charging_gbp: per_home(ev_bn)
+        }
+        household.total_gbp = household.electricity_gbp + household.gas_gbp + household.home_fuel_gbp + household.car_fuel_gbp + household.car_charging_gbp
+
+        // VAT within these that the other tax lines do not already count
+        let vat_share = (spend, vat_prc) => spend * vat_prc / (100 + vat_prc)
+        household.extra_vat_bn = vat_share(ev_bn, i.retail.vat_prc) + vat_share(hydrogen_car_bn, fr.road_vat_prc) + vat_share(home_synthetic_bn, i.retail.vat_prc)
+        o.retail.household = household
+    },
+
     // -----------------------------------------------------------------------------------------
     // 7. Total cost: the headline figures
     //
@@ -901,6 +989,7 @@ Object.assign(model, {
             networks: elec.network_total_bn + per_home_bn(e.network_gbp),
             policy: per_kWh_bn(e.policy_p_kWh) + per_home_bn(e.policy_gbp),
             supplier: per_kWh_bn(e.supplier_p_kWh) + per_home_bn(e.supplier_gbp),
+            fuel_delivery: o.prices.fuel_delivery_bn,
             fossil_fuel: bill.before_bn
         }
         let before_bn = 0
@@ -908,24 +997,32 @@ Object.assign(model, {
 
         // Spend including VAT x rate / (100 + rate) gives the VAT within it. Businesses reclaim VAT.
         let vat_share = (spend, vat_prc) => spend * vat_prc / (100 + vat_prc)
+
+        // Climate Change Levy on non-domestic electricity. Scenarios keep it, as they keep VAT.
+        // Fuels pay it only where they are fossil, within the fossil bill.
+        let fc = o.final_consumption
+        let levy_bn = (fc.services.electricity + fc.industry.electricity) * o.GWh_to_TWhy * fr.non_domestic_electricity_ccl_p_kWh * 0.01
+
         let tax_bn = vat_share(elec.household_spend_bn, i.retail.vat_prc)
             + vat_share(o.retail.road_fuel.synthetic_car_spend_bn, fr.road_vat_prc)
+            + o.retail.household.extra_vat_bn
+            + levy_bn
             + bill.after_bn - bill.before_bn
 
         // What electricity users pay before VAT, which the validation compares with observed spend
-        let electricity_bn = before_bn - bill.before_bn - o.prices.fuel_sales - elec.network_fuel_bn
+        let electricity_bn = before_bn - bill.before_bn - o.prices.fuel_sales - o.prices.fuel_delivery_bn - elec.network_fuel_bn
 
         // Scenarios use very different amounts of energy, so also divide by final energy. This
         // counts heat pump ambient heat, solar thermal and geothermal heat, and the electricity
         // into electric vehicles.
         let energy_TWh = (o.final_consumption.total + o.final_consumption.international_shipping) * o.GWh_to_TWhy
 
-        // The tax gap is the 2024 tax take less this scenario's. Household electricity VAT is
-        // stored, as a scenario cannot see the 2024 bill.
-        let tax_2024_bn = reference.after_bn - reference.before_bn + fr.household_electricity_vat_bn
+        // The tax gap is the 2024 tax take less this scenario's. Household electricity VAT and the
+        // electricity levy are stored, as a scenario cannot see 2024 electricity use.
+        let tax_2024_bn = reference.after_bn - reference.before_bn + fr.household_electricity_vat_bn + fr.non_domestic_electricity_ccl_bn
 
         o.total_cost = {
-            layers, electricity_bn,
+            layers, electricity_bn, levy_bn,
             before_bn, tax_bn, after_bn: before_bn + tax_bn,
             energy_TWh,
             before_p_kWh: 100 * before_bn / energy_TWh,
@@ -957,9 +1054,9 @@ Object.assign(model, {
         let supply_bn = at_social_rate + other_supply
         let supply_at_hurdle_bn = o.total_annual_cost - o.carbon_cost_annual + imports
 
-        // Networks, suppliers and fossil fuel before tax are real resources. Fossil fuel prices
-        // are market prices, which is the cost of buying the fuel from abroad.
-        let resource_excluding_supply = layers.networks + layers.supplier + layers.fossil_fuel
+        // Networks, suppliers, fuel delivery and fossil fuel before tax are real resources. Fossil
+        // fuel prices are market prices, which is the cost of buying the fuel from abroad.
+        let resource_excluding_supply = layers.networks + layers.supplier + layers.fuel_delivery + layers.fossil_fuel
         let resource_bn = supply_bn + resource_excluding_supply
 
         // Emissions from energy, valued at the carbon value. These are fossil fuel emissions plus
@@ -973,6 +1070,7 @@ Object.assign(model, {
             supply_bn, supply_at_hurdle_bn,
             networks_bn: layers.networks,
             supplier_bn: layers.supplier,
+            fuel_delivery_bn: layers.fuel_delivery,
             fossil_fuel_bn: layers.fossil_fuel,
             resource_bn,
             carbon_MtCO2e, carbon_bn,
