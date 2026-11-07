@@ -191,12 +191,39 @@ Fuel prices add the fuel users' network share to production cost, shared by hydr
 - **Methane, £235.** The price weighted by turbine fuel use. End users' mean is £219, about 7% lower.
 - **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This marginal value is £156/MWh in zcb_2024 (15.6 p/kWh, 164 p/litre at the diesel energy density), and PyPSA gives £145.
 
-For comparison, 2024 fuel before tax:
+### 2024 fossil fuel reference
 
-- **Jet fuel, £47.4/MWh, 50 p/litre.** $99/barrel (IATA), at $1.278/£ (2024 average), 159 litres per barrel and 46.2 GJ/t gross at 0.8 kg/litre.
-- **Marine gas oil, £50.2/MWh, 53 p/litre.** $812/t, the Ship & Bunker average of 20 ports, at 45.6 GJ/t gross.
+`fossil_reference` in zcb_2024 holds 2024 fossil prices, taxes and volumes. baseline_2024 merges onto zcb_2024, so every scenario shows the same reference. It does not change the system cost or dispatch.
 
-The exchange rate and calorific values are recalled figures, not yet checked against the Bank of England and DUKES annex A. They affect only this comparison. Both per litre figures use the diesel energy density.
+Volumes are baseline_2024 model outputs, fixed in TWh/yr. Validation compares them with a live baseline run. Refinery and extraction fuel is left out, as it is in product prices. Road fuel includes 32 TWh of biofuel, priced as fossil fuel.
+
+Prices and taxes:
+
+- **Petrol and diesel.** QEP 4.1.2 pump prices (`retail.road_fuel`), with duty of 52.95 p/litre and VAT of 20%. This gives 64.95 and 70.66 p/litre before tax, matching the annual averages on the QEP 4.1.2 excluding VAT sheet. Cars and vans pay duty and VAT. Other transport is at the diesel price with duty only, as businesses reclaim VAT. Rail and domestic shipping pay less duty than this and are not split out.
+- **Jet fuel, £47.4/MWh.** $99/barrel (IATA), at $1.278/£ (2024 average), 159 litres per barrel and 46.2 GJ/t gross at 0.8 kg/litre. No duty or VAT.
+- **Marine gas oil, £50.2/MWh.** $812/t, the Ship & Bunker average of 20 ports, at 45.6 GJ/t gross. No duty or VAT.
+- **Heating oil.** Burning oil at 58.24 p/litre with 5% VAT (QEP 4.1.2), at 10.294 kWh/litre (DESNZ 2024 CO2 factors per litre and per kWh). VAT is applied to services use as well, which adds about £0.05bn.
+- **Industry oil.** Gas oil at 72.32 p/litre with 5% VAT (QEP 4.1.2), at 10.742 kWh/litre. Rebated duty is 10.18 p/litre, from the QEP 4.1.2 excluding VAT sheet. VAT is reclaimed.
+- **Household gas, delivered.** The Ofgem cap components and QEP 3.2.1 commodity price in baseline_2024, with the standing charge spread over use. Validation compares this with the baseline's household gas spend.
+- **Services and industry gas, delivered.** QEP 3.4.1 and 3.4.2 average non-domestic prices: 5.376 p/kWh excluding Climate Change Levy and 5.667 p/kWh including it.
+- **Coal outside power stations.** 1.399 p/kWh, the QEP 3.2.1 power station price. No retail or industrial price is sourced. At £0.3bn it has little effect on the total.
+- **Power station fuel.** QEP 3.2.1 prices. The only carbon cost is the £55.18/tCO2 paid by power stations on 40.03 MtCO2.
+
+UK ETS costs for industry and aviation also applied in 2024. They are left out, as free allocation means the net cost is not known from the sources used here. Road fuel and household gas paid no carbon price.
+
+The result is £72bn/yr before tax and £105bn after for final users, and £79bn and £113bn with power station fuel. Power station fuel is in electricity bills, so it should not be added to them. Road fuel duty in the reference comes to £23.8bn.
+
+The total cost card is the system cost plus electricity networks, including the fuel users' share. Where final users burn fossil fuel, as in the baselines, it adds the final users' fossil bill from this reference. Power station fuel is already in the system cost. Tax is VAT on household electricity, VAT on synthetic car fuel in scenarios, and the taxes on final users' fossil fuel in baselines. Electricity policy and supplier costs are left out, as the Ofgem figures are for households only. The carbon cost in baseline generation prices stays in the before tax figure. The fossil bill uses fixed 2024 volumes, so this total is only meaningful for baseline_2024 among scenarios that burn fossil fuel.
+
+The cost per kWh card divides total cost by final energy demand, including international shipping. This is `final_consumption`, so it counts heat pump ambient heat, solar thermal and geothermal heat as energy (161 TWh in zcb_2024 and 16 TWh in baseline_2024). Boilers count fuel in, and electric vehicles count electricity in, so a scenario with more electric vehicles shows a higher cost per kWh for the same travel.
+
+The tax gap card is 2024 tax less the scenario's tax, using the taxes counted in total cost. 2024 tax is the final users' tax in this reference plus household electricity VAT of £1.48bn (`household_electricity_vat_bn`, 5/105 of baseline_2024 household electricity spend). Validation compares it with a live baseline run. The carbon cost in baseline generation prices is not counted, which leaves the gap about £2.2bn lower than it would be otherwise.
+
+The fuel table shows each fuel price, with its network share, as a multiple of the bulk price it replaces, on energy and with no carbon price. The network share is electricity network cost for electrolysis and not fuel delivery, so bulk fossil prices are the like for like comparison. In zcb_2024 methane is 4.8 times power station gas (£34.99/MWh), and synthetic fuel 3.5 times jet fuel and 3.3 times marine gas oil. Hydrogen has no comparison, as it has no direct 2024 fossil equivalent.
+
+The pump price comparison puts synthetic fuel at the diesel energy density, at 175 p/litre before tax. It is 210 p/litre with VAT and no duty, or 273 p/litre with road duty and VAT, against 148 p/litre for diesel. Fossil prices before tax include refining, distribution and retail margin. The synthetic price leaves out distribution and retail margin. In zcb_2024, car fuel spend prices synthetic fuel with VAT and no duty. Baselines use pump prices.
+
+The exchange rate and calorific values for jet fuel and marine gas oil are recalled figures, not yet checked against the Bank of England and DUKES annex A. They affect only this reference.
 
 The hourly electricity price (`d.electricity_price`, summarised in `o.prices`) follows what is at the margin:
 

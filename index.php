@@ -237,6 +237,10 @@ function load_page(page)
           has_gas: function () {
             return this.o.retail.gas.customers > 0 && this.o.retail.gas.household_kWh > 0;
           },
+          // Synthetic fuel pump prices are shown only where fuel users pay for synthetic fuel
+          show_synthetic_pump: function () {
+            return this.o.prices.fuel.synthetic_fuel.gbp_MWh > 0;
+          },
           // Generation cost preset: "lcoe" for the build-up, a reference scenario whose fixed
           // generator prices match, or "custom". Choosing one applies it.
           cost_preset: {

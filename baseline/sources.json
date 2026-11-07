@@ -191,6 +191,14 @@
         "file": "DUKES_5.16.xlsx",
         "sha256": "81a2f075be500d68c12bcd78d86407953b2d60a85698f4cb1faa869a9f5cbe58"
     },
+    "qep_3.4.1": {
+        "title": "QEP 3.4.1 and 3.4.2 Prices of fuels purchased by non-domestic consumers",
+        "edition": "Quarterly Energy Prices, September 2026",
+        "page": "https://www.gov.uk/government/statistical-data-sets/prices-of-fuels-purchased-by-non-domestic-consumers-in-the-united-kingdom",
+        "url": "https://assets.publishing.service.gov.uk/media/6ab543da997a4b2950cceedc/table_341.xlsx",
+        "file": "table_341.xlsx",
+        "sha256": "fbd44eed6c9d2f6a4e22ac423f256cd7a5ac6a6de9e1f0b4a740a5b0e1313d31"
+    },
     "qep_3.2.1": {
         "title": "QEP 3.2.1 Prices of fuels purchased by major power producers",
         "edition": "Quarterly Energy Prices, September 2026",

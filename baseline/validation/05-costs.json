@@ -361,5 +361,175 @@
         "tolerance": 0.01,
         "basis": "input",
         "note": "Including duty and VAT."
+    },
+    "costs.fossil_ref_petrol": {
+        "group": "Costs",
+        "label": "Fossil reference, petrol before tax",
+        "units": "p/litre",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_4.1", "sheet": "4.1.2 (excl VAT)", "range": "W426:W426", "expect": {"A426": "2024", "W6": "Annual Average ULSP: Ex VAT & Duty\n(Pence per litre)"}}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {"a": "fossil_reference.pump.petrol.before"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Pump price less VAT and duty against the QEP annual average."
+    },
+    "costs.fossil_ref_diesel": {
+        "group": "Costs",
+        "label": "Fossil reference, diesel before tax",
+        "units": "p/litre",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_4.1", "sheet": "4.1.2 (excl VAT)", "range": "U426:U426", "expect": {"A426": "2024", "U6": "Annual Average Derv: Ex VAT & Duty\n(Pence per litre)"}}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {"a": "fossil_reference.pump.diesel.before"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Pump price less VAT and duty against the QEP annual average."
+    },
+    "costs.fossil_ref_burning_oil": {
+        "group": "Costs",
+        "label": "Fossil reference, burning oil price",
+        "units": "p/litre",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_4.1", "sheet": "4.1.2", "block": "Table 4.1.2 Typical retail prices", "row": ["{year}"], "column": "Standard grade burning oil (Pence per litre)"}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {"a": "i.fossil_reference.burning_oil.p_litre"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Including VAT."
+    },
+    "costs.fossil_ref_gas_oil": {
+        "group": "Costs",
+        "label": "Fossil reference, gas oil price",
+        "units": "p/litre",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_4.1", "sheet": "4.1.2", "block": "Table 4.1.2 Typical retail prices", "row": ["{year}"], "column": "Gas oil (Pence per litre)"}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {"a": "i.fossil_reference.gas_oil.p_litre"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Including VAT and rebated duty."
+    },
+    "costs.fossil_ref_non_domestic_gas": {
+        "group": "Costs",
+        "label": "Fossil reference, non-domestic gas excluding CCL",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_3.4.1", "sheet": "3.4.1 (Annual excl CCL)", "block": "Table 3.4.1", "row": ["{year}"], "column": "Gas: Average (Pence per kWh)"}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {"a": "i.fossil_reference.non_domestic_gas.p_kWh"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Fully delivered price, excluding VAT and Climate Change Levy."
+    },
+    "costs.fossil_ref_non_domestic_gas_ccl": {
+        "group": "Costs",
+        "label": "Fossil reference, non-domestic gas including CCL",
+        "units": "p/kWh",
+        "observed": {
+            "values": {
+                "p": {"source": "qep_3.4.1", "sheet": "3.4.2 (Annual inc CCL)", "block": "Table 3.4.2", "row": ["{year}"], "column": "Gas: Average (Pence per kWh)"}
+            },
+            "formula": "p"
+        },
+        "model": {
+            "values": {"a": "i.fossil_reference.non_domestic_gas.with_ccl_p_kWh"},
+            "formula": "a"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Fully delivered price, excluding VAT."
+    },
+    "costs.fossil_ref_final_volume": {
+        "group": "Costs",
+        "label": "Fossil reference, final user volume against this run",
+        "units": "ratio",
+        "observed": {
+            "values": {"one": {"value": 1, "cite": "The stored volume should equal the live baseline run"}},
+            "formula": "one"
+        },
+        "model": {
+            "values": {
+                "stored": "fossil_reference.final.TWh",
+                "liquid": "final_consumption.liquid",
+                "shipping": "final_consumption.international_shipping",
+                "gas": "final_consumption.gas",
+                "coal": "fossil_fuels.coal",
+                "coal_power": "fossil_fuels.coal_for_dispatchable",
+                "scale": "GWh_to_TWhy"
+            },
+            "formula": "stored / ((liquid + shipping + gas + coal - coal_power) * scale)"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Volumes in the reference are fixed. A failure means they need updating from baseline_2024."
+    },
+    "costs.fossil_ref_household_gas": {
+        "group": "Costs",
+        "label": "Fossil reference, household gas against the baseline bill",
+        "units": "ratio",
+        "observed": {
+            "values": {"one": {"value": 1, "cite": "The reference should equal the baseline's household gas spend"}},
+            "formula": "one"
+        },
+        "model": {
+            "values": {
+                "stored": "fossil_reference.rows.household_gas.after_bn",
+                "spend": "retail.gas.household_spend_bn"
+            },
+            "formula": "stored / spend"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "Commodity to delivered in the reference against the retail gas calculation."
+    },
+    "costs.fossil_ref_tax": {
+        "group": "Costs",
+        "label": "Fossil reference, 2024 tax against this run",
+        "units": "ratio",
+        "observed": {
+            "values": {"one": {"value": 1, "cite": "The stored 2024 tax should equal the tax in the live baseline run"}},
+            "formula": "one"
+        },
+        "model": {
+            "values": {
+                "stored": "total_cost.tax_2024_bn",
+                "live": "total_cost.tax_bn"
+            },
+            "formula": "stored / live"
+        },
+        "tolerance": 0.01,
+        "basis": "input",
+        "note": "The tax gap card compares scenarios with this stored figure, which includes fixed household electricity VAT."
     }
 }

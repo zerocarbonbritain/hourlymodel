@@ -1629,10 +1629,10 @@ input[type='text'] {
     <div class="inner" style="display:block" name="cost_model">
 
         <div class="cost-summary">
+            <div v-if="o.total_cost" title="System cost and electricity networks, plus fossil fuel for final users where they burn it. Tax is VAT on household electricity and car fuel, and fossil fuel duty, VAT and Climate Change Levy. Retail policy and supplier costs for electricity are left out.">Total cost<b>£{{ o.total_cost.after_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.before_bn | toFixed(1) }} bn before tax</div>
+            <div v-if="o.total_cost" title="Total cost divided by final energy demand, including international shipping. Heat pump ambient heat, solar thermal and geothermal heat are counted as energy. Electric vehicles count electricity in, so a scenario with more of them shows a higher cost per kWh for the same travel.">Cost per kWh of energy<b>{{ o.total_cost.after_p_kWh | toFixed(1) }} p/kWh</b>{{ o.total_cost.before_p_kWh | toFixed(1) }} p before tax, {{ o.total_cost.energy_TWh | toFixed(0) }} TWh/year</div>
+            <div v-if="o.total_cost" title="Tax raised in 2024 less tax in this scenario, in the taxes counted in total cost. The carbon price in 2024 generation prices is not counted as tax here.">Tax gap against 2024<b>£{{ o.total_cost.tax_gap_bn | toFixed(1) }} bn/year</b>£{{ o.total_cost.tax_bn | toFixed(1) }} bn tax, £{{ o.total_cost.tax_2024_bn | toFixed(1) }} bn in 2024</div>
             <div>Generation cost<b>{{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.generation_costs.electricity_annual | toFixed(1) }} bn/year</div>
-            <div>Electricity unit rate<b>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>+ £{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}/yr standing</div>
-            <div>Electricity bill<b>£{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</b>{{ o.retail.electricity.household_kWh | toFixed(0) }} kWh per home</div>
-            <div v-if="has_gas">Gas unit rate<b>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.retail.gas.bill_gbp | toFixed(0) }}/year bill</div>
         </div>
 
         <p>Generation costs:
@@ -1677,24 +1677,56 @@ input[type='text'] {
         </table>
         <p>Hourly prices recover {{ 100 * o.prices.offshore_recovery | toFixed(0) }}% of offshore wind's cost. With fuel at its marginal values as well, they would recover {{ 100 * o.prices.recovery | toFixed(0) }}% of system cost. Electricity users pay one rate, {{ o.retail.electricity.generation_cost_p_kWh | toFixed(2) }} p/kWh over {{ o.prices.end_use_TWh | toFixed(0) }} TWh of end use. The top-up is similar to Contract for Difference payments, calculated for the whole system. Network costs are outside the system cost and are in the retail and fuel prices.</p>
         </details>
+        </div>
 
+        <details class="cost-part">
+        <summary><h3>2024 fossil fuel reference</h3><span>£{{ o.fossil_reference.total.before_bn | toFixed(0) }} bn before tax, £{{ o.fossil_reference.total.after_bn | toFixed(0) }} bn after</span></summary>
+        <p>What the UK paid for fossil fuel in 2024, at 2024 prices and baseline_2024 volumes. These figures are the same in every scenario.</p>
+        <table class="table cost-table" style="width:100%">
+            <tr><th>Use</th><th>Volume</th><th>Before tax</th><th title="Duty, Climate Change Levy, VAT and the carbon price paid in 2024. VAT that businesses reclaim is left out.">Tax</th><th>After tax</th><th>Before tax</th><th>After tax</th></tr>
+            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th>£/MWh</th><th>£bn/y</th><th>£bn/y</th></tr>
+            <tr v-for="row in o.fossil_reference.rows"><td>{{ row.label }}</td><td>{{ row.TWh | toFixed(0) }}</td><td>{{ row.before | toFixed(0) }}</td><td>{{ row.tax | toFixed(0) }}</td><td>{{ row.after | toFixed(0) }}</td><td>{{ row.before_bn | toFixed(1) }}</td><td>{{ row.after_bn | toFixed(1) }}</td></tr>
+            <tr class="total"><td>Final users</td><td>{{ o.fossil_reference.final.TWh | toFixed(0) }}</td><td></td><td></td><td></td><td>{{ o.fossil_reference.final.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.final.after_bn | toFixed(1) }}</td></tr>
+            <tr><td>{{ o.fossil_reference.power.label }}</td><td>{{ o.fossil_reference.power.TWh | toFixed(0) }}</td><td>{{ o.fossil_reference.power.before | toFixed(0) }}</td><td>{{ o.fossil_reference.power.tax | toFixed(0) }}</td><td>{{ o.fossil_reference.power.after | toFixed(0) }}</td><td>{{ o.fossil_reference.power.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.power.after_bn | toFixed(1) }}</td></tr>
+            <tr class="total"><td>All fossil fuel</td><td>{{ o.fossil_reference.total.TWh | toFixed(0) }}</td><td></td><td></td><td></td><td>{{ o.fossil_reference.total.before_bn | toFixed(1) }}</td><td>{{ o.fossil_reference.total.after_bn | toFixed(1) }}</td></tr>
+        </table>
+        <p>Power station fuel is already in electricity bills, so compare final users with fuel bills. Fuel used by refineries and extraction is in product prices and is left out. Road fuel includes 32 TWh of biofuel. Carbon is the £{{ i.fossil_reference.power.carbon_price | toFixed(2) }}/tCO2 paid by power stations. UK ETS costs for industry and aviation are not included.</p>
+        <table class="table cost-table" style="width:100%; margin-top:20px">
+            <tr><th>Household gas, from commodity to delivered</th><th>p/kWh</th></tr>
+            <tr><td>Commodity, price paid by power stations</td><td>{{ i.fossil_reference.household_gas.commodity_p_kWh | toFixed(2) }}</td></tr>
+            <tr><td>Wholesale adjustment, forward buying and demand profile</td><td>{{ i.fossil_reference.household_gas.wholesale_adjustment_p_kWh | toFixed(2) }}</td></tr>
+            <tr><td>Network</td><td>{{ i.fossil_reference.household_gas.network_p_kWh | toFixed(2) }}</td></tr>
+            <tr><td>Policy</td><td>{{ i.fossil_reference.household_gas.policy_p_kWh | toFixed(2) }}</td></tr>
+            <tr><td>Supplier</td><td>{{ i.fossil_reference.household_gas.supplier_p_kWh | toFixed(2) }}</td></tr>
+            <tr><td>Standing charge, £{{ i.fossil_reference.household_gas.standing_gbp | toFixed(0) }}/yr over {{ o.fossil_reference.household_gas.household_kWh | toFixed(0) }} kWh</td><td>{{ o.fossil_reference.household_gas.standing_p_kWh | toFixed(2) }}</td></tr>
+            <tr><td>VAT {{ i.fossil_reference.household_gas.vat_prc }} %</td><td>{{ o.fossil_reference.household_gas.vat | toFixed(2) }}</td></tr>
+            <tr class="total"><td>Delivered, £{{ o.fossil_reference.household_gas.bill_gbp | toFixed(0) }}/year bill</td><td>{{ o.fossil_reference.household_gas.delivered | toFixed(2) }}</td></tr>
+        </table>
+        </details>
+
+        <div v-if="i.fuel_values.methane_gbp_MWh > 0">
         <details class="cost-part">
         <summary><h3>Fuel and hourly electricity prices</h3><span>Electricity £{{ o.prices.mean_gbp_MWh | toFixed(0) }}/MWh mean</span></summary>
         <table class="table cost-table" style="width:100%">
-            <tr><th>Fuel</th><th>Output</th><th>Production cost</th><th>Network</th><th colspan="3">Price</th><th>Annual</th></tr>
-            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th>£/MWh</th><th>p/kWh</th><th>p/litre</th><th>£bn/y</th></tr>
+            <tr><th>Fuel</th><th>Output</th><th>Production cost</th><th>Network</th><th colspan="2">Price</th><th title="Price as a multiple of the 2024 bulk fossil fuel it replaces, on energy and before tax">Compared with 2024</th><th>Annual</th></tr>
+            <tr class="units"><th></th><th>TWh/y</th><th>£/MWh</th><th>£/MWh</th><th>£/MWh</th><th>p/kWh</th><th></th><th>£bn/y</th></tr>
             <tr><td>Hydrogen</td><td>{{ o.prices.fuel.hydrogen.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.hydrogen.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.hydrogen.network_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.hydrogen.price_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.hydrogen.p_kWh | toFixed(1) }}</td><td></td><td>{{ o.prices.fuel.hydrogen.annual + o.prices.fuel.hydrogen.network_annual | toFixed(2) }}</td></tr>
-            <tr><td>Methane</td><td>{{ o.prices.fuel.methane.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.methane.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.network_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.price_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.p_kWh | toFixed(1) }}</td><td></td><td>{{ o.prices.fuel.methane.annual + o.prices.fuel.methane.network_annual | toFixed(2) }}</td></tr>
-            <tr><td>Synthetic fuel</td><td>{{ o.prices.fuel.synthetic_fuel.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.network_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.price_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_kWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_litre | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.annual + o.prices.fuel.synthetic_fuel.network_annual | toFixed(2) }}</td></tr>
+            <tr><td>Methane</td><td>{{ o.prices.fuel.methane.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.methane.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.network_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.price_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.methane.p_kWh | toFixed(1) }}</td><td>{{ o.prices.fuel.methane.times_gas | toFixed(1) }}x gas</td><td>{{ o.prices.fuel.methane.annual + o.prices.fuel.methane.network_annual | toFixed(2) }}</td></tr>
+            <tr><td>Synthetic fuel</td><td>{{ o.prices.fuel.synthetic_fuel.TWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.network_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.price_gbp_MWh | toFixed(0) }}</td><td>{{ o.prices.fuel.synthetic_fuel.p_kWh | toFixed(1) }}</td><td>{{ o.prices.fuel.synthetic_fuel.times_jet_fuel | toFixed(1) }}x jet, {{ o.prices.fuel.synthetic_fuel.times_marine_gas_oil | toFixed(1) }}x marine</td><td>{{ o.prices.fuel.synthetic_fuel.annual + o.prices.fuel.synthetic_fuel.network_annual | toFixed(2) }}</td></tr>
             <tr class="total"><td>Fuel users</td><td></td><td></td><td></td><td></td><td></td><td></td><td>{{ o.prices.fuel_sales + o.retail.electricity.network_fuel_bn | toFixed(2) }}</td></tr>
         </table>
-        <p>Production cost is plant, stores and feedstock, with electricity at hourly prices. Network is the fuel users' £{{ o.retail.electricity.network_fuel_bn | toFixed(1) }} bn, shared by hydrogen content. 2024 fuel before tax: jet fuel {{ o.prices.jet_fuel_p_litre | toFixed(0) }} and marine gas oil {{ o.prices.marine_gas_oil_p_litre | toFixed(0) }} p/litre, at the energy density of diesel.</p>
+        <p>Production cost is plant, stores and feedstock, with electricity at hourly prices. Network is the fuel users' £{{ o.retail.electricity.network_fuel_bn | toFixed(1) }} bn, shared by hydrogen content. The comparison uses 2024 bulk prices before tax from the fossil fuel reference: power station gas £{{ i.fossil_reference.power.gas_p_kWh * 10 | toFixed(0) }}, jet fuel £{{ i.fossil_reference.jet_fuel_gbp_MWh | toFixed(0) }} and marine gas oil £{{ i.fossil_reference.marine_gas_oil_gbp_MWh | toFixed(0) }}/MWh, with no carbon price.</p>
         <p>Marginal values set hourly electricity prices, not fuel prices: hydrogen <input v-model.number="i.fuel_values.hydrogen_gbp_MWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> and methane <input v-model.number="i.fuel_values.methane_gbp_MWh" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> £/MWh. Electricity averages £{{ o.prices.mean_gbp_MWh | toFixed(0) }}/MWh, or £{{ o.prices.end_use_weighted_gbp_MWh | toFixed(0) }}/MWh weighted by end use.</p>
         </details>
         </div>
 
         <details class="cost-part">
         <summary><h3>Retail prices and bills</h3><span>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh, £{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</span></summary>
+        <div class="cost-summary">
+            <div>Electricity unit rate<b>{{ o.retail.electricity.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>+ £{{ o.retail.electricity.standing_charge_gbp | toFixed(0) }}/yr standing</div>
+            <div>Electricity bill<b>£{{ o.retail.electricity.bill_gbp | toFixed(0) }}/year</b>{{ o.retail.electricity.household_kWh | toFixed(0) }} kWh per home</div>
+            <div v-if="has_gas">Gas unit rate<b>{{ o.retail.gas.unit_rate_p_kWh | toFixed(2) }} p/kWh</b>£{{ o.retail.gas.bill_gbp | toFixed(0) }}/year bill</div>
+        </div>
         <p>Unit rates add network, policy and supplier costs (2024 Ofgem price cap) to the generation cost, then VAT. RO, FiT and the capacity market are in the generation cost.</p>
         <table class="table cost-table" style="width:100%">
             <tr class="group"><th></th><th colspan="2">Electricity</th><th colspan="2" v-if="has_gas">Gas</th></tr>
@@ -1712,11 +1744,14 @@ input[type='text'] {
             <tr><td>All households (£bn/yr), gas in <input v-model.number="i.retail.gas.households_prc" type="text" @change="update_non_hourly" autocomplete="off"/> % of homes</td><td></td><td>{{ o.retail.electricity.household_spend_bn | toFixed(1) }}</td><td v-if="has_gas"></td><td v-if="has_gas">{{ o.retail.gas.household_spend_bn | toFixed(1) }}</td></tr>
         </table>
         <table class="table cost-table" style="width:100%; margin-top:20px">
-            <tr><th>Road fuel at the pump, with duty and VAT</th><th>p/litre</th><th>p/kWh</th></tr>
-            <tr><td>Petrol</td><td><input v-model.number="i.retail.road_fuel.petrol_p_litre" type="text" @change="update_non_hourly" autocomplete="off"/></td><td>{{ o.retail.road_fuel.petrol_p_kWh | toFixed(1) }}</td></tr>
-            <tr><td>Diesel, <input v-model.number="i.retail.road_fuel.car_diesel_prc" type="text" @change="update_non_hourly" autocomplete="off"/> % of car fuel</td><td><input v-model.number="i.retail.road_fuel.diesel_p_litre" type="text" @change="update_non_hourly" autocomplete="off"/></td><td>{{ o.retail.road_fuel.diesel_p_kWh | toFixed(1) }}</td></tr>
-            <tr class="total"><td>Car fuel (£bn/yr)</td><td></td><td>{{ o.retail.road_fuel.car_fuel_spend_bn | toFixed(1) }}</td></tr>
+            <tr><th>Road fuel, p/litre</th><th>Petrol 2024</th><th>Diesel 2024</th><th v-if="show_synthetic_pump" title="At the energy density of diesel">Synthetic, no duty</th><th v-if="show_synthetic_pump" title="At the energy density of diesel">Synthetic, same duty</th></tr>
+            <tr><td>Before tax</td><td>{{ o.fossil_reference.pump.petrol.before | toFixed(0) }}</td><td>{{ o.fossil_reference.pump.diesel.before | toFixed(0) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_no_duty.before | toFixed(0) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_same_duty.before | toFixed(0) }}</td></tr>
+            <tr><td>Duty</td><td colspan="2"><input v-model.number="i.fossil_reference.road_duty_p_litre" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_no_duty.duty | toFixed(0) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_same_duty.duty | toFixed(0) }}</td></tr>
+            <tr><td>VAT <input v-model.number="i.fossil_reference.road_vat_prc" type="text" @change="update_non_hourly" autocomplete="off"/> %</td><td>{{ o.fossil_reference.pump.petrol.vat | toFixed(0) }}</td><td>{{ o.fossil_reference.pump.diesel.vat | toFixed(0) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_no_duty.vat | toFixed(0) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_same_duty.vat | toFixed(0) }}</td></tr>
+            <tr class="total"><td>At the pump</td><td><input v-model.number="i.retail.road_fuel.petrol_p_litre" type="text" @change="update_non_hourly" autocomplete="off"/></td><td><input v-model.number="i.retail.road_fuel.diesel_p_litre" type="text" @change="update_non_hourly" autocomplete="off"/></td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_no_duty.pump | toFixed(0) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_same_duty.pump | toFixed(0) }}</td></tr>
+            <tr><td>At the pump, p/kWh</td><td>{{ o.retail.road_fuel.petrol_p_kWh | toFixed(1) }}</td><td>{{ o.retail.road_fuel.diesel_p_kWh | toFixed(1) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_no_duty.pump_p_kWh | toFixed(1) }}</td><td v-if="show_synthetic_pump">{{ o.fossil_reference.pump.synthetic_same_duty.pump_p_kWh | toFixed(1) }}</td></tr>
         </table>
+        <p>Car fuel: £{{ o.retail.road_fuel.car_fuel_spend_bn | toFixed(1) }} bn/yr on {{ o.transport.modes['Cars & Vans'].IC.TWh | toFixed(1) }} TWh<span v-if="show_synthetic_pump">, synthetic fuel with VAT and no duty</span>. Diesel is <input v-model.number="i.retail.road_fuel.car_diesel_prc" type="text" @change="update_non_hourly" style="width:40px" autocomplete="off"/> % of 2024 car fuel.<span v-if="show_synthetic_pump"> Before tax, petrol and diesel include refining, distribution and retail margin. Synthetic fuel leaves out distribution and retail margin.</span></p>
         </details>
 
         <details class="cost-part">
@@ -1774,8 +1809,8 @@ input[type='text'] {
         </table>
         <table class="table cost-table" style="width:100%; margin-top:20px">
             <tr><th>Other costs</th><th>£bn/y</th></tr>
-            <tr v-if="o.generation_costs.backup_fuel_used"><td>Backup fuel, p/kWh: gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" autocomplete="off"/></td><td>{{ o.fuel_cost_annual | toFixed(1) }}</td></tr>
-            <tr v-if="o.generation_costs.backup_fuel_used"><td>Carbon price <input v-model.number="i.carbon_price" type="text" @change="update_non_hourly" autocomplete="off"/> £/tCO2 on {{ o.grid_co2_emissions | toFixed(1) }} MtCO2/yr</td><td>{{ o.carbon_cost_annual | toFixed(1) }}</td></tr>
+            <tr v-if="o.generation_costs.backup_fuel_used && o.backup_fuel_burned"><td>Backup fuel, p/kWh: gas <input v-model.number="i.fuel_prices.gas" type="text" @change="update_non_hourly" autocomplete="off"/> oil <input v-model.number="i.fuel_prices.oil" type="text" @change="update_non_hourly" autocomplete="off"/> coal <input v-model.number="i.fuel_prices.coal" type="text" @change="update_non_hourly" autocomplete="off"/> biomass <input v-model.number="i.fuel_prices.biomass" type="text" @change="update_non_hourly" autocomplete="off"/></td><td>{{ o.fuel_cost_annual | toFixed(1) }}</td></tr>
+            <tr v-if="o.generation_costs.backup_fuel_used && o.backup_fuel_burned"><td>Carbon price <input v-model.number="i.carbon_price" type="text" @change="update_non_hourly" autocomplete="off"/> £/tCO2 on {{ o.grid_co2_emissions | toFixed(1) }} MtCO2/yr</td><td>{{ o.carbon_cost_annual | toFixed(1) }}</td></tr>
             <tr v-if="o.synth_fuel.total_biomass_used > 0"><td>FT biomass <input v-model.number="i.synth_fuel.biomass_gbp_MWh" type="text" @change="update_non_hourly" autocomplete="off"/> £/MWh of biomass</td><td>{{ o.ft_biomass_annual | toFixed(1) }}</td></tr>
             <tr v-if="o.biomass.grass_for_biogas > 0"><td>Biogas crop feedstock <input v-model.number="i.biogas.crop_feedstock_gbp_MWh" type="text" @change="update_non_hourly" autocomplete="off"/> £/MWh of methane (waste feedstock is free)</td><td>{{ o.biogas_feedstock_annual | toFixed(1) }}</td></tr>
         </table>

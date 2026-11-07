@@ -504,9 +504,60 @@
     },
     "fuel_values": {
         "hydrogen_gbp_MWh": 150,
-        "methane_gbp_MWh": 235,
+        "methane_gbp_MWh": 235
+    },
+    "fossil_reference": {
+        "TWh": {
+            "cars_and_vans": 269.22,
+            "other_transport": 185.83,
+            "aviation": 157.32,
+            "international_shipping": 23.9,
+            "heating_oil": 54.18,
+            "industry_oil": 26.26,
+            "household_gas": 230.42,
+            "other_gas": 220.44,
+            "other_coal": 22.03,
+            "power_gas": 167.94,
+            "power_oil": 4.24,
+            "power_coal": 31.37
+        },
+        "road_duty_p_litre": 52.95,
+        "road_vat_prc": 20,
         "jet_fuel_gbp_MWh": 47.4,
-        "marine_gas_oil_gbp_MWh": 50.2
+        "marine_gas_oil_gbp_MWh": 50.2,
+        "burning_oil": {
+            "p_litre": 58.24,
+            "vat_prc": 5,
+            "kWh_per_litre": 10.294
+        },
+        "gas_oil": {
+            "p_litre": 72.32,
+            "vat_prc": 5,
+            "duty_p_litre": 10.18,
+            "kWh_per_litre": 10.742
+        },
+        "non_domestic_gas": {
+            "p_kWh": 5.376,
+            "with_ccl_p_kWh": 5.667
+        },
+        "household_gas": {
+            "commodity_p_kWh": 3.499,
+            "wholesale_adjustment_p_kWh": 0.197,
+            "network_p_kWh": 1.414,
+            "policy_p_kWh": 0.273,
+            "supplier_p_kWh": 0.611,
+            "standing_gbp": 104.28,
+            "vat_prc": 5,
+            "customers": 24689567
+        },
+        "power": {
+            "gas_p_kWh": 3.499,
+            "oil_p_kWh": 5.245,
+            "coal_p_kWh": 1.399,
+            "carbon_price": 55.18,
+            "co2_Mt": 40.03
+        },
+        "household_electricity_vat_bn": 1.48
     },
     "fuel_prices": {
         "gas": 0,

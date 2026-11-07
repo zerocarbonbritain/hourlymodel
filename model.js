@@ -2236,10 +2236,6 @@ var model = {
             p.fuel_sales += p.fuel[z].annual
             p.fuel_value_sales += p.fuel[z].TWh * values[z] * 0.001
         }
-        // 2024 fuel prices before tax per litre, at the diesel energy density
-        let kWh_per_litre = i.retail.road_fuel.diesel_kWh_per_litre
-        p.jet_fuel_p_litre = fv.jet_fuel_gbp_MWh * 0.1 * kWh_per_litre
-        p.marine_gas_oil_p_litre = fv.marine_gas_oil_gbp_MWh * 0.1 * kWh_per_litre
         p.recovery = o.generation_costs.total_annual > 0 ? (p.electricity_revenue + p.fuel_value_sales) / o.generation_costs.total_annual : 0
 
         // Fuel users pay production cost, which includes the electricity used to make the fuel.
@@ -2327,6 +2323,7 @@ var model = {
             o.fuel_cost_annual += fuel_annual
             o.carbon_cost_annual += carbon_annual
         }
+        o.backup_fuel_burned = Object.values(backup_fuel).some(([fuel]) => fuel > 0)
         o.total_annual_cost += o.fuel_cost_annual + o.carbon_cost_annual
 
         let backup = { annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, generation: o.costs['CCGT'].generation + o.costs['OCGT'].generation }
@@ -2497,9 +2494,128 @@ var model = {
             petrol_p_kWh: f.petrol_p_litre / f.petrol_kWh_per_litre,
             diesel_p_kWh: f.diesel_p_litre / f.diesel_kWh_per_litre
         }
-        road.car_p_kWh = road.petrol_p_kWh * (1 - diesel) + road.diesel_p_kWh * diesel
+        road.fossil_car_p_kWh = road.petrol_p_kWh * (1 - diesel) + road.diesel_p_kWh * diesel
+        // Synthetic fuel users pay its price with VAT and no duty. Baselines burn fossil fuel at pump prices.
+        let synthetic_car_fuel = i.fossil_reference && p.fuel.synthetic_fuel.gbp_MWh > 0
+        road.car_p_kWh = synthetic_car_fuel ? p.fuel.synthetic_fuel.p_kWh * (1 + i.fossil_reference.road_vat_prc * 0.01) : road.fossil_car_p_kWh
         road.car_fuel_spend_bn = o.transport.modes["Cars & Vans"].IC.TWh * road.car_p_kWh * 0.01
         o.retail.road_fuel = road
+        model.fossil_reference()
+    },
+    // 2024 fossil fuel prices and bills at fixed 2024 volumes, the same in every scenario.
+    // Prices are in £/MWh of fuel and bills in £bn/yr. Tax is what users pay and cannot reclaim.
+    fossil_reference: function() {
+        let fr = i.fossil_reference
+        if (!fr) return
+        let rf = i.retail.road_fuel
+        let row = (label, TWh, before, tax) => ({
+            label, TWh, before, tax, after: before + tax,
+            before_bn: TWh * before * 0.001,
+            after_bn: TWh * (before + tax) * 0.001
+        })
+        // Pence per litre at the pump, split into before tax, duty and VAT
+        let pump_split = (pump_p_litre, kWh_per_litre) => {
+            let ex_vat = pump_p_litre / (1 + fr.road_vat_prc * 0.01)
+            return {
+                before: ex_vat - fr.road_duty_p_litre,
+                duty: fr.road_duty_p_litre,
+                vat: pump_p_litre - ex_vat,
+                pump: pump_p_litre,
+                pump_p_kWh: pump_p_litre / kWh_per_litre
+            }
+        }
+        // Synthetic fuel at the energy density of diesel, with and without road fuel duty
+        let synthetic_pump = (duty) => {
+            let before = o.prices.fuel.synthetic_fuel.p_litre
+            let vat = (before + duty) * fr.road_vat_prc * 0.01
+            return { before, duty, vat, pump: before + duty + vat, pump_p_kWh: (before + duty + vat) / rf.diesel_kWh_per_litre }
+        }
+        let petrol = pump_split(rf.petrol_p_litre, rf.petrol_kWh_per_litre)
+        let diesel = pump_split(rf.diesel_p_litre, rf.diesel_kWh_per_litre)
+        let per_litre_to_MWh = 10
+        let petrol_before = petrol.before / rf.petrol_kWh_per_litre * per_litre_to_MWh
+        let diesel_before = diesel.before / rf.diesel_kWh_per_litre * per_litre_to_MWh
+        let diesel_share = rf.car_diesel_prc * 0.01
+        let car_before = petrol_before * (1 - diesel_share) + diesel_before * diesel_share
+        let car_after = o.retail.road_fuel.fossil_car_p_kWh * 10
+
+        let heating_before = fr.burning_oil.p_litre / (1 + fr.burning_oil.vat_prc * 0.01) / fr.burning_oil.kWh_per_litre * per_litre_to_MWh
+        let heating_after = fr.burning_oil.p_litre / fr.burning_oil.kWh_per_litre * per_litre_to_MWh
+        let gas_oil_ex_vat = fr.gas_oil.p_litre / (1 + fr.gas_oil.vat_prc * 0.01)
+        let industry_before = (gas_oil_ex_vat - fr.gas_oil.duty_p_litre) / fr.gas_oil.kWh_per_litre * per_litre_to_MWh
+        let industry_tax = fr.gas_oil.duty_p_litre / fr.gas_oil.kWh_per_litre * per_litre_to_MWh
+
+        // Household gas from commodity to delivered, with the standing charge spread over use
+        let hg = fr.household_gas
+        let household_kWh = fr.TWh.household_gas * 1e9 / hg.customers
+        let gas = {
+            household_kWh,
+            unit_before_vat: hg.commodity_p_kWh + hg.wholesale_adjustment_p_kWh + hg.network_p_kWh + hg.policy_p_kWh + hg.supplier_p_kWh,
+            standing_p_kWh: hg.standing_gbp * 100 / household_kWh
+        }
+        gas.before_vat = gas.unit_before_vat + gas.standing_p_kWh
+        gas.vat = gas.before_vat * hg.vat_prc * 0.01
+        gas.delivered = gas.before_vat + gas.vat
+        gas.bill_gbp = gas.delivered * 0.01 * household_kWh
+
+        let rows = {
+            cars_and_vans: row("Cars and vans, petrol and diesel", fr.TWh.cars_and_vans, car_before, car_after - car_before),
+            other_transport: row("Other road, rail and domestic shipping, at diesel", fr.TWh.other_transport, diesel_before, diesel.duty / rf.diesel_kWh_per_litre * per_litre_to_MWh),
+            aviation: row("Aviation, jet fuel", fr.TWh.aviation, fr.jet_fuel_gbp_MWh, 0),
+            international_shipping: row("International shipping, marine gas oil", fr.TWh.international_shipping, fr.marine_gas_oil_gbp_MWh, 0),
+            heating_oil: row("Heating oil", fr.TWh.heating_oil, heating_before, heating_after - heating_before),
+            industry_oil: row("Industry oil, gas oil", fr.TWh.industry_oil, industry_before, industry_tax),
+            household_gas: row("Household gas, delivered", fr.TWh.household_gas, gas.before_vat * 10, gas.vat * 10),
+            other_gas: row("Services and industry gas, delivered", fr.TWh.other_gas, fr.non_domestic_gas.p_kWh * 10, (fr.non_domestic_gas.with_ccl_p_kWh - fr.non_domestic_gas.p_kWh) * 10),
+            other_coal: row("Coal outside power stations", fr.TWh.other_coal, fr.power.coal_p_kWh * 10, 0)
+        }
+        let final = { TWh: 0, before_bn: 0, after_bn: 0 }
+        for (let z in rows) {
+            final.TWh += rows[z].TWh
+            final.before_bn += rows[z].before_bn
+            final.after_bn += rows[z].after_bn
+        }
+        // Power station fuel, with the carbon price paid in 2024 as its tax
+        let power_TWh = fr.TWh.power_gas + fr.TWh.power_oil + fr.TWh.power_coal
+        let power_fuel_bn = (fr.TWh.power_gas * fr.power.gas_p_kWh + fr.TWh.power_oil * fr.power.oil_p_kWh + fr.TWh.power_coal * fr.power.coal_p_kWh) * 0.01
+        let power = row("Power station fuel, tax is the carbon price", power_TWh, 1000 * power_fuel_bn / power_TWh, fr.power.co2_Mt * fr.power.carbon_price / power_TWh)
+        let total = { TWh: final.TWh + power.TWh, before_bn: final.before_bn + power.before_bn, after_bn: final.after_bn + power.after_bn }
+
+        // Price as a multiple of the 2024 bulk fossil fuel it replaces, on energy and before tax
+        let fuel = o.prices.fuel
+        fuel.methane.times_gas = fuel.methane.price_gbp_MWh / (fr.power.gas_p_kWh * 10)
+        fuel.synthetic_fuel.times_jet_fuel = fuel.synthetic_fuel.price_gbp_MWh / fr.jet_fuel_gbp_MWh
+        fuel.synthetic_fuel.times_marine_gas_oil = fuel.synthetic_fuel.price_gbp_MWh / fr.marine_gas_oil_gbp_MWh
+
+        o.fossil_reference = {
+            rows, final, power, total, household_gas: gas,
+            pump: { petrol, diesel, synthetic_no_duty: synthetic_pump(0), synthetic_same_duty: synthetic_pump(fr.road_duty_p_litre) }
+        }
+
+        // Headline cost: system cost and networks, with fossil fuel for final users where they burn it.
+        // Tax is VAT on household electricity and synthetic car fuel, and the taxes in the fossil reference.
+        let elec = o.retail.electricity
+        let burns_fossil = o.generation_costs.fuel_users_annual == 0
+        let vat_share = (spend, vat_prc) => spend * vat_prc / (100 + vat_prc)
+        let before_bn = o.generation_costs.total_annual + elec.network_total_bn
+        let tax_bn = vat_share(elec.household_spend_bn, i.retail.vat_prc)
+        if (burns_fossil) {
+            before_bn += final.before_bn
+            tax_bn += final.after_bn - final.before_bn
+        } else {
+            tax_bn += vat_share(o.retail.road_fuel.car_fuel_spend_bn, fr.road_vat_prc)
+        }
+        let energy_TWh = (o.final_consumption.total + o.final_consumption.international_shipping) * o.GWh_to_TWhy
+        let tax_2024_bn = final.after_bn - final.before_bn + fr.household_electricity_vat_bn
+        o.total_cost = {
+            before_bn, tax_bn, after_bn: before_bn + tax_bn,
+            energy_TWh,
+            before_p_kWh: 100 * before_bn / energy_TWh,
+            after_p_kWh: 100 * (before_bn + tax_bn) / energy_TWh,
+            tax_2024_bn,
+            // Rounded so the baseline shows 0.0 and not -0.0
+            tax_gap_bn: Math.round((tax_2024_bn - tax_bn) * 10) / 10
+        }
     }
 }
 
