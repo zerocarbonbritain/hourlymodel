@@ -188,6 +188,7 @@ In ZCB_PyPSA, docs/datasets.md. ERA5 cutouts are downloading on a server (server
 ## Phase 8. Comparisons
 
 - [ ] Interconnected sensitivity (D4), to compare with PyPSA-Eur GB results.
+- [x] Clean Power 2030 (2026-11-08). scenarios/clean_power_2030.json follows the NESO Further Flex and Renewables pathway, built from the 2024 baseline by docs/build_clean_power_2030.py. On NESO's boundary it costs £132.0/MWh against NESO's £132.7/MWh. Method, cost comparison and retail price are in docs/clean-power-2030-notes.md.
 
 ## Backlog
 

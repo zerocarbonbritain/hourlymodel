@@ -170,6 +170,8 @@ The UI has one setting for generation costs, with two price presets and the buil
 - **2024 fleet prices** (baseline_2024): capture price plus support per MWh. Offshore wind £163, onshore £121, solar £108, hydro £106, nuclear £72, gas £85, bioenergy £131, oil £114 and imports £76/MWh, plus £3.0bn of Feed-in Tariff and capacity market payments. Built by `baseline/inputs/13-prices.json`, see [baseline-2024-notes.md](baseline-2024-notes.md).
 - **New-build strike prices** (zcb_2024): AR7 strike prices for wind, solar and tidal, the Hinkley Point C strike price for nuclear, and the hydro build-up at its 35% reference load factor (£138), from the table above. Other plant uses the build-up.
 
+clean_power_2030 uses blended prices: 2024 fleet prices for capacity in the 2024 baseline and AR7 strike prices for capacity added since, weighted by capacity. Its build script computes them. See [clean-power-2030-notes.md](clean-power-2030-notes.md).
+
 Applied to another scenario, a preset sets only the fixed generators (wind, solar, marine, geothermal, nuclear, hydro and imports). Backup, storage and support not split by technology keep their current values. Editing a price shows the setting as custom. The build-up table shows only the components in use.
 
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |
