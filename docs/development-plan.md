@@ -172,6 +172,13 @@ The H2 store stays at a 10% floor for FT and methanation, and direct hydrogen de
 - [ ] Calibrate the hourly price on the ten year cost-optimal network and check cost recovery for every extendable technology.
 - [ ] Checks: electricity and fuel revenue against total system cost, offshore wind revenue against its cost, and the series valuation of the SPF penalty against resizing.
 - [ ] Rerun the SPF 2.8 against 3.8 study in both models. Decide whether to finish the blog post (/var/www/trystan2/pages/en/heatpump_spf_system.html).
+  Hourly model done 2026-11-07, PyPSA not yet. Scripts and results are in /home/trystan/hourlymodel-costwork/spf_study_2026-11-07. Each case is re-optimised on supply plus network cost against the phase 5 store requirements, in zcb_2024 and zcb_2024_high_demand. SPF is fleet wide (homes and services). Results, as differences in supply plus network cost:
+  - SPF 2.8 against 3.8: £9.34bn/yr (zcb_2024), £14.50bn/yr (high demand).
+  - Same SPF, COP at −5 °C of 1.8 against 2.5: £4.92bn/yr, £9.54bn/yr.
+  - Domestic space heat at 204 against 98 TWh/yr, with services and industry heat unchanged: £11.83bn/yr, £9.31bn/yr.
+  - Restarts from other offshore wind levels agree within £0.3bn/yr.
+  - Hourly prices value the SPF penalty at 61% (zcb_2024) and 77% (high demand) of the re-optimised supply cost difference, before networks.
+  The blog post draft is rewritten with these results and is still marked draft.
 
 ## Phase 7. Weather data
 
