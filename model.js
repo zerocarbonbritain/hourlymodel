@@ -1758,7 +1758,11 @@ var model = {
 
             let supply = d.elec_supply_hourly[hour]
             let end_use = d.lac_demand[hour] + d.spacewater_elec[hour] + d.industrial_elec_demand[hour] + d.EL_transport[hour]
-            if (end_use / grid_loss_prc > o.balance.max_electricity_demand) o.balance.max_electricity_demand = end_use / grid_loss_prc
+            if (end_use / grid_loss_prc > o.balance.max_electricity_demand) {
+                o.balance.max_electricity_demand = end_use / grid_loss_prc
+                // End use at the peak hour by series, which the network cost shares between users
+                o.balance.peak_end_use = { lac: d.lac_demand[hour], heat: d.spacewater_elec[hour], industry: d.industrial_elec_demand[hour], transport: d.EL_transport[hour] }
+            }
             let demand = end_use + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
             let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.excess_elec[hour]
             error += Math.abs(balance)

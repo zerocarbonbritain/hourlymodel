@@ -703,7 +703,27 @@
     },
     "retail.electricity.network_basis": {
         "type": "assumption",
-        "value": "per_kWh",
-        "note": "Baselines pay network charges at the observed per kWh rate. Scenarios can scale network cost with peak demand relative to the 2024 baseline."
+        "value": "components",
+        "note": "Network cost is a system wide total, shared between fuel users, homes and other users. Homes pay their share on the unit rate, with no network standing charge. In the baseline the total is the 2024/25 network revenue, as the peak and wind capacity match the reference values."
+    },
+    "retail.electricity.network_existing_gbp_bn": {
+        "type": "assumption",
+        "units": "£bn/yr",
+        "value": 14.29,
+        "note": "Network revenue from electricity users in 2024/25, nominal: TNUoS recovered from demand £3.13bn (NESO Final TNUoS Tariffs 2024/25, table 17), BSUoS outturn £3.29bn (NESO monthly outturn, April 2024 to March 2025), DUoS as billed £7.42bn (Ofgem ED2 PCFM v4, mean of 2023/24 to 2025/26 over the 14 licensees) and NIE Networks revenue in 2024 £0.45bn (press report of the annual report). See docs/cost-assumptions.md."
+    },
+    "retail.electricity.network_domestic_prc": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "p": {"ref": "retail.electricity.network_p_kWh"},
+            "s": {"ref": "retail.electricity.network_gbp"},
+            "h": {"ref": "households_2030"},
+            "x": {"ref": "retail.electricity.network_existing_gbp_bn"},
+            "e": {"source": "dukes_1.1", "sheet": "{year}", "block": "Aggregate energy commodity balance", "row": ["Domestic"], "column": "Electricity"}
+        },
+        "formula": "(p * e * 0.01163 * 0.01 + s * h * 1e-9) / x * 100",
+        "round": 1,
+        "note": "Domestic share of the 2024 network revenue: the Ofgem cap network rate on DUKES domestic electricity plus the cap network standing charge on every home."
     }
 }

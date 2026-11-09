@@ -198,6 +198,17 @@ In ZCB_PyPSA, docs/datasets.md. ERA5 cutouts are downloading on a server (server
 - [x] Clean Power 2030 (2026-11-08). scenarios/clean_power_2030.json follows the NESO Further Flex and Renewables pathway, built from the 2024 baseline by docs/build_clean_power_2030.py. On NESO's boundary it costs £132.0/MWh against NESO's £132.7/MWh. Method, cost comparison and retail price are in docs/clean-power-2030-notes.md.
 - [x] Deployed technologies (2026-11-09). scenarios/deployed_tech.json follows zcb_2024_high_demand with only technologies deployed at scale today, and fossil fuel for what is not electrified. Built from the 2024 baseline by docs/build_deployed_tech.py. Energy emissions fall 63% from 2024 to 129 MtCO2e, and the society cost is £166.75bn/yr against £170.89bn for zcb_2024_high_demand. Results in docs/deployed-tech-notes.md.
 
+## Network cost
+
+A review on 2026-11-08 compared the network cost with NESO Clean Power 2030 and wider work. Method and sources are in docs/cost-assumptions.md, network cost.
+
+1. [x] **Network by component** (2026-11-09). `network_basis` "components" replaces "peak": the 2024 network held flat, distribution at £980/kW of peak above 2024, transmission at £1,100/kW of wind above 2024, an annuity at 4.6% over 45 years plus 1.2% O&M, and constraints above 2024 as an input. The UI has an electricity networks section with each part, its driver, capital and annual cost. zcb_2024 networks go from £20.68bn to £19.56bn/yr before standing charges. The 2024 network was then set from 2024/25 revenue (£14.29bn with standing charges, against £12.5bn from the cap rate), which takes it to £21.39bn, or £24.71bn with standing charges. The total is now shared between fuel users, homes and other users, and homes pay their share on the unit rate with no network standing charge. baseline_2024 moved to this basis: its 2024 bill at 3,400 kWh is within 1.7% of DESNZ quarterly energy prices. The cost of peak falls from £166 to £64/kW/yr. Not yet redone with it: the deployed_tech search (networks fall from £32.2bn to £25.8bn/yr at its current capacities), the SPF study, where networks were £2.86bn of the £9.34bn penalty, and the zcb_2024_retune search.
+2. [ ] **Electrolysis pays per kW** at a transmission rate with no distribution part, in place of the 20% share.
+3. [ ] **Clean Power 2030 test.** Run clean_power_2030 on the component basis against NESO CP.13, CP.14 and CP.31, and update docs/clean_power_2030_retail.py, which still has a peak scaling sensitivity.
+4. [ ] **A steadier peak**, such as the mean of annual maxima. Recheck after hourly heat demand (phase 7).
+5. [ ] **Zonal check in ZCB_PyPSA.** Two or three GB zones with the B4 and B6 boundaries as extendable links, to test the £1,100/kW transmission cost and the zero constraint cost for a finished system. A two zone constraint method in the hourly model was considered and dropped, as curtailment is already costed.
+6. [ ] **Small fixes.** Losses on delivered electricity, not excess. Size the overlap of generator TNUoS with retail network charges.
+
 ## Backlog
 
 Baseline open items that don't block the phases above. See baseline/open-items.md for detail.
@@ -210,4 +221,4 @@ Baseline open items that don't block the phases above. See baseline/open-items.m
 - Biomass fuel price and 2018 carbon price series.
 - Battery wear is not costed, and matters more now that the battery charges about 33 TWh/yr in zcb_2024.
 - First fill of the fuel stores is not costed, so a higher start level gives margin at no modelled cost.
-- The peak scaled network cost uses baseline_2024 outputs (55.19 GW, 269.39 TWh) typed in as inputs. Update them when the baseline changes.
+- The network cost uses baseline_2024 outputs (55.19 GW peak, 32.34 GW of wind) typed in as inputs. Update them when the baseline changes.

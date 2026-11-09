@@ -1,7 +1,7 @@
 {
  "scenario": "baseline_2024",
  "year": 2024,
- "generated": "2026-11-07",
+ "generated": "2026-11-09",
  "warn_factor": 2,
  "checks": [
   {
@@ -1471,11 +1471,11 @@
     },
     "formula": "a"
    },
-   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to the generation cost.",
-   "issue": "",
-   "status_at_build": "ok",
+   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs to the generation cost.",
+   "issue": "By design. The model has no network standing charge: homes pay their share of the system network cost on the unit rate, which moves about 3.4 p/kWh (\u00a3116 a year before VAT) from the standing charge to the unit rate. The bill at 3,400 kWh is the like for like check (docs/cost-assumptions.md, network cost).",
+   "status_at_build": "known",
    "observed": 25.82700021794268,
-   "model_at_build": 25.387893463178074,
+   "model_at_build": 28.71972287888294,
    "sources": [
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
    ]
@@ -1494,10 +1494,10 @@
     "formula": "a"
    },
    "note": "Built from the Ofgem cap nil consumption allowances, including VAT.",
-   "issue": "",
-   "status_at_build": "ok",
+   "issue": "By design. The model's standing charge covers policy and supplier costs only. The network part, \u00a3116.23 before VAT in the 2024 cap, is on the unit rate. Without it the observed figure is about \u00a383.",
+   "status_at_build": "known",
    "observed": 205.1094903566591,
-   "model_at_build": 210.91350000000003,
+   "model_at_build": 88.872,
    "sources": [
     "f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)"
    ]
@@ -1520,7 +1520,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1083.2274977667098,
-   "model_at_build": 1074.1018777480547,
+   "model_at_build": 1065.34257788202,
    "sources": [
     "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
    ]
@@ -1631,7 +1631,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 30.07343406773285,
-   "model_at_build": 31.16978173024987,
+   "model_at_build": 30.977036308559953,
    "sources": [
     "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
@@ -1656,7 +1656,7 @@
    "issue": "ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).",
    "status_at_build": "known",
    "observed": 26.289,
-   "model_at_build": 31.16978173024987,
+   "model_at_build": 30.977036308559953,
    "sources": [
     "s = 26289 (table_261.xlsx, 2.6.1!D62)"
    ]
@@ -1997,7 +1997,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 74.24371058392231,
-   "model_at_build": 70.88198435566656,
+   "model_at_build": 72.70371541517417,
    "sources": [
     "all = 23298.55 (DUKES_1.1.xlsx, 2024!I35)",
     "dom = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
@@ -2048,7 +2048,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1,
-   "model_at_build": 0.9998635848884699,
+   "model_at_build": 0.999946566813455,
    "sources": [
     "one = 1 (published: The stored 2024 tax should equal the tax in the live baseline run)"
    ]

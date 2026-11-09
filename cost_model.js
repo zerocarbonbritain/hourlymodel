@@ -614,8 +614,8 @@ Object.assign(model, {
     //
     //   generation + network + policy + supplier, all per kWh, then VAT
     //
-    // Network, policy and supplier costs also have a part per customer, which is the standing
-    // charge. These inputs come from the 2024 Ofgem price cap.
+    // Policy and supplier costs also have a part per customer, which is the standing charge. So
+    // does the network on the per kWh basis. These inputs come from the 2024 Ofgem price cap.
     electricity_retail: function(hydrogen) {
         let r = i.retail
         let e = r.electricity
@@ -639,31 +639,80 @@ Object.assign(model, {
         // zero in scenarios.
         elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
 
-        // Network cost. With basis "per_kWh" it is the Ofgem rate times the energy billed. With
-        // basis "peak", wires are sized for the highest demand and not for total energy, so:
+        // Network cost. With basis "per_kWh" it is the Ofgem rate times the energy billed, plus a
+        // standing charge on homes. With basis "components" it is a system wide total, the 2024
+        // network plus what is built beyond it:
         //
-        //   network total = 2024 network total x (peak demand / 2024 peak) + new transmission
+        //   existing       2024/25 network revenue from all users, held in real terms
+        //   distribution   peak demand above the 2024 peak, per kW
+        //   transmission   wind capacity above 2024, per kW
+        //   constraints    balancing cost above 2024, £bn/yr
         //
-        // Peak demand is end use, without electrolysis. New transmission is an annuity on the
-        // investment, like a mortgage. Fuel users pay a share, and electricity users pay the rest
-        // per kWh. The standing charge is per connection, so it does not scale.
+        // Peak demand is end use, without electrolysis, storage charging or power to X. Transmission
+        // follows wind, which is far from demand. Offshore connections are within wind capex. New
+        // capital is an annuity, like a mortgage, plus O&M.
+        //
+        // Fuel users pay a share of the total. The rest is shared between homes and other users:
+        // the 2024 network by the 2024 domestic share, distribution by the domestic share of the
+        // peak, and transmission and constraints by energy. Homes pay their share on the unit rate,
+        // with no network standing charge.
+        let domestic_TWh = o.final_consumption.domestic.electricity * o.GWh_to_TWhy
         elec.network_p_kWh = e.network_p_kWh
         elec.network_total_bn = e.network_p_kWh * 0.01 * billed_TWh
-        elec.network_investment_annual_bn = 0
+        elec.network_standing_gbp = e.network_gbp
+        let n = { existing_bn: elec.network_total_bn, distribution_GW: 0, distribution_capital_bn: 0, distribution_bn: 0,
+            transmission_GW: 0, transmission_capital_bn: 0, transmission_bn: 0, constraints_bn: 0, annual_share: 0,
+            standing_bn: e.network_gbp * i.households_2030 * 1e-9, domestic_TWh, domestic_bn: 0, other_bn: 0,
+            domestic_peak_prc: 0, domestic_energy_prc: 0, other_p_kWh: 0 }
+        elec.network = n
         elec.network_fuel_bn = 0
-        if (e.network_basis == "peak" && billed_TWh > 0) {
-            let rate = e.network_investment_return_prc * 0.01
-            elec.network_investment_annual_bn = e.network_investment_gbp_bn * rate / (1 - Math.pow(1 + rate, -e.network_investment_life_years))
-            elec.network_total_bn = e.network_p_kWh * 0.01 * e.network_reference_TWh * (o.balance.max_electricity_demand / e.network_reference_peak_GW) + elec.network_investment_annual_bn
+        if (e.network_basis == "components" && billed_TWh > 0) {
+            // The share of capital paid each year: annuity plus O&M
+            let rate = e.network_return_prc * 0.01
+            n.annual_share = rate / (1 - Math.pow(1 + rate, -e.network_life_years)) + e.network_om_prc * 0.01
+            n.existing_bn = e.network_existing_gbp_bn
+            n.distribution_GW = Math.max(0, o.balance.max_electricity_demand - e.network_reference_peak_GW)
+            n.transmission_GW = Math.max(0, i.supply.onshore_wind_capacity + i.supply.offshore_wind_capacity - e.network_reference_wind_GW)
+            // GW x £/kW is £m, so 0.001 gives £bn
+            n.distribution_capital_bn = n.distribution_GW * e.network_distribution_gbp_kW * 0.001
+            n.transmission_capital_bn = n.transmission_GW * e.network_transmission_gbp_kW * 0.001
+            n.distribution_bn = n.distribution_capital_bn * n.annual_share
+            n.transmission_bn = n.transmission_capital_bn * n.annual_share
+            n.constraints_bn = e.network_constraints_gbp_bn
+            n.standing_bn = 0
+            elec.network_standing_gbp = 0
+            elec.network_total_bn = n.existing_bn + n.distribution_bn + n.transmission_bn + n.constraints_bn
             if (hydrogen.sold_TWh > 0) elec.network_fuel_bn = elec.network_total_bn * e.network_fuel_share_prc * 0.01
-            elec.network_p_kWh = 100 * (elec.network_total_bn - elec.network_fuel_bn) / billed_TWh
+
+            // Domestic share of the peak. The hourly lighting, appliance and heat series cover homes
+            // and services together, so each is split by its annual domestic share. Industry and
+            // transport are not domestic.
+            let lac_domestic = i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.domestic.cooking_TWhy
+            let lac_total = lac_domestic + i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.catering_TWhy + i.LAC.services.cooling_TWhy
+            let lac_share = lac_total > 0 ? lac_domestic / lac_total : 0
+            let heat_elec = o.heating_systems.heatpump.fuel_demand + o.heating_systems.elres.fuel_demand
+            let heat_domestic = o.final_consumption.domestic.electricity - o.LAC.total * lac_share
+            let heat_share = heat_elec > 0 ? heat_domestic / heat_elec : 0
+            let p = o.balance.peak_end_use
+            let peak = p.lac + p.heat + p.industry + p.transport
+            n.domestic_peak_prc = peak > 0 ? 100 * (p.lac * lac_share + p.heat * heat_share) / peak : 0
+            n.domestic_energy_prc = 100 * domestic_TWh / billed_TWh
+
+            // Homes and other users share what fuel users do not pay
+            let users = 1 - (hydrogen.sold_TWh > 0 ? e.network_fuel_share_prc * 0.01 : 0)
+            n.domestic_bn = users * (n.existing_bn * e.network_domestic_prc * 0.01
+                + n.distribution_bn * n.domestic_peak_prc * 0.01
+                + (n.transmission_bn + n.constraints_bn) * n.domestic_energy_prc * 0.01)
+            n.other_bn = elec.network_total_bn - elec.network_fuel_bn - n.domestic_bn
+            n.other_p_kWh = billed_TWh > domestic_TWh ? 100 * n.other_bn / (billed_TWh - domestic_TWh) : 0
+            elec.network_p_kWh = domestic_TWh > 0 ? 100 * n.domestic_bn / domestic_TWh : 0
         }
         elec.network_annual_bn = elec.network_total_bn - elec.network_fuel_bn
 
         // Unit rate, standing charge and the household bill. Domestic electricity includes heat
         // pumps and leaves out electric vehicles, which are in transport.
         elec.unit_rate_p_kWh = (elec.generation_p_kWh + elec.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
-        elec.standing_charge_gbp = (e.network_gbp + e.policy_gbp + e.supplier_gbp) * vat
+        elec.standing_charge_gbp = (elec.network_standing_gbp + e.policy_gbp + e.supplier_gbp) * vat
         elec.household_kWh = o.final_consumption.domestic.electricity * o.per_year * 1000000 / i.households_2030
         elec.bill_gbp = elec.unit_rate_p_kWh * 0.01 * elec.household_kWh + elec.standing_charge_gbp
         elec.household_spend_bn = elec.bill_gbp * i.households_2030 * 1e-9
@@ -1043,7 +1092,7 @@ Object.assign(model, {
         let layers = {
             system: generation_costs.total_annual,
             wholesale_adjustment: per_kWh_bn(e.wholesale_adjustment_p_kWh),
-            networks: elec.network_total_bn + per_home_bn(e.network_gbp),
+            networks: elec.network_total_bn + per_home_bn(elec.network_standing_gbp),
             policy: per_kWh_bn(e.policy_p_kWh) + per_home_bn(e.policy_gbp),
             supplier: per_kWh_bn(e.supplier_p_kWh) + per_home_bn(e.supplier_gbp),
             fuel_delivery: o.prices.fuel_delivery_bn,

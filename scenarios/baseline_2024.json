@@ -401,7 +401,9 @@
             "supplier_p_kWh": 3.176,
             "supplier_gbp": 73.88,
             "wholesale_adjustment_p_kWh": 3.189,
-            "network_basis": "per_kWh"
+            "network_basis": "components",
+            "network_existing_gbp_bn": 14.29,
+            "network_domestic_prc": 45.5
         },
         "gas": {
             "network_p_kWh": 1.414,

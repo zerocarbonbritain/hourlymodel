@@ -152,16 +152,68 @@ The build-up for every technology is also reported (`retail.electricity.resource
 
 Network charges start from the 2024 Ofgem cap: 3.394 p/kWh and £116.23 per customer per year. They are in retail and fuel prices, not in the system cost.
 
-With `retail.electricity.network_basis` `peak` (zcb_2024), the network total has two parts. Baselines use `per_kWh`, with neither part.
+With `retail.electricity.network_basis` `components` (baseline_2024 and zcb_2024), the network cost is a system wide total: the 2024 network plus what is built beyond it. It is then shared between fuel users, homes and other electricity users, as described under who pays. clean_power_2030 still uses `per_kWh`: the cap rate on every kWh billed plus the cap standing charge on every home.
 
-- **Peak scaling.** £bn/yr = 3.394 p/kWh × 269.39 TWh × (peak / 55.19 GW). The reference values are baseline_2024 model outputs (`balance.max_electricity_demand` and delivered electricity) and need updating when the baseline changes. Both peaks come from the same model, so its high peak (open item "Peak demand is high") partly cancels. The peak is end use and excludes electrolysis.
-- **New transmission.** `network_investment_gbp_bn` as an annuity at `network_investment_return_prc` over `network_investment_life_years`. NESO identifies around £89bn of transmission investment beyond 2030. The return is 4.6%, within the 4.46 to 4.67% CPIH-real allowed return on capital under RIIO-T3 that NESO reports. The 40 year life is our assumption. NESO's annex gives no price base for the £89bn, and adds that it is not a full assessment, leaving out asset replacement, asset health and connection-specific works.
+- **Existing network.** `network_existing_gbp_bn`, £14.29bn/yr, held in real terms. This is what electricity users paid for networks in 2024/25, in nominal prices, which are close to 2024 prices:
 
-Fuel users pay `network_fuel_share_prc` of the total, 20% in zcb_2024. This is a judgement: electrolysis is likely to sit near generation, and NESO identifies up to 10 GW of flexible demand including electrolysers that could co-locate in North Scotland and Shetland. Electricity users pay the rest over end use. Network costs are outside the system cost.
+  | £bn | |
+  |---|---|
+  | Transmission (TNUoS) recovered from demand | 3.13 |
+  | Balancing (BSUoS) outturn, of which £2.70bn balancing services and £0.60bn NESO internal costs | 3.29 |
+  | Distribution (DUoS) as billed, mean of 2023/24 (6.45), 2024/25 (8.72) and 2025/26 (7.08) | 7.42 |
+  | Northern Ireland, NIE Networks revenue in 2024 | 0.45 |
+  | Total | 14.29 |
 
-In zcb_2024 peak demand is 95.2 GW (1.72 times 2024), so peak scaling gives £15.8bn/yr and new transmission £4.9bn/yr, £20.7bn in total. Fuel users pay £4.1bn and electricity users £16.6bn, 4.81 p/kWh over 344 TWh of end use. The standing charge adds £3.3bn across 28.6 million homes, giving £24.0bn. Non-domestic standing charges are not counted. Each 10 GW of peak reduction saves about £1.7bn/yr. A peak based on network capacity costs, such as technology-data's distribution grid at £554/kW, is an alternative not used yet.
+  Transmission is NESO's forecast for the year (Final TNUoS Tariffs 2024/25, table 17). Balancing is the sum of NESO's monthly outturn from April 2024 to March 2025. Distribution is the "revenue as billed" row for each of the 14 licensees in Ofgem's ED2 price control financial model (v4, January 2026). Billed revenue in 2024/25 includes an inflation catch-up, so the mean of three years is used. The Northern Ireland figure is from a press report of the NIE Networks annual report, and SONI is not included. It includes all standing and capacity charges. It does not include the £1.06bn of transmission charges paid by generators, which are in generator fixed costs.
 
-The 2024 equivalent is £12.5bn (£9.1bn per kWh and £3.3bn standing). TNUoS target revenue was £3.13bn in 2024 and BSUoS was £7.63 to £14.03/MWh, as reported by Drax. A published total including DUoS has not been found. Peak scaling also grows the existing transmission share, a small overlap with new transmission. Offshore connection costs are within wind capex. No figure is included for distribution beyond peak scaling, as ED3 business plans are not due until December 2026, so the total may still be low. See the open item.
+  The total includes the return on and depreciation of today's assets, their O&M and replacement, and 2024/25 balancing costs. It does not grow with demand, as most of it pays for assets already built. The per kWh basis, the Ofgem cap rate times delivered electricity plus the cap standing charge on homes, gives £12.5bn. The difference is mainly non-domestic standing and capacity charges, which it leaves out.
+- **Distribution.** Peak demand above 55.19 GW at `network_distribution_gbp_kW`, £980/kW. The peak is end use grossed up for losses, without electrolysis, storage charging or power to X (`balance.max_electricity_demand`). The DESNZ and Ofgem network modelling for the Electricity Networks Strategic Framework (Appendix 1, 2022) gives £60 to £180bn of load-related distribution investment by 2050 (undiscounted, 2020 prices), as national peak rises from 58 GW to 130 to 190 GW. The low end, for a 130 GW peak with today's headroom, is £833/kW of added peak. The high end, for 190 GW with half the headroom, is £1,364/kW. Uplifted by the GDP deflator (ONS YBGB, 100/84.9), £833/kW is £980/kW. That modelling also uses national peak for distribution, assuming local peaks grow in proportion. It leaves out connections and non-load related spend, which stay within the existing network here.
+- **Transmission.** Onshore and offshore wind above 32.34 GW at `network_transmission_gbp_kW`, £1,100/kW. Transmission is driven by wind far from demand, mainly in Scotland and off the coasts. NESO's Clean Power 2030 workbook (sheet CP.13, Further Flex and Renewables) has £4.68bn/yr of onshore transmission investment over 2025 to 2030, £28.1bn in 2024 prices, for 47.0 GW of new wind (model capacities, 2024 to 2030). NESO then identifies about £89bn beyond 2030, with no stated price base and taken here as 2024 prices. FES 2025 Holistic Transition adds 59.2 GW of wind from 2031 to 2040 (data workbook, sheet "Infra. Build"). £117.1bn over 106.2 GW is £1,103/kW. NESO's 2025 balancing costs report gives about £118bn of transmission investment behind its projections, which matches. Offshore connections are within wind capex, as in NESO's separate offshore network line. Solar, nuclear and interconnectors add nothing, which leaves out some transmission need.
+- **Annuity and O&M.** New capital is an annuity at `network_return_prc` (4.6%) over `network_life_years` (45 years), plus `network_om_prc` (1.2%) of capital a year. The return is within the 4.46 to 4.67% CPIH-real allowed return on capital under RIIO-T3 that NESO reports. The 45 year life is NESO's (Clean Power 2030 Annex 4, section 2.1.4). O&M is the CCC Seventh Carbon Budget Balanced Pathway network reinforcement opex in 2050 (£1.54bn) over its network reinforcement capex from 2025 to 2050 (£126bn), from the charts workbook, figure 7.5.7. Each £ of new capital costs 6.5p a year, so distribution costs £64/kW/yr of peak.
+- **Constraints.** `network_constraints_gbp_bn` is balancing cost above 2024, 0 in zcb_2024. Thermal constraints cost £1.7bn in 2024/25 (NESO 2025 annual balancing costs report), which is within the existing network. NESO expects constraint costs to peak around 2030 and fall once the network is built. Zero suits a finished system. Transmission is costed for the network NESO plans for the wind, and what constraint remains is what that plan judges not worth building out. Curtailed wind is already paid for, as generation is costed on output before curtailment, so a constraint costs extra only in hours when the south needs backup while Scotland curtails. A system with a large surplus has few such hours. The input suits a system in transition, such as Clean Power 2030, whose 2030 constraint costs are £3.68bn (Annex 4, CP.31) while the network is still behind the wind.
+
+The reference peak and wind capacity are baseline_2024 model outputs (`balance.max_electricity_demand` and wind capacity) and need updating when the baseline changes. Both peaks come from the same model, so its high peak (open item "Peak demand is high") partly cancels.
+
+#### Who pays
+
+Fuel users pay `network_fuel_share_prc` of the total, 20% in zcb_2024. This is a judgement: electrolysis is likely to sit near generation, and NESO identifies up to 10 GW of flexible demand including electrolysers that could co-locate in North Scotland and Shetland.
+
+Homes and other electricity users share the rest. Each part has its own key:
+
+- **2024 network.** `network_domestic_prc`, 45.5%, the domestic share of 2024 revenue. It is the Ofgem cap network rate (3.394 p/kWh) on DUKES domestic electricity (93.7 TWh) plus the cap network standing charge (£116.23) on 28.6 million homes, £6.50bn of £14.29bn. The baseline build computes it from these inputs.
+- **Distribution.** The domestic share of end use at the peak hour (`network.domestic_peak_prc`). The hourly heat and appliance series cover homes and services together, so each is split by its annual domestic share. Industry and transport are not domestic, so electric car charging counts as other use.
+- **Transmission and constraints.** The domestic share of electricity billed (`network.domestic_energy_prc`).
+
+Homes pay their share on the unit rate, with no network standing charge (`network.domestic_bn` over domestic electricity). Other users' share is reported as a rate over their energy (`network.other_p_kWh`). Policy and supplier costs keep their standing charges. The unit rate is therefore not comparable with a real tariff, and overstates the network cost of one more kWh, as real network charges are now largely fixed. The bill is comparable.
+
+| £bn/yr | baseline_2024 | zcb_2024 | zcb_2024_high_demand |
+|---|---|---|---|
+| 2024 network | 14.29 | 14.29 | 14.29 |
+| Distribution | 0 | 2.55 (40.0 GW) | 5.62 (88.3 GW) |
+| Transmission | 0 | 7.87 (110.1 GW) | 12.78 (178.7 GW) |
+| Constraints | 0 | 0 | 0 |
+| Total | 14.29 | 24.71 | 32.69 |
+| Fuel users | 0 | 4.94 | 6.54 |
+| Homes | 6.50 | 7.92 | 10.75 |
+| Other electricity users | 7.79 | 11.85 | 15.40 |
+| Domestic share of peak | 45.8% | 52.5% | 52.7% |
+| Homes, p/kWh before VAT | 6.57 | 8.80 | 6.79 |
+| Homes, £ a year before VAT | 227 | 277 | 376 |
+| Other users, p/kWh | 4.57 | 4.66 | 4.39 |
+
+In baseline_2024 the domestic share of the peak (45.8%) is close to the domestic share of 2024 revenue (45.5%), an independent check on keying distribution by peak. Homes pay 6.57 p/kWh over the model's 99.0 TWh of domestic electricity. On DUKES' 93.7 TWh it would be 6.94 p/kWh, as the model's domestic electricity is 5.6% high (validation, known issue). Against the 2024 cap at 3,400 kWh (£232 before VAT), the model charges £223, 3.5% less, for the same reason.
+
+The validation compares the 2024 domestic bill at 3,400 kWh with DESNZ quarterly energy prices: £1,065 against £1,083 (−1.7%), against −0.8% on the per kWh basis. Electricity users' spend before VAT is £72.7bn against £74.2bn (−2.1%), against −4.5% on the per kWh basis. The unit rate (28.7 against 25.8 p/kWh) and standing charge (£89 against £205) differ by design.
+
+Each 10 GW of peak reduction saves £0.64bn/yr and each 10 GW of wind costs £0.72bn/yr in transmission.
+
+The previous method scaled the whole 2024 network by peak demand and added NESO's £89bn as one sum. It gave £20.7bn/yr in zcb_2024 before standing charges but charged £166/kW/yr for peak, because today's assets do not grow with demand. Its transmission did not change with wind capacity.
+
+As a check, the CCC Seventh Carbon Budget has £126bn of network reinforcement capex from 2025 to 2050 in its Balanced Pathway (2023 prices). zcb_2024 has £160bn of new capital: £39bn of distribution and £121bn of transmission. The CCC does not say whether its figure includes offshore networks, so the boundaries may differ.
+
+clean_power_2030 on this basis would have £17.95bn/yr against £13.52bn on the per kWh basis, with £3.36bn of transmission for 47.0 GW of new wind. NESO's own 2030 figure is lower, £1.37bn/yr of annuitised transmission capex, because it counts spend to 2030 only, while it pays £3.68bn for constraints. This basis values a network built for its wind with no extra constraints, so it suits a finished system better than a 2030 snapshot.
+
+No published single total of GB network revenue has been found. ED3 business plans are not due until December 2026.
 
 ### Presets
 
@@ -185,9 +237,9 @@ Generation cost after fuel users pay their share, in p/kWh of end use for zcb_20
 
 ### Fuel users and hourly prices
 
-Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £159 for methane and £139 for synthetic fuel. Fuel users pay £22.03bn/yr of £86.35bn. Electricity users pay £64.32bn over 344 TWh of end use, so the generation cost is 18.68 p/kWh. With network costs the unit rate is 28.92 p/kWh and the household electricity bill £1,120. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £159 for methane and £139 for synthetic fuel. Fuel users pay £22.03bn/yr of £86.35bn. Electricity users pay £64.32bn over 344 TWh of end use, so the generation cost is 18.68 p/kWh. With network costs the unit rate is 33.11 p/kWh and the household electricity bill £1,130. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
 
-Fuel prices add the fuel users' network share to production cost, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £44/MWh of hydrogen. Delivery is then added, as described under fuel delivery below. Fuel sales in the system cost table leave out the network share, because network costs are outside the system cost.
+Fuel prices add the fuel users' network share to production cost, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £53/MWh of hydrogen. Delivery is then added, as described under fuel delivery below. Fuel sales in the system cost table leave out the network share, because network costs are outside the system cost.
 
 `fuel_values` holds marginal values, which set hourly electricity prices and not fuel prices. They are in £/MWh, from the 2010 PyPSA expansion at 3 hour steps. They are provisional until phase 6 recalibrates them on the ten year optimum.
 
@@ -223,7 +275,7 @@ The result is £72bn/yr before tax and £105bn after for final users, and £79bn
 
 The cost model gives two totals. Neither includes demand side equipment.
 
-**Cost to consumers** is what is paid. Before tax, it is the system cost, the 2024 wholesale adjustment, electricity networks with their standing charges, policy costs, supplier costs and the scenario's fossil bill for final users. Power station fuel is already in the system cost. Tax is VAT on household electricity, VAT on synthetic car fuel, and the taxes on the fossil bill. Non-domestic standing charges are left out. The carbon cost in baseline generation prices stays in the before tax figure. Validation compares electricity users' spend before VAT with DUKES use at QEP prices.
+**Cost to consumers** is what is paid. Before tax, it is the system cost, the 2024 wholesale adjustment, electricity networks, policy costs, supplier costs and the scenario's fossil bill for final users. Power station fuel is already in the system cost. Tax is VAT on household electricity, VAT on synthetic car fuel, and the taxes on the fossil bill. Non-domestic standing charges are left out on the per kWh network basis, and are within the 2024 network total on the component basis. The carbon cost in baseline generation prices stays in the before tax figure. Validation compares electricity users' spend before VAT with DUKES use at QEP prices.
 
 Tax also includes the Climate Change Levy on non-domestic electricity, 0.562 p/kWh on services and industry use (the 2024 gap between QEP 3.4.2 and 3.4.1 average prices). Scenarios keep the levy and VAT at 2024 rates, and pay no duty or levy on synthetic fuel. 2024 tax stores £1.53bn of household electricity VAT, including home car charging, and £0.88bn of levy, and validation compares the total with a live baseline run.
 
@@ -300,7 +352,14 @@ Wind and solar are paid as if they earn about 11% real, against 7.3 to 7.6% for 
 ## Sources
 
 - NESO, [Beyond 2030 update, investor annex](https://www.neso.energy/document/385581/download), August 2026 (about £89bn of transmission investment, allowed returns, co-location).
-- Drax, [Falling transmission charges](https://energy.drax.com/insights/tnuos-charges-falling) (2024 TNUoS and BSUoS).
+- NESO, [Clean Power 2030 data workbook](https://www.neso.energy/document/346781/download), sheets CP.13, CP.14 and CP.31, and [Annex 4: Costs and benefit analysis](https://www.neso.energy/document/346806/download), section 2.1.4 (network investment, annuity method).
+- NESO, [Future Energy Scenarios 2025 data workbook](https://www.neso.energy/document/364551/download), sheet "Infra. Build" (Holistic Transition capacity additions).
+- NESO, [Final TNUoS Tariffs for 2024/25](https://neso.energy/document/301741/download), tables 17 and 28, and [BSUoS outturn for March 2025](https://www.neso.energy/document/359231/download).
+- Ofgem, [ED2 price control financial model v4](https://www.ofgem.gov.uk/guidance/ed2-price-control-financial-model), January 2026, "revenue as billed" for each licensee.
+- Irish News, [NIE Networks pays £54m dividend](https://www.irishnews.com/news/business/nie-networks-pays-54m-dividend-to-the-republics-state-owned-esb-after-98-surge-in-profit-PSGWSZLVENBNTL3IRS3NZNAN7A/) (NIE Networks revenue in 2024).
+- NESO, [2025 annual balancing costs report](https://www.neso.energy/document/362561/download) (thermal constraints in 2024/25, about £118bn of transmission investment).
+- DESNZ and Ofgem, [Electricity Networks Strategic Framework, Appendix 1: electricity networks modelling](https://www.gov.uk/government/publications/electricity-networks-strategic-framework/electricity-networks-strategic-framework-appendix-1-electricity-networks-modelling), 2022 (distribution investment and peak demand to 2050).
+- CCC, [The Seventh Carbon Budget, charts and data](https://www.theccc.org.uk/wp-content/uploads/2025/02/The-Seventh-Carbon-Budget-Charts-and-data-in-the-report-v2.xlsx), figure 7.5.7 (network reinforcement capex and opex).
 - DESNZ, [Electricity Generation Costs 2025](https://www.gov.uk/government/publications/electricity-generation-costs-2025), Annex A key assumptions, 2024 prices.
 - CEPA for DESNZ, [Hurdle rates for electricity generation](https://assets.publishing.service.gov.uk/media/68cd1d818c44a661b4995d9f/cepa-desnz-hurdle-rates-electricity.pdf).
 - DESNZ, [CfD Allocation Round 7 results](https://www.gov.uk/government/publications/contracts-for-difference-cfd-allocation-round-7-results/contracts-for-difference-allocation-round-7-results-accessible-webpage) (offshore wind) and Energy UK, [AR7 onshore results](https://www.energy-uk.org.uk/wp-content/uploads/2026/02/Energy-UK-explains-AR7-onshore-results-11-February-2026.pdf).

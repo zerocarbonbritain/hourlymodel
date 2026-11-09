@@ -89,7 +89,8 @@
         },
         "tolerance": 0.05,
         "basis": "independent",
-        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs from the Ofgem cap to the generation cost."
+        "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs to the generation cost.",
+        "issue": "By design. The model has no network standing charge: homes pay their share of the system network cost on the unit rate, which moves about 3.4 p/kWh (£116 a year before VAT) from the standing charge to the unit rate. The bill at 3,400 kWh is the like for like check (docs/cost-assumptions.md, network cost)."
     },
     "costs.electricity_standing": {
         "group": "Costs",
@@ -109,7 +110,8 @@
         },
         "tolerance": 0.05,
         "basis": "input",
-        "note": "Built from the Ofgem cap nil consumption allowances, including VAT."
+        "note": "Built from the Ofgem cap nil consumption allowances, including VAT.",
+        "issue": "By design. The model's standing charge covers policy and supplier costs only. The network part, £116.23 before VAT in the 2024 cap, is on the unit rate. Without it the observed figure is about £83."
     },
     "costs.electricity_bill": {
         "group": "Costs",
