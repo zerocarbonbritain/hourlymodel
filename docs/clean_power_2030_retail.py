@@ -4,7 +4,7 @@ Usage (from the repository root):
     python3 -I docs/clean_power_2030_retail.py
 
 Results and sources are in docs/clean-power-2030-notes.md. Every adjustment is a change in
-generation cost (£bn/yr), spread over kWh billed with VAT. Gas sensitivities assume the price
+cost (£bn/yr), spread over kWh billed with VAT. Gas sensitivities assume the price
 paid to plant exposed to the wholesale market moves with the cost of a gas turbine in the hours
 when gas runs.
 """
@@ -51,7 +51,6 @@ central = {
     "Export earnings (gap to NESO net trade)": -(1.65 - (-2.24 * neso_useful * 0.001)),
     "Lower wholesale prices for RO plant (NESO £10/MWh)": -10 * billed * 0.001,
     "RO and FiT contracts expiring (NESO £10/MWh)": -10 * billed * 0.001,
-    "Network and constraint growth (NESO £5/MWh)": 5 * billed * 0.001,
 }
 rate = rate_cp
 for name, bn in central.items():
@@ -84,10 +83,13 @@ sens["New offshore wind at £81 to £116/MWh (AR7 £91.20)"] = (
 # NESO legacy and merit order effects at half to full value
 sens["NESO wholesale and legacy effects at half value"] = (0, 10 * billed * 0.001)
 sens["No export earnings"] = (0, -central["Export earnings (gap to NESO net trade)"])
-# Network: peak scaling of 2024 charges (zcb_2024 method, no post-2030 transmission) or NESO
-e = s_base["retail"]["electricity"]
-peak_network = e["network_p_kWh"] * 0.01 * 269.39 * cp["balance"]["max_electricity_demand"] / 55.19
-sens["Network by peak scaling, not NESO £5/MWh"] = (peak_network - e["network_p_kWh"] * 0.01 * billed - 5 * billed * 0.001, 0)
+# Transmission: the model costs the finished network for 2030 wind at £1,100/kW with no constraint
+# growth. NESO's 2030 network is still behind the wind: its 2025 to 2030 onshore transmission
+# (CP.13, £28.1bn) annualised as in the model, plus 2030 constraints (CP.31) above 2024/25 thermal
+# constraints. Transmission and constraints are shared by energy, so they spread over kWh billed.
+n = cp["retail"]["electricity"]["network"]
+neso_transmission = 4.6835 * 6 * n["annual_share"] + (3.682 - 1.7)
+sens["NESO 2030 transmission and constraints, not £1,100/kW"] = (0, neso_transmission - n["transmission_bn"] - n["constraints_bn"])
 # Storage: build-up prices long duration storage per kWh as batteries
 storage = gc["storage"]["annual"]
 sens["Storage cost 0 to 30% lower"] = (-0.3 * storage, 0)
@@ -100,6 +102,15 @@ for name, (lo, hi) in sens.items():
     high += b
     print(f"  {name:55s} {a:+.2f} to {b:+.2f}")
 print(f"Range at 2024 gas price: {low:.2f} to {high:.2f} p/kWh, against {rate_base:.2f} in 2024")
+
+# Homes pay the network on the unit rate, and household use falls, so the unit rate rises more than
+# the bill. The bill is comparable between the two years.
+e_base, e_cp = base["retail"]["electricity"], cp["retail"]["electricity"]
+kWh = e_cp["household_kWh"]
+bill = lambda r: e_cp["bill_gbp"] + (r - rate_cp) * kWh * 0.01
+print(f"Household bill: baseline_2024 £{e_base['bill_gbp']:.0f} at {e_base['household_kWh']:.0f} kWh, "
+      f"clean_power_2030 £{e_cp['bill_gbp']:.0f} at {kWh:.0f} kWh, central £{bill(central_rate):.0f}, "
+      f"range £{bill(low):.0f} to £{bill(high):.0f}")
 
 # ---- Gas price ----
 # Market exposed output: everything in 2024. In 2030, existing wind and solar (2024 output),

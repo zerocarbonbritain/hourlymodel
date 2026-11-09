@@ -37,8 +37,13 @@ const NESO = {
     useful_TWh: 289 + 14.863,
     per_MWh: { capacity: 85.95, fuel: 11.2, carbon: 7.66, constraints: 12.08, trade: -2.24, network: 18.01 },
     investment: { generation: 33.998, offshore_network: 6.314, transmission: 4.684, distribution: 3.386 },
-    gas_p_therm: 100, carbon_gbp_t: 147
+    gas_p_therm: 100, carbon_gbp_t: 147,
+    // CP.31, 2030 annuitised network and constraint costs (£bn/yr). Distribution and network O&M are
+    // the rest of the CP.14 network cost.
+    annuitised: { transmission: 1.3698, offshore_network: 1.4773, hydrogen: 0.0027, co2: 0.0646, constraints: 3.6818 }
 };
+// Thermal constraints in 2024/25 (NESO 2025 annual balancing costs report), within the 2024 network
+const CONSTRAINTS_2024 = 1.7;
 const P_THERM_TO_P_KWH = 1 / 29.3071;
 
 // Capacity in 2023 (NESO table 2, GB) plus Northern Ireland onshore wind. Capacity above this is new.
@@ -155,6 +160,26 @@ function report() {
     let model_with_neso = model_known + neso.constraints + neso.network;
     line("Total (model with NESO network, constraints)", neso_total, model_with_neso);
     line("Total with AR7 prices on new output", neso_total, model_with_neso + strike_change);
+
+    // Network and constraints: the model's component basis against CP.31. The model's 2024 network
+    // (2024/25 revenue) has no equivalent on NESO's boundary, which counts existing networks at O&M.
+    let n = o.retail.electricity.network, A = NESO.annuitised;
+    let neso_dist_om = neso.network - A.transmission - A.offshore_network - A.hydrogen - A.co2;
+    let neso_tc = A.transmission + A.constraints - CONSTRAINTS_2024;
+    console.log("\nNetwork and constraints in 2030 (£bn/yr)          NESO    Model");
+    let row = (name, a, b, note) => console.log(name.padEnd(48) + (a === null ? "     n/a" : f(a)) + "  " + (b === null ? "    n/a" : f(b)) + (note ? "   " + note : ""));
+    row("Onshore transmission, annuitised", A.transmission, n.transmission_bn,
+        n.transmission_GW.toFixed(1) + " GW of wind at £" + i.retail.electricity.network_transmission_gbp_kW + "/kW");
+    row("  NESO 2025 to 2030 build at the model's annuity", NESO.investment.transmission * 6 * n.annual_share, null);
+    row("Constraints above 2024/25 thermal (£" + CONSTRAINTS_2024 + "bn)", A.constraints - CONSTRAINTS_2024, n.constraints_bn);
+    row("Transmission and constraints", neso_tc, n.transmission_bn + n.constraints_bn);
+    row("Offshore network", A.offshore_network, null, "in offshore wind costs");
+    row("Distribution and network O&M", neso_dist_om, n.distribution_bn,
+        n.distribution_GW.toFixed(1) + " GW of peak at £" + i.retail.electricity.network_distribution_gbp_kW + "/kW");
+    row("Hydrogen and CO2 infrastructure", A.hydrogen + A.co2, null);
+    row("2024 network", null, n.existing_bn);
+    console.log("Model total £" + o.retail.electricity.network_total_bn.toFixed(2) + "bn, of which fuel users £" + o.retail.electricity.network_fuel_bn.toFixed(2) + "bn");
+
     console.log("\nCarbon at the scenario's £" + i.carbon_price + "/t: £" + carbon_model.toFixed(2) + "bn. Emissions " + co2.toFixed(2) + " MtCO2.");
 
     // Whole system on the model's own terms
