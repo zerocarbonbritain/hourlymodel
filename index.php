@@ -154,6 +154,7 @@ var view_html = {};
 var view_desc = {};
 
 var view_mode = "electricity";
+var show_price = false;
 
 view.start = 32*365.25*24*3600;
 view.end = view.start + 87648*3600;
@@ -229,6 +230,7 @@ function load_page(page)
             selected_scenario: "zcb_2024",
             scenario_list: {},
             live_edit: true,
+            show_price: false,
             validation: null,
             validation_open: "",
             validation_tick: 0
@@ -360,6 +362,10 @@ function load_page(page)
           },
           view_mode: function (_view_mode) {
             view_mode = _view_mode
+            model_view();
+          },
+          toggle_price: function () {
+            show_price = app.show_price;
             model_view();
           },
           auto_scale: function(val,baseunit) {

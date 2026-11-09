@@ -134,10 +134,19 @@ function model_ui() {
 	
 function model_view()
 {
+    var series = [];
+    var options = {
+        xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
+        // The fourth axis carries the hourly electricity price
+        yaxes: [{},{min: 0},{},{position: "right"}],
+        grid: {hoverable: true, clickable: true},
+        selection: { mode: "x" },
+        legend: {show: true, position: "nw"}
+    };
+
     if (view_mode=="electricity")
     {
-        console.log("view mode electric")
-        plot = Flot.plot(document.getElementById("placeholder"), [
+        series = [
 
             // {label: "Heatstore", data:timeseries(d.heatstore, color:"#cc3311"},
 
@@ -151,69 +160,48 @@ function model_view()
             {stack:true, label: "Excess", data:timeseries(d.excess_elec), color:"#33ccff", lines: {lineWidth:0, fill: 0.4 }},            
             {stack:false, label: "Supply", data:timeseries(d.elec_supply_hourly), color:"#000000", lines: {lineWidth:0.2, fill: false }}
 
-            ], {
-                canvas: true,
-                series: {lines: {lineWidth:0, fill: 1.0 } },
-                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
-                grid: {hoverable: true, clickable: true},
-                selection: { mode: "x" },
-                legend: {show: true, position: "nw"}
-            }
-        );
+        ];
+        options.canvas = true;
+        options.series = {lines: {lineWidth:0, fill: 1.0 } };
     }
     if (view_mode=="stores")
     {
-        plot = Flot.plot(document.getElementById("placeholder"), [
+        series = [
                 {stack:true, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:3, color:"#1960d5", lines: {lineWidth:0, fill: 0.8 }},
                 // {stack:true, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:3, color:"#cc3311", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:3, color:"#aac15b", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "Hydrogen Store", data:timeseries(d.hydrogen_SOC), yaxis:3, color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "Synth Fuel Store", data:timeseries(d.synth_fuel_store_SOC), yaxis:3, color:"#cb9950", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:true, label: "Methane Store", data:timeseries(d.methane_SOC), yaxis:3, color:"#ccaa00", lines: {lineWidth:0, fill: 0.8 }}
-            ], {
-                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
-                yaxes: [{},{min: 0},{}],
-                grid: {hoverable: true, clickable: true},
-                selection: { mode: "x" },
-                legend: {show: true, position: "nw"}
-            }
-        );
+        ];
     }
     if (view_mode=="backup")
     {
-        plot = Flot.plot(document.getElementById("placeholder"), [
+        series = [
                 {stack:true, label: "CCGT output", data:timeseries(d.electricity_from_dispatchable), yaxis:1, color:"#ccaa00", lines: {lineWidth:0, fill: 1.0 }},
                 {stack:true, label: "Elec Store discharge", data:timeseries(d.elec_store_discharge), yaxis:1, color:"#1960d5", lines: {lineWidth:0, fill: 1.0 }},
                 {stack:true, label: "EV Smart discharge", data:timeseries(d.EV_smart_discharge), yaxis:1, color:"#aac15b", lines: {lineWidth:0, fill: 1.0 }},
                 // {stack:false, label: "Heat Store", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "Battery Store", data:timeseries(d.elecstore_SOC), yaxis:2, color:"#1960d5", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "BEV Store", data:timeseries(d.BEV_Store_SOC), yaxis:2, color:"#aac15b", lines: {lineWidth:1, fill: false }},       
-            ], {
-                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
-                yaxes: [{},{min: 0},{}],
-                grid: {hoverable: true, clickable: true},
-                selection: { mode: "x" },
-                legend: {show: true, position: "nw"}
-            }
-        );
+        ];
     }
     if (view_mode=="heat")
     {
-        plot = Flot.plot(document.getElementById("placeholder"), [
+        series = [
                 {stack:true, label: "Direct heat", data:timeseries(d.spacewater_heat), color:"#cc6622", lines: {lineWidth:0, fill: 1.0 }},
                 // {stack:true, label: "Heatstore discharge", data:timeseries(d.heatstore_discharge_GWth), color:"#a3511b", lines: {lineWidth:0, fill: 1.0 }} ,
                 // {stack:false, label: "Heatstore SOC", data:timeseries(d.heatstore_SOC), yaxis:2, color:"#cc3311", lines: {lineWidth:1, fill: false }},
                 {stack:false, label: "Electric for heat", data:timeseries(d.spacewater_elec), color:"#97b5e7", lines: {lineWidth:0, fill: 0.8 }},
                 {stack:false, label: "Heat Demand", data:timeseries(d.spacewater_balance), yaxis:1, color:"#000", lines: {lineWidth:1, fill: false }}
-            ], {
-                xaxis:{mode:"time", timeBase:"milliseconds", min:view.start*1000, max:view.end*1000, minTickSize: [1, "hour"]},
-                yaxes: [{},{min: 0},{}],
-                grid: {hoverable: true, clickable: true},
-                selection: { mode: "x" },
-                legend: {show: true, position: "nw"}
-            }
-        );
+        ];
     }
+
+    if (show_price) {
+        series.push({stack:false, label: "Electricity price", data:timeseries(d.electricity_price), yaxis:4, unit:"£/MWh", color:"#d62728", lines: {lineWidth:1, fill: false }});
+    }
+
+    plot = Flot.plot(document.getElementById("placeholder"), series, options);
 }
 
 if (typeof loading_prc === "undefined") {
@@ -259,7 +247,7 @@ document.addEventListener("plothover", function (event) {
         var point = series[s].data[index];
         if (!point || point[1] == null) continue;
         // Store levels are drawn on the second and third y axes
-        var unit = series[s].yaxis.n > 1 ? "GWh" : "GW";
+        var unit = series[s].unit || (series[s].yaxis.n > 1 ? "GWh" : "GW");
         out += '<tr><td><span class="tooltip-swatch" style="background-color:' + series[s].color + '"></span>' + series[s].label + '</td>';
         out += '<td class="tooltip-value">' + point[1].toFixed(1) + ' ' + unit + '</td></tr>';
     }
