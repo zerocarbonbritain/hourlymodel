@@ -83,7 +83,7 @@ Ten year runs, default profile against HeatpumpMonitor profile.
 | Backup capacity requirement (GW) | 43.7 | 36.7 | 71.9 | 71.0 |
 | Methane store minimum (TWh) | 8.6 | 17.2 | 9.9 | 23.8 |
 | Liquid store minimum (TWh) | 9.4 | 13.4 | 19.6 | 26.0 |
-| Society cost (£bn/yr) | 113.69 | 111.70 | 170.74 | 169.94 |
+| Society cost (£bn/yr) | 108.69 | 106.72 | 162.11 | 161.52 |
 
 Supply capacities are not re-optimised, so the larger store minimums are spare margin.
 

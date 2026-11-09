@@ -83,18 +83,18 @@ Summary: 68 ok, 4 WARN, 16 known issue
 
 | Check | Observed | Model | Error | Tolerance | Basis | Status |
 |---|---|---|---|---|---|---|
-| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 14.1 | -13.5% | 10% | independent | known issue |
-| Generation cost in the unit rate, 2024 prices (p/kWh) | 16.4 | 16.7 | +2.3% | 5% | input | ok |
-| Gas generation, build-up against price paid (£/MWh) | 85.0 | 133 | +56.8% | 10% | independent | known issue |
-| Domestic electricity unit rate (p/kWh) | 25.8 | 28.7 | +11.2% | 5% | independent | known issue |
-| Domestic electricity standing charge (£/yr) | 205 | 88.9 | -56.7% | 5% | input | known issue |
-| Domestic electricity bill at 3,400 kWh (£/yr) | 1,083 | 1,065 | -1.7% | 5% | independent | ok |
+| Generation cost in the unit rate, build-up for every technology (p/kWh) | 16.4 | 14.4 | -12.0% | 10% | independent | known issue |
+| Generation cost in the unit rate, 2024 prices (p/kWh) | 16.4 | 16.7 | +2.4% | 5% | input | ok |
+| Gas generation, build-up against price paid (£/MWh) | 85.0 | 138 | +62.6% | 10% | independent | known issue |
+| Domestic electricity unit rate (p/kWh) | 25.8 | 26.8 | +3.8% | 5% | independent | ok |
+| Domestic electricity standing charge (£/yr) | 205 | 147 | -28.5% | 5% | input | known issue |
+| Domestic electricity bill at 3,400 kWh (£/yr) | 1,083 | 1,058 | -2.3% | 5% | independent | ok |
 | Wholesale gas cost in the domestic unit rate (p/kWh) | 3.7 | 3.7 | +0.0% | 2% | input | ok |
 | Domestic gas unit rate (p/kWh) | 6.54 | 6.29 | -3.8% | 5% | independent | ok |
 | Domestic gas standing charge (£/yr) | 113 | 109 | -3.1% | 5% | input | ok |
 | Domestic gas bill at 11,200 kWh (£/yr) | 846 | 814 | -3.7% | 5% | independent | ok |
-| Household electricity spend, DUKES use at QEP prices (£bn/yr) | 30.1 | 31.0 | +3.0% | 5% | independent | ok |
-| Household electricity spend, ONS (£bn/yr) | 26.3 | 31.0 | +17.8% | 10% | independent | known issue |
+| Household electricity spend, DUKES use at QEP prices (£bn/yr) | 30.1 | 30.7 | +2.2% | 5% | independent | ok |
+| Household electricity spend, ONS (£bn/yr) | 26.3 | 30.7 | +16.9% | 10% | independent | known issue |
 | Household gas spend, DUKES use at QEP prices (£bn/yr) | 19.3 | 17.2 | -10.9% | 5% | independent | known issue |
 | Household gas spend, ONS (£bn/yr) | 14.6 | 17.2 | +17.5% | 10% | independent | known issue |
 | Household vehicle fuel spend (£bn/yr) | 38.2 | 39.2 | +2.8% | 10% | independent | ok |
@@ -109,7 +109,7 @@ Summary: 68 ok, 4 WARN, 16 known issue
 | Fossil reference, final user volume against this run (ratio) | 1 | 1 | -0.0% | 1% | input | ok |
 | Fossil reference, household gas against the baseline bill (ratio) | 1 | 1 | +0.0% | 1% | input | ok |
 | Fossil bill for this run against the 2024 reference (ratio) | 1 | 1 | +0.0% | 1% | input | ok |
-| Electricity users' spend before VAT, DUKES use at QEP prices (£bn/yr) | 74.2 | 72.7 | -2.1% | 5% | independent | ok |
+| Electricity users' spend before VAT, DUKES use at QEP prices (£bn/yr) | 74.2 | 67.9 | -8.5% | 5% | independent | known issue |
 | Climate Change Levy on non-domestic electricity (p/kWh) | 0.562 | 0.562 | -0.0% | 1% | input | ok |
 | Fossil reference, 2024 tax against this run (ratio) | 1 | 1 | -0.0% | 1% | input | ok |
 
@@ -626,7 +626,7 @@ Summary: 68 ok, 4 WARN, 16 known issue
 - ro = 30.755745 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD53:AG53)
 - fit = 7.407030899 (Default-tariff-cap-level-v1.31.xlsx, 3d PC!mean of AD54:AG54)
 - observed: `(df + cm) / 3100 * 100 + (ro + fit) / 10` = 16.4 p/kWh
-- model: `a` with a = `retail.electricity.resource_p_kWh` = 14.1 p/kWh
+- model: `a` with a = `retail.electricity.resource_p_kWh` = 14.4 p/kWh
 - note: Ofgem cap wholesale (including CfD), capacity market, Renewables Obligation and Feed-in Tariff costs per kWh, mean of the four 2024 cap periods, against the build-up for every technology per kWh delivered (capital, O&M, fuel and carbon of every generator and store at new-build costs).
 - issue: The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).
 
@@ -646,7 +646,7 @@ Summary: 68 ok, 4 WARN, 16 known issue
 - id: `costs.gas_build_up`
 - capture = 85.04 (published: Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT (baseline/inputs/13-prices.json))
 - observed: `capture` = 85.0 £/MWh
-- model: `a` with a = `generation_costs.by_tech.gas.lcoe` = 133 £/MWh
+- model: `a` with a = `generation_costs.by_tech.gas.lcoe` = 138 £/MWh
 - note: Build-up for gas generation (its share of backup turbine capacity at new-build cost, variable O&M, and 2024 fuel and carbon prices) against the 2024 day ahead capture price for gas. The 2024 baseline costs gas at the capture price.
 - issue: Fuel and carbon alone are about £93/MWh at the DUKES fleet efficiency, above the capture price, and turbine capacity at new-build cost adds about £37/MWh. The 2024 fleet is largely paid off and also earns capacity market and balancing payments (open-items.md, Model).
 
@@ -655,25 +655,24 @@ Summary: 68 ok, 4 WARN, 16 known issue
 - id: `costs.electricity_unit_rate`
 - u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)
 - observed: `u * 100` = 25.8 p/kWh
-- model: `a` with a = `retail.electricity.unit_rate_p_kWh` = 28.7 p/kWh
-- note: DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs to the generation cost.
-- issue: By design. The model has no network standing charge: homes pay their share of the system network cost on the unit rate, which moves about 3.4 p/kWh (£116 a year before VAT) from the standing charge to the unit rate. The bill at 3,400 kWh is the like for like check (docs/cost-assumptions.md, network cost).
+- model: `a` with a = `retail.electricity.unit_rate_p_kWh` = 26.8 p/kWh
+- note: DESNZ average variable unit price including VAT, all payment methods. The model adds its share of network, policy and supplier costs to the generation cost. It has no network standing charge, which raises the unit rate, and puts all supplier costs per customer on the standing charge, which lowers it. The bill at 3,400 kWh is the like for like check (docs/cost-assumptions.md, network cost).
 
 ### Domestic electricity standing charge
 
 - id: `costs.electricity_standing`
 - f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)
 - observed: `f` = 205 £/yr
-- model: `a` with a = `retail.electricity.standing_charge_gbp` = 88.9 £/yr
-- note: Built from the Ofgem cap nil consumption allowances, including VAT.
-- issue: By design. The model's standing charge covers policy and supplier costs only. The network part, £116.23 before VAT in the 2024 cap, is on the unit rate. Without it the observed figure is about £83.
+- model: `a` with a = `retail.electricity.standing_charge_gbp` = 147 £/yr
+- note: DESNZ average fixed cost including VAT. The model's standing charge is the Warm Home Discount and the supplier costs per customer, with the supplier margin and VAT.
+- issue: By design. The network part, £116.23 before VAT in the 2024 cap, is on the unit rate in the model. The model also puts all supplier costs per customer on the standing charge (£121 before VAT), where the cap puts £67 there and the rest on the unit rate.
 
 ### Domestic electricity bill at 3,400 kWh
 
 - id: `costs.electricity_bill`
 - b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)
 - observed: `b` = 1,083 £/yr
-- model: `u * 34 + s` with u = `retail.electricity.unit_rate_p_kWh`, s = `retail.electricity.standing_charge_gbp` = 1,065 £/yr
+- model: `u * 34 + s` with u = `retail.electricity.unit_rate_p_kWh`, s = `retail.electricity.standing_charge_gbp` = 1,058 £/yr
 - note: DESNZ standard bill at 3,400 kWh a year.
 
 ### Wholesale gas cost in the domestic unit rate
@@ -715,7 +714,7 @@ Summary: 68 ok, 4 WARN, 16 known issue
 - h = 28609 (familiesandhouseholdsuk2025.xlsx, 5!E21)
 - f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)
 - observed: `e * 0.01163 * u + h * 1000 * f / 1e9` = 30.1 £bn/yr
-- model: `a` with a = `retail.electricity.household_spend_bn` = 31.0 £bn/yr
+- model: `a` with a = `retail.electricity.household_spend_bn` = 30.7 £bn/yr
 - note: Domestic electricity use times the average unit price, plus the average fixed cost for every household. Tests consumption and price together.
 
 ### Household electricity spend, ONS
@@ -723,7 +722,7 @@ Summary: 68 ok, 4 WARN, 16 known issue
 - id: `costs.electricity_spend_ons`
 - s = 26289 (table_261.xlsx, 2.6.1!D62)
 - observed: `s / 1000` = 26.3 £bn/yr
-- model: `a` with a = `retail.electricity.household_spend_bn` = 31.0 £bn/yr
+- model: `a` with a = `retail.electricity.household_spend_bn` = 30.7 £bn/yr
 - note: ONS consumer expenditure.
 - issue: ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).
 
@@ -854,8 +853,9 @@ Summary: 68 ok, 4 WARN, 16 known issue
 - f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)
 - n = 25.72905985 (table_341.xlsx, 3.4.1 (Annual excl CCL)!I28)
 - observed: `(dom * 0.01163 * u + h * 1000 * f / 1e9) / 1.05 + (all - dom) * 0.01163 * n * 0.01` = 74.2 £bn/yr
-- model: `a` with a = `total_cost.electricity_bn` = 72.7 £bn/yr
+- model: `a` with a = `total_cost.electricity_bn` = 67.9 £bn/yr
 - note: Tests the retail layers in the cost to consumers. Household spend without 5% VAT, plus all other use at the average non-domestic price without VAT or Climate Change Levy.
+- issue: Non-domestic users paid 25.7 p/kWh in 2024 (QEP 3.4.1) and pay 22.7 p/kWh in the model. The model charges them generation, the 2024 wholesale adjustment, their network share, a supplier cost per customer and the supplier margin. Observed prices also carry fixed price contracts signed in 2022 and 2023, broker commissions and a non-domestic cost to serve, none of which is sourced. Modelled non-domestic use is also 4% low. Before 2026-11-09 the model applied the domestic supplier and policy rates to every kWh, which closed the gap for the wrong reason (open-items.md, Cost model).
 
 ### Climate Change Levy on non-domestic electricity
 

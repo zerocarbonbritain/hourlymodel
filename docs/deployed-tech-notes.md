@@ -75,7 +75,7 @@ The lowest cost is at 0.8: 77.9 GW offshore wind, 36 GW onshore and 104 GW solar
 | Final energy (TWh/yr) | 1,507 | 1,134 | 1,098 | 689 |
 | Energy emissions (MtCO2e) | 347.1 | 129.4 | 21.1 | 7.6 |
 | Net emissions (MtCO2e) | 433.2 | 209.2 | 86.3 | -6.3 |
-| Supply cost (£bn/yr) | 38.11 | 79.26 | 143.51 | 91.91 |
+| Supply cost (£bn/yr) | 38.75 | 80.25 | 144.33 | 92.41 |
 | Consumer cost before tax (£bn/yr) | 146.23 | 148.66 | 203.60 | 136.40 |
 | Of which fossil fuel (£bn/yr) | 72.35 | 18.40 | 0 | 0 |
 | Of which networks (£bn/yr) | 12.47 | 32.22 | 32.00 | 24.01 |

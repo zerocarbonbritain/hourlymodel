@@ -403,9 +403,6 @@
     "retail": {
         "vat_prc": 5,
         "electricity": {
-            "network_p_kWh": 3.394,
-            "network_gbp": 116.23,
-            "network_basis": "components",
             "network_reference_peak_GW": 55.19,
             "network_existing_gbp_bn": 14.29,
             "network_domestic_prc": 45.5,
@@ -416,13 +413,13 @@
             "network_life_years": 45,
             "network_om_prc": 1.2,
             "network_constraints_gbp_bn": 0,
-            "network_electrolysis_gbp_kW": 1100,
             "network_generator_gbp_MWh": 1.51,
             "network_reference_generation_TWh": 273.58,
-            "policy_p_kWh": 0.878,
+            "policy_gbp_bn": 0.82,
             "policy_gbp": 10.76,
-            "supplier_p_kWh": 3.176,
-            "supplier_gbp": 73.88,
+            "supplier_customer_gbp": 121.29,
+            "supplier_margin_prc": 4.24,
+            "non_domestic_customers": 2500000,
             "wholesale_adjustment_p_kWh": 0
         },
         "gas": {
@@ -497,9 +494,5 @@
         "Methane store discharging": {
             "capex": 0
         }
-    },
-    "fuel_values": {
-        "hydrogen_gbp_MWh": 0,
-        "methane_gbp_MWh": 0
     }
 }

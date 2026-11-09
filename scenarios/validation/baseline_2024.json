@@ -470,7 +470,7 @@
    "issue": "Storage output is low, see the storage check.",
    "status_at_build": "known",
    "observed": 286.0275332,
-   "model_at_build": 273.5799000918608,
+   "model_at_build": 273.5798464420034,
    "sources": [
     "g = 286027.5332 (DUKES_5.6.xlsx, 5.6 Annual summaries!N523)"
    ]
@@ -994,7 +994,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 153.7,
-   "model_at_build": 151.54265722711557,
+   "model_at_build": 151.54268694510125,
    "sources": [
     "g = 153.7 (DUKES_5.14.xlsx, 5.14!AD8)"
    ]
@@ -1402,7 +1402,7 @@
    "issue": "The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
-   "model_at_build": 14.148239420736303,
+   "model_at_build": 14.39934819621999,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1428,7 +1428,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 16.358265549176576,
-   "model_at_build": 16.730946155407686,
+   "model_at_build": 16.74358497126743,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1453,7 +1453,7 @@
    "issue": "Fuel and carbon alone are about \u00a393/MWh at the DUKES fleet efficiency, above the capture price, and turbine capacity at new-build cost adds about \u00a337/MWh. The 2024 fleet is largely paid off and also earns capacity market and balancing payments (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 85.04,
-   "model_at_build": 133.3427607722077,
+   "model_at_build": 138.31714292415379,
    "sources": [
     "capture = 85.04 (published: Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT (baseline/inputs/13-prices.json))"
    ]
@@ -1471,11 +1471,11 @@
     },
     "formula": "a"
    },
-   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds network, social policy and supplier costs to the generation cost.",
-   "issue": "By design. The model has no network standing charge: homes pay their share of the system network cost on the unit rate, which moves about 3.4 p/kWh (\u00a3116 a year before VAT) from the standing charge to the unit rate. The bill at 3,400 kWh is the like for like check (docs/cost-assumptions.md, network cost).",
-   "status_at_build": "known",
+   "note": "DESNZ average variable unit price including VAT, all payment methods. The model adds its share of network, policy and supplier costs to the generation cost. It has no network standing charge, which raises the unit rate, and puts all supplier costs per customer on the standing charge, which lowers it. The bill at 3,400 kWh is the like for like check (docs/cost-assumptions.md, network cost).",
+   "issue": "",
+   "status_at_build": "ok",
    "observed": 25.82700021794268,
-   "model_at_build": 28.71972287888294,
+   "model_at_build": 26.80332129393566,
    "sources": [
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
    ]
@@ -1493,11 +1493,11 @@
     },
     "formula": "a"
    },
-   "note": "Built from the Ofgem cap nil consumption allowances, including VAT.",
-   "issue": "By design. The model's standing charge covers policy and supplier costs only. The network part, \u00a3116.23 before VAT in the 2024 cap, is on the unit rate. Without it the observed figure is about \u00a383.",
+   "note": "DESNZ average fixed cost including VAT. The model's standing charge is the Warm Home Discount and the supplier costs per customer, with the supplier margin and VAT.",
+   "issue": "By design. The network part, \u00a3116.23 before VAT in the 2024 cap, is on the unit rate in the model. The model also puts all supplier costs per customer on the standing charge (\u00a3121 before VAT), where the cap puts \u00a367 there and the rest on the unit rate.",
    "status_at_build": "known",
    "observed": 205.1094903566591,
-   "model_at_build": 88.872,
+   "model_at_build": 146.62501875000004,
    "sources": [
     "f = 205.1094904 (table_224__1_.xlsx, 2.2.4!K253)"
    ]
@@ -1520,7 +1520,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1083.2274977667098,
-   "model_at_build": 1065.34257788202,
+   "model_at_build": 1057.9379427438125,
    "sources": [
     "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
    ]
@@ -1631,7 +1631,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 30.07343406773285,
-   "model_at_build": 30.977036308559953,
+   "model_at_build": 30.731923291812656,
    "sources": [
     "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
@@ -1656,7 +1656,7 @@
    "issue": "ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).",
    "status_at_build": "known",
    "observed": 26.289,
-   "model_at_build": 30.977036308559953,
+   "model_at_build": 30.731923291812656,
    "sources": [
     "s = 26289 (table_261.xlsx, 2.6.1!D62)"
    ]
@@ -1994,10 +1994,10 @@
     "formula": "a"
    },
    "note": "Tests the retail layers in the cost to consumers. Household spend without 5% VAT, plus all other use at the average non-domestic price without VAT or Climate Change Levy.",
-   "issue": "",
-   "status_at_build": "ok",
+   "issue": "Non-domestic users paid 25.7 p/kWh in 2024 (QEP 3.4.1) and pay 22.7 p/kWh in the model. The model charges them generation, the 2024 wholesale adjustment, their network share, a supplier cost per customer and the supplier margin. Observed prices also carry fixed price contracts signed in 2022 and 2023, broker commissions and a non-domestic cost to serve, none of which is sourced. Modelled non-domestic use is also 4% low. Before 2026-11-09 the model applied the domestic supplier and policy rates to every kWh, which closed the gap for the wrong reason (open-items.md, Cost model).",
+   "status_at_build": "known",
    "observed": 74.24371058392231,
-   "model_at_build": 72.70371541517417,
+   "model_at_build": 67.94889465287429,
    "sources": [
     "all = 23298.55 (DUKES_1.1.xlsx, 2024!I35)",
     "dom = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
@@ -2048,7 +2048,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1,
-   "model_at_build": 0.999946566813455,
+   "model_at_build": 0.9999708573686881,
    "sources": [
     "one = 1 (published: The stored 2024 tax should equal the tax in the live baseline run)"
    ]

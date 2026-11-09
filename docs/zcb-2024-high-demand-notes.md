@@ -68,7 +68,7 @@ Offshore wind, onshore wind, solar PV and solar thermal are the zcb_2024 values 
 | UK area (kha) | 24,728 | 24,417 |
 | Carbon sequestration (MtCO2e) | 41.3 | 4.4 |
 | Net emissions (MtCO2e) | -6.3 | 86.3 |
-| Total cost (£bn/yr) | 91.91 | 143.51 |
+| Total cost (£bn/yr) | 92.41 | 144.33 |
 
 Biomass rises by 1.83 times against 1.48 for wind and solar, because liquid fuel demand doubles, mostly from aviation.
 

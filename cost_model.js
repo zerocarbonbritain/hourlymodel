@@ -79,6 +79,13 @@ Object.assign(model, {
         model.total_cost()
     },
 
+    // The share of generated electricity that reaches users, after grid losses and power station
+    // own use. Demand is measured at the user and generation at the plant, so a MW at the user
+    // needs 1 / delivered_share MW at the plant.
+    delivered_share: function() {
+        return 1.0 - (i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc) * 0.01
+    },
+
     // -----------------------------------------------------------------------------------------
     // 1. Build-up: what each technology costs to build and run
     //
@@ -114,17 +121,21 @@ Object.assign(model, {
         o.costs['H2 Electrolysis'] = { capacity: i.hydrogen.electrolysis_capacity_GW, generation: 0 }
         o.costs['Methanation'] = { capacity: i.methane.methanation_capacity, generation: 0 }
 
-        // Backup turbines are sized by the hour of highest need. Some plant is always out of
-        // action, so the fleet has to be larger than that peak. A de-rating factor of 0.9 means
-        // 1 GW of plant counts as 0.9 GW of reliable capacity, so capacity is the peak divided by
-        // the factor. OCGT runs only when CCGT is full, so OCGT covers its own peak output and
-        // CCGT covers the rest of the peak.
+        // Backup turbines are sized by the hour of highest need. The model measures that need at
+        // the user, and costs are per kW at the plant, so the peak at the plant is the need
+        // divided by the share that reaches users. Some plant is always out of action, so the
+        // fleet has to be larger than that peak. A de-rating factor of 0.9 means 1 GW of plant
+        // counts as 0.9 GW of reliable capacity, so capacity is the peak divided by the factor.
+        // OCGT runs only when CCGT is full, so OCGT covers its own peak output and CCGT covers
+        // the rest of the peak.
+        let peak_at_plant = backup_output.max_capacity_requirement / model.delivered_share()
+        let ocgt_peak_at_plant = backup_output.max_ocgt_output / model.delivered_share()
         o.costs['CCGT'] = {
-            capacity: (backup_output.max_capacity_requirement - backup_output.max_ocgt_output) / backup_input.ccgt_derating_factor,
+            capacity: (peak_at_plant - ocgt_peak_at_plant) / backup_input.ccgt_derating_factor,
             generation: (backup_output.total_before_grid_loss - backup_output.total_ocgt_output) * to_TWh
         }
         o.costs['OCGT'] = {
-            capacity: backup_output.max_ocgt_output / backup_input.ocgt_derating_factor,
+            capacity: ocgt_peak_at_plant / backup_input.ocgt_derating_factor,
             generation: backup_output.total_ocgt_output * to_TWh
         }
         o.costs['Power to X'] = { capacity: i.power_to_X.capacity, generation: 0 }
@@ -216,12 +227,7 @@ Object.assign(model, {
         o.backup_fuel_burned = Object.values(backup_fuel).some(([fuel]) => fuel > 0)
         o.total_annual_cost += o.fuel_cost_annual + o.carbon_cost_annual
 
-        // Summary figures: the LCOE of backup, and of all electricity demand
-        let turbines = { annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, generation: o.costs['CCGT'].generation + o.costs['OCGT'].generation }
-        o.backup_LCOE = turbines.generation > 0 ? 1000 * (turbines.annual + o.fuel_cost_annual + o.carbon_cost_annual) / turbines.generation : 0
-        o.LCOE = 1000 * o.total_annual_cost / (o.balance.total_electricity_demand * o.GWh_to_TWhy)
-
-        return { turbines_annual: turbines.annual, fuel_annual: backup_fuel_annual }
+        return { turbines_annual: o.costs['CCGT'].annual + o.costs['OCGT'].annual, fuel_annual: backup_fuel_annual }
     },
 
     // -----------------------------------------------------------------------------------------
@@ -357,22 +363,95 @@ Object.assign(model, {
     //   battery_charge      the battery is charging, so it sets the price from later hours
     //   battery_discharge   the battery is discharging, so it sets the price from later hours
     //
-    // i.fuel_values gives the value of fuel at the margin, which is not the same as what fuel costs
-    // to make. These values are inputs from a PyPSA optimisation, and scripts/price_check.py in
-    // ZCB_PyPSA compares the resulting prices with PyPSA at equal capacities.
-    //
-    // Sets d.electricity_price, and returns the class of each hour.
+    // So the price needs a value for hydrogen and for turbine fuel. Both are derived from the
+    // system itself, in fuel_values. scripts/price_check.py in ZCB_PyPSA compares the resulting
+    // prices with PyPSA at equal capacities.
     // -----------------------------------------------------------------------------------------
+
+    // The class of each hour, which follows from the dispatch alone.
+    hour_classes: function() {
+        let cls = new Array(i.hours)
+        for (let hour = 0; hour < i.hours; hour++) {
+            // Backup below 0.5 GW is a remainder beside the battery, which is then at the margin
+            if (d.electricity_from_dispatchable[hour] > 0.5) cls[hour] = 'backup'
+            else if (d.excess_elec[hour] > 1e-6) cls[hour] = 'curtail'
+            else if (d.electricity_for_electrolysis[hour] > 1e-6) cls[hour] = 'electrolysis'
+            else if (d.elec_store_charge[hour] > 1e-6) cls[hour] = 'battery_charge'
+            else cls[hour] = 'battery_discharge'
+        }
+        return cls
+    },
+
+    // The value of fuel at the margin, £/MWh. Each fuel is worth what it costs from the source
+    // that would make more of it.
+    //
+    //   hydrogen   In hours with spare power, electricity is free and electrolysers earn the full
+    //              value of their hydrogen. In other hours they pay what the hydrogen is worth and
+    //              earn nothing. So they break even when the hydrogen made in zero price hours
+    //              pays for the electrolysers, compressors and store:
+    //
+    //                value = annual plant cost / hydrogen made in zero price hours
+    //
+    //   methane    Methanation is the source that can make more. Its methane costs the hydrogen
+    //              it uses at the value above, plus the methanation plant and CO2 store. With no
+    //              methanation the source is biogas, at the cost of digestion and feedstock. The
+    //              methane stores are added per MWh of methane used.
+    //
+    //   turbine    Turbines burn that methane, or fossil gas at its price plus carbon. The value
+    //   fuel       is weighted by what they burned.
+    //
+    // Hydrogen at this value costs exactly what it is worth, so fuel users and the hourly price
+    // see the same number. Biomass, oil and coal turbines are priced as gas turbines.
+    fuel_values: function(cls) {
+        let to_TWh = o.GWh_to_TWhy
+        let eb = i.electric_backup
+        let annual = (names) => names.reduce((total, name) => total + o.costs[name].annual, 0)
+        let per_MWh = (annual_bn, TWh) => TWh > 0 ? 1000 * annual_bn / TWh : 0
+
+        let free_electricity = 0
+        for (let hour = 0; hour < i.hours; hour++) {
+            if (cls[hour] == 'curtail') free_electricity += d.electricity_for_electrolysis[hour]
+        }
+        let free_hydrogen_TWh = free_electricity * i.hydrogen.electrolysis_efficiency * to_TWh
+        let hydrogen = per_MWh(annual(['H2 Electrolysis', 'Hydrogen storage', 'Hydrogen compressor']), free_hydrogen_TWh)
+
+        let methanation_TWh = o.methane.total_from_methanation * to_TWh
+        let methanation_hydrogen_bn = o.methane.total_hydrogen_used * to_TWh * hydrogen * 0.001
+        let source = methanation_TWh > 0
+            ? per_MWh(methanation_hydrogen_bn + annual(['Methanation', 'CO2 storage']), methanation_TWh)
+            : per_MWh(o.costs['Anaerobic digestion'].annual + o.biogas_feedstock_annual, o.costs['Anaerobic digestion'].generation)
+        let methane_used_TWh = (o.methane.total_produced - o.methane.store_excess) * to_TWh
+        let methane = source + per_MWh(annual(['Methane storage', 'Methane store charging', 'Methane store discharging']), methane_used_TWh)
+
+        // Fossil gas: p/kWh x 10 gives £/MWh, and tCO2/MWh x £/tCO2 gives £/MWh
+        let fossil_gas = i.fuel_prices.gas * 10 + i.co2_factors.gas * i.carbon_price
+        // Methane burned in turbines, GWh over the run, and the share of it that was fossil gas
+        let ebo = o.electric_backup
+        let turbine_methane = (ebo.total_methane_turbine_output - ebo.total_ocgt_output) / (eb.methane_efficiency * 0.01) + ebo.total_ocgt_output / (eb.ocgt_efficiency * 0.01)
+        let fossil_share = turbine_methane > 0 ? Math.min(1, o.methane.ccgt_methane_from_fossil_gas / turbine_methane) : 0
+
+        return {
+            hydrogen_gbp_MWh: hydrogen,
+            methane_gbp_MWh: methane,
+            fossil_gas_gbp_MWh: fossil_gas,
+            turbine_fossil_share: fossil_share,
+            turbine_fuel_gbp_MWh: fossil_share * fossil_gas + (1 - fossil_share) * methane,
+            free_hydrogen_TWh
+        }
+    },
+
+    // Sets d.electricity_price and o.fuel_values, and returns the class of each hour.
     hourly_prices: function() {
-        let fv = i.fuel_values
+        let cls = model.hour_classes()
+        let fv = o.fuel_values = model.fuel_values(cls)
         let eb = i.electric_backup
 
         // Prices are per MWh reaching the user, so a turbine's cost is divided by the share of
         // its output that survives grid losses and own use.
-        let glf = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+        let glf = model.delivered_share()
 
         // A turbine MWh costs the fuel it burns (fuel value / efficiency) plus variable O&M
-        let turbine_price = (efficiency, tech) => (fv.methane_gbp_MWh / (efficiency*0.01) + i.costs[tech].variable_om) / glf
+        let turbine_price = (efficiency, tech) => (fv.turbine_fuel_gbp_MWh / (efficiency*0.01) + i.costs[tech].variable_om) / glf
         let ccgt_price = turbine_price(eb.methane_efficiency, 'CCGT')
         let ocgt_price = turbine_price(eb.ocgt_efficiency, 'OCGT')
 
@@ -383,35 +462,27 @@ Object.assign(model, {
 
         // Scarcity adder. The last turbine in the fleet runs for only a few hours, so fuel alone
         // never pays for it. The hours within 10% of peak backup carry its annual cost, shared in
-        // proportion to how far each hour is above that threshold. peak_cost is £ per MW of
-        // reliable capacity over the whole run: £/kW/yr x 1000 x years, divided by de-rating.
+        // proportion to how far each hour is above that threshold. peak_cost is £ per MW reaching
+        // the user over the whole run: £/kW/yr x 1000 x years, divided by de-rating and by the
+        // share of output that reaches users.
         let peak_tech = o.electric_backup.max_ocgt_output > 0 ? 'OCGT' : 'CCGT'
         let derating = peak_tech == 'OCGT' ? eb.ocgt_derating_factor : eb.ccgt_derating_factor
-        let peak_cost = annual_fixed_cost(i.costs[peak_tech], i.annualisation) * 1000 * o.years / derating
+        let peak_cost = annual_fixed_cost(i.costs[peak_tech], i.annualisation) * 1000 * o.years / derating / glf
         let threshold = 0.9 * o.electric_backup.max_capacity_requirement
         let depth_total = 0
         for (let hour = 0; hour < i.hours; hour++) depth_total += Math.max(d.electricity_from_dispatchable[hour] - threshold, 0)
 
-        // First pass: find the class of each hour, and the price of every class but the battery
+        // First pass: the price of every class but the battery
         let price = new Array(i.hours)
-        let cls = new Array(i.hours)
         for (let hour = 0; hour < i.hours; hour++) {
-            // Backup below 0.5 GW is a remainder beside the battery, which is then at the margin
-            if (d.electricity_from_dispatchable[hour] > 0.5) {
-                cls[hour] = 'backup'
+            if (cls[hour] == 'backup') {
                 price[hour] = d.ocgt_output[hour] > 1e-6 ? ocgt_price : ccgt_price
                 let depth = d.electricity_from_dispatchable[hour] - threshold
                 if (depth > 0) price[hour] += peak_cost * depth / depth_total
-            } else if (d.excess_elec[hour] > 1e-6) {
-                cls[hour] = 'curtail'
+            } else if (cls[hour] == 'curtail') {
                 price[hour] = 0
-            } else if (d.electricity_for_electrolysis[hour] > 1e-6) {
-                cls[hour] = 'electrolysis'
+            } else if (cls[hour] == 'electrolysis') {
                 price[hour] = electrolysis_price
-            } else if (d.elec_store_charge[hour] > 1e-6) {
-                cls[hour] = 'battery_charge'
-            } else {
-                cls[hour] = 'battery_discharge'
             }
         }
 
@@ -439,7 +510,7 @@ Object.assign(model, {
     // Returns the electricity bill of the fuel plants, in GWh x £/MWh, for the next step.
     price_summary: function(cls) {
         let price = d.electricity_price
-        let glf = 1.0-((i.energy_industry_use.electricity_grid_loss_prc + i.energy_industry_use.electricity_own_use_prc)*0.01)
+        let glf = model.delivered_share()
         let p = o.prices = { hours: {}, mean: {} }
         let revenue = 0, end_use_total = 0, offshore = 0, sum = 0, electrolysis_power = 0, ptx_power = 0
         let offshore_gw = i.supply.offshore_wind_capacity * i.supply.offshore_wind_availability * glf
@@ -518,7 +589,7 @@ Object.assign(model, {
 
     fuel_production_costs: function(electricity_for_fuel, fossil_share) {
         let p = o.prices
-        let fv = i.fuel_values
+        let fv = o.fuel_values
         let sf = i.synth_fuel
         let ptx = i.power_to_X
         let ft = o.costs['FT synthetic fuel']
@@ -555,8 +626,8 @@ Object.assign(model, {
         }
 
         // Marginal values, used only to check how much of the system cost marginal prices would
-        // recover. Synthetic fuel has no input value, so it is its hydrogen and biomass at their
-        // values, plus the FT plant cost per MWh.
+        // recover. Hydrogen and methane are derived in fuel_values. Synthetic fuel is its hydrogen
+        // and biomass at their values, plus the FT plant cost per MWh.
         let ft_plant = per_MWh(ft.annual, ft.generation)
         let values = {
             hydrogen: fv.hydrogen_gbp_MWh,
@@ -610,127 +681,155 @@ Object.assign(model, {
         return { content, sold_TWh }
     },
 
-    // The electricity unit rate and bill. The unit rate adds layers, as on a real bill:
+    // Network cost: the 2024 network plus what is built beyond it, and who pays for it.
     //
-    //   generation + network + policy + supplier, all per kWh, then VAT
+    //   existing       2024/25 network revenue from all users, held in real terms
+    //   distribution   peak demand above the 2024 peak, per kW
+    //   transmission   wind capacity above 2024, per kW
+    //   constraints    balancing cost above 2024, £bn/yr
     //
-    // Policy and supplier costs also have a part per customer, which is the standing charge. So
-    // does the network on the per kWh basis. These inputs come from the 2024 Ofgem price cap.
+    // Peak demand is end use, without electrolysis, storage charging or power to X. Transmission
+    // follows wind, which is far from demand. Offshore connections are within wind capex. New
+    // capital is an annuity, like a mortgage, plus O&M.
+    //
+    // Each part is shared by what drives it:
+    //
+    //   existing       the 2024 domestic share for homes, and the rest for other users
+    //   distribution   the share of end use at the peak hour
+    //   transmission   energy delivered. Electrolysis and power to X connect at transmission
+    //   and            level, so fuel users pay a share of this part alone. Generators pay wider
+    //   constraints    transmission charges within their prices, which come off this part first.
+    network_cost: function(hydrogen, domestic_TWh, other_TWh) {
+        let e = i.retail.electricity
+        let to_TWh = o.GWh_to_TWhy
+        let n = { domestic_TWh }
+
+        // The share of capital paid each year: annuity plus O&M
+        let rate = e.network_return_prc * 0.01
+        n.annual_share = rate / (1 - Math.pow(1 + rate, -e.network_life_years)) + e.network_om_prc * 0.01
+
+        // GW x £/kW is £m, so 0.001 gives £bn
+        n.existing_bn = e.network_existing_gbp_bn
+        n.distribution_GW = Math.max(0, o.balance.max_electricity_demand - e.network_reference_peak_GW)
+        n.transmission_GW = Math.max(0, i.supply.onshore_wind_capacity + i.supply.offshore_wind_capacity - e.network_reference_wind_GW)
+        n.distribution_capital_bn = n.distribution_GW * e.network_distribution_gbp_kW * 0.001
+        n.transmission_capital_bn = n.transmission_GW * e.network_transmission_gbp_kW * 0.001
+        n.distribution_bn = n.distribution_capital_bn * n.annual_share
+        n.transmission_bn = n.transmission_capital_bn * n.annual_share
+        n.constraints_bn = e.network_constraints_gbp_bn
+        n.total_bn = n.existing_bn + n.distribution_bn + n.transmission_bn + n.constraints_bn
+
+        // Generators pay wider transmission charges per MWh, within their prices. The 2024 network
+        // revenue leaves out what generators paid in 2024, so only output above 2024 counts.
+        // Output is generation after curtailment, without imports.
+        n.generation_TWh = (o.supply.total_fixed_electricity + o.electric_backup.total_before_grid_loss - o.balance.total_excess_elec) * to_TWh
+        let transmission = n.transmission_bn + n.constraints_bn
+        n.generator_bn = Math.min(transmission, Math.max(0, n.generation_TWh - e.network_reference_generation_TWh) * e.network_generator_gbp_MWh * 0.001)
+
+        // Domestic share of the peak. The hourly lighting, appliance and heat series cover homes
+        // and services together, so each is split by its annual domestic share. Industry and
+        // transport are not domestic.
+        let lac_domestic = i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.domestic.cooking_TWhy
+        let lac_total = lac_domestic + i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.catering_TWhy + i.LAC.services.cooling_TWhy
+        let lac_share = lac_total > 0 ? lac_domestic / lac_total : 0
+        let heat_elec = o.heating_systems.heatpump.fuel_demand + o.heating_systems.elres.fuel_demand
+        let heat_domestic = o.final_consumption.domestic.electricity - o.LAC.total * lac_share
+        let heat_share = heat_elec > 0 ? heat_domestic / heat_elec : 0
+        let p = o.balance.peak_end_use
+        let peak = p.lac + p.heat + p.industry + p.transport
+        n.domestic_peak_prc = peak > 0 ? 100 * (p.lac * lac_share + p.heat * heat_share) / peak : 0
+
+        // Shares of energy delivered. Where no fuel is sold, electricity users pay for it all.
+        n.fuel_TWh = hydrogen.sold_TWh > 0 ? (o.hydrogen.total_electricity_for_electrolysis + o.power_to_X.total_electricity_demand) * to_TWh : 0
+        let delivered_TWh = domestic_TWh + other_TWh + n.fuel_TWh
+        n.domestic_energy_prc = delivered_TWh > 0 ? 100 * domestic_TWh / delivered_TWh : 0
+        n.fuel_energy_prc = delivered_TWh > 0 ? 100 * n.fuel_TWh / delivered_TWh : 0
+
+        let shared = transmission - n.generator_bn
+        n.fuel_bn = shared * n.fuel_energy_prc * 0.01
+        n.domestic_bn = n.existing_bn * e.network_domestic_prc * 0.01 + n.distribution_bn * n.domestic_peak_prc * 0.01 + shared * n.domestic_energy_prc * 0.01
+        n.other_bn = n.total_bn - n.generator_bn - n.fuel_bn - n.domestic_bn
+        n.other_p_kWh = other_TWh > 0 ? 100 * n.other_bn / other_TWh : 0
+        return n
+    },
+
+    // Who pays for electricity. The cost is built in layers, and each layer is shared by what
+    // drives it:
+    //
+    //   generation   electricity users' share of the system cost, by energy
+    //   adjustment   year specific wholesale costs, by energy (zero in scenarios)
+    //   network      see network_cost
+    //   policy       ECO and the Warm Home Discount. These are fixed programmes paid by homes,
+    //                so their cost does not grow with electricity use.
+    //   customers    billing, metering and customer service, per customer
+    //   margin       supplier profit, headroom, bad debt and working capital, as a share of the
+    //                rest of the bill
+    //
+    // There are three groups of users. Homes and other users buy electricity. Fuel users buy
+    // hydrogen, methane and synthetic fuel. They pay for the electricity in their fuel at hourly
+    // prices, within its production cost, so here they carry only their share of the network.
+    //
+    // The household bill is the homes' total, split into a unit rate and a standing charge. Costs
+    // per customer are on the standing charge and the rest is on the unit rate. The supplier
+    // inputs come from the 2024 Ofgem price cap.
     electricity_retail: function(hydrogen) {
-        let r = i.retail
-        let e = r.electricity
-        let vat = 1 + r.vat_prc * 0.01
+        let e = i.retail.electricity
+        let to_TWh = o.GWh_to_TWhy
+        let homes_count = i.households_2030
+        let vat = 1 + i.retail.vat_prc * 0.01
+        let margin = e.supplier_margin_prc * 0.01
 
-        // The kWh that carry the cost. Where fuel users pay for the electricity in their fuel,
-        // electricity users' costs are shared over end use. Baselines have no fuel users, so they
-        // use delivered electricity, which is nearly the same thing.
-        let delivered_TWh = (o.balance.total_electricity_demand - o.total_losses.grid) * o.GWh_to_TWhy
-        let billed_TWh = o.generation_costs.fuel_users_annual > 0 ? o.prices.end_use_TWh : delivered_TWh
+        // Energy billed is end use. Homes use domestic electricity, which includes heat pumps.
+        // Other users take the rest, which includes electric vehicles.
+        let billed_TWh = o.prices.end_use_TWh
+        let domestic_TWh = o.final_consumption.domestic.electricity * to_TWh
+        let other_TWh = billed_TWh - domestic_TWh
+        let per_kWh = (bn, TWh) => TWh > 0 ? 100 * bn / TWh : 0
 
+        let n = model.network_cost(hydrogen, domestic_TWh, other_TWh)
         let elec = {
             billed_TWh,
-            // The build-up for every technology is kept for comparison
-            resource_p_kWh: delivered_TWh > 0 ? 100 * o.total_annual_cost / delivered_TWh : 0,
-            generation_cost_p_kWh: billed_TWh > 0 ? 100 * o.generation_costs.electricity_annual / billed_TWh : 0,
-            bill_top_up_p_kWh: billed_TWh > 0 ? 100 * o.prices.bill_top_up / billed_TWh : 0
+            generation_cost_p_kWh: per_kWh(o.generation_costs.electricity_annual, billed_TWh),
+            bill_top_up_p_kWh: per_kWh(o.prices.bill_top_up, billed_TWh),
+            // The build-up for every technology, less what fuel users pay, for comparison
+            resource_p_kWh: per_kWh(o.total_annual_cost - o.generation_costs.fuel_users_annual, billed_TWh),
+            network: n,
+            network_total_bn: n.total_bn,
+            network_fuel_bn: n.fuel_bn
         }
-
-        // The wholesale adjustment covers year specific costs such as power bought forward. It is
-        // zero in scenarios.
+        // The wholesale adjustment covers year specific costs such as power bought forward
         elec.generation_p_kWh = elec.generation_cost_p_kWh + e.wholesale_adjustment_p_kWh
 
-        // Network cost. With basis "per_kWh" it is the Ofgem rate times the energy billed, plus a
-        // standing charge on homes. With basis "components" it is a system wide total, the 2024
-        // network plus what is built beyond it:
-        //
-        //   existing       2024/25 network revenue from all users, held in real terms
-        //   distribution   peak demand above the 2024 peak, per kW
-        //   transmission   wind capacity above 2024, per kW
-        //   constraints    balancing cost above 2024, £bn/yr
-        //
-        // Peak demand is end use, without electrolysis, storage charging or power to X. Transmission
-        // follows wind, which is far from demand. Offshore connections are within wind capex. New
-        // capital is an annuity, like a mortgage, plus O&M.
-        //
-        // Fuel users pay per kW of electrolysis and power to X capacity. This is a share of the
-        // transmission they use, not an extra cost. Generators pay wider transmission charges per MWh
-        // of output above 2024, which are within their prices. The rest is shared between homes and other
-        // users: the 2024 network by the 2024 domestic share, distribution by the domestic share
-        // of the peak, and transmission and constraints by energy. Homes pay their share on the
-        // unit rate, with no network standing charge.
-        let domestic_TWh = o.final_consumption.domestic.electricity * o.GWh_to_TWhy
-        elec.network_p_kWh = e.network_p_kWh
-        elec.network_total_bn = e.network_p_kWh * 0.01 * billed_TWh
-        elec.network_standing_gbp = e.network_gbp
-        let n = { existing_bn: elec.network_total_bn, distribution_GW: 0, distribution_capital_bn: 0, distribution_bn: 0,
-            transmission_GW: 0, transmission_capital_bn: 0, transmission_bn: 0, constraints_bn: 0, annual_share: 0,
-            generation_TWh: 0, generator_bn: 0,
-            standing_bn: e.network_gbp * i.households_2030 * 1e-9, domestic_TWh, domestic_bn: 0, other_bn: 0,
-            domestic_peak_prc: 0, domestic_energy_prc: 0, other_p_kWh: 0, fuel_GW: 0 }
-        elec.network = n
-        elec.network_fuel_bn = 0
-        if (e.network_basis == "components" && billed_TWh > 0) {
-            // The share of capital paid each year: annuity plus O&M
-            let rate = e.network_return_prc * 0.01
-            n.annual_share = rate / (1 - Math.pow(1 + rate, -e.network_life_years)) + e.network_om_prc * 0.01
-            n.existing_bn = e.network_existing_gbp_bn
-            n.distribution_GW = Math.max(0, o.balance.max_electricity_demand - e.network_reference_peak_GW)
-            n.transmission_GW = Math.max(0, i.supply.onshore_wind_capacity + i.supply.offshore_wind_capacity - e.network_reference_wind_GW)
-            // GW x £/kW is £m, so 0.001 gives £bn
-            n.distribution_capital_bn = n.distribution_GW * e.network_distribution_gbp_kW * 0.001
-            n.transmission_capital_bn = n.transmission_GW * e.network_transmission_gbp_kW * 0.001
-            n.distribution_bn = n.distribution_capital_bn * n.annual_share
-            n.transmission_bn = n.transmission_capital_bn * n.annual_share
-            n.constraints_bn = e.network_constraints_gbp_bn
-            n.standing_bn = 0
-            elec.network_standing_gbp = 0
-            elec.network_total_bn = n.existing_bn + n.distribution_bn + n.transmission_bn + n.constraints_bn
-            // Electrolysis and power to X connect at transmission level and run in windy hours, when
-            // the transmission network is most loaded. Where no fuel is sold, electricity users pay.
-            n.fuel_GW = i.hydrogen.electrolysis_capacity_GW + (i.power_to_X.capacity || 0)
-            if (hydrogen.sold_TWh > 0) elec.network_fuel_bn = n.fuel_GW * e.network_electrolysis_gbp_kW * 0.001 * n.annual_share
-            // Generators pay wider transmission charges per MWh, within their prices. The 2024 network
-            // revenue leaves out what generators paid in 2024, so only output above 2024 counts.
-            // Output is generation after curtailment, without imports.
-            n.generation_TWh = (o.supply.total_fixed_electricity + o.electric_backup.total_before_grid_loss - o.balance.total_excess_elec) * o.GWh_to_TWhy
-            n.generator_bn = Math.max(0, n.generation_TWh - e.network_reference_generation_TWh) * e.network_generator_gbp_MWh * 0.001
-
-            // Domestic share of the peak. The hourly lighting, appliance and heat series cover homes
-            // and services together, so each is split by its annual domestic share. Industry and
-            // transport are not domestic.
-            let lac_domestic = i.LAC.domestic.lighting_and_appliances_TWhy + i.LAC.domestic.cooking_TWhy
-            let lac_total = lac_domestic + i.LAC.services.lighting_and_appliances_TWhy + i.LAC.services.catering_TWhy + i.LAC.services.cooling_TWhy
-            let lac_share = lac_total > 0 ? lac_domestic / lac_total : 0
-            let heat_elec = o.heating_systems.heatpump.fuel_demand + o.heating_systems.elres.fuel_demand
-            let heat_domestic = o.final_consumption.domestic.electricity - o.LAC.total * lac_share
-            let heat_share = heat_elec > 0 ? heat_domestic / heat_elec : 0
-            let p = o.balance.peak_end_use
-            let peak = p.lac + p.heat + p.industry + p.transport
-            n.domestic_peak_prc = peak > 0 ? 100 * (p.lac * lac_share + p.heat * heat_share) / peak : 0
-            n.domestic_energy_prc = 100 * domestic_TWh / billed_TWh
-
-            // Homes and other users share what fuel users and generators do not pay. Those payments
-            // come out of transmission and constraints first, and any excess out of the rest pro rata.
-            let paid = elec.network_fuel_bn + n.generator_bn
-            let transmission_left = Math.max(0, n.transmission_bn + n.constraints_bn - paid)
-            let excess = Math.max(0, paid - n.transmission_bn - n.constraints_bn)
-            let rest = n.existing_bn + n.distribution_bn
-            let rest_share = rest > 0 ? Math.max(0, 1 - excess / rest) : 0
-            n.domestic_bn = rest_share * (n.existing_bn * e.network_domestic_prc * 0.01 + n.distribution_bn * n.domestic_peak_prc * 0.01)
-                + transmission_left * n.domestic_energy_prc * 0.01
-            n.other_bn = elec.network_total_bn - paid - n.domestic_bn
-            n.other_p_kWh = billed_TWh > domestic_TWh ? 100 * n.other_bn / (billed_TWh - domestic_TWh) : 0
-            elec.network_p_kWh = domestic_TWh > 0 ? 100 * n.domestic_bn / domestic_TWh : 0
+        // The layers of each group, £bn/yr before VAT. p/kWh x TWh x 0.01 gives £bn.
+        let groups = {
+            homes: { TWh: domestic_TWh, customers: homes_count, network_bn: n.domestic_bn, policy_bn: e.policy_gbp_bn + e.policy_gbp * homes_count * 1e-9 },
+            other: { TWh: other_TWh, customers: e.non_domestic_customers, network_bn: n.other_bn, policy_bn: 0 }
         }
-        elec.network_annual_bn = elec.network_total_bn - elec.network_fuel_bn - n.generator_bn
+        for (let z in groups) {
+            let g = groups[z]
+            g.generation_bn = g.TWh * elec.generation_cost_p_kWh * 0.01
+            g.adjustment_bn = g.TWh * e.wholesale_adjustment_p_kWh * 0.01
+            g.customer_bn = g.customers * e.supplier_customer_gbp * 1e-9
+            g.margin_bn = margin * (g.generation_bn + g.adjustment_bn + g.network_bn + g.policy_bn + g.customer_bn)
+            g.total_bn = g.generation_bn + g.adjustment_bn + g.network_bn + g.policy_bn + g.customer_bn + g.margin_bn
+            g.p_kWh = per_kWh(g.total_bn, g.TWh)
+        }
+        groups.fuel = { TWh: n.fuel_TWh, customers: 0, generation_bn: 0, adjustment_bn: 0, network_bn: n.fuel_bn, policy_bn: 0, customer_bn: 0, margin_bn: 0, total_bn: n.fuel_bn, p_kWh: per_kWh(n.fuel_bn, n.fuel_TWh) }
+        elec.who_pays = groups
+        elec.other_p_kWh = groups.other.p_kWh
 
-        // Unit rate, standing charge and the household bill. Domestic electricity includes heat
-        // pumps and leaves out electric vehicles, which are in transport.
-        elec.unit_rate_p_kWh = (elec.generation_p_kWh + elec.network_p_kWh + e.policy_p_kWh + e.supplier_p_kWh) * vat
-        elec.standing_charge_gbp = (elec.network_standing_gbp + e.policy_gbp + e.supplier_gbp) * vat
-        elec.household_kWh = o.final_consumption.domestic.electricity * o.per_year * 1000000 / i.households_2030
+        // The household bill. Each row of the bill is kept, so the page can show the layers.
+        elec.network_p_kWh = per_kWh(n.domestic_bn, domestic_TWh)
+        elec.policy_p_kWh = per_kWh(e.policy_gbp_bn, domestic_TWh)
+        let unit_before_margin = elec.generation_p_kWh + elec.network_p_kWh + elec.policy_p_kWh
+        let standing_before_margin = e.policy_gbp + e.supplier_customer_gbp
+        elec.supplier_p_kWh = unit_before_margin * margin
+        elec.supplier_gbp = e.supplier_customer_gbp + standing_before_margin * margin
+        elec.unit_rate_p_kWh = unit_before_margin * (1 + margin) * vat
+        elec.standing_charge_gbp = standing_before_margin * (1 + margin) * vat
+        elec.household_kWh = domestic_TWh * 1e9 / homes_count
         elec.bill_gbp = elec.unit_rate_p_kWh * 0.01 * elec.household_kWh + elec.standing_charge_gbp
-        elec.household_spend_bn = elec.bill_gbp * i.households_2030 * 1e-9
+        elec.household_spend_bn = elec.bill_gbp * homes_count * 1e-9
         o.retail.electricity = elec
     },
 
@@ -1037,9 +1136,9 @@ Object.assign(model, {
         let vat = 1 + i.retail.vat_prc * 0.01
         let road_vat = 1 + fr.road_vat_prc * 0.01
 
-        // Charging at the electricity unit rate, which includes VAT. Hydrogen pays road VAT and no
-        // duty, as synthetic fuel does.
-        let ev_bn = cars.EV.TWh * elec.unit_rate_p_kWh * 0.01
+        // Car charging is in transport, so it is billed with other electricity users and pays their
+        // rate, with the home VAT rate added. Hydrogen pays road VAT and no duty, as synthetic fuel does.
+        let ev_bn = cars.EV.TWh * elec.other_p_kWh * vat * 0.01
         let hydrogen_car_bn = cars.H2.TWh * fuel.hydrogen.p_kWh * road_vat * 0.01
 
         // Fuel in the home that is not on a gas bill, TWh/yr x p/kWh x 0.01. Heating oil pays its
@@ -1094,23 +1193,20 @@ Object.assign(model, {
         let bill = o.fossil_bill.final
         let reference = o.fossil_reference.final
         let elec = o.retail.electricity
-        let e = i.retail.electricity
         let generation_costs = o.generation_costs
 
-        // A retail layer has a part per kWh and a part per home. p/kWh x TWh x 0.01 gives £bn, and
-        // £ x homes x 1e-9 gives £bn. Non-domestic standing charges are not modelled.
-        let per_home_bn = (gbp) => gbp * i.households_2030 * 1e-9
-        let per_kWh_bn = (p_kWh) => p_kWh * 0.01 * elec.billed_TWh
-
-        // Layers paid by consumers before tax. Together they rebuild every bill: electricity users
-        // pay the system cost less fuel sales, and fuel users pay fuel sales.
+        // Layers paid by consumers before tax. The electricity layers add up the who pays table,
+        // so together they rebuild every bill: electricity users pay the system cost less fuel
+        // sales, and fuel users pay fuel sales.
+        let who = elec.who_pays
+        let all_users = (layer) => who.homes[layer] + who.other[layer] + who.fuel[layer]
         let layers = {
             system: generation_costs.total_annual,
-            wholesale_adjustment: per_kWh_bn(e.wholesale_adjustment_p_kWh),
+            wholesale_adjustment: all_users('adjustment_bn'),
             // Generators' share of the network is within the system cost
-            networks: elec.network_total_bn - elec.network.generator_bn + per_home_bn(elec.network_standing_gbp),
-            policy: per_kWh_bn(e.policy_p_kWh) + per_home_bn(e.policy_gbp),
-            supplier: per_kWh_bn(e.supplier_p_kWh) + per_home_bn(e.supplier_gbp),
+            networks: all_users('network_bn'),
+            policy: all_users('policy_bn'),
+            supplier: all_users('customer_bn') + all_users('margin_bn'),
             fuel_delivery: o.prices.fuel_delivery_bn,
             heat_and_biomass: o.heat_and_biomass.before_bn,
             fossil_fuel: bill.before_bn
@@ -1134,7 +1230,7 @@ Object.assign(model, {
             + bill.after_bn - bill.before_bn
 
         // What electricity users pay before VAT, which the validation compares with observed spend
-        let electricity_bn = before_bn - bill.before_bn - o.prices.fuel_sales - o.prices.fuel_delivery_bn - layers.heat_and_biomass - elec.network_fuel_bn
+        let electricity_bn = who.homes.total_bn + who.other.total_bn
 
         // Scenarios use very different amounts of energy, so also divide by final energy. This
         // counts heat pump ambient heat, solar thermal and geothermal heat, and the electricity

@@ -389,9 +389,6 @@
             "petrol_p_litre": 125.2,
             "diesel_p_litre": 129.98,
             "car_diesel_prc": 52.0
-        },
-        "electricity": {
-            "network_basis": "per_kWh"
         }
     },
     "co2_factors": {

@@ -926,6 +926,7 @@ var model = {
         o.methane.store_full_count = 0
         o.methane.total_produced = 0
         o.methane.total_hydrogen_used = 0
+        o.methane.total_from_methanation = 0
         o.methane.total_demand = 0
         o.methane.store_excess = 0
         o.methane.unmet = 0
@@ -964,6 +965,7 @@ var model = {
         o.electric_backup = {}        
         o.electric_backup.max_capacity_requirement = 0
         o.electric_backup.max_capacity_requirement_hour = 0
+        o.electric_backup.max_capacity_requirement_at_turbine = 0
         o.electric_backup.max_shortfall = 0
         o.electric_backup.max_shortfall_hour = 0
         
@@ -1301,6 +1303,7 @@ var model = {
             // Methanation process itself
             let methane_from_sabatier = hydrogen_for_sabatier * (889.0/1144.0)                               // 78% efficiency based on HHV kj/mol of CH4/4H2
             o.total_losses.sabatier += hydrogen_for_sabatier - methane_from_sabatier
+            o.methane.total_from_methanation += methane_from_sabatier
             
             let hydrogen_SOC_before = o.hydrogen.SOC
             o.hydrogen.SOC += hydrogen_balance
@@ -1835,6 +1838,9 @@ var model = {
         var datastarttime = (32*365.25*24 + i.start_hour)*3600*1000;
 
         var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        // The backup peak is measured at the user. At the turbine it is higher by grid losses and own use.
+        o.electric_backup.max_capacity_requirement_at_turbine = o.electric_backup.max_capacity_requirement / grid_loss_prc
 
         var date = new Date(datastarttime + (o.electric_backup.max_capacity_requirement_hour * 3600 * 1000));
         var h = date.getHours();

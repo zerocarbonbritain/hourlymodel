@@ -396,16 +396,14 @@
     "carbon_price": 55.18,
     "retail": {
         "electricity": {
-            "network_p_kWh": 3.394,
-            "network_gbp": 116.23,
-            "policy_p_kWh": 0.878,
             "policy_gbp": 10.76,
-            "supplier_p_kWh": 3.176,
-            "supplier_gbp": 73.88,
             "wholesale_adjustment_p_kWh": 0,
-            "network_basis": "components",
             "network_existing_gbp_bn": 14.29,
-            "network_domestic_prc": 45.5
+            "network_domestic_prc": 45.5,
+            "policy_gbp_bn": 0.82,
+            "supplier_customer_gbp": 121.29,
+            "supplier_margin_prc": 4.24,
+            "non_domestic_customers": 2500000
         },
         "gas": {
             "network_p_kWh": 1.414,
@@ -480,9 +478,5 @@
         "Methane store discharging": {
             "capex": 0
         }
-    },
-    "fuel_values": {
-        "hydrogen_gbp_MWh": 0,
-        "methane_gbp_MWh": 0
     }
 }

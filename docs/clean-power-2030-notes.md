@@ -108,13 +108,13 @@ The script uses the model's flows and its own cost inputs ([cost-assumptions.md]
 
 | £bn/yr (£/MWh) | NESO | Model |
 |---|---|---|
-| Capacity | 26.1 (86.0) | 26.6 (86.5) |
+| Capacity | 26.1 (86.0) | 26.7 (86.7) |
 | Fuel | 3.4 (11.2) | 2.7 (8.9) |
 | Carbon at £147/t | 2.3 (7.7) | 1.3 (4.1) |
 | Constraints | 3.7 (12.1) | NESO value |
 | Net import and export | -0.7 (-2.2) | 1.7 (5.3) |
 | Network | 5.5 (18.0) | NESO value |
-| Total | 40.3 (132.7) | 41.4 (134.6) |
+| Total | 40.3 (132.7) | 41.5 (134.8) |
 
 Model values are per MWh of 307.7 TWh of useful energy (UK). The totals agree within 2%. The components differ:
 
@@ -180,49 +180,50 @@ The blend overstates 2030 costs in four ways:
 - RO support lasts 20 years, so the earliest plants lose it before 2030. NESO puts falling legacy costs at another £10/MWh.
 - Storage is at new-build cost, including existing pumped hydro, and long duration storage is priced per kWh as batteries.
 
-The build-up values every plant at new-build cost, including existing nuclear and wind. On that basis, and before networks, the 2024 baseline costs £141.6/MWh and this scenario £150.0/MWh. With carbon at NESO's £147/t for both, the baseline is £155.3/MWh and this scenario £152.6/MWh. NESO puts its New Dispatch pathway £10/MWh above today's system, including about £5/MWh for networks and constraints. It does not give this figure for Further Flex and Renewables. Its own pathway costs suggest about £7/MWh more. The model's build-up shows a smaller rise because it charges the existing fleet at new-build cost in both years.
+The build-up values every plant at new-build cost, including existing nuclear and wind. On that basis, and before networks, the 2024 baseline costs £144.0/MWh and this scenario £151.2/MWh. With carbon at NESO's £147/t for both, the baseline is £157.6/MWh and this scenario £153.8/MWh. NESO puts its New Dispatch pathway £10/MWh above today's system, including about £5/MWh for networks and constraints. It does not give this figure for Further Flex and Renewables. Its own pathway costs suggest about £7/MWh more. The model's build-up shows a smaller rise because it charges the existing fleet at new-build cost in both years.
 
 ### AR7 strike prices
 
 The zcb_2024 preset holds AR7 strike prices for wind, solar and tidal (£91.20, £72.24, £65.23 and £265/MWh) and the Hinkley Point C price for nuclear (£124.70/MWh). Applied in two ways:
 
-- **On the output of new capacity only.** Output is shared between new and existing plant by capacity. New output is paid the strike price, and existing plant keeps its O&M. This is NESO's boundary. Capacity costs £26.11bn against NESO's £26.12bn, and the total is £133.0/MWh against £132.7/MWh. Offshore wind costs £0.28bn less than its build-up, because AR7 is £91.20/MWh against a build-up of £99/MWh at the model's load factor. Solar costs £0.24bn less and onshore wind £0.08bn more.
-- **On the whole fleet.** Gas, biomass and waste plant use the build-up, with gas at 100 p/therm and carbon at £147/t. Generation costs £45.0bn/yr, £146/MWh before networks and constraints, or £176/MWh with NESO's network and constraint costs. Existing wind, solar, nuclear, gas turbines and storage are paid new-build prices, which adds about £13.5bn/yr of capital that NESO does not count.
+- **On the output of new capacity only.** Output is shared between new and existing plant by capacity. New output is paid the strike price, and existing plant keeps its O&M. This is NESO's boundary. Capacity costs £26.17bn against NESO's £26.12bn, and the total is £133.2/MWh against £132.7/MWh. Offshore wind costs £0.28bn less than its build-up, because AR7 is £91.20/MWh against a build-up of £99/MWh at the model's load factor. Solar costs £0.24bn less and onshore wind £0.08bn more.
+- **On the whole fleet.** Gas, biomass and waste plant use the build-up, with gas at 100 p/therm and carbon at £147/t. Imports keep their 2024 price. Generation costs £45.4bn/yr, £147/MWh before networks and constraints, or £177/MWh with NESO's network and constraint costs. Existing wind, solar, nuclear, gas turbines and storage are paid new-build prices, which adds about £13.5bn/yr of capital that NESO does not count.
 
 NESO's comparison with today uses AR6 strike prices: £72 (onshore), £83 (offshore) and £71/MWh (solar) in 2024 prices (Annex 4, figure 4). AR7 offshore wind is £8/MWh higher.
 
 ## Retail electricity price
 
-The model's retail unit rate is the generation cost per kWh billed, plus the wholesale adjustment, network, policy and supplier costs, and 5% VAT. The 2024 wholesale adjustment (3.19 p/kWh for electricity, 0.197 p/kWh for gas) reflects power and gas bought forward in 2023 and the cost of the domestic profile. It is specific to 2024, so it is zero in this scenario, as in other scenarios. Gas and carbon stay at 2024 prices. Homes pay their share of the network on the unit rate, with no network standing charge.
+The model's retail unit rate is the generation cost per kWh billed, plus the wholesale adjustment, the homes' network share and ECO, then the supplier margin and 5% VAT. Supplier costs per customer and the Warm Home Discount are on the standing charge. The supplier margin is 4.24% here against 5.75% in 2024, as it leaves out the 2024 adjustment allowance. The 2024 wholesale adjustment (3.19 p/kWh for electricity, 0.197 p/kWh for gas) reflects power and gas bought forward in 2023 and the cost of the domestic profile. It is specific to 2024, so it is zero in this scenario, as in other scenarios. Gas and carbon stay at 2024 prices. Homes pay their share of the network on the unit rate, with no network standing charge.
 
 | p/kWh | baseline_2024 | clean_power_2030 |
 |---|---|---|
-| Generation cost | 13.54 | 15.91 |
+| Generation cost | 13.55 | 15.85 |
 | Wholesale adjustment | 3.19 | 0 |
-| Network | 6.57 | 8.83 |
-| Policy | 0.88 | 0.88 |
-| Supplier | 3.18 | 3.18 |
-| Unit rate with VAT | 28.72 | 30.23 |
-| Household electricity bill | £1,083 | £986 |
-| Household energy and car fuel | £3,231 | £2,899 |
+| Network | 6.57 | 8.89 |
+| Policy (ECO) | 0.83 | 0.97 |
+| Supplier margin | 1.39 | 1.09 |
+| Unit rate with VAT | 26.80 | 28.13 |
+| Standing charge with VAT | £147 | £145 |
+| Household electricity bill | £1,074 | £980 |
+| Household energy and car fuel | £3,215 | £2,823 |
 
-Generation costs £48.8bn over 300 TWh billed, against £36.5bn over 269 TWh. Networks cost £18.00bn against £14.29bn. The unit rate rises 1.5 p/kWh, but the household electricity bill falls £97, because household use falls 14% with NESO's appliance efficiency. Of the 2.26 p/kWh rise in the network rate, about 1.1 p/kWh is the 2024 network spread over fewer domestic kWh, and the rest is growth in transmission and distribution. Spending on home energy and car fuel falls £332 a year on average, as electric cars replace petrol and diesel.
+Generation costs £48.8bn over 300 TWh billed, against £36.5bn over 269 TWh. Networks cost £18.00bn against £14.29bn. The unit rate rises 1.3 p/kWh, but the household electricity bill falls £94, because household use falls 14% with NESO's appliance efficiency. Of the 2.32 p/kWh rise in the network rate, about 1.1 p/kWh is the 2024 network spread over fewer domestic kWh, and the rest is growth in transmission and distribution. Spending on home energy and car fuel falls £392 a year on average, as electric cars replace petrol and diesel.
 
-The blended prices leave out effects that NESO expects by 2030. Applied to the unit rate, at £/MWh across demand with VAT:
+The blended prices leave out effects that NESO expects by 2030. Applied to the unit rate, at £/MWh across demand with the supplier margin and VAT:
 
 | p/kWh | |
 |---|---|
-| clean_power_2030 as modelled | 30.23 |
-| Export earnings, the £2.3bn/yr gap to NESO's net trade | -0.81 |
-| Lower wholesale prices for RO plant (NESO, £10/MWh) | -1.05 |
-| RO and Feed-in Tariff contracts expiring (NESO, £10/MWh) | -1.05 |
-| Adjusted | 27.32 |
+| clean_power_2030 as modelled | 28.13 |
+| Export earnings, the £2.3bn/yr gap to NESO's net trade | -0.85 |
+| Lower wholesale prices for RO plant (NESO, £10/MWh) | -1.09 |
+| RO and Feed-in Tariff contracts expiring (NESO, £10/MWh) | -1.09 |
+| Adjusted | 25.09 |
 
-With these, the unit rate is 1.4 p/kWh below 2024 and the household electricity bill is £900, £183 below 2024. Network growth is in the model, so NESO's £5/MWh for network and constraint growth is no longer added. NESO's own comparison with today is close to flat: its New Dispatch pathway costs £10/MWh more, lower wholesale prices for older plant offset this, and Further Flex and Renewables costs £7/MWh more than New Dispatch. Most of the model's fall is the 2024 wholesale adjustment, which is not carried into 2030.
+With these, the unit rate is 1.7 p/kWh below 2024 and the household electricity bill is £890, £184 below 2024. Network growth is in the model, so NESO's £5/MWh for network and constraint growth is no longer added. NESO's own comparison with today is close to flat: its New Dispatch pathway costs £10/MWh more, lower wholesale prices for older plant offset this, and Further Flex and Renewables costs £7/MWh more than New Dispatch. Most of the model's fall is the 2024 wholesale adjustment, which is not carried into 2030.
 
 Two things are not in the adjusted figure:
 
 - **Storage.** It is at new-build cost of £4.1bn/yr, with 99 GWh of long duration storage priced per kWh as batteries. A lower cost for pumped hydro would reduce the unit rate.
 - **Gas price exposure.** The 2024 system burned 168 TWh of gas for power, and gas set the wholesale price in most hours. This scenario burns 29 TWh. A 1 p/kWh rise in the gas price adds 0.10 p/kWh to this scenario's unit rate through fuel. It adds 0.66 p/kWh to the 2024 system through fuel alone, before its effect on the price paid to other plant.
 
-[clean_power_2030_retail.py](clean_power_2030_retail.py) gives the sensitivities around the adjusted unit rate (25.9 to 33.9 p/kWh at 2024 gas prices, a bill of £858 to £1,094) and the unit rate at gas prices from 60 to 200 p/therm. Keeping the 2024 wholesale adjustment adds up to 3.35 p/kWh. Part of it is the cost of the domestic profile, which persists, but the baseline does not split it out. Replacing the model's transmission with NESO's 2030 build and constraint growth adds up to 0.16 p/kWh. Each 1 p/kWh rise in gas adds 2.45 p/kWh to the 2024 system and 0.20 to 0.62 p/kWh to this scenario. The range depends on whether gas runs in 15% of hours (NESO) or 46% (this model). Plant exposed to the market is assumed to be paid the cost of a gas turbine in those hours.
+[clean_power_2030_retail.py](clean_power_2030_retail.py) gives the sensitivities around the adjusted unit rate (23.6 to 31.9 p/kWh at 2024 gas prices, a bill of £846 to £1,092) and the unit rate at gas prices from 60 to 200 p/therm. Keeping the 2024 wholesale adjustment adds up to 3.49 p/kWh. Part of it is the cost of the domestic profile, which persists, but the baseline does not split it out. Replacing the model's transmission with NESO's 2030 build and constraint growth adds up to 0.16 p/kWh. Each 1 p/kWh rise in gas adds 2.60 p/kWh to the 2024 system and 0.20 to 0.65 p/kWh to this scenario. The range depends on whether gas runs in 15% of hours (NESO) or 46% (this model). Plant exposed to the market is assumed to be paid the cost of a gas turbine in those hours.

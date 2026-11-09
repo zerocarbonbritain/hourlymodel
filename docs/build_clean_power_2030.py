@@ -164,6 +164,9 @@ def build(pathway):
     # clean_power_2030_retail.py keeps the 2024 electricity value as a sensitivity.
     s["retail"]["electricity"]["wholesale_adjustment_p_kWh"] = 0
     s["retail"]["gas"]["wholesale_adjustment_p_kWh"] = 0
+    # The supplier margin follows zcb_2024, which leaves out the 2024 adjustment allowance.
+    zcb_retail = json.load(open(os.path.join(ROOT, "scenarios/zcb_2024.json")))["retail"]["electricity"]
+    s["retail"]["electricity"]["supplier_margin_prc"] = zcb_retail["supplier_margin_prc"]
 
     # Batteries and long duration storage as one store, at NESO's combined round trip
     st = s["electric_storage"]

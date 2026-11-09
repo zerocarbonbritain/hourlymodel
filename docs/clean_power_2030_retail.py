@@ -35,9 +35,13 @@ billed = cp["retail"]["electricity"]["billed_TWh"]
 billed_base = base["retail"]["electricity"]["billed_TWh"]
 
 
-def p(bn, TWh=billed):
-    """£bn/yr over TWh billed, as p/kWh with VAT"""
-    return bn / TWh * 100 * VAT
+margin = s_cp["retail"]["electricity"]["supplier_margin_prc"] * 0.01
+margin_base = s_base["retail"]["electricity"]["supplier_margin_prc"] * 0.01
+
+
+def p(bn, TWh=billed, margin=margin):
+    """£bn/yr over TWh billed, as p/kWh with the supplier margin and VAT"""
+    return bn / TWh * 100 * (1 + margin) * VAT
 
 
 rate_base = base["retail"]["electricity"]["unit_rate_p_kWh"]
@@ -126,7 +130,7 @@ exposed_cp = (base["supply"]["total_offshore_wind"] + base["supply"]["total_onsh
     + sum(gc[t]["generation"] for t in ("nuclear", "hydro", "gas", "biomass", "coal_other", "imports"))
 hours_base = base["prices"]["hours"]["backup"] * 0.01
 hours_cp = (0.15, cp["prices"]["hours"]["backup"] * 0.01)   # NESO, model
-slope_base = p(exposed_base * hours_base / eff * 0.01, billed_base)
+slope_base = p(exposed_base * hours_base / eff * 0.01, billed_base, margin_base)
 slope_cp = [p(exposed_cp * h / eff * 0.01) for h in hours_cp]
 print(f"\nGas: exposed output {exposed_base:.0f} TWh (2024), {exposed_cp:.0f} TWh (2030)")
 print(f"Unit rate per 1 p/kWh of gas: 2024 system {slope_base:.2f}, clean_power_2030 {slope_cp[0]:.2f} to {slope_cp[1]:.2f}")
