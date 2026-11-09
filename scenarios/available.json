@@ -11,6 +11,10 @@
         "name": "ZeroCarbonBritain supply with 2024 demand levels",
         "group": "ZeroCarbonBritain"
     },
+    "zcb_2024_high_demand_v2": {
+        "name": "ZeroCarbonBritain high demand without geothermal, marine or solar thermal",
+        "group": "ZeroCarbonBritain"
+    },
     "deployed_tech": {
         "name": "Deployed technologies with 2024 demand levels",
         "group": "ZeroCarbonBritain"
