@@ -6,6 +6,7 @@
     "households_2030": 28609000,
     "number_of_households": 1000,
     "use_flat_profiles": 0,
+    "heat_profile": "default",
     "include_ambient_heat": 1,
     "supply": {
         "offshore_wind_capacity": 97.4,

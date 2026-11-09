@@ -456,7 +456,13 @@ input[type='text'] {
         
         <p><b>1. Space Heating</b></p>
                 
-        <p>Space heating base temperature: <input v-model.number="i.space_heating.base_temperature" type="text" @change="update" style="width:70px"  autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span></p>
+        <p>Space heating base temperature: <input v-model.number="i.space_heating.base_temperature" type="text" @change="update" style="width:70px"  autocomplete="off" /> K<br><span style="font-size:14px">Uses 16.7°C as average internal temp. and gains& losses from DECC 2050</span>
+        <span v-if="o.hpm_heat_profile" style="font-size:14px"><br>HeatpumpMonitor profile: base temperature {{ o.space_heating.base_temperature | toFixed(1) }}°C, with GW/K scaled by {{ o.space_heating.GWK_scale | toFixed(3) }} so annual space heat is unchanged.</span></p>
+
+        <p>Heat demand profile: <select v-model="i.heat_profile" autocomplete="off" @change="update">
+                <option value="default">Default (one daily shape)</option>
+                <option value="heatpumpmonitor">HeatpumpMonitor (measured)</option>
+            </select><br><span style="font-size:14px">HeatpumpMonitor uses measured data from MID metered heat pumps: a base temperature fitted to daily heat output, a space heat shape that changes with daily mean temperature, a separate hot water shape and measured heat pump efficiencies. Annual heat demand is unchanged. Flat demand profiles take precedence.</span></p>
 
         <table class="table" style="width:100%">
         <tr>
@@ -541,14 +547,22 @@ input[type='text'] {
                 <td>{{ system.name }}</td>
                 <td><input v-model.number="system.share" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
                 <td>{{ o.heating_systems[index].heat_demand | format_energy }} <span class="unit">TWh/yr</span></td>
+                <template v-if="index=='heatpump' && o.hpm_heat_profile">
+                <td>{{ o.heating_systems[index].efficiency_hot_water }} %</td>
+                <td>{{ o.heating_systems[index].efficiency_0C }} %</td>
+                <td>{{ o.heating_systems[index].efficiency_10C }} %</td>
+                </template>
+                <template v-else>
                 <td><input v-model.number="system.efficiency_hot_water" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
                 <td><input v-model.number="system.efficiency_0C" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
                 <td><input v-model.number="system.efficiency_10C" type="text" @change="update" style="width:40px"  autocomplete="off" itype="%" /> %</td>
+                </template>
                 <td><span v-if="!isNaN(o.heating_systems[index].efficiency)">{{ o.heating_systems[index].efficiency }} <span class="unit">%</span></span> </td>     
                 <td>{{ o.heating_systems[index].fuel_demand | format_energy }} <span class="unit">TWh/yr</span></td>
             </tr>
         </table>
 
+        <p v-if="o.hpm_heat_profile" style="font-size:14px">Heat pump efficiencies are the measured HeatpumpMonitor values for the selected heat demand profile. Below the coldest measured day ({{ o.heating_systems.heatpump.efficiency_cold_T }} °C) the space heat efficiency falls by {{ o.heating_systems.heatpump.efficiency_cold_slope }}% per K.</p>
         <p>Peak electricity demand for heat: {{o.heat.max_elec_demand | toFixed(1) }} GW ({{o.heat.max_elec_demand_date}})</p>
         <p>Max heat from hybrid boilers: {{ o.heat.max_heat_from_hybrid_boiler  | toFixed(1) }} GW ({{ o.heat.max_elec_avoided_by_hybrid_boiler  | toFixed(1) }} GW elec avoided)</p>
     

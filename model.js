@@ -43,6 +43,12 @@ var model = {
             space_heat_profile = JSON.parse(JSON.stringify(flat_profile))  
             BEV_charge_profile = JSON.parse(JSON.stringify(flat_profile))  
         }
+        // HeatpumpMonitor heat profiles: space heat shape by daily mean temperature, a separate
+        // hot water shape and measured heat pump efficiencies. Flat profiles take precedence.
+        o.hpm_heat_profile = i.heat_profile == "heatpumpmonitor" && !i.use_flat_profiles
+        if (o.hpm_heat_profile) {
+            hot_water_profile = JSON.parse(JSON.stringify(hpm_hot_water_profile))
+        }
         
         o.biomass = {
             total_used: 0
@@ -277,6 +283,25 @@ var model = {
         
         let water_heating_daily_demand = o.water_heating.demand_TWhy * 1000.0 / 365.2
         
+        // HeatpumpMonitor base temperature. The GW/K values are scaled so that space heat over the
+        // run is the same as at the scenario's base temperature.
+        o.space_heating.base_temperature = i.space_heating.base_temperature
+        o.space_heating.GWK_scale = 1
+        if (o.hpm_heat_profile) {
+            let dd_scenario = 0
+            let dd_hpm = 0
+            for (var day = i.start_hour / 24; day < (i.start_hour + i.hours) / 24; day++) {
+                let temperature = parseFloat(temperaturelines[day].split(",")[1])
+                dd_scenario += Math.max(0, i.space_heating.base_temperature - temperature)
+                dd_hpm += Math.max(0, hpm_base_temperature - temperature)
+            }
+            o.space_heating.base_temperature = hpm_base_temperature
+            if (dd_hpm > 0) o.space_heating.GWK_scale = dd_scenario / dd_hpm
+        }
+        let domestic_GWK = i.space_heating.domestic_demand_GWK * o.space_heating.GWK_scale
+        let services_GWK = i.space_heating.services_demand_GWK * o.space_heating.GWK_scale
+        let industry_GWK = i.space_heating.industry_demand_GWK * o.space_heating.GWK_scale
+
         o.space_heating.total_domestic_demand = 0
         o.space_heating.total_services_demand = 0
         o.space_heating.total_industry_demand = 0
@@ -291,17 +316,19 @@ var model = {
             var day = parseInt(Math.floor((hour + i.start_hour) / 24))
             var temperature = parseFloat(temperaturelines[day].split(",")[1]); 
 
-            let degree_hours = i.space_heating.base_temperature - temperature
+            let degree_hours = o.space_heating.base_temperature - temperature
             if (degree_hours<0) degree_hours = 0
+
+            let space_shape = o.hpm_heat_profile ? model.hpm_space_heat_shape(temperature, hour%24) : space_heat_profile[hour%24]
             
             // Domestic space heat
-            let domestic_space_heat_demand = degree_hours * i.space_heating.domestic_demand_GWK * 24.0 * space_heat_profile[hour%24]
+            let domestic_space_heat_demand = degree_hours * domestic_GWK * 24.0 * space_shape
             o.space_heating.total_domestic_demand += domestic_space_heat_demand
             // Services space heat        
-            let services_space_heat_demand = degree_hours * i.space_heating.services_demand_GWK * 24.0 * space_heat_profile[hour%24]
+            let services_space_heat_demand = degree_hours * services_GWK * 24.0 * space_shape
             o.space_heating.total_services_demand += services_space_heat_demand
             // Industry space heat        
-            let industry_space_heat_demand = degree_hours * i.space_heating.industry_demand_GWK * 24.0 * space_heat_profile[hour%24]        
+            let industry_space_heat_demand = degree_hours * industry_GWK * 24.0 * space_shape        
             o.space_heating.total_industry_demand += industry_space_heat_demand
             // Combined space heat         
             let space_heat_demand = domestic_space_heat_demand + services_space_heat_demand + industry_space_heat_demand
@@ -348,8 +375,28 @@ var model = {
         
     },
 
+    // HeatpumpMonitor space heat shape for one hour of the day. Profiles are measured for daily
+    // mean temperature bands and interpolated between band means, held at the end bands outside.
+    hpm_space_heat_shape: function(temperature, h) {
+        let t = hpm_space_heat_profiles.temperature
+        let p = hpm_space_heat_profiles.profiles
+        let n = t.length
+        if (temperature <= t[0]) return p[0][h]
+        if (temperature >= t[n-1]) return p[n-1][h]
+        let k = 0
+        while (temperature > t[k+1]) k++
+        let f = (temperature - t[k]) / (t[k+1] - t[k])
+        return p[k][h] * (1 - f) + p[k+1][h] * f
+    },
+
+    // Heating system efficiencies, with measured HeatpumpMonitor values for heat pumps when selected
+    heating_system_efficiency: function(z) {
+        if (z == "heatpump" && o.hpm_heat_profile) return hpm_heatpump_efficiency
+        return i.heating_systems[z]
+    },
+
     // --------------------------------------------------------------------------------------------------------------
-    // Stage 2: Heatstore 
+    // Stage 2: Heatstore
     // - needs to be reworked to provide the equivalent service as hot water tanks
     // - or/and district heating large scale inter seasonal heat storage
     // - was only really working as peak shaving (whilst placing all hot water demand in the peak.. )
@@ -455,16 +502,22 @@ var model = {
 
         // Calculate heating system efficiency slopes and intercepts
         for (var z in i.heating_systems) {
-            var slope  = (i.heating_systems[z].efficiency_10C - i.heating_systems[z].efficiency_0C) / (10 - 0);
-            var intercept = i.heating_systems[z].efficiency_10C - (slope*10);
+            var eff = model.heating_system_efficiency(z)
+            var slope  = (eff.efficiency_10C - eff.efficiency_0C) / (10 - 0);
+            var intercept = eff.efficiency_10C - (slope*10);
         
             o.heating_systems[z] = {
                 heat_demand: 0,
                 fuel_demand: 0,
                 water_heat_demand: 0,
                 water_fuel_demand: 0,
+                efficiency_hot_water: eff.efficiency_hot_water,
+                efficiency_0C: eff.efficiency_0C,
+                efficiency_10C: eff.efficiency_10C,
                 efficiency_slope: slope,
-                efficiency_intercept: intercept
+                efficiency_intercept: intercept,
+                efficiency_cold_T: eff.efficiency_cold_T,
+                efficiency_cold_slope: eff.efficiency_cold_slope
             }
 
             d.heating_systems[z] = {
@@ -485,8 +538,14 @@ var model = {
             
             for (var z in i.heating_systems) {
                 
-                var space_heat_efficiency = (o.heating_systems[z].efficiency_slope * outside_temperature) + o.heating_systems[z].efficiency_intercept
-                var water_heat_efficiency = i.heating_systems[z].efficiency_hot_water
+                var hs = o.heating_systems[z]
+                var space_heat_efficiency = (hs.efficiency_slope * outside_temperature) + hs.efficiency_intercept
+                // Optional shallower slope below a cold limit (HeatpumpMonitor heat pumps)
+                if (hs.efficiency_cold_T !== undefined && outside_temperature < hs.efficiency_cold_T) {
+                    space_heat_efficiency = (hs.efficiency_slope * hs.efficiency_cold_T) + hs.efficiency_intercept
+                        + hs.efficiency_cold_slope * (outside_temperature - hs.efficiency_cold_T)
+                }
+                var water_heat_efficiency = o.heating_systems[z].efficiency_hot_water
             
                 let system_space_heat_demand = space_heat_demand * (i.heating_systems[z].share * 0.01)
                 let system_space_fuel_demand = system_space_heat_demand / (space_heat_efficiency*0.01)

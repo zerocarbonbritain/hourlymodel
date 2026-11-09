@@ -179,6 +179,7 @@ The H2 store stays at a 10% floor for FT and methanation, and direct hydrogen de
   - Restarts from other offshore wind levels agree within £0.3bn/yr.
   - Hourly prices value the SPF penalty at 61% (zcb_2024) and 77% (high demand) of the re-optimised supply cost difference, before networks.
   The blog post draft is rewritten with these results and is still marked draft.
+- [x] HeatpumpMonitor heat demand profiles (2026-11-09). A `heat_profile` option selects the HeatpumpMonitor base temperature (15.5 °C, with GW/K scaled so annual space heat is unchanged), measured space heat shapes by daily mean temperature, a separate hot water shape and measured heat pump efficiencies. Shapes and base temperature use three years of the MID metered aggregate. Efficiencies use the latest twelve months and the per system space and hot water split: 301% hot water, 286% at 0 °C and 472% at 10 °C, with the zcb_2024 slope below the coldest measured day (-1.6 °C). They reproduce the measured SPF (3.90 against 3.88). Built by docs/build_heatpumpmonitor_profiles.py. In zcb_2024 heat pump SPF rises from 3.20 to 3.55, peak electricity demand falls from 95.2 to 77.8 GW and the society cost from £113.69bn to £111.70bn/yr, with supply unchanged. It stays below HeatpumpMonitor's 3.9 because of colder weather years and a larger hot water share. The default is unchanged. Results in docs/heatpumpmonitor-profiles-notes.md.
 
 ## Phase 7. Weather data
 
