@@ -12,7 +12,7 @@ The wind and solar scale comes from a sweep, with the other inputs searched at e
 |---|---|---|---|---|---|---|
 | Society cost (£bn/yr) | 159.00 | 158.16 | 157.44 | 157.32 | 157.04 | 157.32 |
 
-The optimum is flat. Lower scales use more biogas and FT, and so more land.
+The optimum is flat. Lower scales use more biogas and FT, and so more land. The sweep used the network rates before 2026-11-09 (£1,100/kW of wind). At the new rates each step of 0.03 saves about £0.28bn/yr less transmission, which leaves 1.47 the lowest.
 
 ## Inputs
 
@@ -46,11 +46,11 @@ The optimum is flat. Lower scales use more biogas and FT, and so more land.
 | Ryegrass for biogas (kha) | 1,611 | 2,244 |
 | System cost (£bn/yr) | 144.33 | 144.73 |
 | Heat and biomass (£bn/yr) | 8.18 | 2.38 |
-| Networks (£bn/yr) | 31.85 | 31.77 |
-| Society cost (£bn/yr) | 162.11 | 156.90 |
-| Consumer cost after tax (£bn/yr) | 196.73 | 188.79 |
-| Retail unit rate (p/kWh) | 28.86 | 26.46 |
-| Household electricity bill (£) | 1,742 | 1,703 |
+| Networks (£bn/yr) | 26.87 | 26.84 |
+| Society cost (£bn/yr) | 156.99 | 151.83 |
+| Consumer cost after tax (£bn/yr) | 191.51 | 183.62 |
+| Retail unit rate (p/kWh) | 28.15 | 25.77 |
+| Household electricity bill (£) | 1,703 | 1,662 |
 | Methane store minimum, end above start (TWh) | 9.91, 13.92 | 8.09, 18.65 |
 | Liquid store minimum, end above start (TWh) | 19.57, 17.50 | 8.62, 14.59 |
 | Net emissions (MtCO2e) | 86.3 | 86.3 |

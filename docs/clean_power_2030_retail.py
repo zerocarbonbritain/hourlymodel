@@ -87,13 +87,13 @@ sens["New offshore wind at £81 to £116/MWh (AR7 £91.20)"] = (
 # NESO legacy and merit order effects at half to full value
 sens["NESO wholesale and legacy effects at half value"] = (0, 10 * billed * 0.001)
 sens["No export earnings"] = (0, -central["Export earnings (gap to NESO net trade)"])
-# Transmission: the model costs the finished network for 2030 wind at £1,100/kW with no constraint
-# growth. NESO's 2030 network is still behind the wind: its 2025 to 2030 onshore transmission
+# Transmission: the model costs the finished network for 2030 plant at its rates per kW with no
+# constraint growth. NESO's 2030 network is still behind the wind: its 2025 to 2030 onshore transmission
 # (CP.13, £28.1bn) annualised as in the model, plus 2030 constraints (CP.31) above 2024/25 thermal
 # constraints. Transmission and constraints are shared by energy, so they spread over kWh billed.
 n = cp["retail"]["electricity"]["network"]
 neso_transmission = 4.6835 * 6 * n["annual_share"] + (3.682 - 1.7)
-sens["NESO 2030 transmission and constraints, not £1,100/kW"] = (0, neso_transmission - n["transmission_bn"] - n["constraints_bn"])
+sens["NESO 2030 transmission and constraints, not the model rates"] = (0, neso_transmission - n["transmission_bn"] - n["constraints_bn"])
 # The 2024 wholesale adjustment, zero in the scenario. Part of it is the cost of the domestic
 # demand profile, which persists. The rest is power bought forward in 2023.
 wa = s_base["retail"]["electricity"]["wholesale_adjustment_p_kWh"]

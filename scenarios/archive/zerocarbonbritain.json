@@ -451,9 +451,21 @@
             "network_reference_peak_GW": 55.19,
             "network_existing_gbp_bn": 14.29,
             "network_domestic_prc": 45.5,
-            "network_reference_wind_GW": 32.34,
+            "network_reference_GW": {
+                "offshore_wind": 16.14,
+                "onshore_wind": 16.2,
+                "nuclear": 5.88,
+                "solar": 19.43
+            },
+            "network_solar_transmission_prc": 25,
             "network_distribution_gbp_kW": 980,
-            "network_transmission_gbp_kW": 1100,
+            "network_distribution_solar_gbp_kW": 0,
+            "network_transmission_gbp_kW": {
+                "offshore_wind": 700,
+                "onshore_wind": 600,
+                "nuclear": 250,
+                "solar": 0
+            },
             "network_return_prc": 4.6,
             "network_life_years": 45,
             "network_om_prc": 1.2,

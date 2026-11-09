@@ -687,12 +687,14 @@ Object.assign(model, {
     // Network cost: the 2024 network plus what is built beyond it, and who pays for it.
     //
     //   existing       2024/25 network revenue from all users, held in real terms
-    //   distribution   peak demand above the 2024 peak, per kW
-    //   transmission   wind capacity above 2024, per kW
+    //   distribution   peak demand above the 2024 peak, and distribution connected solar above
+    //                  2024, per kW
+    //   transmission   offshore wind, onshore wind, nuclear and transmission connected solar
+    //                  above 2024, each at its own rate per kW
     //   constraints    balancing cost above 2024, £bn/yr
     //
-    // Peak demand is end use, without electrolysis, storage charging or power to X. Transmission
-    // follows wind, which is far from demand. Offshore connections are within wind capex. New
+    // Peak demand is end use, without electrolysis, storage charging or power to X. Offshore wind
+    // connections are within wind capex, so its rate covers onshore reinforcement only. New
     // capital is an annuity, like a mortgage, plus O&M.
     //
     // Each part is shared by what drives it:
@@ -714,9 +716,27 @@ Object.assign(model, {
         // GW x £/kW is £m, so 0.001 gives £bn
         n.existing_bn = e.network_existing_gbp_bn
         n.distribution_GW = Math.max(0, o.balance.max_electricity_demand - e.network_reference_peak_GW)
-        n.transmission_GW = Math.max(0, i.supply.onshore_wind_capacity + i.supply.offshore_wind_capacity - e.network_reference_wind_GW)
-        n.distribution_capital_bn = n.distribution_GW * e.network_distribution_gbp_kW * 0.001
-        n.transmission_capital_bn = n.transmission_GW * e.network_transmission_gbp_kW * 0.001
+        let solar_transmission = e.network_solar_transmission_prc * 0.01
+        let solar_GW = Math.max(0, i.supply.solarpv_capacity - e.network_reference_GW.solar)
+        n.distribution_solar_GW = solar_GW * (1 - solar_transmission)
+        n.distribution_capital_bn = (n.distribution_GW * e.network_distribution_gbp_kW + n.distribution_solar_GW * e.network_distribution_solar_gbp_kW) * 0.001
+
+        // Transmission by the plant that drives it, GW above 2024
+        let capacity = {
+            offshore_wind: i.supply.offshore_wind_capacity,
+            onshore_wind: i.supply.onshore_wind_capacity,
+            nuclear: i.supply.nuclear_capacity,
+            solar: i.supply.solarpv_capacity
+        }
+        n.transmission = {}
+        n.transmission_capital_bn = 0
+        for (let z in capacity) {
+            let GW = Math.max(0, capacity[z] - e.network_reference_GW[z])
+            if (z == 'solar') GW *= solar_transmission
+            let capital_bn = GW * e.network_transmission_gbp_kW[z] * 0.001
+            n.transmission[z] = { GW, capital_bn }
+            n.transmission_capital_bn += capital_bn
+        }
         n.distribution_bn = n.distribution_capital_bn * n.annual_share
         n.transmission_bn = n.transmission_capital_bn * n.annual_share
         n.constraints_bn = e.network_constraints_gbp_bn

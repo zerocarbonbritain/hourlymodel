@@ -171,7 +171,8 @@ function report() {
     console.log("\nNetwork and constraints in 2030 (£bn/yr)          NESO    Model");
     let row = (name, a, b, note) => console.log(name.padEnd(48) + (a === null ? "     n/a" : f(a)) + "  " + (b === null ? "    n/a" : f(b)) + (note ? "   " + note : ""));
     row("Onshore transmission, annuitised", A.transmission, n.transmission_bn,
-        n.transmission_GW.toFixed(1) + " GW of wind at £" + i.retail.electricity.network_transmission_gbp_kW + "/kW");
+        Object.keys(n.transmission).filter(z => n.transmission[z].GW > 0)
+            .map(z => n.transmission[z].GW.toFixed(1) + " GW " + z + " at £" + i.retail.electricity.network_transmission_gbp_kW[z] + "/kW").join(", "));
     row("  NESO 2025 to 2030 build at the model's annuity", NESO.investment.transmission * 6 * n.annual_share, null);
     row("Constraints above 2024/25 thermal (£" + CONSTRAINTS_2024 + "bn)", A.constraints - CONSTRAINTS_2024, n.constraints_bn);
     row("Transmission and constraints", neso_tc, n.transmission_bn + n.constraints_bn);
