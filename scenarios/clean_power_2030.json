@@ -402,7 +402,7 @@
             "policy_gbp": 10.76,
             "supplier_p_kWh": 3.176,
             "supplier_gbp": 73.88,
-            "wholesale_adjustment_p_kWh": 3.189,
+            "wholesale_adjustment_p_kWh": 0,
             "network_basis": "components",
             "network_existing_gbp_bn": 14.29,
             "network_domestic_prc": 45.5
@@ -415,7 +415,7 @@
             "supplier_p_kWh": 0.611,
             "supplier_gbp": 93.12,
             "households_prc": 86.3,
-            "wholesale_adjustment_p_kWh": 0.197
+            "wholesale_adjustment_p_kWh": 0
         },
         "vat_prc": 5,
         "road_fuel": {

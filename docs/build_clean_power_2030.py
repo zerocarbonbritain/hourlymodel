@@ -159,6 +159,12 @@ def build(pathway):
         prices[key] = round(existing * old + (1 - existing) * strike[key], 2)
         print(f"  {key}: {existing:.3f} existing at {old}, rest at {strike[key]}, blended {prices[key]}")
 
+    # The 2024 wholesale adjustments reflect power and gas bought forward in 2023 and the
+    # domestic profile. They are specific to 2024, so they are zero here, as in other scenarios.
+    # clean_power_2030_retail.py keeps the 2024 electricity value as a sensitivity.
+    s["retail"]["electricity"]["wholesale_adjustment_p_kWh"] = 0
+    s["retail"]["gas"]["wholesale_adjustment_p_kWh"] = 0
+
     # Batteries and long duration storage as one store, at NESO's combined round trip
     st = s["electric_storage"]
     st["capacity_GWh"] = round(p["battery_GWh"] + p["ldes_GWh"], 1)

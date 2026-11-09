@@ -90,6 +90,10 @@ sens["No export earnings"] = (0, -central["Export earnings (gap to NESO net trad
 n = cp["retail"]["electricity"]["network"]
 neso_transmission = 4.6835 * 6 * n["annual_share"] + (3.682 - 1.7)
 sens["NESO 2030 transmission and constraints, not £1,100/kW"] = (0, neso_transmission - n["transmission_bn"] - n["constraints_bn"])
+# The 2024 wholesale adjustment, zero in the scenario. Part of it is the cost of the domestic
+# demand profile, which persists. The rest is power bought forward in 2023.
+wa = s_base["retail"]["electricity"]["wholesale_adjustment_p_kWh"]
+sens["2024 wholesale adjustment kept"] = (0, wa * 0.01 * billed)
 # Storage: build-up prices long duration storage per kWh as batteries
 storage = gc["storage"]["annual"]
 sens["Storage cost 0 to 30% lower"] = (-0.3 * storage, 0)
