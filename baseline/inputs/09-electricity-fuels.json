@@ -78,43 +78,72 @@
         "round": 1,
         "note": "Oil generation over fuel used. Without it the ZCB default of 21% applies."
     },
+    "electric_backup.prc_waste": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Other (thermal) [note 3]"},
+            "total": {"ref": "_fuels.dispatchable_generation_GWh"}
+        },
+        "formula": "generation / total * 100",
+        "round": 2,
+        "note": "Other thermal share of dispatchable generation. DUKES 5.6 note 3: mainly non-biodegradable waste, with coke oven gas, blast furnace gas and chemical waste for other generators. Biodegradable waste is in bioenergy."
+    },
     "electric_backup.prc_coal": {
         "type": "statistic",
         "units": "%",
         "values": {
             "methane": {"ref": "electric_backup.prc_methane"},
             "biomass": {"ref": "electric_backup.prc_biomass"},
-            "oil": {"ref": "electric_backup.prc_synth_fuel"}
+            "oil": {"ref": "electric_backup.prc_synth_fuel"},
+            "waste": {"ref": "electric_backup.prc_waste"}
         },
-        "formula": "100 - methane - biomass - oil",
+        "formula": "100 - methane - biomass - oil - waste",
         "round": 2,
-        "note": "Coal plus other thermal (mainly non biodegradable waste), taken as the remainder so the shares sum to 100. Calculated directly it is 6.03."
+        "note": "Coal, taken as the remainder so the shares sum to 100. Ratcliffe, the last coal station, closed in September 2024."
     },
     "electric_backup.coal_efficiency": {
         "type": "statistic",
         "units": "%",
         "values": {
-            "coal_gen": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Coal (thermal)"},
-            "other_gen": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Other (thermal) [note 3]"},
-            "coal_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Coal (thermal)"},
-            "other_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Other (thermal) [note 3]"}
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Coal (thermal)"},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Coal (thermal)"}
         },
-        "formula": "(coal_gen + other_gen) / (coal_fuel + other_fuel) * 100",
+        "formula": "generation / fuel * 100",
+        "round": 1
+    },
+    "electric_backup.waste_efficiency": {
+        "type": "statistic",
+        "units": "%",
+        "values": {
+            "generation": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Generation" ], "column": "Other (thermal) [note 3]"},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Other (thermal) [note 3]"}
+        },
+        "formula": "generation / fuel * 100",
         "round": 1,
-        "note": "Coal and other thermal together, matching prc_coal, which covers both."
+        "note": "Other thermal generation over fuel used."
     },
     "electric_backup.coal_co2_factor": {
         "type": "statistic",
         "units": "kgCO2/kWh fuel",
         "values": {
-            "co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "GHG grouped": "CO2", "Territorial Emissions Statistics category": [ "Power stations - coal", "Power stations - municipal solid waste", "Power stations - other fuel" ]}
-            },
-            "coal_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Coal (thermal)"},
-            "other_fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Other (thermal) [note 3]"}
+            "co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "GHG grouped": "CO2", "Territorial Emissions Statistics category": ["Power stations - coal"] }},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Coal (thermal)"}
         },
-        "formula": "co2 * 1000 / (coal_fuel + other_fuel)",
+        "formula": "co2 * 1000 / fuel",
         "round": 4,
-        "note": "Power station CO2 from coal, municipal solid waste and other fuels over coal and other thermal fuel used (DUKES 5.6, GWh). Matches prc_coal and coal_efficiency, which cover the same plants. Municipal solid waste CO2 therefore stays out of emissions_balance."
+        "note": "Power station coal CO2 over coal fuel used (DUKES 5.6, GWh)."
+    },
+    "electric_backup.waste_co2_factor": {
+        "type": "statistic",
+        "units": "kgCO2/kWh fuel",
+        "values": {
+            "co2": {"source": "ghg_by_source", "sheet": "UK_by_source", "sum": "Emissions (MtCO2e)", "where": { "Year": "{year}", "Included in UK territorial total": "Yes", "GHG grouped": "CO2", "Territorial Emissions Statistics category": ["Power stations - municipal solid waste", "Power stations - other fuel"] }},
+            "fuel": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": [ "All generating companies", "Fuel used" ], "column": "Other (thermal) [note 3]"}
+        },
+        "formula": "co2 * 1000 / fuel",
+        "round": 4,
+        "note": "Power station CO2 from municipal solid waste and other fuels over other thermal fuel used (DUKES 5.6, GWh). Municipal solid waste CO2 therefore stays out of emissions_balance. Coke oven and blast furnace gas CO2 is in iron and steel."
     },
     "electric_backup.hydrogen_efficiency": {
         "type": "assumption",

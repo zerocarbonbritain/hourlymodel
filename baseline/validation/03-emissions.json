@@ -35,9 +35,10 @@
             "values": {
                 "a": "emissions_balance.fossil_fuel_coal",
                 "b": "emissions_balance.fossil_fuel_oil",
-                "c": "emissions_balance.fossil_fuel_gas"
+                "c": "emissions_balance.fossil_fuel_gas",
+                "w": "emissions_balance.energy_from_waste"
             },
-            "formula": "a + b + c"
+            "formula": "a + b + c + w"
         },
         "tolerance": 0.03,
         "basis": "independent",
@@ -100,9 +101,10 @@
         },
         "model": {
             "values": {
-                "a": "emissions_balance.fossil_fuel_coal"
+                "a": "emissions_balance.fossil_fuel_coal",
+                "w": "emissions_balance.energy_from_waste"
             },
-            "formula": "a"
+            "formula": "a + w"
         },
         "tolerance": 0.1,
         "basis": "independent",

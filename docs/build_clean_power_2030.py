@@ -177,7 +177,7 @@ def build(pathway):
 
     # Dispatchable generation shares. Gas includes CHP and the small hydrogen and CCS output.
     # Bioenergy includes biodegradable waste and other renewables (landfill and sewage gas),
-    # as in the baseline. Non-biodegradable waste goes in the coal and other thermal share.
+    # as in the baseline. Non-biodegradable waste is energy from waste. There is no coal.
     gas = p["gas_TWh"] + p["gas_chp_TWh"] + p["hydrogen_TWh"]
     bio = p["biomass_TWh"] + p["waste_TWh"] * WASTE_BIODEGRADABLE + p["other_renewables_TWh"]
     other = p["waste_TWh"] * (1 - WASTE_BIODEGRADABLE)
@@ -185,7 +185,8 @@ def build(pathway):
     eb = s["electric_backup"]
     eb["prc_methane"] = round(gas / total * 100, 2)
     eb["prc_biomass"] = round(bio / total * 100, 2)
-    eb["prc_coal"] = round(100 - eb["prc_methane"] - eb["prc_biomass"], 2)
+    eb["prc_waste"] = round(100 - eb["prc_methane"] - eb["prc_biomass"], 2)
+    eb["prc_coal"] = 0
     eb["prc_synth_fuel"] = 0
     eb["ccgt_capacity_GW"] = 35
 

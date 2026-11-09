@@ -289,7 +289,7 @@ The hourly price needs a value for hydrogen and for turbine fuel. Both are deriv
 
 - **Hydrogen.** In hours with spare power electricity is free, and electrolysers earn the full value of their hydrogen. In other hours they pay what the hydrogen is worth and earn nothing. They break even when the hydrogen made in zero price hours pays for the electrolysers, compressors and hydrogen store, so the value is their annual cost over that hydrogen. In zcb_2024 this is £8.21bn over 75.9 TWh, £108/MWh. Hydrogen then costs exactly what it is worth, so fuel users and the hourly price see the same number.
 - **Methane.** Methanation is the source that can make more, as biogas is fixed by the scenario. The value is the hydrogen it uses at the value above plus the methanation plant and CO2 store, per MWh of methane it makes, plus the methane stores per MWh of methane used: £177/MWh in zcb_2024. With no methanation it is biogas, at the cost of digestion and feedstock. Methane users pay the average production cost, £152, which blends in cheaper biogas.
-- **Turbine fuel.** Turbines burn that methane or fossil gas. Fossil gas is worth its price plus the carbon price, £45/MWh in baseline_2024. The value is weighted by what the turbines burned (`turbine_fossil_share`), which is all fossil gas in baseline_2024, clean_power_2030 and deployed_tech. Biomass, oil and coal turbines are priced as gas turbines.
+- **Turbine fuel.** Turbines burn that methane or fossil gas. Fossil gas is worth its price plus the carbon price, £45/MWh in baseline_2024. The value is weighted by what the turbines burned (`turbine_fossil_share`), which is all fossil gas in baseline_2024, clean_power_2030 and deployed_tech. Biomass, oil, coal and energy from waste turbines are priced as gas turbines.
 - **Synthetic fuel.** Hydrogen at 0.61 times its value, biomass at 1.3 times its price, and the FT plant cost per MWh. This is £130/MWh in zcb_2024, against a production cost of £132.
 
 | £/MWh | zcb_2024 | zcb_2024_high_demand | baseline_2024 |
@@ -320,6 +320,7 @@ Prices and taxes:
 - **Household gas, delivered.** The Ofgem cap components and QEP 3.2.1 commodity price in baseline_2024, with the standing charge spread over use. Validation compares this with the baseline's household gas spend.
 - **Services and industry gas, delivered.** QEP 3.4.1 and 3.4.2 average non-domestic prices: 5.376 p/kWh excluding Climate Change Levy and 5.667 p/kWh including it.
 - **Coal outside power stations.** 1.399 p/kWh, the QEP 3.2.1 power station price. No retail or industrial price is sourced. At £0.3bn it has little effect on the total.
+- **Energy from waste fuel.** No fuel price. Plants are paid gate fees to take waste, and the model leaves these out. Its carbon is priced at `waste_co2_factor`. In 2024 the plants are paid the CCGT capture price plus energy from waste CfD payments (£85.50/MWh), and coal the CCGT capture price alone (£85.04/MWh). Until 2026-11-09 waste fuel was costed at the coal price in the build-up, £0.38bn/yr in baseline_2024.
 - **Power station fuel.** QEP 3.2.1 prices. The only carbon cost is the £55.18/tCO2 paid by power stations on 40.03 MtCO2.
 
 UK ETS costs for industry and aviation also applied in 2024. They are left out, as free allocation means the net cost is not known from the sources used here. Road fuel and household gas paid no carbon price.

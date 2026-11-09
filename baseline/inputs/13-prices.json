@@ -502,7 +502,7 @@
         "round": 2,
         "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price plus support payments. "
     },
-    "generation_costs.price_gbp_MWh.coal_other": {
+    "generation_costs.price_gbp_MWh.coal": {
         "type": "statistic",
         "years": [
             2024
@@ -511,7 +511,23 @@
         "values": {
             "capture": {
                 "value": 85.04,
-                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT, as a proxy for coal and waste plant"
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT, as a proxy for coal plant"
+            }
+        },
+        "formula": "capture",
+        "round": 2,
+        "note": "Average price paid per MWh generated in 2024: wholesale value at the technology's capture price. Coal had no support."
+    },
+    "generation_costs.price_gbp_MWh.waste": {
+        "type": "statistic",
+        "years": [
+            2024
+        ],
+        "units": "£/MWh",
+        "values": {
+            "capture": {
+                "value": 85.04,
+                "cite": "Generation weighted mean of the LCCC intermittent market reference price (GB day ahead hourly, dp.lowcarboncontracts.uk resource d0e58993-d8b2-4ab5-90e0-518b1e7b2f1e) over 2024, weighted by Elexon FUELHH half hourly generation for CCGT, as a proxy for energy from waste plant"
             },
             "support": {
                 "ref": "_prices.support_other_thermal"

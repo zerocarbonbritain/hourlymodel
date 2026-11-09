@@ -21,7 +21,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1876.5196809999998,
-   "model_at_build": 1832.6162705741528,
+   "model_at_build": 1832.6193328974266,
    "sources": [
     "supply = 169158.49 (DUKES_1.1.xlsx, 2024!K10)",
     "bunkers = -2054.95 (DUKES_1.1.xlsx, 2024!K8)",
@@ -411,15 +411,16 @@
    "id": "energy.coal_demand",
    "model": {
     "values": {
-     "a": "fossil_fuels.coal"
+     "a": "fossil_fuels.coal",
+     "w": "electric_backup.waste_fuel"
     },
-    "formula": "a / 10000"
+    "formula": "(a + w) / 10000"
    },
-   "note": "The model's coal backup share also covers other thermal generation, mainly waste, so DUKES 5.6 other thermal fuel is added to the observed coal. Blast furnace and coke oven fuel is included on both sides.",
+   "note": "DUKES 5.6 other thermal fuel, mainly waste, is added to the observed coal, and the model's energy from waste fuel to the model coal. Blast furnace and coke oven fuel is included on both sides.",
    "issue": "",
    "status_at_build": "ok",
    "observed": 58.1519296,
-   "model_at_build": 53.40181565156001,
+   "model_at_build": 53.404877974833475,
    "sources": [
     "coal = 1446.3 (DUKES_1.1.xlsx, 2024!B12)",
     "manufactured = 1096.92 (DUKES_1.1.xlsx, 2024!C12)",
@@ -633,11 +634,11 @@
   },
   {
    "group": "Electricity",
-   "label": "Coal and other thermal generation",
+   "label": "Coal generation",
    "units": "TWh/yr",
    "tolerance": 0.05,
    "basis": "independent",
-   "id": "electricity.coal_other",
+   "id": "electricity.coal",
    "model": {
     "values": {
      "a": "electric_backup.total_coal_turbine_output"
@@ -647,11 +648,32 @@
    "note": "",
    "issue": "",
    "status_at_build": "warn",
-   "observed": 8.2899657,
-   "model_at_build": 7.748776674647464,
+   "observed": 2.0400817,
+   "model_at_build": 1.9050148635346265,
    "sources": [
-    "c = 2040.0817 (DUKES_5.6.xlsx, 5.6 Annual summaries!C523)",
-    "o = 6249.884 (DUKES_5.6.xlsx, 5.6 Annual summaries!H523)"
+    "g = 2040.0817 (DUKES_5.6.xlsx, 5.6 Annual summaries!C523)"
+   ]
+  },
+  {
+   "group": "Electricity",
+   "label": "Other thermal generation (mainly waste)",
+   "units": "TWh/yr",
+   "tolerance": 0.05,
+   "basis": "independent",
+   "id": "electricity.waste",
+   "model": {
+    "values": {
+     "a": "electric_backup.total_waste_turbine_output"
+    },
+    "formula": "a / 10000"
+   },
+   "note": "",
+   "issue": "",
+   "status_at_build": "warn",
+   "observed": 6.249884,
+   "model_at_build": 5.843761811112853,
+   "sources": [
+    "g = 6249.884 (DUKES_5.6.xlsx, 5.6 Annual summaries!H523)"
    ]
   },
   {
@@ -693,7 +715,7 @@
    "issue": "The model peak is higher than any year in DUKES 5.10 since 2010 (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 47.361,
-   "model_at_build": 55.18838121534326,
+   "model_at_build": 55.18838121534325,
    "sources": [
     "p = 47361 (DUKES_5.10.xlsx, 5.10.A!AE7)"
    ]
@@ -850,7 +872,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 414.640274014361,
-   "model_at_build": 404.1956979043267,
+   "model_at_build": 404.1967742884858,
    "sources": [
     "t = 414.640274 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 2456 rows where {\"Year\": \"2024\"})"
    ]
@@ -866,15 +888,16 @@
     "values": {
      "a": "emissions_balance.fossil_fuel_coal",
      "b": "emissions_balance.fossil_fuel_oil",
-     "c": "emissions_balance.fossil_fuel_gas"
+     "c": "emissions_balance.fossil_fuel_gas",
+     "w": "emissions_balance.energy_from_waste"
     },
-    "formula": "a + b + c"
+    "formula": "a + b + c + w"
    },
    "note": "CO2 from gaseous, petroleum and solid fuels including international bunkers, plus non biogenic waste burned for power, which the model includes in coal backup.",
    "issue": "",
    "status_at_build": "ok",
    "observed": 326.55450446290166,
-   "model_at_build": 318.142008777054,
+   "model_at_build": 318.1430851612131,
    "sources": [
     "fuel = 319.4861626 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 235 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": [\"Gaseous fuels\", \"Petroleum\", \"Coal\", \"Other solid fuels\"]} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
     "waste = 7.068341841 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 1 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel group\": \"Other emissions\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
@@ -935,15 +958,16 @@
    "id": "emissions.coal_co2",
    "model": {
     "values": {
-     "a": "emissions_balance.fossil_fuel_coal"
+     "a": "emissions_balance.fossil_fuel_coal",
+     "w": "emissions_balance.energy_from_waste"
     },
-    "formula": "a"
+    "formula": "a + w"
    },
    "note": "Other gases are blast furnace and coke oven gas, made from coal. Petroleum coke in refineries is in the oil check, and sinter, process and coke production CO2 are inputs.",
    "issue": "",
    "status_at_build": "ok",
    "observed": 16.812349539219763,
-   "model_at_build": 15.77964192707703,
+   "model_at_build": 15.7807183112361,
    "sources": [
     "coal = 3.593506516 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 26 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Coal\"} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
     "solid = 4.988806051 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 19 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Fuel\": \"Other solid fuels\"} and not {\"Territorial Emissions Statistics category\": [\"Sinter production\", \"Iron and steel production processes\", \"Iron and steel - coke production\"]})",
@@ -969,7 +993,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 36.98354548196988,
-   "model_at_build": 40.02868866052658,
+   "model_at_build": 40.029765044685654,
    "sources": [
     "e = 36.98354548 (final-greenhouse-gas-emissions-2024-by-source-datasets.xlsx, UK_by_source!sum of 6 rows where {\"Year\": \"2024\", \"GHG grouped\": \"CO2\", \"Territorial Emissions Statistics sector\": \"Electricity supply\"})"
    ]
@@ -994,7 +1018,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 153.7,
-   "model_at_build": 151.54268694510125,
+   "model_at_build": 151.546761976113,
    "sources": [
     "g = 153.7 (DUKES_5.14.xlsx, 5.14!AD8)"
    ]
@@ -1402,7 +1426,7 @@
    "issue": "The build-up is what the 2024 system would cost to build today. Consumers paid wholesale prices set by gas plant, support for older renewables and, in 2024, power bought forward in 2023. The 2024 prices check below rebuilds what was paid (open-items.md, Model).",
    "status_at_build": "known",
    "observed": 16.358265549176576,
-   "model_at_build": 14.39934819621999,
+   "model_at_build": 14.260044883872915,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1428,7 +1452,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 16.358265549176576,
-   "model_at_build": 16.74358497126743,
+   "model_at_build": 16.743259372817377,
    "sources": [
     "df = 368.0268726 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T31:W31)",
     "cm = 20.77475416 (Default-tariff-cap-level-v1.31.xlsx, 1b Historical level tables!mean of T32:W32)",
@@ -1475,7 +1499,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 25.82700021794268,
-   "model_at_build": 26.80332129393566,
+   "model_at_build": 26.802959757556682,
    "sources": [
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)"
    ]
@@ -1520,7 +1544,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1083.2274977667098,
-   "model_at_build": 1057.9379427438125,
+   "model_at_build": 1057.9256505069272,
    "sources": [
     "b = 1083.227498 (table_221__1_.xlsx, 2.2.1!M24)"
    ]
@@ -1631,7 +1655,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 30.07343406773285,
-   "model_at_build": 30.731923291812656,
+   "model_at_build": 30.731565345977973,
    "sources": [
     "e = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
     "u = 0.2582700022 (table_224__1_.xlsx, 2.2.4!J253)",
@@ -1656,7 +1680,7 @@
    "issue": "ONS spend is about 13% below DUKES use at QEP prices for 2024, so the two observed series disagree (open-items.md, Observed data).",
    "status_at_build": "known",
    "observed": 26.289,
-   "model_at_build": 30.731923291812656,
+   "model_at_build": 30.731565345977973,
    "sources": [
     "s = 26289 (table_261.xlsx, 2.6.1!D62)"
    ]
@@ -1997,7 +2021,7 @@
    "issue": "Non-domestic users paid 25.7 p/kWh in 2024 (QEP 3.4.1) and pay 22.7 p/kWh in the model. The model charges them generation, the 2024 wholesale adjustment, their network share, a supplier cost per customer and the supplier margin. Observed prices also carry fixed price contracts signed in 2022 and 2023, broker commissions and a non-domestic cost to serve, none of which is sourced. Modelled non-domestic use is also 4% low. Before 2026-11-09 the model applied the domestic supplier and policy rates to every kWh, which closed the gap for the wrong reason (open-items.md, Cost model).",
    "status_at_build": "known",
    "observed": 74.24371058392231,
-   "model_at_build": 67.94889465287429,
+   "model_at_build": 67.94796795839392,
    "sources": [
     "all = 23298.55 (DUKES_1.1.xlsx, 2024!I35)",
     "dom = 8058.6 (DUKES_1.1.xlsx, 2024!I57)",
@@ -2048,7 +2072,7 @@
    "issue": "",
    "status_at_build": "ok",
    "observed": 1,
-   "model_at_build": 0.9999708573686881,
+   "model_at_build": 0.9999713694273064,
    "sources": [
     "one = 1 (published: The stored 2024 tax should equal the tax in the live baseline run)"
    ]

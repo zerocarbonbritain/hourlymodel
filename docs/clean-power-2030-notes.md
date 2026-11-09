@@ -27,7 +27,7 @@ Supply:
 - Wind availability is set so output before curtailment matches NESO: offshore 44.5% and onshore 29.3% load factor. NESO's solar load factor of 12.0% would need an availability of 1.27, above the potential in the weather data. Solar availability is capped at 1, which gives 9.4%.
 - Batteries (27.4 GW, 48.9 GWh) and long duration storage (7.9 GW, 98.9 GWh) form one store of 35.2 GW and 147.8 GWh. Charge and discharge efficiencies are 0.837, from NESO's combined round trip of 70%.
 - Interconnectors 12.45 GW. Unabated gas capacity 35 GW, as CCGT.
-- Dispatchable output is split as in NESO: gas including CHP and the small hydrogen and CCS output 45.1%, bioenergy 44.3%, non-biodegradable waste 10.6% (the baseline's coal and other thermal share). Half of energy from waste is taken as biodegradable. NESO's other renewables (mainly landfill and sewage gas) count as bioenergy, as in the baseline.
+- Dispatchable output is split as in NESO: gas including CHP and the small hydrogen and CCS output 45.1%, bioenergy 44.3%, non-biodegradable waste 10.6% (energy from waste, the baseline's other thermal share). There is no coal. Half of energy from waste is taken as biodegradable. NESO's other renewables (mainly landfill and sewage gas) count as bioenergy, as in the baseline.
 
 Demand:
 
@@ -119,7 +119,7 @@ The script uses the model's flows and its own cost inputs ([cost-assumptions.md]
 Model values are per MWh of 307.7 TWh of useful energy (UK). The totals agree within 2%. The components differ:
 
 - **Capacity.** The model's £26.6bn is £15.1bn of capital on new capacity, £10.9bn of fixed O&M and £0.5bn of variable O&M. Offshore wind is £15.1bn of it. NESO does not publish its capacity cost by technology, so the close match may hide offsetting differences. NESO counts interconnector capital as generation capital. The model has no interconnector cost, but prices the 99 GWh of long duration storage at battery cost per kWh (£147/kWh), well above pumped hydro. It also includes the 1 TWh hydrogen store (£0.2bn). With the DESNZ levelised method that the model uses by default, capital is £1.0bn higher, because it charges interest during pre-development and construction.
-- **Fuel and carbon.** The model burns about half as much gas and biomass as NESO, because its CHP and energy from waste run only when renewables fall short (see differences above). Gas is priced at the same 100 p/therm. Emissions are 8.7 MtCO2 against NESO's 5.2 Mt excluding BECCS, as the model counts non-biodegradable waste with the coal factor.
+- **Fuel and carbon.** The model burns about half as much gas and biomass as NESO, because its CHP and energy from waste run only when renewables fall short (see differences above). Gas is priced at the same 100 p/therm. Emissions are 9.0 MtCO2 against NESO's 5.2 Mt excluding BECCS. The model's waste efficiency is the 2024 value of 21.8%, and it counts non-biodegradable waste CO2 at the 2024 inventory factor of 0.247 kgCO2/kWh.
 - **Trade.** The model buys 21.6 TWh of imports at the scenario's import price (£76/MWh) and has no exports. NESO earns enough from 57.6 TWh of exports to be a net earner. The model's 51.6 TWh of excess has no value.
 
 ### Investment

@@ -157,20 +157,38 @@
         "tolerance": 0.05,
         "basis": "independent"
     },
-    "electricity.coal_other": {
+    "electricity.coal": {
         "group": "Electricity",
-        "label": "Coal and other thermal generation",
+        "label": "Coal generation",
         "units": "TWh/yr",
         "observed": {
             "values": {
-                "c": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Coal (thermal)"},
-                "o": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Other (thermal)"}
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Coal (thermal)"}
             },
-            "formula": "(c + o) / 1000"
+            "formula": "g / 1000"
         },
         "model": {
             "values": {
                 "a": "electric_backup.total_coal_turbine_output"
+            },
+            "formula": "a / 10000"
+        },
+        "tolerance": 0.05,
+        "basis": "independent"
+    },
+    "electricity.waste": {
+        "group": "Electricity",
+        "label": "Other thermal generation (mainly waste)",
+        "units": "TWh/yr",
+        "observed": {
+            "values": {
+                "g": {"source": "dukes_5.6", "sheet": "5.6 Annual summaries", "block": "Table 5.6.J {year} summary", "row": ["All generating companies", "Generation"], "column": "Other (thermal)"}
+            },
+            "formula": "g / 1000"
+        },
+        "model": {
+            "values": {
+                "a": "electric_backup.total_waste_turbine_output"
             },
             "formula": "a / 10000"
         },

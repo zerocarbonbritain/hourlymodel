@@ -106,9 +106,11 @@ function report() {
     let gas_fuel = o.methane.ccgt_methane_from_fossil_gas * k;           // TWh/yr
     let biomass_fuel = o.electric_backup.total_biomass_turbine_output * k / (i.electric_backup.biomass_efficiency * 0.01);
     let coal_fuel = o.fossil_fuels.coal_for_dispatchable * k;
+    let waste_fuel = o.electric_backup.waste_fuel * k;                   // no fuel price
     let gas_price = NESO.gas_p_therm * P_THERM_TO_P_KWH;                 // p/kWh
     let fuel = 0.01 * (gas_fuel * gas_price + biomass_fuel * i.fuel_prices.biomass + coal_fuel * i.fuel_prices.coal);
-    let co2 = gas_fuel * i.co2_factors.gas + coal_fuel * i.electric_backup.coal_co2_factor;  // Mt
+    let co2 = gas_fuel * i.co2_factors.gas + coal_fuel * i.electric_backup.coal_co2_factor
+        + waste_fuel * i.electric_backup.waste_co2_factor;  // Mt
     let carbon_neso = co2 * NESO.carbon_gbp_t * 0.001;
     let carbon_model = co2 * i.carbon_price * 0.001;
 

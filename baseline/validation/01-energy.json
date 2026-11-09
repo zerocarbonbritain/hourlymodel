@@ -376,13 +376,14 @@
         },
         "model": {
             "values": {
-                "a": "fossil_fuels.coal"
+                "a": "fossil_fuels.coal",
+                "w": "electric_backup.waste_fuel"
             },
-            "formula": "a / 10000"
+            "formula": "(a + w) / 10000"
         },
         "tolerance": 0.1,
         "basis": "independent",
-        "note": "The model's coal backup share also covers other thermal generation, mainly waste, so DUKES 5.6 other thermal fuel is added to the observed coal. Blast furnace and coke oven fuel is included on both sides."
+        "note": "DUKES 5.6 other thermal fuel, mainly waste, is added to the observed coal, and the model's energy from waste fuel to the model coal. Blast furnace and coke oven fuel is included on both sides."
     },
     "energy.bioenergy_demand": {
         "group": "Energy balance",

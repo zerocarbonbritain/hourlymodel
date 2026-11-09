@@ -340,6 +340,9 @@
         "prc_coal": 0,
         "coal_efficiency": 34,
         "coal_co2_factor": 0.3166,
+        "prc_waste": 0,
+        "waste_efficiency": 21.8,
+        "waste_co2_factor": 0.2469,
         "ccgt_derating_factor": 1,
         "ocgt_derating_factor": 1,
         "prc_imports": 0
@@ -496,7 +499,8 @@
             "imports": null,
             "gas": null,
             "biomass": null,
-            "coal_other": null,
+            "coal": null,
+            "waste": null,
             "oil": null,
             "hydrogen": null,
             "storage": null

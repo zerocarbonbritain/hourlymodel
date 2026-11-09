@@ -209,7 +209,9 @@ Object.assign(model, {
         let backup_fuel = {
             gas: [o.methane.ccgt_methane_from_fossil_gas, i.fuel_prices.gas, i.co2_factors.gas],
             oil: [o.synth_fuel.backup_from_fossil_oil, i.fuel_prices.oil, i.co2_factors.fuel_oil],
-            coal_other: [o.fossil_fuels.coal_for_dispatchable, i.fuel_prices.coal, i.electric_backup.coal_co2_factor],
+            coal: [o.fossil_fuels.coal_for_dispatchable, i.fuel_prices.coal, i.electric_backup.coal_co2_factor],
+            // Waste has no fuel price. Gate fees are left out.
+            waste: [o.electric_backup.waste_fuel, 0, i.electric_backup.waste_co2_factor],
             biomass: [biomass_for_backup, i.fuel_prices.biomass, 0]
         }
         o.fuel_cost_annual = 0
@@ -273,7 +275,8 @@ Object.assign(model, {
             imports: [o.supply.total_imports, null],
             gas: [eb.total_methane_turbine_output, () => turbine_share(eb.total_methane_turbine_output) + backup.fuel_annual.gas],
             biomass: [eb.total_biomass_turbine_output, () => turbine_share(eb.total_biomass_turbine_output) + backup.fuel_annual.biomass],
-            coal_other: [eb.total_coal_turbine_output, () => turbine_share(eb.total_coal_turbine_output) + backup.fuel_annual.coal_other],
+            coal: [eb.total_coal_turbine_output, () => turbine_share(eb.total_coal_turbine_output) + backup.fuel_annual.coal],
+            waste: [eb.total_waste_turbine_output, () => turbine_share(eb.total_waste_turbine_output) + backup.fuel_annual.waste],
             oil: [eb.total_synth_fuel_turbine_output, () => turbine_share(eb.total_synth_fuel_turbine_output) + backup.fuel_annual.oil],
             hydrogen: [eb.total_hydrogen_turbine_output, () => turbine_share(eb.total_hydrogen_turbine_output)],
             storage: [o.electric_storage.total_discharge, ['Electric Storage', 'Battery inverter']]
@@ -1285,7 +1288,7 @@ Object.assign(model, {
         // the extra warming from aviation above its CO2 (the uplift also applies to synthetic jet
         // fuel). Land use and other non-energy emissions are outside this cost boundary.
         let eb = o.emissions_balance
-        let carbon_MtCO2e = eb.fossil_fuel_coal + eb.fossil_fuel_gas + eb.fossil_fuel_oil + eb.international_aviation_bunkers
+        let carbon_MtCO2e = eb.fossil_fuel_coal + eb.fossil_fuel_gas + eb.fossil_fuel_oil + eb.energy_from_waste + eb.international_aviation_bunkers
         let carbon_bn = carbon_MtCO2e * society.carbon_value_gbp_tCO2e * 0.001
 
         o.total_cost.society = {

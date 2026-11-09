@@ -1121,9 +1121,17 @@ input[type='text'] {
             <td>{{ (o.electric_backup.total_coal_turbine_output*o.GWh_to_TWhy)/(i.electric_backup.coal_efficiency*0.01) | toFixed(1) }}</td>
             <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_coal*0.01 | toFixed(1) }} GW ({{ o.electric_backup.max_capacity_requirement_at_turbine*i.electric_backup.prc_coal*0.01 | toFixed(1) }} GW)</td>
         </tr>
+        <tr>
+            <td>Energy from waste (non-biodegradable)</td>
+            <td><input v-model.number="i.electric_backup.prc_waste" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            <td>{{ o.electric_backup.total_waste_turbine_output*o.GWh_to_TWhy | toFixed(1) }}</td>
+            <td><input v-model.number="i.electric_backup.waste_efficiency" type="text" @change="update" style="width:70px"  autocomplete="off"/></td>
+            <td>{{ o.electric_backup.waste_fuel*o.GWh_to_TWhy | toFixed(1) }}</td>
+            <td>{{ o.electric_backup.max_capacity_requirement*i.electric_backup.prc_waste*0.01 | toFixed(1) }} GW ({{ o.electric_backup.max_capacity_requirement_at_turbine*i.electric_backup.prc_waste*0.01 | toFixed(1) }} GW)</td>
+        </tr>
         </table>
         <p>Interconnector imports meet <input v-model.number="i.electric_backup.prc_imports" type="text" @change="update" style="width:50px"  autocomplete="off"/> % of the backup requirement, up to <input v-model.number="i.supply.interconnector_capacity_GW" type="text" @change="update" style="width:50px"  autocomplete="off"/> GW interconnector capacity. Total imports, including any flat imports: {{ o.supply.total_imports*o.GWh_to_TWhy | toFixed(1) }} TWh/yr</p>
-        <p>Coal backup CO2 factor (coal and other thermal): <input v-model.number="i.electric_backup.coal_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/> kgCO2/kWh fuel</p>
+        <p>CO2 factors, kgCO2/kWh fuel: coal <input v-model.number="i.electric_backup.coal_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/>, energy from waste <input v-model.number="i.electric_backup.waste_co2_factor" type="text" @change="update" style="width:70px"  autocomplete="off"/>. Biodegradable waste is in biomass.</p>
         
         <p>Capacity required is the highest hourly need at the user. The figure in brackets is the same peak at the turbine, before grid losses and own use. Costs use the figure at the turbine, divided by a de-rating factor for plant outages.</p>
         <p>Max capacity requirement date: {{ o.electric_backup.max_capacity_requirement_date }}</p>
@@ -1458,6 +1466,10 @@ input[type='text'] {
             <tr>
                 <td>Fossil fuels: Coal</td>
                 <td>{{ o.emissions_balance.fossil_fuel_coal | toFixed(2) }} </td>
+            </tr>
+            <tr>
+                <td>Energy from waste</td>
+                <td>{{ o.emissions_balance.energy_from_waste | toFixed(2) }} </td>
             </tr>
             <tr>
                 <td></td>

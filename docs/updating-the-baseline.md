@@ -162,8 +162,8 @@ The baseline represents today's fossil generation as "backup" filling the gap le
 
 This step is scripted in `baseline/inputs/09-electricity-fuels.json`.
 
-- `electric_backup.prc_methane / prc_biomass / prc_coal / prc_synth_fuel`: shares of dispatchable generation (all thermal generation except nuclear) from the DUKES 5.6 annual summaries, all generating companies. `prc_coal` covers coal plus other thermal (mainly waste) and is the remainder, so the shares sum to 100. `_efficiency` values are generation over fuel used from the same table.
-- `synth_fuel_efficiency` is oil generation over fuel used. `coal_efficiency` covers coal and other thermal together, to match `prc_coal`. `coal_co2_factor` is power station CO2 from coal, municipal solid waste and other fuels (greenhouse gas by source dataset) over coal and other thermal fuel used, since waste dominates this share.
+- `electric_backup.prc_methane / prc_biomass / prc_synth_fuel / prc_waste / prc_coal`: shares of dispatchable generation (all thermal generation except nuclear) from the DUKES 5.6 annual summaries, all generating companies. `prc_waste` is other thermal (mainly non-biodegradable waste). `prc_coal` is the remainder, so the shares sum to 100. `_efficiency` values are generation over fuel used from the same table.
+- `synth_fuel_efficiency` is oil generation over fuel used. `coal_co2_factor` is power station coal CO2 (greenhouse gas by source dataset) over coal fuel used. `waste_co2_factor` is power station CO2 from municipal solid waste and other fuels over other thermal fuel used.
 - `fuel_prices`: prices paid by major power producers for gas, oil and coal (DESNZ Quarterly Energy Prices table 3.2.1), used for the fuel part of the LCOE.
 - `fossil_fuels.allow_use_for_backup` must be 1 for a baseline.
 - `fossil_fuels.other_gas_use`: the ECUK U2 industry "unknown (other)" gas. `other_oil_use` and `other_coal_use`: the oil and coal of that row. Do not include gas losses here, the model calculates them.
@@ -246,7 +246,7 @@ Headline figures gathered from the latest editions, to seed the workbook update.
 
 Changes since 2018 that need more than a value refresh:
 
-- **Coal.** `electric_backup.prc_coal` goes to 0 and gas takes the remaining dispatchable share.
+- **Coal.** `electric_backup.prc_coal` goes to 0 and gas takes the remaining dispatchable share. Other thermal stays in `prc_waste`.
 - **EV shares.** `transport.modes.*.prc.EV` at 1.25% for cars is far below the current fleet share, take vehicle licensing statistics (DfT table VEH) or ECUK C8 fuel data.
 - **Heat pumps.** `heating_systems.heatpump.share` (3.58% in 2018) should be rederived from the ECUK end use tables and DUKES 6.1 ambient heat rows.
 - **Interconnector imports.** Net imports were 29.7 TWh in 2025 against 20.1 TWh in 2018. The 2018 workbook folded imports into backup generation. Use `electric_backup.prc_imports` and `supply.interconnector_capacity_GW` instead.

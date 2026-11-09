@@ -127,7 +127,7 @@ eff = s_base["electric_backup"]["methane_efficiency"] * 0.01
 gas_2024 = s_base["fuel_prices"]["gas"]
 exposed_base = base["supply"]["total_electricity_before_grid_loss"] * k
 exposed_cp = (base["supply"]["total_offshore_wind"] + base["supply"]["total_onshore_wind"] + base["supply"]["total_solarpv"]) * k \
-    + sum(gc[t]["generation"] for t in ("nuclear", "hydro", "gas", "biomass", "coal_other", "imports"))
+    + sum(gc[t]["generation"] for t in ("nuclear", "hydro", "gas", "biomass", "coal", "waste", "imports"))
 hours_base = base["prices"]["hours"]["backup"] * 0.01
 hours_cp = (0.15, cp["prices"]["hours"]["backup"] * 0.01)   # NESO, model
 slope_base = p(exposed_base * hours_base / eff * 0.01, billed_base, margin_base)

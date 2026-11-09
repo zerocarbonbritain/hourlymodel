@@ -296,15 +296,18 @@
         "prc_biomass": 29.17,
         "biomass_efficiency": 34.9,
         "prc_synth_fuel": 1.27,
-        "prc_coal": 6.02,
-        "coal_efficiency": 24.7,
+        "prc_coal": 1.48,
+        "coal_efficiency": 41.7,
         "synth_fuel_efficiency": 36.8,
         "capacity_limit": 100,
         "prc_hydrogen": 0,
         "prc_imports": 20.61,
-        "coal_co2_factor": 0.2542,
+        "coal_co2_factor": 0.2971,
         "ccgt_derating_factor": 0.9048,
-        "ccgt_capacity_GW": 100
+        "ccgt_capacity_GW": 100,
+        "prc_waste": 4.54,
+        "waste_efficiency": 21.8,
+        "waste_co2_factor": 0.2469
     },
     "energy_industry_use": {
         "electricity_grid_loss_prc": 8.8,
@@ -454,10 +457,11 @@
             "imports": 76.19,
             "gas": 85.04,
             "biomass": 131.33,
-            "coal_other": 85.5,
             "oil": 114.48,
             "hydrogen": null,
-            "storage": null
+            "storage": null,
+            "coal": 85.04,
+            "waste": 85.5
         },
         "other_support_gbp_bn": 2.984
     },

@@ -976,6 +976,7 @@ var model = {
         o.electric_backup.total_synth_fuel_turbine_output = 0
         o.electric_backup.total_biomass_turbine_output = 0
         o.electric_backup.total_coal_turbine_output = 0
+        o.electric_backup.total_waste_turbine_output = 0
         o.electric_backup.total_before_grid_loss = 0
     
         // demand totals
@@ -1366,6 +1367,7 @@ var model = {
             let synth_fuel_turbine_output = 0
             let biomass_turbine_output = 0
             let coal_turbine_output = 0
+            let waste_turbine_output = 0
             let electricity_from_dispatchable = 0
             let electricity_from_dispatchable_before_grid_loss = 0
             let imports_dispatched = 0
@@ -1398,6 +1400,7 @@ var model = {
                 synth_fuel_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_synth_fuel * 0.01)
                 biomass_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_biomass * 0.01)
                 coal_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_coal * 0.01)
+                waste_turbine_output = backup_requirement_before_grid_loss * (i.electric_backup.prc_waste * 0.01)
 
                 // Methane backup: CCGT runs first up to its capacity (after grid loss) and OCGT meets the rest
                 ccgt_output = Math.min(methane_turbine_output, i.electric_backup.ccgt_capacity_GW / grid_loss_prc)
@@ -1436,6 +1439,7 @@ var model = {
                 o.electric_backup.total_synth_fuel_turbine_output += synth_fuel_turbine_output 
                 o.electric_backup.total_biomass_turbine_output += biomass_turbine_output
                 o.electric_backup.total_coal_turbine_output += coal_turbine_output 
+                o.electric_backup.total_waste_turbine_output += waste_turbine_output
                                 
                 // Log maximum dispatchable capacity requirement and time (excluding imports)
                 let generation_requirement = backup_requirement - imports_dispatched * grid_loss_prc
@@ -1444,7 +1448,7 @@ var model = {
                     o.electric_backup.max_capacity_requirement_hour = hour
                 }
                 
-                electricity_from_dispatchable_before_grid_loss = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output
+                electricity_from_dispatchable_before_grid_loss = hydrogen_turbine_output + methane_turbine_output + synth_fuel_turbine_output + biomass_turbine_output + coal_turbine_output + waste_turbine_output
                 o.electric_backup.total_before_grid_loss += electricity_from_dispatchable_before_grid_loss
                 electricity_from_dispatchable = (electricity_from_dispatchable_before_grid_loss + imports_dispatched) * grid_loss_prc
                 o.total_losses.grid += electricity_from_dispatchable_before_grid_loss + imports_dispatched - electricity_from_dispatchable
@@ -1624,6 +1628,11 @@ var model = {
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.synth_fuel_efficiency*0.01))-1.0) * o.electric_backup.total_synth_fuel_turbine_output
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.biomass_efficiency*0.01))-1.0) * o.electric_backup.total_biomass_turbine_output
         o.total_losses.elec_backup += ((1.0/(i.electric_backup.coal_efficiency*0.01))-1.0) * o.electric_backup.total_coal_turbine_output
+        o.total_losses.elec_backup += ((1.0/(i.electric_backup.waste_efficiency*0.01))-1.0) * o.electric_backup.total_waste_turbine_output
+
+        // Energy from waste burns the non-biodegradable part of waste. It is not a fossil fuel
+        // supply, so it stays out of fossil_fuels, but its CO2 counts.
+        o.electric_backup.waste_fuel = o.electric_backup.total_waste_turbine_output / (i.electric_backup.waste_efficiency*0.01)
         
         let biomass_for_dispatchable = o.electric_backup.total_biomass_turbine_output / (i.electric_backup.biomass_efficiency*0.01)
         o.biomass.total_used += biomass_for_dispatchable
@@ -1710,7 +1719,7 @@ var model = {
         
         o.balance.total_unmet_demand = o.balance.total_unmet_elec
         
-        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_imports + o.supply.total_fixed_heat + o.biomass.total_used + o.fossil_fuels.total + o.hydrogen.total_from_imports
+        o.balance.total_supply = o.supply.total_fixed_electricity + o.supply.total_imports + o.supply.total_fixed_heat + o.biomass.total_used + o.fossil_fuels.total + o.electric_backup.waste_fuel + o.hydrogen.total_from_imports
         if (i.include_ambient_heat) o.balance.total_supply += o.heat.total_ambient_supply
         
         o.balance.total_demand = 0
@@ -2060,7 +2069,7 @@ var model = {
         // Fossil fuels
         // Energy quantities are in GWh over the run, so o.per_year gives one year. CO2 factors are
         // kgCO2 per kWh (gross), so a further 0.001 gives MtCO2 per GWh.
-        // Coal backup may include other thermal generation (e.g. waste), with its own CO2 factor.
+        // Coal and waste backup each have their own CO2 factor, per kWh of fuel.
         let f = {}
         for (let z in i.co2_factors) f[z] = i.co2_factors[z] * 0.001
         let coal_backup_co2_factor = i.electric_backup.coal_co2_factor * 0.001
@@ -2069,6 +2078,7 @@ var model = {
         o.emissions_balance.blast_furnace = o.fossil_fuels.blast_furnace*o.per_year*f.blast_furnace
         o.emissions_balance.fossil_fuel_coal += o.emissions_balance.blast_furnace
         o.emissions_balance.fossil_fuel_gas = o.fossil_fuels.gas*o.per_year*f.gas
+        o.emissions_balance.energy_from_waste = o.electric_backup.waste_fuel*o.per_year*i.electric_backup.waste_co2_factor*0.001
 
         // Fossil oil from the liquid fuel store is shared between its uses by their demand. Backup
         // generation is tracked hourly, the other uses take the average fossil share of the rest.
@@ -2093,6 +2103,7 @@ var model = {
         let grid_co2_emissions = 0;
         grid_co2_emissions += o.methane.ccgt_methane_from_fossil_gas*f.gas
         grid_co2_emissions += o.fossil_fuels.coal_for_dispatchable*coal_backup_co2_factor
+        grid_co2_emissions += o.electric_backup.waste_fuel*i.electric_backup.waste_co2_factor*0.001
         grid_co2_emissions += o.synth_fuel.backup_from_fossil_oil*f.fuel_oil
         o.grid_co2_emissions = grid_co2_emissions*o.per_year   // MtCO2/yr
 
@@ -2113,6 +2124,7 @@ var model = {
         o.emissions_balance.total += o.emissions_balance.fossil_fuel_coal
         o.emissions_balance.total += o.emissions_balance.fossil_fuel_oil
         o.emissions_balance.total += o.emissions_balance.fossil_fuel_gas
+        o.emissions_balance.total += o.emissions_balance.energy_from_waste
 
         o.emissions_balance.total += o.emissions_balance.reforestation
         o.emissions_balance.total += o.emissions_balance.existing_woodland
