@@ -172,6 +172,8 @@ The UI has one setting for generation costs, with two price presets and the buil
 
 clean_power_2030 uses blended prices: 2024 fleet prices for capacity in the 2024 baseline and AR7 strike prices for capacity added since, weighted by capacity. Its build script computes them. See [clean-power-2030-notes.md](clean-power-2030-notes.md).
 
+deployed_tech pays Sizewell C the Hinkley Point C price (£124.70/MWh), as both are EPR stations. See [deployed-tech-notes.md](deployed-tech-notes.md).
+
 Applied to another scenario, a preset sets only the fixed generators (wind, solar, marine, geothermal, nuclear, hydro and imports). Backup, storage and support not split by technology keep their current values. Editing a price shows the setting as custom. The build-up table shows only the components in use.
 
 | Scenario | 2024 fleet prices | New-build strike prices | Build-up for every technology |

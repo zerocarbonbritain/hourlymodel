@@ -196,6 +196,7 @@ In ZCB_PyPSA, docs/datasets.md. ERA5 cutouts are downloading on a server (server
 
 - [ ] Interconnected sensitivity (D4), to compare with PyPSA-Eur GB results.
 - [x] Clean Power 2030 (2026-11-08). scenarios/clean_power_2030.json follows the NESO Further Flex and Renewables pathway, built from the 2024 baseline by docs/build_clean_power_2030.py. On NESO's boundary it costs £132.0/MWh against NESO's £132.7/MWh. Method, cost comparison and retail price are in docs/clean-power-2030-notes.md.
+- [x] Deployed technologies (2026-11-09). scenarios/deployed_tech.json follows zcb_2024_high_demand with only technologies deployed at scale today, and fossil fuel for what is not electrified. Built from the 2024 baseline by docs/build_deployed_tech.py. Energy emissions fall 63% from 2024 to 129 MtCO2e, and the society cost is £166.75bn/yr against £170.89bn for zcb_2024_high_demand. Results in docs/deployed-tech-notes.md.
 
 ## Backlog
 

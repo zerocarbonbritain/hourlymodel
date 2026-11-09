@@ -11,6 +11,10 @@
         "name": "ZeroCarbonBritain supply with 2024 demand levels",
         "group": "ZeroCarbonBritain"
     },
+    "deployed_tech": {
+        "name": "Deployed technologies with 2024 demand levels",
+        "group": "ZeroCarbonBritain"
+    },
     "clean_power_2030": {
         "name": "Clean Power 2030 (NESO Further Flex and Renewables)",
         "group": "Government pathways"
