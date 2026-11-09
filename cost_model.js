@@ -653,7 +653,8 @@ Object.assign(model, {
         // capital is an annuity, like a mortgage, plus O&M.
         //
         // Fuel users pay per kW of electrolysis and power to X capacity. This is a share of the
-        // transmission they use, not an extra cost. The rest is shared between homes and other
+        // transmission they use, not an extra cost. Generators pay wider transmission charges per MWh
+        // of output above 2024, which are within their prices. The rest is shared between homes and other
         // users: the 2024 network by the 2024 domestic share, distribution by the domestic share
         // of the peak, and transmission and constraints by energy. Homes pay their share on the
         // unit rate, with no network standing charge.
@@ -663,6 +664,7 @@ Object.assign(model, {
         elec.network_standing_gbp = e.network_gbp
         let n = { existing_bn: elec.network_total_bn, distribution_GW: 0, distribution_capital_bn: 0, distribution_bn: 0,
             transmission_GW: 0, transmission_capital_bn: 0, transmission_bn: 0, constraints_bn: 0, annual_share: 0,
+            generation_TWh: 0, generator_bn: 0,
             standing_bn: e.network_gbp * i.households_2030 * 1e-9, domestic_TWh, domestic_bn: 0, other_bn: 0,
             domestic_peak_prc: 0, domestic_energy_prc: 0, other_p_kWh: 0, fuel_GW: 0 }
         elec.network = n
@@ -687,6 +689,11 @@ Object.assign(model, {
             // the transmission network is most loaded. Where no fuel is sold, electricity users pay.
             n.fuel_GW = i.hydrogen.electrolysis_capacity_GW + (i.power_to_X.capacity || 0)
             if (hydrogen.sold_TWh > 0) elec.network_fuel_bn = n.fuel_GW * e.network_electrolysis_gbp_kW * 0.001 * n.annual_share
+            // Generators pay wider transmission charges per MWh, within their prices. The 2024 network
+            // revenue leaves out what generators paid in 2024, so only output above 2024 counts.
+            // Output is generation after curtailment, without imports.
+            n.generation_TWh = (o.supply.total_fixed_electricity + o.electric_backup.total_before_grid_loss - o.balance.total_excess_elec) * o.GWh_to_TWhy
+            n.generator_bn = Math.max(0, n.generation_TWh - e.network_reference_generation_TWh) * e.network_generator_gbp_MWh * 0.001
 
             // Domestic share of the peak. The hourly lighting, appliance and heat series cover homes
             // and services together, so each is split by its annual domestic share. Industry and
@@ -702,19 +709,20 @@ Object.assign(model, {
             n.domestic_peak_prc = peak > 0 ? 100 * (p.lac * lac_share + p.heat * heat_share) / peak : 0
             n.domestic_energy_prc = 100 * domestic_TWh / billed_TWh
 
-            // Homes and other users share what fuel users do not pay. Fuel users' payment comes out
-            // of transmission and constraints first, and any excess out of the rest pro rata.
-            let transmission_left = Math.max(0, n.transmission_bn + n.constraints_bn - elec.network_fuel_bn)
-            let excess = Math.max(0, elec.network_fuel_bn - n.transmission_bn - n.constraints_bn)
+            // Homes and other users share what fuel users and generators do not pay. Those payments
+            // come out of transmission and constraints first, and any excess out of the rest pro rata.
+            let paid = elec.network_fuel_bn + n.generator_bn
+            let transmission_left = Math.max(0, n.transmission_bn + n.constraints_bn - paid)
+            let excess = Math.max(0, paid - n.transmission_bn - n.constraints_bn)
             let rest = n.existing_bn + n.distribution_bn
             let rest_share = rest > 0 ? Math.max(0, 1 - excess / rest) : 0
             n.domestic_bn = rest_share * (n.existing_bn * e.network_domestic_prc * 0.01 + n.distribution_bn * n.domestic_peak_prc * 0.01)
                 + transmission_left * n.domestic_energy_prc * 0.01
-            n.other_bn = elec.network_total_bn - elec.network_fuel_bn - n.domestic_bn
+            n.other_bn = elec.network_total_bn - paid - n.domestic_bn
             n.other_p_kWh = billed_TWh > domestic_TWh ? 100 * n.other_bn / (billed_TWh - domestic_TWh) : 0
             elec.network_p_kWh = domestic_TWh > 0 ? 100 * n.domestic_bn / domestic_TWh : 0
         }
-        elec.network_annual_bn = elec.network_total_bn - elec.network_fuel_bn
+        elec.network_annual_bn = elec.network_total_bn - elec.network_fuel_bn - n.generator_bn
 
         // Unit rate, standing charge and the household bill. Domestic electricity includes heat
         // pumps and leaves out electric vehicles, which are in transport.
@@ -1099,7 +1107,8 @@ Object.assign(model, {
         let layers = {
             system: generation_costs.total_annual,
             wholesale_adjustment: per_kWh_bn(e.wholesale_adjustment_p_kWh),
-            networks: elec.network_total_bn + per_home_bn(elec.network_standing_gbp),
+            // Generators' share of the network is within the system cost
+            networks: elec.network_total_bn - elec.network.generator_bn + per_home_bn(elec.network_standing_gbp),
             policy: per_kWh_bn(e.policy_p_kWh) + per_home_bn(e.policy_gbp),
             supplier: per_kWh_bn(e.supplier_p_kWh) + per_home_bn(e.supplier_gbp),
             fuel_delivery: o.prices.fuel_delivery_bn,

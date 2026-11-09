@@ -417,6 +417,8 @@
             "network_om_prc": 1.2,
             "network_constraints_gbp_bn": 0,
             "network_electrolysis_gbp_kW": 1100,
+            "network_generator_gbp_MWh": 1.51,
+            "network_reference_generation_TWh": 273.58,
             "policy_p_kWh": 0.878,
             "policy_gbp": 10.76,
             "supplier_p_kWh": 3.176,

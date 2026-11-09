@@ -207,7 +207,7 @@ A review on 2026-11-08 compared the network cost with NESO Clean Power 2030 and 
 3. [x] **Clean Power 2030 test** (2026-11-09). clean_power_2030 now uses the component basis. Its transmission at £1,100/kW with no constraint growth costs £3.36bn/yr, against £3.35bn for NESO's 2030 transmission annuity plus constraint growth above 2024/25 (CP.31). Networks cost £17.95bn/yr against £13.52bn on the per kWh basis. The household bill is £1,084 against £1,083 in baseline_2024, and £997 with NESO's wholesale, legacy and trade adjustments. NESO's £5/MWh for network growth is no longer added, and the peak scaling sensitivity is replaced by NESO's 2030 build and constraints (up to +0.16 p/kWh). Distribution does not compare directly. Details in docs/clean-power-2030-notes.md, network.
 4. [ ] **A steadier peak**, such as the mean of annual maxima. Recheck after hourly heat demand (phase 7).
 5. [ ] **Zonal check in ZCB_PyPSA.** Two or three GB zones with the B4 and B6 boundaries as extendable links, to test the £1,100/kW transmission cost and the zero constraint cost for a finished system. A two zone constraint method in the hourly model was considered and dropped, as curtailment is already costed.
-6. [ ] **Small fixes.** Losses on delivered electricity, not excess. Size the overlap of generator TNUoS with retail network charges.
+6. [x] **Small fixes** (2026-11-09). Grid losses now apply to delivered electricity only. Excess is curtailed or exported at the generator, so it is reported before losses: zcb_2024 losses fall from 44.5 to 36.4 TWh/yr and excess rises from 108.3 to 116.5 TWh/yr, with no change to dispatch or cost. clean_power_2030 recalibrates its loss share from 7.32% to 8.44% to keep NESO's 28.7 TWh of losses. Generators pay £1.51/MWh of wider TNUoS on output above 2024 (NESO Final TNUoS Tariffs 2024/25, table 17), within their prices, so retail network costs leave it out: £0.37bn/yr in zcb_2024, £0.84bn in zcb_2024_high_demand and £0.07bn in clean_power_2030. The zcb_2024 bill falls from £1,184 to £1,181. Earlier search tables report excess after losses.
 
 ## Backlog
 
@@ -221,4 +221,4 @@ Baseline open items that don't block the phases above. See baseline/open-items.m
 - Biomass fuel price and 2018 carbon price series.
 - Battery wear is not costed, and matters more now that the battery charges about 33 TWh/yr in zcb_2024.
 - First fill of the fuel stores is not costed, so a higher start level gives margin at no modelled cost.
-- The network cost uses baseline_2024 outputs (55.19 GW peak, 32.34 GW of wind) typed in as inputs. Update them when the baseline changes.
+- The network cost uses baseline_2024 outputs (55.19 GW peak, 32.34 GW of wind, 273.58 TWh of generation) typed in as inputs. Update them when the baseline changes.

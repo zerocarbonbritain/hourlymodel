@@ -49,7 +49,7 @@ Offshore wind, onshore wind, solar PV and solar thermal are the zcb_2024 values 
 
 | | zcb_2024 | High demand |
 |---|---|---|
-| Electricity demand (TWh/yr) | 527.6 | 838.2 |
+| Electricity demand (TWh/yr) | 519.4 | 830.9 |
 | Of which electrolysis (TWh/yr) | 135.6 | 259.6 |
 | Peak electricity demand (GW) | 95.2 | 143.5 |
 | Space heat demand (TWh/yr) | 159.1 | 322.9 |
@@ -57,7 +57,7 @@ Offshore wind, onshore wind, solar PV and solar thermal are the zcb_2024 values 
 | Liquid fuel demand (TWh/yr) | 101.9 | 217.1 |
 | Methane demand (TWh/yr) | 64.8 | 93.3 |
 | Biomass used (TWh/yr) | 235.8 | 432.7 |
-| Excess electricity (TWh/yr) | 108.3 | 97.4 |
+| Excess electricity (TWh/yr) | 116.5 | 104.8 |
 | Backup output (TWh/yr) | 12.3 | 28.3 |
 | Peak backup (GW) | 43.7 | 71.9 |
 | Methane store minimum, end (TWh) | 8.56, 29.47 | 9.91, 43.92 |

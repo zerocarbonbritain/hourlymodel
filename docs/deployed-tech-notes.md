@@ -53,16 +53,18 @@ Scale against zcb_2024 wind and solar, at the final battery size:
 | 1.25 | 122, 56, 163 | 48.6 | 258.6 | 20.1 | 112.6 | 173.53 | 163.48 |
 | 1.5 | 146, 68, 195 | 34.2 | 380.3 | 13.9 | 108.2 | 180.33 | 173.54 |
 
+Excess in this search is after grid losses. Since 2026-11-09 the model reports it before grid losses, about 7% higher.
+
 The lowest cost is at 0.8: 77.9 GW offshore wind, 36 GW onshore and 104 GW solar. The battery is 106 GWh with 19.7 GW of charge and discharge. From 0.7 to 1.0 the cost changes by less than £1.8bn/yr. Above 1.0 each step adds more excess than it saves in gas, and energy emissions fall slowly, since most of what remains is outside power. Consumer cost is lowest at a smaller scale, because it values carbon only at the £68/t ETS price on power.
 
 ## Results
 
 | | baseline_2024 | Deployed tech | zcb_2024_high_demand | zcb_2024 |
 |---|---|---|---|---|
-| Electricity demand (TWh/yr) | 307.0 | 561.5 | 838.2 | 527.6 |
+| Electricity demand (TWh/yr) | 307.0 | 556.1 | 830.9 | 519.4 |
 | Peak electricity demand (GW) | 55.2 | 144.8 | 143.5 | 95.2 |
 | Wind, solar, nuclear and hydro (TWh/yr) | 144.9 | 528.3 | 907.3 | 623.6 |
-| Excess electricity (TWh/yr) | 3.8 | 71.4 | 97.4 | 108.3 |
+| Excess electricity (TWh/yr) | 3.8 | 76.8 | 104.8 | 116.5 |
 | Backup output (TWh/yr) | 128.7 | 104.6 | 28.3 | 12.3 |
 | Peak backup (GW) | 30.2 | 86.7 | 71.9 | 43.7 |
 | Grid CO2 intensity (gCO2/kWh) | 130.4 | 45.0 | 0 | 0 |
@@ -114,5 +116,5 @@ Against zcb_2024_high_demand, the society total is £4.1bn/yr lower. This scenar
 - The cost leaves out demand side equipment: heat pumps, electric vehicles and industrial plant. This favours scenarios that change more equipment.
 - First fill of the stores is not costed, as elsewhere. This scenario holds no fuel stores.
 - Smart charging and vehicle to grid are off, as in zcb_2024 (phase 3, item 7). Both would reduce peak demand, network cost and battery size.
-- Without interconnectors, the 71 TWh/yr of excess electricity has no value, and imports cannot replace gas backup.
+- Without interconnectors, the 77 TWh/yr of excess electricity has no value, and imports cannot replace gas backup.
 - The model has no exports and no gas CCS.

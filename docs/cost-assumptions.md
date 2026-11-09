@@ -18,7 +18,7 @@ Costs from older sources are uplifted to 2024 prices with the deflator the sourc
 
 Periods must be whole years. Decommissioning costs are left out (under £1/MWh for wind and solar in DESNZ 2025).
 
-`capex` includes the DESNZ infrastructure cost per kW. `fixed_om` is DESNZ fixed O&M plus insurance plus connection and use of system charges. The connection charges include generator transmission charges, which also sit within the network charges in retail prices, so there is a small overlap. Strike prices include these charges, so keeping them makes the comparison like for like.
+`capex` includes the DESNZ infrastructure cost per kW. `fixed_om` is DESNZ fixed O&M plus insurance plus connection and use of system charges. The connection charges include generator transmission charges. Strike prices include these charges too, so keeping them makes the comparison like for like. Retail network costs take out what generators pay towards transmission (network cost, who pays).
 
 ## Inputs
 
@@ -180,6 +180,8 @@ Fuel users pay `network_electrolysis_gbp_kW`, £1,100/kW, on electrolysis and po
 
 The rate assumes electrolysers sit near demand and salt cavern storage in England. Sited with the wind, in Scotland, they would add little more than a connection, about £170/kW (technology-data, electricity grid connection), and NESO puts the saving from co-locating up to 10 GW of flexible demand in North Scotland and Shetland at about £5bn. A mix can be set as a weighted rate. The previous method charged fuel users 20% of the total, £4.94bn/yr in zcb_2024 or £183/kW/yr, and £483/MWh of hydrogen in clean_power_2030 on the component basis.
 
+Generators pay `network_generator_gbp_MWh`, £1.51/MWh, on output above `network_reference_generation_TWh` (273.58 TWh, baseline_2024 generation after curtailment, without imports). This is the wider transmission charge (TNUoS) that generators pay, which is within strike prices and the build-up's fixed O&M. In 2024/25 generators paid £1,058m of TNUoS: £694m of offshore local charges, £57m of onshore local charges and £307.5m of wider charges, on 204 TWh of chargeable output (Final TNUoS Tariffs 2024/25, table 17). The wider charges are held within the €2.50/MWh cap of the Limiting Regulation, so they grow with output and not with the network. Offshore local charges pay for offshore connections, which are within wind costs here. The 2024 network revenue leaves out generator charges, so only output above 2024 counts. Generators' share comes out of transmission and constraints, after fuel users, and is left out of the network layer in the cost to consumers, as it is within the system cost.
+
 Homes and other electricity users share the rest. Each part has its own key:
 
 - **2024 network.** `network_domestic_prc`, 45.5%, the domestic share of 2024 revenue. It is the Ofgem cap network rate (3.394 p/kWh) on DUKES domestic electricity (93.7 TWh) plus the cap network standing charge (£116.23) on 28.6 million homes, £6.50bn of £14.29bn. The baseline build computes it from these inputs.
@@ -196,12 +198,13 @@ Homes pay their share on the unit rate, with no network standing charge (`networ
 | Constraints | 0 | 0 | 0 |
 | Total | 14.29 | 24.71 | 32.69 |
 | Fuel users | 0 | 1.93 (27 GW) | 3.93 (55 GW) |
-| Homes | 6.50 | 9.39 | 12.22 |
-| Other electricity users | 7.79 | 13.39 | 16.54 |
+| Generators | 0 | 0.37 | 0.84 |
+| Homes | 6.50 | 9.30 | 11.96 |
+| Other electricity users | 7.79 | 13.11 | 15.96 |
 | Domestic share of peak | 45.8% | 52.5% | 52.7% |
-| Homes, p/kWh before VAT | 6.57 | 10.44 | 7.71 |
-| Homes, £ a year before VAT | 227 | 328 | 427 |
-| Other users, p/kWh | 4.57 | 5.26 | 4.72 |
+| Homes, p/kWh before VAT | 6.57 | 10.33 | 7.55 |
+| Homes, £ a year before VAT | 227 | 325 | 418 |
+| Other users, p/kWh | 4.57 | 5.16 | 4.55 |
 
 In baseline_2024 the domestic share of the peak (45.8%) is close to the domestic share of 2024 revenue (45.5%), an independent check on keying distribution by peak. Homes pay 6.57 p/kWh over the model's 99.0 TWh of domestic electricity. On DUKES' 93.7 TWh it would be 6.94 p/kWh, as the model's domestic electricity is 5.6% high (validation, known issue). Against the 2024 cap at 3,400 kWh (£232 before VAT), the model charges £223, 3.5% less, for the same reason.
 
@@ -213,7 +216,7 @@ The previous method scaled the whole 2024 network by peak demand and added NESO'
 
 As a check, the CCC Seventh Carbon Budget has £126bn of network reinforcement capex from 2025 to 2050 in its Balanced Pathway (2023 prices). zcb_2024 has £160bn of new capital: £39bn of distribution and £121bn of transmission. The CCC does not say whether its figure includes offshore networks, so the boundaries may differ.
 
-clean_power_2030 has £17.95bn/yr on this basis against £13.52bn on the per kWh basis, with £3.36bn of transmission for 47.0 GW of new wind. NESO's 2030 transmission is £1.37bn/yr of annuitised capex, as it counts spend to 2030 only, and its constraints rise £1.98bn above 2024/25 thermal constraints. Together they are £3.35bn, against the model's £3.36bn. Distribution does not compare directly, as NESO's distribution investment includes replacement and connections. See [clean-power-2030-notes.md](clean-power-2030-notes.md), network.
+clean_power_2030 has £18.00bn/yr on this basis against £13.52bn on the per kWh basis, with £3.36bn of transmission for 47.0 GW of new wind. NESO's 2030 transmission is £1.37bn/yr of annuitised capex, as it counts spend to 2030 only, and its constraints rise £1.98bn above 2024/25 thermal constraints. Together they are £3.35bn, against the model's £3.36bn. Distribution does not compare directly, as NESO's distribution investment includes replacement and connections. See [clean-power-2030-notes.md](clean-power-2030-notes.md), network.
 
 No published single total of GB network revenue has been found. ED3 business plans are not due until December 2026.
 
@@ -239,7 +242,7 @@ Generation cost after fuel users pay their share, in p/kWh of end use for zcb_20
 
 ### Fuel users and hourly prices
 
-Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £159 for methane and £139 for synthetic fuel. Fuel users pay £22.03bn/yr of £86.35bn. Electricity users pay £64.32bn over 344 TWh of end use, so the generation cost is 18.68 p/kWh. With network costs the unit rate is 34.84 p/kWh and the household electricity bill £1,184. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £159 for methane and £139 for synthetic fuel. Fuel users pay £22.03bn/yr of £86.35bn. Electricity users pay £64.32bn over 344 TWh of end use, so the generation cost is 18.68 p/kWh. With network costs the unit rate is 34.72 p/kWh and the household electricity bill £1,181. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
 
 Fuel prices add the fuel users' network share to production cost, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £21/MWh of hydrogen. Delivery is then added, as described under fuel delivery below. Fuel sales in the system cost table leave out the network share, because network costs are outside the system cost.
 

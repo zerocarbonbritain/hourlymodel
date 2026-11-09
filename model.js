@@ -1447,8 +1447,11 @@ var model = {
             let excess_elec = 0.0
             let unmet_elec = 0.0
             if (balance>=0.0) {
-                excess_elec = balance
+                // Excess is surplus at the generator, which is curtailed or exported before it
+                // reaches the grid, so grid losses apply to delivered electricity only.
+                excess_elec = balance / grid_loss_prc
                 o.balance.total_excess_elec += excess_elec
+                o.total_losses.grid -= excess_elec - balance
             } else {
                 unmet_elec = -balance
                 o.balance.total_unmet_elec += unmet_elec
@@ -1764,7 +1767,7 @@ var model = {
                 o.balance.peak_end_use = { lac: d.lac_demand[hour], heat: d.spacewater_elec[hour], industry: d.industrial_elec_demand[hour], transport: d.EL_transport[hour] }
             }
             let demand = end_use + d.electricity_for_electrolysis[hour] + d.elec_store_charge[hour] + d.electricity_for_power_to_X[hour]
-            let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand-d.excess_elec[hour]
+            let balance = (supply + d.unmet_elec[hour] + d.electricity_from_dispatchable[hour] + d.elec_store_discharge[hour]) + d.EV_smart_discharge[hour] - demand - d.excess_elec[hour] * grid_loss_prc
             error += Math.abs(balance)
         } 
         

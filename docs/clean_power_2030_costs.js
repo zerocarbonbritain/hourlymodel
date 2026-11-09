@@ -178,7 +178,8 @@ function report() {
         n.distribution_GW.toFixed(1) + " GW of peak at £" + i.retail.electricity.network_distribution_gbp_kW + "/kW");
     row("Hydrogen and CO2 infrastructure", A.hydrogen + A.co2, null);
     row("2024 network", null, n.existing_bn);
-    console.log("Model total £" + o.retail.electricity.network_total_bn.toFixed(2) + "bn, of which fuel users £" + o.retail.electricity.network_fuel_bn.toFixed(2) + "bn");
+    console.log("Model total £" + o.retail.electricity.network_total_bn.toFixed(2) + "bn, of which fuel users £" + o.retail.electricity.network_fuel_bn.toFixed(2)
+        + "bn and generators £" + n.generator_bn.toFixed(2) + "bn within their prices");
 
     console.log("\nCarbon at the scenario's £" + i.carbon_price + "/t: £" + carbon_model.toFixed(2) + "bn. Emissions " + co2.toFixed(2) + " MtCO2.");
 
