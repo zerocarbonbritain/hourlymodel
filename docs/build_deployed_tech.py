@@ -137,12 +137,13 @@ def supply(s, z):
     for k in ("electricity_grid_loss_prc", "electricity_own_use_prc"):
         s["energy_industry_use"][k] = z["energy_industry_use"][k]
 
-    # Backup from new gas turbines at zcb_2024 efficiencies. Existing biomass power keeps its 2024
-    # share of backup output. Coal, oil and imports go, and their shares move to gas.
+    # Backup from new gas turbines at zcb_2024 efficiencies. Biomass power (Drax and others) goes,
+    # to avoid its land and supply chain impacts. Coal, oil and imports go too. Gas meets all backup.
     eb = s["electric_backup"]
     for k in ("methane_efficiency", "ocgt_efficiency", "ccgt_capacity_GW"):
         eb[k] = z["electric_backup"][k]
-    eb["prc_methane"] = round(100 - eb["prc_biomass"], 2)
+    eb["prc_methane"] = 100
+    eb["prc_biomass"] = 0
     eb["prc_coal"] = 0
     eb["prc_synth_fuel"] = 0
     eb["prc_imports"] = 0
