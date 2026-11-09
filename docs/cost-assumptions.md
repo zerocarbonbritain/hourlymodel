@@ -176,7 +176,9 @@ The reference peak and wind capacity are baseline_2024 model outputs (`balance.m
 
 #### Who pays
 
-Fuel users pay `network_fuel_share_prc` of the total, 20% in zcb_2024. This is a judgement: electrolysis is likely to sit near generation, and NESO identifies up to 10 GW of flexible demand including electrolysers that could co-locate in North Scotland and Shetland.
+Fuel users pay `network_electrolysis_gbp_kW`, £1,100/kW, on electrolysis and power to X capacity, annualised like other new capital (£72/kW/yr). This is the transmission rate. Electrolysis connects at transmission level and runs in windy hours, when the boundaries are most loaded, so a kW of electrolysis south of them needs about as much transfer capacity as a kW of wind. It is a share of the network, not an extra cost, and comes out of transmission and constraints first. Fuel users pay no share of the 2024 network or of distribution, as electrolysis did not exist in 2024 and is not in the peak. Fuel prices share it by hydrogen content.
+
+The rate assumes electrolysers sit near demand and salt cavern storage in England. Sited with the wind, in Scotland, they would add little more than a connection, about £170/kW (technology-data, electricity grid connection), and NESO puts the saving from co-locating up to 10 GW of flexible demand in North Scotland and Shetland at about £5bn. A mix can be set as a weighted rate. The previous method charged fuel users 20% of the total, £4.94bn/yr in zcb_2024 or £183/kW/yr, and £483/MWh of hydrogen in clean_power_2030 on the component basis.
 
 Homes and other electricity users share the rest. Each part has its own key:
 
@@ -193,13 +195,13 @@ Homes pay their share on the unit rate, with no network standing charge (`networ
 | Transmission | 0 | 7.87 (110.1 GW) | 12.78 (178.7 GW) |
 | Constraints | 0 | 0 | 0 |
 | Total | 14.29 | 24.71 | 32.69 |
-| Fuel users | 0 | 4.94 | 6.54 |
-| Homes | 6.50 | 7.92 | 10.75 |
-| Other electricity users | 7.79 | 11.85 | 15.40 |
+| Fuel users | 0 | 1.93 (27 GW) | 3.93 (55 GW) |
+| Homes | 6.50 | 9.39 | 12.22 |
+| Other electricity users | 7.79 | 13.39 | 16.54 |
 | Domestic share of peak | 45.8% | 52.5% | 52.7% |
-| Homes, p/kWh before VAT | 6.57 | 8.80 | 6.79 |
-| Homes, £ a year before VAT | 227 | 277 | 376 |
-| Other users, p/kWh | 4.57 | 4.66 | 4.39 |
+| Homes, p/kWh before VAT | 6.57 | 10.44 | 7.71 |
+| Homes, £ a year before VAT | 227 | 328 | 427 |
+| Other users, p/kWh | 4.57 | 5.26 | 4.72 |
 
 In baseline_2024 the domestic share of the peak (45.8%) is close to the domestic share of 2024 revenue (45.5%), an independent check on keying distribution by peak. Homes pay 6.57 p/kWh over the model's 99.0 TWh of domestic electricity. On DUKES' 93.7 TWh it would be 6.94 p/kWh, as the model's domestic electricity is 5.6% high (validation, known issue). Against the 2024 cap at 3,400 kWh (£232 before VAT), the model charges £223, 3.5% less, for the same reason.
 
@@ -237,9 +239,9 @@ Generation cost after fuel users pay their share, in p/kWh of end use for zcb_20
 
 ### Fuel users and hourly prices
 
-Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £159 for methane and £139 for synthetic fuel. Fuel users pay £22.03bn/yr of £86.35bn. Electricity users pay £64.32bn over 344 TWh of end use, so the generation cost is 18.68 p/kWh. With network costs the unit rate is 33.11 p/kWh and the household electricity bill £1,130. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
+Fuel users pay the average production cost of hydrogen, methane and synthetic fuel, and electricity users pay the rest of the generation cost. Production cost covers plant, stores and feedstock, with electricity at the hourly price and hydrogen at its own production cost. Costs are shared over all fuel produced, so stores count fully in the fuel and turbine methane stays with electricity users. In zcb_2024 this is £121/MWh for hydrogen, £159 for methane and £139 for synthetic fuel. Fuel users pay £22.03bn/yr of £86.35bn. Electricity users pay £64.32bn over 344 TWh of end use, so the generation cost is 18.68 p/kWh. With network costs the unit rate is 34.84 p/kWh and the household electricity bill £1,184. Delivered electricity is 483 TWh: end use, 136 TWh of electrolysis and 3 TWh of battery losses. Baselines burn fossil fuel, so their fuel values are zero and their retail prices do not change.
 
-Fuel prices add the fuel users' network share to production cost, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £53/MWh of hydrogen. Delivery is then added, as described under fuel delivery below. Fuel sales in the system cost table leave out the network share, because network costs are outside the system cost.
+Fuel prices add the fuel users' network share to production cost, shared by hydrogen content: 1 for hydrogen, 0.61 for synthetic fuel and 0.51 for methane in zcb_2024, where methanation hydrogen is 51% of methane produced. This is £21/MWh of hydrogen. Delivery is then added, as described under fuel delivery below. Fuel sales in the system cost table leave out the network share, because network costs are outside the system cost.
 
 `fuel_values` holds marginal values, which set hourly electricity prices and not fuel prices. They are in £/MWh, from the 2010 PyPSA expansion at 3 hour steps. They are provisional until phase 6 recalibrates them on the ten year optimum.
 
@@ -308,9 +310,9 @@ The cost per kWh card divides total cost by final energy demand, including inter
 
 The tax gap card is 2024 tax less the scenario's tax, using the taxes counted in total cost. 2024 tax is the final users' tax in this reference plus household electricity VAT of £1.48bn (`household_electricity_vat_bn`, 5/105 of baseline_2024 household electricity spend). Validation compares it with a live baseline run. The carbon cost in baseline generation prices is not counted, which leaves the gap about £2.2bn lower than it would be otherwise.
 
-The fuel table shows each fuel price, with its network share, as a multiple of the bulk price it replaces, on energy and with no carbon price. The network share is electricity network cost for electrolysis and not fuel delivery, so bulk fossil prices are the like for like comparison. Delivery is left out of the multiple, as bulk prices have no delivery cost. In zcb_2024 methane is 5.2 times power station gas (£34.99/MWh), and synthetic fuel 3.5 times jet fuel and 3.3 times marine gas oil. Hydrogen has no comparison, as it has no direct 2024 fossil equivalent.
+The fuel table shows each fuel price, with its network share, as a multiple of the bulk price it replaces, on energy and with no carbon price. The network share is electricity network cost for electrolysis and not fuel delivery, so bulk fossil prices are the like for like comparison. Delivery is left out of the multiple, as bulk prices have no delivery cost. In zcb_2024 methane is 4.8 times power station gas (£34.99/MWh), and synthetic fuel 3.2 times jet fuel and 3.0 times marine gas oil. Hydrogen has no comparison, as it has no direct 2024 fossil equivalent.
 
-The pump price comparison puts synthetic fuel at the diesel energy density, at 193 p/litre before tax with road delivery. It is 231 p/litre with VAT and no duty, or 295 p/litre with road duty and VAT, against 148 p/litre for diesel. Car fuel spend prices synthetic fuel with VAT and no duty, and its fossil and biofuel share at pump prices.
+The pump price comparison puts synthetic fuel at the diesel energy density, at 178 p/litre before tax with road delivery. It is 213 p/litre with VAT and no duty, or 277 p/litre with road duty and VAT, against 148 p/litre for diesel. Car fuel spend prices synthetic fuel with VAT and no duty, and its fossil and biofuel share at pump prices.
 
 The exchange rate and calorific values for jet fuel and marine gas oil are recalled figures, not yet checked against the Bank of England and DUKES annex A. They affect only this reference.
 

@@ -461,7 +461,7 @@
             "network_life_years": 45,
             "network_om_prc": 1.2,
             "network_constraints_gbp_bn": 0,
-            "network_fuel_share_prc": 20,
+            "network_electrolysis_gbp_kW": 1100,
             "policy_p_kWh": 0.878,
             "policy_gbp": 10.76,
             "supplier_p_kWh": 3.176,

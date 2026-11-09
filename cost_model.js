@@ -652,10 +652,11 @@ Object.assign(model, {
         // follows wind, which is far from demand. Offshore connections are within wind capex. New
         // capital is an annuity, like a mortgage, plus O&M.
         //
-        // Fuel users pay a share of the total. The rest is shared between homes and other users:
-        // the 2024 network by the 2024 domestic share, distribution by the domestic share of the
-        // peak, and transmission and constraints by energy. Homes pay their share on the unit rate,
-        // with no network standing charge.
+        // Fuel users pay per kW of electrolysis and power to X capacity. This is a share of the
+        // transmission they use, not an extra cost. The rest is shared between homes and other
+        // users: the 2024 network by the 2024 domestic share, distribution by the domestic share
+        // of the peak, and transmission and constraints by energy. Homes pay their share on the
+        // unit rate, with no network standing charge.
         let domestic_TWh = o.final_consumption.domestic.electricity * o.GWh_to_TWhy
         elec.network_p_kWh = e.network_p_kWh
         elec.network_total_bn = e.network_p_kWh * 0.01 * billed_TWh
@@ -663,7 +664,7 @@ Object.assign(model, {
         let n = { existing_bn: elec.network_total_bn, distribution_GW: 0, distribution_capital_bn: 0, distribution_bn: 0,
             transmission_GW: 0, transmission_capital_bn: 0, transmission_bn: 0, constraints_bn: 0, annual_share: 0,
             standing_bn: e.network_gbp * i.households_2030 * 1e-9, domestic_TWh, domestic_bn: 0, other_bn: 0,
-            domestic_peak_prc: 0, domestic_energy_prc: 0, other_p_kWh: 0 }
+            domestic_peak_prc: 0, domestic_energy_prc: 0, other_p_kWh: 0, fuel_GW: 0 }
         elec.network = n
         elec.network_fuel_bn = 0
         if (e.network_basis == "components" && billed_TWh > 0) {
@@ -682,7 +683,10 @@ Object.assign(model, {
             n.standing_bn = 0
             elec.network_standing_gbp = 0
             elec.network_total_bn = n.existing_bn + n.distribution_bn + n.transmission_bn + n.constraints_bn
-            if (hydrogen.sold_TWh > 0) elec.network_fuel_bn = elec.network_total_bn * e.network_fuel_share_prc * 0.01
+            // Electrolysis and power to X connect at transmission level and run in windy hours, when
+            // the transmission network is most loaded. Where no fuel is sold, electricity users pay.
+            n.fuel_GW = i.hydrogen.electrolysis_capacity_GW + (i.power_to_X.capacity || 0)
+            if (hydrogen.sold_TWh > 0) elec.network_fuel_bn = n.fuel_GW * e.network_electrolysis_gbp_kW * 0.001 * n.annual_share
 
             // Domestic share of the peak. The hourly lighting, appliance and heat series cover homes
             // and services together, so each is split by its annual domestic share. Industry and
@@ -698,11 +702,14 @@ Object.assign(model, {
             n.domestic_peak_prc = peak > 0 ? 100 * (p.lac * lac_share + p.heat * heat_share) / peak : 0
             n.domestic_energy_prc = 100 * domestic_TWh / billed_TWh
 
-            // Homes and other users share what fuel users do not pay
-            let users = 1 - (hydrogen.sold_TWh > 0 ? e.network_fuel_share_prc * 0.01 : 0)
-            n.domestic_bn = users * (n.existing_bn * e.network_domestic_prc * 0.01
-                + n.distribution_bn * n.domestic_peak_prc * 0.01
-                + (n.transmission_bn + n.constraints_bn) * n.domestic_energy_prc * 0.01)
+            // Homes and other users share what fuel users do not pay. Fuel users' payment comes out
+            // of transmission and constraints first, and any excess out of the rest pro rata.
+            let transmission_left = Math.max(0, n.transmission_bn + n.constraints_bn - elec.network_fuel_bn)
+            let excess = Math.max(0, elec.network_fuel_bn - n.transmission_bn - n.constraints_bn)
+            let rest = n.existing_bn + n.distribution_bn
+            let rest_share = rest > 0 ? Math.max(0, 1 - excess / rest) : 0
+            n.domestic_bn = rest_share * (n.existing_bn * e.network_domestic_prc * 0.01 + n.distribution_bn * n.domestic_peak_prc * 0.01)
+                + transmission_left * n.domestic_energy_prc * 0.01
             n.other_bn = elec.network_total_bn - elec.network_fuel_bn - n.domestic_bn
             n.other_p_kWh = billed_TWh > domestic_TWh ? 100 * n.other_bn / (billed_TWh - domestic_TWh) : 0
             elec.network_p_kWh = domestic_TWh > 0 ? 100 * n.domestic_bn / domestic_TWh : 0
