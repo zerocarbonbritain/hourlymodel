@@ -17,7 +17,11 @@
     },
     "deployed_tech": {
         "name": "Deployed technologies with 2024 demand levels",
-        "group": "ZeroCarbonBritain"
+        "group": "Other"
+    },
+    "deployed_tech_nuclear": {
+        "name": "Deployed technologies with nuclear in place of wind and solar",
+        "group": "Other"
     },
     "clean_power_2030": {
         "name": "Clean Power 2030 (NESO Further Flex and Renewables)",
